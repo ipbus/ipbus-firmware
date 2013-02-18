@@ -9,16 +9,16 @@ project set "Pack I/O Registers/Latches into IOBs" "For Inputs and Outputs" -pro
 project set "Enable Multi-Threading" "2" -process "Place & Route"
 project set "Enable BitStream Compression" TRUE -process "Generate Programming File"
 
-xfile add firmware/temp_boards/minit_base/hdl/top.vhd
-xfile add firmware/temp_boards/minit_base/ucf/minit_240_ipb.ucf
-xfile add firmware/example_designs/hdl/clocks_v5_extphy.vhd
-xfile add firmware/example_designs/hdl/clock_divider_s6.v
-xfile add firmware/ethernet/hdl/emac_hostbus_decl.vhd
-xfile add firmware/ethernet/hdl/eth_v5_1000basex.vhd
+xfile add firmware/minit_base/hdl/top.vhd
+xfile add firmware/minit_base/ucf/minit_240_ipb.ucf
+xfile add firmware/ipbus/firmware/example_designs/hdl/clocks_v5_extphy.vhd
+xfile add firmware/ipbus/firmware/example_designs/hdl/clock_divider_s6.v
+xfile add firmware/ipbus/firmware/ethernet/hdl/emac_hostbus_decl.vhd
+xfile add firmware/ipbus/firmware/ethernet/hdl/eth_v5_1000basex.vhd
 
-source firmware/ethernet/cfg/setup_v5_serdes.tcl
-source firmware/ipbus_core_v1/cfg/setup.tcl
-source firmware/example_designs/cfg/setup.tcl
+source firmware/ipbus/firmware/ethernet/cfg/setup_v5_serdes.tcl
+source firmware/ipbus/firmware/ipbus_core_v1/cfg/setup.tcl
+source firmware/ipbus/firmware/example_designs/cfg/setup.tcl
 
 set fp [open cores_list r]
 set files [read $fp]
