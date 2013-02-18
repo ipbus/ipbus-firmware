@@ -1,0 +1,26 @@
+NET sysclk_p LOC = AU15 | IOSTANDARD = LVDS | TNM_NET = sysclk;
+NET sysclk_n LOC = AV15 | IOSTANDARD = LVDS; # External termination
+
+TIMESPEC TS_sysclk = PERIOD sysclk 10ns;
+
+NET eth/txoutclk TNM_NET=txoutclk;
+TIMESPEC TS_txoutclk = PERIOD txoutclk 16ns;
+
+NET clocks/rst TIG;
+
+NET gt_clkp LOC=A10 | DIFF_TERM=TRUE | TNM_NET=gt_clk;
+NET gt_clkn LOC=A9 | DIFF_TERM=TRUE;
+
+TIMESPEC TS_gt_clk = PERIOD gt_clk 8ns;
+
+INST eth/phy/*/gtxe2_i LOC=GTXE2_CHANNEL_X1Y24;
+
+NET gt_txp LOC=F4;
+NET gt_txn LOC=F3;
+NET gt_rxp LOC=D4;
+NET gt_rxn LOC=D3;
+
+NET leds<0> LOC=AN20 | IOSTANDARD=LVCMOS18;
+NET leds<1> LOC=AP19 | IOSTANDARD=LVCMOS18;
+NET leds<2> LOC=AM22 | IOSTANDARD=LVCMOS18;
+NET leds<3> LOC=AJ21 | IOSTANDARD=LVCMOS18;
