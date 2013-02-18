@@ -17,9 +17,9 @@ entity trans_buffer is
 	port(
 		clk_m: in std_logic;
 		rst_m: in std_logic;
-		m_wdata: in std_logic_vector(7 downto 0);
+		m_wdata: in std_logic_vector(15 downto 0);
 		m_we: in std_logic;
-		m_rdata: out std_logic_vector(7 downto 0);
+		m_rdata: out std_logic_vector(15 downto 0);
 		m_re: in std_logic;
 		m_req: in std_logic;
 		m_done: out std_logic;
@@ -59,6 +59,11 @@ architecture rtl of trans_buffer is
 	signal req_d, mode, done_m, done_m_s: std_logic;
 	signal mode_ipb, mode_ipb_s, mode_ipb_d, rdy, done: std_logic;
 	signal addr: unsigned(9 downto 0);
+	
+	attribute KEEP: string;
+	attribute KEEP of done_m_s: signal is "TRUE"; -- Synchroniser not to be optimised into shreg
+	attribute KEEP of mode_ipb_s: signal is "TRUE"; -- Synchroniser not to be optimised into shreg
+
 
 begin
 	
