@@ -1,5 +1,4 @@
 #!/bin/sh
-ln -s ../firmware
 mkdir ipcore_dir
 cd ipcore_dir
 ln -s ../coregen.cgp
