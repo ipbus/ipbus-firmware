@@ -150,21 +150,27 @@ address_block:  process (mac_clk)
   end process;
 
 next_addr:  process(mac_clk)
-  variable addr_int, next_addr: unsigned(6 downto 0);
-  variable mac_rx_valid_buf: std_logic;
+  variable addr_int, next_addr, addr_to_set_buf: unsigned(6 downto 0);
+  variable set_addr_buf: std_logic;
   begin
     if rising_edge(mac_clk) then
       if set_addr = '1' then
-        addr_int := addr_to_set;
-      elsif mac_rx_valid_buf = '1' and pkt_drop_status = '0' then
-        addr_int := next_addr;
+        addr_to_set_buf := addr_to_set;
+	set_addr_buf := '1';
+      end if;
+      if rx_reset = '1' or mac_rx_valid = '1' then
+        if set_addr_buf = '1' then
+          addr_int := addr_to_set_buf;
+	  set_addr_buf := '0';
+	elsif pkt_drop_status = '0' then
+          addr_int := next_addr;
+	end if;
       end if;
       address <= addr_int
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
       ;
-      mac_rx_valid_buf := mac_rx_valid;
       next_addr := addr_int + 1;
     end if;
   end process;

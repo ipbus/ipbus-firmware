@@ -112,6 +112,7 @@ ARCHITECTURE flat OF UDP_if IS
    SIGNAL pkt_drop_ping: std_logic;
    SIGNAL pkt_drop_resend: std_logic;
    SIGNAL pkt_drop_status: std_logic;
+   signal last_rx_last: std_logic;
    signal my_rx_last: std_logic;
 --
    signal pkt_done_125: std_logic;
@@ -126,8 +127,20 @@ BEGIN
    rx_clr_sum <= clr_sum_ping or clr_sum_payload;
    rx_int_valid <= int_valid_ping or int_valid_payload;
    rx_int_data <= int_data_payload when int_valid_payload = '1' else int_data_ping;
+
 -- force rx_last to match documentation!
-   my_rx_last <= mac_rx_last and mac_rx_valid;
+rx_last_kludge: process(mac_clk)
+  begin
+    if rising_edge(mac_clk) then
+      last_rx_last <= mac_rx_last
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+    end if;
+  end process;
+
+   my_rx_last <= mac_rx_last and not last_rx_last;
 
    -- Instance port mappings.
    ARP: entity work.udp_build_arp
@@ -232,6 +245,7 @@ BEGIN
          mac_rx_valid => mac_rx_valid,
          int_data => rx_int_data,
          int_valid => rx_int_valid,
+	 run_byte_sum => '0',
          cksum => rx_cksum,
          outbyte => rx_outbyte
       );
@@ -327,6 +341,7 @@ BEGIN
          mac_rx_valid => udpram_busy,
          int_data => int_data,
          int_valid => int_valid,
+         run_byte_sum => int_valid,
          cksum => cksum,
          outbyte => outbyte
       );

@@ -41,7 +41,7 @@ begin
   payload_addr <= std_logic_vector(address);
 
 send_packet:  process (mac_clk)
-  variable send_pending_i, send_i: std_logic;
+  variable send_pending_i, send_i, last_we: std_logic;
   variable state, next_state: integer range 0 to 1;
   begin
     if rising_edge(mac_clk) then
@@ -60,7 +60,7 @@ send_packet:  process (mac_clk)
 	    send_pending_i := '0';
 	  end if;
 	when 1 =>
-	  if payload_we_sig = '0' then
+	  if payload_we_sig = '0' and last_we = '1' then
 	    send_i := '1';
 	    send_pending_i := '0';
 	    next_state := 0;
@@ -68,6 +68,7 @@ send_packet:  process (mac_clk)
 	    send_i := '0';
 	  end if;
       end case;
+      last_we := payload_we_sig;
       payload_send <= send_i
 -- pragma translate_off
       after 4 ns
@@ -105,62 +106,58 @@ address_block:  process(mac_clk)
 	set_addr_int := '1';
 	addr_to_set_int := to_unsigned(12, 6);
 	cksum_pending := '0';
-      elsif mac_rx_valid = '1' then
-        if pkt_drop_payload = '0' then
-	  if mac_rx_last = '1' then
-	    set_addr_int := '1';
-	    addr_to_set_int := to_unsigned(4, 6);
-	    cksum_pending := '1';
-	  elsif low_addr = '1' then
+      elsif pkt_drop_payload = '0' then
+        if mac_rx_last = '1' then
+	  set_addr_int := '1';
+	  addr_to_set_int := to_unsigned(4, 6);
+	  cksum_pending := '1';
+	elsif mac_rx_valid = '1' and low_addr = '1' then
 -- Because address is buffered this logic needs to switch a byte early...
 -- But don't forget we're offset by 4 + 2 bytes for payload word alignment!
-            case to_integer(address(5 downto 0)) is
+          case to_integer(address(5 downto 0)) is
 -- RX Ethernet Dest MAC bytes 0 to 5 => TX copy to Source MAC bytes 12 to 17...
-              when 16 =>
-		set_addr_int := '1';
-                addr_to_set_int := to_unsigned(6, 6);
+            when 16 =>
+	      set_addr_int := '1';
+	      addr_to_set_int := to_unsigned(6, 6);
 -- RX Ethernet Source MAC bytes 6 to 11 => TX copy to Dest MAC bytes 6 to 11...
-              when 10 =>
-		set_addr_int := '1';
-                addr_to_set_int := to_unsigned(18, 6);
+            when 10 =>
+	      set_addr_int := '1';
+	      addr_to_set_int := to_unsigned(18, 6);
 -- RX Eth_Type tho' to IP cksum bytes 12 to 25 => TX copy data bytes 18 to 31...
-              when 30 =>
-		set_addr_int := '1';
-                addr_to_set_int := to_unsigned(36, 6);
+            when 30 =>
+	      set_addr_int := '1';
+	      addr_to_set_int := to_unsigned(36, 6);
 -- RX IP sender addr bytes 26 to 29 => TX copy to target addr bytes 36 to 39...
-              when 38 =>
-                set_addr_int := '1';
-                addr_to_set_int := to_unsigned(32, 6);
+            when 38 =>
+	      set_addr_int := '1';
+	      addr_to_set_int := to_unsigned(32, 6);
 -- RX IP target addr bytes 30 to 33 => TX write sender addr bytes 32 to 35...
-              when 34 =>
-		set_addr_int := '1';
-                addr_to_set_int := to_unsigned(42, 6);
+            when 34 =>
+	      set_addr_int := '1';
+	      addr_to_set_int := to_unsigned(42, 6);
 -- RX UDP source port bytes 34 to 35 => TX copy to dest port bytes 42 to 43...
-              when 42 =>
-                set_addr_int := '1';
-                addr_to_set_int := to_unsigned(40, 6);
+            when 42 =>
+	      set_addr_int := '1';
+	      addr_to_set_int := to_unsigned(40, 6);
 -- RX UDP dest port bytes 36 to 37 => TX write source port bytes 40 to 41...
-              when 40 =>
-                set_addr_int := '1';
-                addr_to_set_int := to_unsigned(44, 6);
+            when 40 =>
+	      set_addr_int := '1';
+	      addr_to_set_int := to_unsigned(44, 6);
 -- RX UDP length and cksum bytes 38 to 41 => TX write zeros bytes 44 to 47...
-              when Others =>
-	        set_addr_int := '0';
-		addr_to_set_int := (Others => '0');
-            end case;
-	  else
-	    set_addr_int := '0';
-	    addr_to_set_int := (Others => '0');
-	  end if;
+            when Others =>
+	      set_addr_int := '0';
+	      addr_to_set_int := (Others => '0');
+          end case;
+        elsif cksum_pending = '1' and low_addr = '1' and
+	address(5 downto 0) = "000100" then
+-- No more data => write cksum and length info...
+          set_addr_int := '1';
+	  addr_to_set_int := to_unsigned(0, 6);
+	  cksum_pending := '0';
         else
 	  set_addr_int := '0';
 	  addr_to_set_int := (Others => '0');
         end if;
-      elsif cksum_pending = '1' and address(2 downto 0) = "100" then
--- No more data => write cksum and length info...
-        set_addr_int := '1';
-	addr_to_set_int := to_unsigned(0, 6);
-	cksum_pending := '0';
       else
 	set_addr_int := '0';
 	addr_to_set_int := (Others => '0');
@@ -191,68 +188,65 @@ build_packet:  process(mac_clk)
 	cksum_pending := '0';
 	payload_len := (Others => '0');
 	buf_to_load_int := (Others => '0');
-      elsif mac_rx_valid = '1' then
-        if pkt_drop_payload = '0' then
-	  if mac_rx_last = '1' then
-	    load_buf_int := '1';
-	    send_buf_int := '1';
-	    cksum_pending := '1';
-	  elsif low_addr = '1' then
+      elsif pkt_drop_payload = '0' then
+        payload_we_i := mac_rx_valid or cksum_pending;
+	if mac_rx_last = '1' then
+	  load_buf_int := '1';
+	  send_buf_int := '1';
+	  cksum_pending := '1';
+	elsif mac_rx_valid = '1' and low_addr = '1' then
 -- Because address is buffered this logic needs to switch a byte early...
 -- But don't forget we're offset by 4 + 2 bytes for payload word alignment!
-            case to_integer(address(5 downto 0)) is
-              when 20 =>
-		load_buf_int := '1';
-		send_buf_int := '1';
+          case to_integer(address(5 downto 0)) is
+            when 20 =>
+	      load_buf_int := '1';
+	      send_buf_int := '1';
 -- RX IP length => ignore for cksum, write zeros, capture packet length
-              when 22 =>
-		send_buf_int := '0';
-              when 28 =>
-		send_buf_int := '1';
+            when 22 =>
+	      send_buf_int := '0';
+            when 28 =>
+	      send_buf_int := '1';
 -- RX IP cksum => ignore for cksum calc and write zeros
-              when 30 =>
-		send_buf_int := '0';
+            when 30 =>
+	      send_buf_int := '0';
 -- RX IP sender addr bytes 26 to 29 => TX copy to target addr bytes 36 to 39...
-              when 40 =>
-		send_buf_int := '1';
-		buf_to_load_int(7 downto 0) := outbyte;
+            when 40 =>
+	      send_buf_int := '1';
+	      buf_to_load_int(7 downto 0) := outbyte;
 -- capture IP cksum value and start payload length calculation...
 -- RX UDP length and cksum bytes 38 to 41 => TX write zeros bytes 44 to 47...
-              when 41 =>
-		buf_to_load_int(15 downto 8) := outbyte;
+            when 41 =>
+	      buf_to_load_int(15 downto 8) := outbyte;
 -- capture IP cksum value and continue payload length calculation...
-              when 46 =>
-		send_buf_int := '0';
-              when 48 =>
+            when 46 =>
+	      send_buf_int := '0';
+            when 48 =>
 -- capture payload length calculation...
-		payload_len(7 downto 0) := outbyte;
-              when 49 =>
+              payload_len(7 downto 0) := outbyte;
+            when 49 =>
 -- capture payload length calculation...
-		payload_len(15 downto 8) := outbyte;
+              payload_len(15 downto 8) := outbyte;
 -- RX rest of packet => TX copy rest of packet...
-              when Others =>
-	        load_buf_int := '0';
-            end case;
-	  end if;
-          payload_we_i := '1';
-        else
-	  payload_we_i := '0';
-        end if;
+            when Others =>
+	      load_buf_int := '0';
+          end case;
 -- No more data => write cksum and length info...
-      elsif cksum_pending = '1' then
-        payload_we_i := '1';
-	case to_integer(address(2 downto 0)) is
-	  when 4 =>
-	    load_buf_int := '1';
-	    buf_to_load_int := std_logic_vector(to_unsigned(11, 16));
-	  when 0 =>
-	    load_buf_int := '1';
-	    buf_to_load_int := payload_len;
-	  when 2 =>
-	    cksum_pending := '0';
-	  when Others =>
-	    load_buf_int := '0';
-	end case;
+        elsif cksum_pending = '1' and low_addr = '1' then
+	  case to_integer(address(5 downto 0)) is
+	    when 4 =>
+	      load_buf_int := '1';
+	      buf_to_load_int := std_logic_vector(to_unsigned(11, 16));
+	    when 0 =>
+	      load_buf_int := '1';
+	      buf_to_load_int := payload_len;
+	    when 2 =>
+	      cksum_pending := '0';
+	    when Others =>
+	      load_buf_int := '0';
+	  end case;
+	else
+	  load_buf_int := '0';
+        end if;
       else
 	payload_we_i := '0';
       end if;
@@ -383,16 +377,23 @@ do_cksum:  process(mac_clk)
   end process;
 
 next_addr:  process(mac_clk)
-  variable addr_int, next_addr: unsigned(12 downto 0);
-  variable mac_rx_valid_buf, low_addr_i, next_low: std_logic;
+  variable addr_int, next_addr, addr_to_set_buf: unsigned(12 downto 0);
+  variable set_addr_buf, low_addr_i, next_low: std_logic;
   begin
     if rising_edge(mac_clk) then
       if set_addr = '1' then
-        addr_int := addr_to_set;
-	low_addr_i := '1';
-      elsif (mac_rx_valid_buf = '1' or send_pending = '1') and pkt_drop_payload = '0' then
-        addr_int := next_addr;
-	low_addr_i := next_low;
+        addr_to_set_buf := addr_to_set;
+	set_addr_buf := '1';
+      end if;
+      if rx_reset = '1' or mac_rx_valid = '1' or send_pending = '1' then
+        if set_addr_buf = '1' then
+          addr_int := addr_to_set_buf;
+	  low_addr_i := '1';
+	  set_addr_buf := '0';
+	elsif pkt_drop_payload = '0' then
+          addr_int := next_addr;
+	  low_addr_i := next_low;
+	end if;
       end if;
       address <= addr_int
 -- pragma translate_off
@@ -404,7 +405,6 @@ next_addr:  process(mac_clk)
       after 4 ns
 -- pragma translate_on
       ;
-      mac_rx_valid_buf := mac_rx_valid;
       next_addr := addr_int + 1;
       if next_addr(12 downto 6) = "0000000" then
         next_low := '1';

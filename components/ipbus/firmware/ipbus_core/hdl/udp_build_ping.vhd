@@ -41,7 +41,7 @@ begin
   ping_addr <= std_logic_vector(address);
 
 send_packet:  process (mac_clk)
-  variable send_pending_i, send_i: std_logic;
+  variable send_pending_i, send_i, last_we: std_logic;
   variable end_addr_i: std_logic_vector(12 downto 0);
   variable state, next_state: integer range 0 to 2;
   begin
@@ -65,12 +65,13 @@ send_packet:  process (mac_clk)
 	  end_addr_i := std_logic_vector(address);
 	  next_state := 2;
 	when 2 =>
-	  if ping_we_sig = '0' then
+	  if ping_we_sig = '0' and last_we = '1' then
 	    send_i := '1';
 	    send_pending_i := '0';
 	    next_state := 0;
 	  end if;
       end case;
+      last_we := ping_we_sig;
       ping_end_addr <= end_addr_i
 -- pragma translate_off
       after 4 ns
@@ -110,44 +111,39 @@ address_block:  process (mac_clk)
       if (rx_reset = '1') then
 	set_addr_int := '1';
 	addr_to_set_int := to_unsigned(6, 6);
-      elsif mac_rx_valid = '1' then
-        if pkt_drop_ping = '0' then
-	  if mac_rx_last = '1' then
+      elsif pkt_drop_ping = '0' then
+	if mac_rx_last = '1' then
 -- ICMP cksum...
-	    set_addr_int := '1';
-	    addr_to_set_int := to_unsigned(36, 6);
-	  elsif low_addr = '1' then
+	  set_addr_int := '1';
+	  addr_to_set_int := to_unsigned(36, 6);
+	elsif mac_rx_valid = '1' and low_addr = '1' then
 -- Because address is buffered this logic needs to switch a byte early...
-            case to_integer(address(5 downto 0)) is
+          case to_integer(address(5 downto 0)) is
 -- RX Ethernet Dest MAC bytes 0 to 5 => TX copy to Source MAC bytes 6 to 11...
-              when 10 =>
-		set_addr_int := '1';
-                addr_to_set_int := to_unsigned(0, 6);
+            when 10 =>
+	      set_addr_int := '1';
+	      addr_to_set_int := to_unsigned(0, 6);
 -- RX Ethernet Source MAC bytes 6 to 11 => TX copy to Dest MAC bytes 0 to 5...
-              when 4 =>
-		set_addr_int := '1';
-                addr_to_set_int := to_unsigned(12, 6);
+            when 4 =>
+	      set_addr_int := '1';
+	      addr_to_set_int := to_unsigned(12, 6);
 -- RX Eth_Type tho' to IP cksum bytes 12 to 25 => TX copy data bytes 12 to 25...
 -- as we're just rearranging words cksum stays the same...
-              when 24 =>
-		set_addr_int := '1';
-                addr_to_set_int := to_unsigned(30, 6);
+            when 24 =>
+	      set_addr_int := '1';
+	      addr_to_set_int := to_unsigned(30, 6);
 -- RX IP sender addr bytes 26 to 29 => TX copy to target addr bytes 30 to 33...
-              when 32 =>
-                set_addr_int := '1';
-                addr_to_set_int := to_unsigned(26, 6);
+            when 32 =>
+	      set_addr_int := '1';
+	      addr_to_set_int := to_unsigned(26, 6);
 -- RX IP target addr bytes 30 to 33 => TX write sender addr bytes 26 to 29...
-              when 28 =>
-                set_addr_int := '1';
-                addr_to_set_int := to_unsigned(34, 6);
-              when Others =>
-	        set_addr_int := '0';
-		addr_to_set_int := (Others => '0');
-	    end case;
-	  else
-	    set_addr_int := '0';
-	    addr_to_set_int := (Others => '0');
-	  end if;
+            when 28 =>
+	      set_addr_int := '1';
+	      addr_to_set_int := to_unsigned(34, 6);
+            when Others =>
+	      set_addr_int := '0';
+	      addr_to_set_int := (Others => '0');
+	  end case;
         else
 	  set_addr_int := '0';
 	  addr_to_set_int := (Others => '0');
@@ -181,47 +177,42 @@ build_packet:  process (mac_clk)
 	ping_we_i := '0';
 	buf_to_load_int := (Others => '0');
 	cksum_pending := '0';
-      elsif mac_rx_valid = '1' then
-        if pkt_drop_ping = '0' then
--- End of packet, send cksum
-	  if mac_rx_last = '1' then
-	    load_buf_int := '1';
-	    send_buf_int := '1';
-	    cksum_pending := '1';
-	  elsif low_addr = '1' then
+      elsif pkt_drop_ping = '0' then
+        ping_we_i := mac_rx_valid or cksum_pending;
+	if mac_rx_last = '1' then
+-- End of packet, prepare to send cksum
+	  load_buf_int := '1';
+	  send_buf_int := '1';
+	  cksum_pending := '1';
+	elsif mac_rx_valid = '1' and low_addr = '1' then
 -- Because address is buffered this logic needs to switch a byte early...
-            case to_integer(address(5 downto 0)) is
+          case to_integer(address(5 downto 0)) is
 -- RX ICMP type code bytes 34 to 35 => TX write reply bytes 34 to 35...
 -- ICMP TYPE = "00", CODE = "00", NB address switch at 28!
-              when 28 =>
-		load_buf_int := '1';
-		send_buf_int := '1';
-		buf_to_load_int := (Others => '0');
-              when 36 =>
+            when 28 =>
+	      load_buf_int := '1';
+	      send_buf_int := '1';
+	      buf_to_load_int := (Others => '0');
+            when 36 =>
 -- RX cksum bytes 36 to 37...
-		send_buf_int := '0';
+	      send_buf_int := '0';
 -- RX rest of packet => TX copy rest of packet...
-              when 41 =>
+            when 41 =>
 -- capture ICMP cksum value
-                buf_to_load_int(15 downto 8) := outbyte;
-              when 42 =>
+              buf_to_load_int(15 downto 8) := outbyte;
+            when 42 =>
 -- capture ICMP cksum value
-                buf_to_load_int(7 downto 0) := outbyte;
-              when Others =>
-	        load_buf_int := '0';
-            end case;
-	  end if;
-          ping_we_i := '1';
-        else
-          ping_we_i := '0';
-        end if;
+              buf_to_load_int(7 downto 0) := outbyte;
+            when Others =>
+	      load_buf_int := '0';
+          end case;
 -- No more data => write cksum...
-      elsif cksum_pending = '1' then
-        load_buf_int := '0';
-        ping_we_i := '1';
-	if address = 36 then
-	  cksum_pending := '0';
-	end if;
+        elsif cksum_pending = '1' then
+          load_buf_int := '0';
+	  if address = 36 then
+	    cksum_pending := '0';
+	  end if;
+        end if;
       else
         ping_we_i := '0';
       end if;
@@ -313,16 +304,23 @@ do_cksum:  process (mac_clk)
   end process;
 
 next_addr:  process(mac_clk)
-  variable addr_int, next_addr: unsigned(12 downto 0);
-  variable mac_rx_valid_buf, low_addr_i, next_low: std_logic;
+  variable addr_int, next_addr, addr_to_set_buf: unsigned(12 downto 0);
+  variable set_addr_buf, low_addr_i, next_low: std_logic;
   begin
     if rising_edge(mac_clk) then
       if set_addr = '1' then
-        addr_int := addr_to_set;
-	low_addr_i := '1';
-      elsif (mac_rx_valid_buf = '1' or send_pending = '1') and pkt_drop_ping = '0' then
-        addr_int := next_addr;
-	low_addr_i := next_low;
+        addr_to_set_buf := addr_to_set;
+	set_addr_buf := '1';
+      end if;
+      if rx_reset = '1' or mac_rx_valid = '1' or send_pending = '1' then
+        if set_addr_buf = '1' then
+          addr_int := addr_to_set_buf;
+	  low_addr_i := '1';
+	  set_addr_buf := '0';
+	elsif pkt_drop_ping = '0' then
+          addr_int := next_addr;
+	  low_addr_i := next_low;
+	end if;
       end if;
       address <= addr_int
 -- pragma translate_off
@@ -334,7 +332,6 @@ next_addr:  process(mac_clk)
       after 4 ns
 -- pragma translate_on
       ;
-      mac_rx_valid_buf := mac_rx_valid;
       next_addr := addr_int + 1;
       if next_addr(12 downto 6) = "0000000" then
         next_low := '1';
