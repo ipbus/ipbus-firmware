@@ -1,0 +1,7 @@
+firmware/ipbus/firmwareexample_designs/hdl/demo_atlys/top_atlys.vhd
+firmware/ipbus/firmwareexample_designs/ucf/atlys.ucf
+firmware/ipbus/firmwareexample_designs/hdl/clocks_s6_extphy_100MHz.vhd
+firmware/ipbus/firmwareexample_designs/hdl/clock_divider_s6.v
+firmware/ipbus/firmwareethernet/hdl/emac_hostbus_decl.vhd
+firmware/ipbus/firmwareethernet/hdl/eth_s6_gmii.vhd
+
