@@ -7,8 +7,8 @@ proc addsources {file base} {
 	set flist [split $files "\n"]
 	foreach f $flist {
 		if {$f == "" || [string index $f 0] == "#"} continue
-		if ($base != "") {
-			xfile add $base/[exec basename $f]
+		if {$base != ""} {
+			xfile add ${base}/[exec basename $f]
 		} else {
 			xfile add $f
 		}
