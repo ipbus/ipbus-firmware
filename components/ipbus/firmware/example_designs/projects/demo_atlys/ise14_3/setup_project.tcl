@@ -21,7 +21,8 @@ proc addcore {file base} {
 	cd ipcore_dir
 	exec coregen -r -b $bname -p coregen.cgp
 	cd ..
-	xfile add ${base}/$bname
+	addfile ${base}/$bname
+}
 
 project new demo_atlys
 project set family spartan6
