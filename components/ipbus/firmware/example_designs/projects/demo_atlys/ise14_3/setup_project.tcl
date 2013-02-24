@@ -7,7 +7,7 @@ proc foreachinfile {file cmd args} {
 	set flist [split $files "\n"]
 	foreach f $flist {
 		if {$f == "" || [string index $f 0] == "#"} continue
-		$cmd $args
+		eval $cmd $args
 	}
 }
 
