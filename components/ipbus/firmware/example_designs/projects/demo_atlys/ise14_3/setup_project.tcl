@@ -21,7 +21,7 @@ proc addcore {file base} {
 	cd ipcore_dir
 	exec coregen -r -b $bname -p coregen.cgp
 	cd ..
-	addfile ${base}/$bname
+	eval addfile ${base}/$bname
 }
 
 project new demo_atlys
