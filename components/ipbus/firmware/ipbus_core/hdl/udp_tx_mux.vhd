@@ -439,7 +439,7 @@ send_data:  process(mac_clk)
       if ready_buf = '1' then
         next_mac_tx_data := next_mac_tx_buf;
       end if;
-      if mac_tx_last_sig = '1' then
+      if mac_tx_ready_sig = '1' and mac_tx_last_sig = '1' then
 	mac_tx_data_int := (Others => '0');
       elsif mac_tx_ready_sig = '1' or prefetch = '1' then
         ready_buf := '1';
@@ -510,21 +510,25 @@ state_machine:  process(mac_clk)
 	  counting_int := '0';
 	  prefetch_int := '0';
 	  mac_tx_valid_int := '1';
-	  if unsigned(addr_sig) = end_addr_int then
+	  if unsigned(addr_sig) = end_addr_int and mac_tx_ready_sig = '1' then
 	    set_addr_int := '1';
 	    addr_to_set_int := (Others => '0');
             next_state := 6;
 	  end if;
         when 6 =>
 	  set_addr_int := '0';
-          mac_tx_last_int := '1';
-          rxram_active_int := '0';
-	  udpram_active_int := '0';
-	  next_state := 7;
+	  if mac_tx_ready_sig = '1' then
+            mac_tx_last_int := '1';
+            rxram_active_int := '0';
+	    udpram_active_int := '0';
+	    next_state := 7;
+	  end if;
         when 7 =>
-	  mac_tx_valid_int := '0';
-	  mac_tx_last_int := '0';
-          next_state := 0;
+	  if mac_tx_ready_sig = '1' then
+	    mac_tx_valid_int := '0';
+	    mac_tx_last_int := '0';
+	    next_state := 0;
+	  end if;
       end case;
       state := next_state;
       rxram_active <= rxram_active_int
