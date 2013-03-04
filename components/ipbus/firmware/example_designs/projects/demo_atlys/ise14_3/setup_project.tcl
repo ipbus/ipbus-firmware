@@ -29,7 +29,7 @@ proc addcore {file} {
 	set bname [exec basename $file]
 	exec cp $file ipcore_dir
 	cd ipcore_dir
-	exec coregen -r -b $bname -p coregen.cgp
+	exec -ignorestderr coregen -r -b $bname -p coregen.cgp
 	cd ..
 	eval addfile ipcore_dir/$bname
 }
