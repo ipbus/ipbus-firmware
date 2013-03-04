@@ -14,7 +14,7 @@ proc dofile {file} {
 		if {$cmd == "hdl"} {
 			addfile $arg
 		} elseif {$cmd == "core"} {
-			addcore $arg ipcore_dir
+			addcore $arg
 		} elseif {$cmd == "include"} {
 			dofile $arg
 		}
@@ -25,13 +25,13 @@ proc addfile {file} {
 	xfile add $file
 }
 
-proc addcore {file base} {
+proc addcore {file} {
 	set bname [exec basename $file]
-	exec cp ../${file} ipcore_dir
+	exec cp $file ipcore_dir
 	cd ipcore_dir
 	exec coregen -r -b $bname -p coregen.cgp
 	cd ..
-	eval addfile ${base}/$bname
+	eval addfile ipcore_dir/$bname
 }
 
 project new demo_atlys
