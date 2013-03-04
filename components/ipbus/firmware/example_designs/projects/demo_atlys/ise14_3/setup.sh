@@ -1,5 +1,5 @@
 #!/bin/sh
 mkdir ipcore_dir
-ln -s ipcore_dir/coregen.cgp coregen.gcp
+ln -s coreen.cgp ipcore_dir/coregen.cgp
 xtclsh setup_project.tcl
 
