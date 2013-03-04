@@ -15,7 +15,7 @@ proc dofile {file} {
 			addfile $arg
 		} elseif {$cmd == "core"} {
 			addcore $arg ipcore_dir
-		} elseif {$cms == "include"} {
+		} elseif {$cmd == "include"} {
 			dofile $arg
 		}
 	}
