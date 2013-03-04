@@ -1,5 +1,0 @@
-firmware/ipbus/firmware/ethernet/coregen/tri_mode_eth_mac_v5_4.xco
-firmware/ipbus/firmware/ethernet/coregen/mac_fifo_axi4.xco
-firmware/ipbus/firmware/ipbus_core_v1/coregen/sdpram_8x11.xco
-firmware/ipbus/firmware/ipbus_core_v1/coregen/dpram_8x12_32x10.xco
-
