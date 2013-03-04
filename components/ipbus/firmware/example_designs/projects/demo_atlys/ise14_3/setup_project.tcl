@@ -7,8 +7,10 @@ proc dofile {file} {
 	foreach f [split $files "\n"] {
 		if {$f == "" || [string index $f 0] == "#"} {
 			continue
-		} 
-		lassign [split $f] cmd arg
+		}
+		set l [split $f]
+		set cmd [lindex $l 0]
+		set arg [lindex $l 1]
 		if {$cmd == "hdl"} {
 			addfile $arg
 		} elseif {$cmd == "core"} {
