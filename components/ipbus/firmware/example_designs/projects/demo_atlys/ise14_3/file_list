@@ -1,7 +1,11 @@
-firmware/ipbus/firmware/example_designs/hdl/demo_atlys/top_atlys.vhd
-firmware/ipbus/firmware/example_designs/ucf/atlys.ucf
-firmware/ipbus/firmware/example_designs/hdl/clocks_s6_extphy_100MHz.vhd
-firmware/ipbus/firmware/example_designs/hdl/clock_divider_s6.v
-firmware/ipbus/firmware/ethernet/hdl/emac_hostbus_decl.vhd
-firmware/ipbus/firmware/ethernet/hdl/eth_s6_gmii.vhd
+hdl firmware/ipbus/firmware/example_designs/hdl/demo_atlys/top_atlys.vhd
+hdl firmware/ipbus/firmware/example_designs/ucf/atlys.ucf
+hdl firmware/ipbus/firmware/example_designs/hdl/clocks_s6_extphy_100MHz.vhd
+hdl firmware/ipbus/firmware/example_designs/hdl/clock_divider_s6.v
+hdl firmware/ipbus/firmware/ethernet/hdl/emac_hostbus_decl.vhd
+hdl firmware/ipbus/firmware/ethernet/hdl/eth_s6_gmii.vhd
+include firmware/ipbus/firmware/ipbus_core/cfg/file_list
+include firmware/ipbus/firmware/example_designs/cfg/file_list
+core firmware/ipbus/firmware/ethernet/coregen/tri_mode_eth_mac_v5_4.xco
+core firmware/ipbus/firmware/ethernet/coregen/mac_fifo_axi4.xco
 

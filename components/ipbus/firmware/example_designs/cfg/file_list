@@ -1,8 +1,8 @@
 # Xilinx ISE setup fragment for example slaves
 
-firmware/ipbus/firmware/example_designs/hdl/slaves.vhd
-firmware/ipbus/firmware/ipbus_core/hdl/ipbus_fabric.vhd
-firmware/ipbus/firmware/example_designs/hdl/ipbus_addr_decode.vhd
-firmware/ipbus/firmware/slaves/hdl/ipbus_reg.vhd
-firmware/ipbus/firmware/slaves/hdl/ipbus_ram.vhd
+hdl firmware/ipbus/firmware/example_designs/hdl/slaves.vhd
+hdl firmware/ipbus/firmware/ipbus_core/hdl/ipbus_fabric.vhd
+hdl firmware/ipbus/firmware/example_designs/hdl/ipbus_addr_decode.vhd
+hdl firmware/ipbus/firmware/slaves/hdl/ipbus_reg.vhd
+hdl firmware/ipbus/firmware/slaves/hdl/ipbus_ram.vhd
 

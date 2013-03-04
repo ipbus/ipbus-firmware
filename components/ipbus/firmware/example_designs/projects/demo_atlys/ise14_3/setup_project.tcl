@@ -1,13 +1,21 @@
 # Horrible hacky TCL script to build ISE project from hierarchy of source lists
 
-proc foreachinfile {file cmd args} {
+proc dofile {file} {
 	set fp [open $file r]
 	set files [read $fp]
 	close $fp
-	set flist [split $files "\n"]
-	foreach f $flist {
-		if {$f == "" || [string index $f 0] == "#"} continue
-		eval $cmd $f $args
+	foreach f [split $files "\n"] {
+		if {$f == "" || [string index $f 0] == "#"} {
+			continue
+		} 
+		lassign [split $f] cmd arg
+		if {$cmd == "hdl"} {
+			addfile $arg
+		} elseif {$cmd == "core"} {
+			addcore $arg ipcore_dir
+		} elseif {$cms == "include"} {
+			dofile $arg
+		}
 	}
 }
 
@@ -35,9 +43,6 @@ project set "Pack I/O Registers/Latches into IOBs" "For Inputs and Outputs" -pro
 project set "Enable Multi-Threading" "2" -process "Place & Route"
 project set "Enable BitStream Compression" TRUE -process "Generate Programming File"
 
-foreachinfile file_list addfile
-foreachinfile firmware/ipbus/firmware/ipbus_core/cfg/file_list addfile
-foreachinfile firmware/ipbus/firmware/example_designs/cfg/file_list addfile
-foreachinfile cores_list addcore ipcore_dir
+dofile file_list
 
 project close
