@@ -24,7 +24,8 @@ entity udp_build_payload is
     clr_sum_payload: out std_logic;
     int_data_payload: out std_logic_vector(7 downto 0);
     int_valid_payload: out std_logic;
-    cksum: out std_logic
+    cksum: out std_logic;
+    ipbus_in_hdr: out std_logic_vector(31 downto 0)
   );
 end udp_build_payload;
 
@@ -34,11 +35,13 @@ architecture rtl of udp_build_payload is
   signal send_buf, load_buf, low_addr: std_logic;
   signal buf_to_load: std_logic_vector(15 downto 0);
   signal address, addr_to_set: unsigned(12 downto 0);
+  signal payload_data_sig: std_logic_vector(7 downto 0);
 
 begin
 
   payload_we <= payload_we_sig;
   payload_addr <= std_logic_vector(address);
+  payload_data <= payload_data_sig;
 
 send_packet:  process (mac_clk)
   variable send_pending_i, send_i, last_we: std_logic;
@@ -235,7 +238,7 @@ build_packet:  process(mac_clk)
 	  case to_integer(address(5 downto 0)) is
 	    when 4 =>
 	      load_buf_int := '1';
-	      buf_to_load_int := std_logic_vector(to_unsigned(11, 16));
+	      buf_to_load_int := std_logic_vector(to_unsigned(12, 16));
 	    when 0 =>
 	      load_buf_int := '1';
 	      buf_to_load_int := payload_len;
@@ -329,13 +332,13 @@ do_cksum:  process(mac_clk)
             int_valid_int := '1';
 	    int_data_int := payload_len(7 downto 0);
           when 44 =>
--- continue payload length calculation (loading -7)...
+-- continue payload length calculation (loading -8)...
 	    int_valid_int := '1';
 	    int_data_int := x"FF";
           when 45 =>
--- continue payload length calculation (loading -7)...
+-- continue payload length calculation (loading -8)...
 	    int_valid_int := '1';
-	    int_data_int := x"F9";
+	    int_data_int := x"F8";
           when 46 =>
 	    do_sum_int := '0';
           when Others =>
@@ -431,7 +434,7 @@ write_data:  process(mac_clk)
 	end if;
 	shift_buf := shift_buf(7 downto 0) & x"00";
       end if;
-      payload_data <= data_to_send
+      payload_data_sig <= data_to_send
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
@@ -439,4 +442,21 @@ write_data:  process(mac_clk)
     end if;
   end process;
 
+do_ipbus_hdr: process(mac_clk)
+  variable ipbus_hdr_int: std_logic_vector(31 downto 0);
+  begin
+    if rising_edge(mac_clk) then
+      if rx_reset = '1' then
+	ipbus_hdr_int := (Others => '0');
+      elsif low_addr = '1' and payload_we_sig = '1' and address(5 downto 2) = "1100" then
+        ipbus_hdr_int := ipbus_hdr_int(23 downto 0) & payload_data_sig;
+      end if;
+      ipbus_in_hdr <= ipbus_hdr_int
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+    end if;
+  end process;
+    
 end rtl;

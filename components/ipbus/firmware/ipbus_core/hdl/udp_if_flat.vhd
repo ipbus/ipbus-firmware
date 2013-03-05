@@ -21,7 +21,6 @@ ENTITY UDP_if IS
       mac_rx_valid: IN std_logic;
       mac_tx_ready: IN std_logic;
       pkt_done: IN std_logic;
-      next_pkt_id: IN std_logic_vector(15 downto 0); -- Next expected packet ID
       raddr: IN std_logic_vector(11 DOWNTO 0);
       waddr: IN std_logic_vector(11 DOWNTO 0);
       wdata: IN std_logic_vector(31 DOWNTO 0);
@@ -115,14 +114,22 @@ ARCHITECTURE flat OF UDP_if IS
    signal last_rx_last: std_logic;
    signal my_rx_last: std_logic;
 --
+   signal ipbus_in_hdr, ipbus_out_hdr: std_logic_vector(31 downto 0);
+   signal pkt_broadcast, ipbus_out_valid: std_logic;
+   signal rxram_dropped_sig, rxpayload_dropped_sig: std_logic;
+   signal pkt_drop_ipbus, pkt_drop_reliable: std_logic;
+   signal next_pkt_id: std_logic_vector(15 downto 0); -- Next expected packet ID
+
+--
    signal pkt_done_125: std_logic;
    signal pkt_rdy_125: std_logic;
    signal we_125: std_logic;
 
 BEGIN
-   -- Architecture concurrent statements
-   -- HDL Embedded Text Block 1 eb1
-   -- eb1 1   
+
+   rxram_dropped <= rxram_dropped_sig;
+   rxpayload_dropped <= rxpayload_dropped_sig;
+
    rx_do_sum <= do_sum_ping or do_sum_payload;
    rx_clr_sum <= clr_sum_ping or clr_sum_payload;
    rx_int_valid <= int_valid_ping or int_valid_payload;
@@ -178,7 +185,8 @@ rx_last_kludge: process(mac_clk)
          clr_sum_payload => clr_sum_payload,
          int_data_payload => int_data_payload,
          int_valid_payload => int_valid_payload,
-         cksum => rx_cksum
+         cksum => rx_cksum,
+	 ipbus_in_hdr => ipbus_in_hdr
       );
    ping: entity work.udp_build_ping
       PORT MAP (
@@ -230,10 +238,27 @@ rx_last_kludge: process(mac_clk)
       PORT MAP (
          mac_clk => mac_clk,
 	 rst_macclk => rst_macclk,
+	 rst_ipb => rst_ipb,
 	 rx_reset => rx_reset,
+	 mac_rx_error => mac_rx_error,
+	 mac_rx_last => my_rx_last,
+	 ipbus_in_hdr => ipbus_in_hdr,
+	 ipbus_out_hdr => ipbus_out_hdr,
+	 ipbus_out_valid => ipbus_out_valid,
+	 pkt_broadcast => pkt_broadcast,
 	 pkt_done_125 => pkt_done_125,
-	 next_pkt_id => next_pkt_id,
+	 pkt_drop_arp => pkt_drop_arp,
+	 pkt_drop_ipbus => pkt_drop_ipbus,
+	 pkt_drop_payload => pkt_drop_payload,
+	 pkt_drop_ping => pkt_drop_ping,
+	 pkt_drop_reliable => pkt_drop_reliable,
+	 pkt_drop_resend => pkt_drop_resend,
+	 pkt_drop_status => pkt_drop_status,
+	 pkt_rdy_125 => pkt_rdy_125,
+	 rxpayload_dropped => rxpayload_dropped_sig,
+	 rxram_dropped => rxram_dropped_sig,
 	 status_request => status_request,
+	 next_pkt_id => next_pkt_id,
 	 status_block => status_block
       );
    rx_byte_sum: entity work.udp_byte_sum
@@ -260,16 +285,20 @@ rx_last_kludge: process(mac_clk)
    rx_packet_parser: entity work.udp_packet_parser
       PORT MAP (
          mac_clk => mac_clk,
-         rx_reset => rx_reset,
-         mac_rx_data => mac_rx_data,
-         mac_rx_valid => mac_rx_valid,
-         MAC_addr => MAC_addr,
-         IP_addr => IP_addr,
-         pkt_drop_arp => pkt_drop_arp,
-         pkt_drop_ping => pkt_drop_ping,
-         pkt_drop_payload => pkt_drop_payload,
-         pkt_drop_resend => pkt_drop_resend,
-         pkt_drop_status => pkt_drop_status
+	 rx_reset => rx_reset,
+	 mac_rx_data => mac_rx_data,
+	 mac_rx_valid => mac_rx_valid,
+	 MAC_addr => MAC_addr,
+	 IP_addr => IP_addr,
+	 next_pkt_id => next_pkt_id,
+	 pkt_broadcast => pkt_broadcast,
+	 pkt_drop_arp => pkt_drop_arp,
+	 pkt_drop_ipbus => pkt_drop_ipbus,
+	 pkt_drop_payload => pkt_drop_payload,
+	 pkt_drop_ping => pkt_drop_ping,
+	 pkt_drop_reliable => pkt_drop_reliable,
+	 pkt_drop_resend => pkt_drop_resend,
+	 pkt_drop_status => pkt_drop_status
       );
    rx_ram_mux: entity work.udp_rxram_mux
       PORT MAP (
@@ -300,7 +329,7 @@ rx_last_kludge: process(mac_clk)
          wea => wea,
          rxram_end_addr => rxram_end_addr,
          rxram_send => rxram_send,
-         rxram_dropped => rxram_dropped
+         rxram_dropped => rxram_dropped_sig
       );
    internal_ram: entity work.udp_DualPortRAM
       PORT MAP (
@@ -366,7 +395,7 @@ rx_last_kludge: process(mac_clk)
          rx_addrb => rx_addrb,
          rx_dia => rx_dia,
          rx_dob => rx_dob,
-         rxpayload_dropped => rxpayload_dropped
+         rxpayload_dropped => rxpayload_dropped_sig
       );
    tx_main: entity work.udp_tx_mux
       PORT MAP (
@@ -391,7 +420,9 @@ rx_last_kludge: process(mac_clk)
          mac_tx_valid => mac_tx_valid,
          mac_tx_last => mac_tx_last,
          mac_tx_error => mac_tx_error,
-         mac_tx_ready => mac_tx_ready
+         mac_tx_ready => mac_tx_ready,
+	 ipbus_out_hdr => ipbus_out_hdr,
+	 ipbus_out_valid => ipbus_out_valid
       );
    tx_transactor: entity work.udp_txtransactor_if
       PORT MAP (

@@ -35,7 +35,10 @@ entity udp_tx_mux is
     mac_tx_valid: out std_logic;
     mac_tx_last: out std_logic;
     mac_tx_error: out std_logic;
-    mac_tx_ready: in std_logic
+    mac_tx_ready: in std_logic;
+--
+    ipbus_out_hdr: out std_logic_vector(31 downto 0);
+    ipbus_out_valid: out std_logic
   );
 end udp_tx_mux;
 
@@ -49,7 +52,7 @@ architecture rtl of udp_tx_mux is
   signal mac_tx_valid_sig, mac_tx_last_sig, mac_tx_ready_sig: std_logic;
   signal addr_to_set: std_logic_vector(12 downto 0);
   signal addr_sig: std_logic_vector(12 downto 0);
-  signal special: std_logic_vector(7 downto 0);
+  signal special, mac_tx_data_sig: std_logic_vector(7 downto 0);
   signal ip_len, ip_cksum, udp_len: std_logic_vector(15 downto 0);
   signal udp_counter: unsigned(4 downto 0);
   signal udp_counting: std_logic;
@@ -60,6 +63,7 @@ begin
   udpram_busy <= udpram_busy_sig;
   addrb <= addr_sig;
   udpaddrb <= addr_sig;
+  mac_tx_data <= mac_tx_data_sig;
   mac_tx_last <= mac_tx_last_sig;
   mac_tx_valid <= mac_tx_valid_sig;
   mac_tx_ready_sig <= mac_tx_ready and mac_tx_valid_sig;
@@ -312,42 +316,43 @@ udp_build_data:  process(mac_clk)
       if udp_counting = '1' then
 	case to_integer(udp_counter) is
 	  when 0 =>
--- Finish IP cksum calculation
+-- Finish IP cksum calculation, adding headers and ipbus payload length
 	    int_data_int := (Others => '0');
 	  when 1 =>
--- IP and UDP header length, 20 + 8 = 28
-	    int_data_int := x"1C";
+-- IP, UDP, ipbus header length, 20 + 8 + 4 = 32
+	    int_data_int := x"20";
 -- convert payload word length to bytes
 	    pay_len(15 downto 10) := "000" & udpdob(2 downto 0);
 	  when 2 =>
--- capture cksum so far...
 	    pay_len(9 downto 0) := udpdob & "00";
 	  when 4 =>
 	    int_data_int := pay_len(15 downto 8);
 	  when 5 =>
 	    int_data_int := pay_len(7 downto 0);
 	  when 9 =>
+-- capture cksum...
 	    ip_cksum_int(15 downto 8) := not outbyte;
 	  when 10 =>
 	    ip_cksum_int(7 downto 0) := not outbyte;
--- now start on IP length, 20 + 8...
+-- now start on IP length, first headers 20 + 8 + 4...
 	    int_data_int := (Others => '0');
 	  when 11 =>
-	    int_data_int := x"1C";
+	    int_data_int := x"20";
 	  when 12 =>
+-- then payload length...
 	    int_data_int := pay_len(15 downto 8);
 	  when 13 =>
 	    int_data_int := pay_len(7 downto 0);
 	  when 16 =>
 	    ip_len_int(7 downto 0) := outbyte;
--- then end address 14 + 5...
+-- then end address 14 (ethernet length) + 5 (mem offset)...
 	    int_data_int := (Others => '0');
 	  when 17 =>
 	    ip_len_int(15 downto 8) := outbyte;
 	    int_data_int := x"13";
 	  when 20 =>
 	    udpram_end_addr_int(7 downto 0) := outbyte;
--- finally UDP length when bytes are reversed -39...
+-- finally UDP length when bytes are reversed -39 (= 20 + 14 + 5)...
 	    int_data_int := (Others => '1');
 	  when 21 =>
 	    udpram_end_addr_int(12 downto 8) := outbyte(4 downto 0);
@@ -447,7 +452,48 @@ send_data:  process(mac_clk)
       else
         ready_buf := '0';
       end if;
-      mac_tx_data <= mac_tx_data_int
+      mac_tx_data_sig <= mac_tx_data_int
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+    end if;
+  end process;
+
+do_ipbus_hdr: process(mac_clk)
+  variable ipbus_hdr_int: std_logic_vector(31 downto 0);
+  variable ipbus_out_valid_int: std_logic;
+  begin
+    if rising_edge(mac_clk) then
+      if rst_macclk = '1' then
+	ipbus_hdr_int := (Others => '0');
+	ipbus_out_valid_int := '0';
+      elsif udpram_active = '1' and low_addr = '1' and mac_tx_ready_sig = '1' then
+        case to_integer(unsigned(addr_sig(5 downto 0))) is
+	  when 50 =>
+	    ipbus_hdr_int(31 downto 24) := mac_tx_data_sig;
+	    ipbus_out_valid_int := '0';
+	  when 51 =>
+	    ipbus_hdr_int(23 downto 16) := mac_tx_data_sig;
+	    ipbus_out_valid_int := '0';
+	  when 52 =>
+	    ipbus_hdr_int(15 downto 8) := mac_tx_data_sig;
+	    ipbus_out_valid_int := '0';
+	  when 53 =>
+	    ipbus_hdr_int(7 downto 0) := mac_tx_data_sig;
+	    ipbus_out_valid_int := '1';
+	  when Others =>
+	    ipbus_out_valid_int := '0';
+	end case;
+      else
+	ipbus_out_valid_int := '0';
+      end if;
+      ipbus_out_valid <= ipbus_out_valid_int
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+      ipbus_out_hdr <= ipbus_hdr_int
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
