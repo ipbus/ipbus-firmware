@@ -18,7 +18,6 @@ entity udp_status_buffer is
     ipbus_out_hdr: in std_logic_vector(31 downto 0);
     ipbus_out_valid: in std_logic;
     pkt_broadcast: in std_logic;
-    pkt_done_125: in std_logic;
     pkt_drop_arp: in std_logic;
     pkt_drop_ipbus: in std_logic;
     pkt_drop_payload: in std_logic;
@@ -39,7 +38,7 @@ architecture rtl of udp_status_buffer is
 
   signal header, history, ipbus_in, ipbus_out: std_logic_vector(127 downto 0);
   signal tick: integer range 0 to 3;
-  signal ram_dropped, payload_dropped, last_pkt_rdy_125: std_logic;
+  signal last_pkt_rdy_125: std_logic;
 
 begin
 
@@ -112,15 +111,65 @@ header_block:  process (mac_clk)
   end process;
 
 history_block:  process (mac_clk)
+  variable last_rst_ipb, new_event, event_pending: std_logic;
+  variable event_data: std_logic_vector(7 downto 0);
   begin
     if rising_edge(mac_clk) then
       if rst_macclk = '1' then
+	event_pending := '0';
         history <= (Others => '0')
 -- pragma translate_off
         after 4 ns
 -- pragma translate_on
         ;
       end if;
+      new_event := '0';
+      if rst_ipb = '1' and last_rst_ipb = '0' then
+        new_event := '1';
+	event_data := x"01";
+      end if;
+      if mac_rx_last = '1' then
+        if pkt_drop_arp = '0' then
+	  event_data := x"05";
+	elsif pkt_drop_ping = '0' then
+	  event_data := x"04";
+	elsif pkt_drop_payload = '0' then
+	  event_data := x"03";
+	elsif pkt_drop_resend = '0' then
+	  event_data := x"07";
+	elsif pkt_drop_status = '0' then
+	  event_data := x"06";
+	elsif pkt_drop_ipbus = '0' then
+	  event_data := x"08";
+	  new_event := '1';
+	elsif pkt_broadcast = '0' then
+	  event_data := x"02";
+	  new_event := '1';
+	end if;
+        if mac_rx_error = '1' then
+	  new_event := '1';
+	  event_data(7 downto 4) := x"8";
+	else
+	  event_pending := '1';
+	end if;
+      end if;
+      if event_pending = '1' then
+        if rxpayload_dropped = '1' or rxram_dropped = '1' then
+	  new_event := '1';
+	  event_data(7 downto 4) := x"4";
+	elsif rx_reset = '1' then
+	  new_event := '1';
+	end if;
+      end if;
+      if new_event = '1' then
+        event_pending := '0';
+        history <= history(119 downto 0) & event_data
+-- pragma translate_off
+        after 4 ns
+-- pragma translate_on
+        ;
+      end if;
+      last_rst_ipb := rst_ipb;
     end if;
   end process;
 

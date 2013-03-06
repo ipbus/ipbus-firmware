@@ -127,8 +127,11 @@ ARCHITECTURE flat OF UDP_if IS
 
 BEGIN
 
-   rxram_dropped <= rxram_dropped_sig;
-   rxpayload_dropped <= rxpayload_dropped_sig;
+-- nasty kludge to not rename port, but this is really rxpacket_dropped
+   rxram_dropped <= rxram_dropped_sig or rxpayload_dropped_sig;
+-- nasty kludge to not rename port, but this is really rxpacket_ignored
+   rxpayload_dropped <= my_rx_last and pkt_drop_arp and pkt_drop_ping and
+   pkt_drop_payload and pkt_drop_resend and pkt_drop_status;
 
    rx_do_sum <= do_sum_ping or do_sum_payload;
    rx_clr_sum <= clr_sum_ping or clr_sum_payload;
@@ -246,7 +249,6 @@ rx_last_kludge: process(mac_clk)
 	 ipbus_out_hdr => ipbus_out_hdr,
 	 ipbus_out_valid => ipbus_out_valid,
 	 pkt_broadcast => pkt_broadcast,
-	 pkt_done_125 => pkt_done_125,
 	 pkt_drop_arp => pkt_drop_arp,
 	 pkt_drop_ipbus => pkt_drop_ipbus,
 	 pkt_drop_payload => pkt_drop_payload,
