@@ -36,4 +36,3 @@ proc addcore {file} {
 
 dofile file_list
 
-project close
