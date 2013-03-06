@@ -33,15 +33,13 @@ architecture rtl of transactor_if is
 
   constant PROTO_VER: std_logic_vector(3 downto 0) := X"2";
 
-	type state_type is (ST_IDLE, ST_HDR, ST_ID, ST_BODY, ST_DONE);
+	type state_type is (ST_IDLE, ST_HDR, ST_PAUSE, ST_BODY, ST_DONE);
 	signal state: state_type;
 	
 	signal raddr, waddr, haddr, waddrh: unsigned(addr_width - 1 downto 0);
 	signal hlen, blen, rctr, wctr: unsigned(15 downto 0);
-	signal id, next_id: unsigned(15 downto 0);
 	signal idata: std_logic_vector(31 downto 0);
-	signal first, start, order: std_logic;
-	signal proto: std_logic_vector(3 downto 0);
+	signal first, start: std_logic;
   
 begin
 
@@ -59,7 +57,7 @@ begin
 				when ST_IDLE => -- Starting state
 					if start = '1' then
 						if trans_in.rdata(31 downto 16) = X"0000" then
-							state <= ST_ID;
+							state <= ST_PAUSE;
 						else
 							state <= ST_HDR;
 						end if;
@@ -67,15 +65,11 @@ begin
 
 				when ST_HDR => -- Transfer packet info
 					if rctr = hlen then
-						state <= ST_ID;
+						state <= ST_PAUSE;
 					end if;
-
-				when ST_ID => -- Check packet ID
-					if (id = X"0000" or id = next_id) and proto = PROTO_VER and blen > 1 then
-						state <= ST_BODY;
-					else
-						state <= ST_DONE;
-					end if;
+					
+				when ST_PAUSE =>
+					state <= ST_BODY;
 
 				when ST_BODY => -- Transfer body
 					if (rctr > blen and tx_hdr = '1') or tx_err = '1' then
@@ -94,7 +88,7 @@ begin
 	process(clk)
 	begin
 		if falling_edge(clk) then
-			if state = ST_HDR or state = ST_ID or (state = ST_BODY and rx_next = '1') or (state = ST_IDLE and start = '1') then
+			if state = ST_HDR or (state = ST_BODY and rx_next = '1') or (state = ST_IDLE and start = '1') then
 				raddr <= raddr + 1;
 			elsif state = ST_DONE or rst = '1' then
 				raddr <= (others => '0');
@@ -111,7 +105,7 @@ begin
 				blen <= unsigned(trans_in.rdata(15 downto 0));
 			end if;
 			
-			if state = ST_HDR or state = ST_ID or (state = ST_BODY and tx_we = '1') then
+			if state = ST_HDR or (state = ST_BODY and tx_we = '1') then
 				waddr <= waddr + 1;
 			elsif state = ST_DONE or rst = '1' then
 				waddr <= to_unsigned(1, addr_width);
@@ -119,13 +113,13 @@ begin
 
 			if state = ST_IDLE then
 				rctr <= X"0001";
-			elsif state = ST_ID then
+			elsif state = ST_PAUSE then
 				rctr <= X"0002";
 			elsif state = ST_HDR or (state = ST_BODY and rx_next = '1') then
 				rctr <= rctr + 1;
 			end if;
 
-			if state = ST_ID then
+			if state = ST_HDR then
 				wctr <= X"0001";
 			elsif state = ST_BODY and tx_we = '1' and first = '0' then
 				wctr <= wctr + 1;
@@ -135,37 +129,16 @@ begin
 				haddr <= waddr;
 			end if;
 			
-			if state = ST_ID then
+			if state = ST_PAUSE then
 				first <= '1';
 			elsif tx_we = '1' then
 				first <= '0';
-			end if;
-			
-			if rst = '1' then
-				next_id <= X"0001";
-			elsif state = ST_ID and id = next_id and proto = PROTO_VER then
-				if next_id = X"ffff" then
-					next_id <= X"0001";
-				else
-					next_id <= next_id + 1;
-				end if;
-			end if;
-			
-			if rst = '1' then
-				byte_order <= '0';
-			elsif state = ST_ID then
-				byte_order <= order;
 			end if;
 			
 		end if;
 	end process;
 	
 	rx_ready <= '1' when state = ST_BODY and not (rctr > blen) else '0';
-	order <= '1' when trans_in.rdata(31 downto 28) = X"f" else '0';
-	id <= unsigned(trans_in.rdata(23 downto 8)) when order = '0' else
-		unsigned(trans_in.rdata(15 downto 8) & trans_in.rdata(23 downto 16));
-	proto <= trans_in.rdata(31 downto 28) when order = '0' else
-		trans_in.rdata(7 downto 4);
 		
 	idata <= std_logic_vector(hlen) & std_logic_vector(wctr) when state = ST_DONE
 		else trans_in.rdata;
@@ -174,12 +147,10 @@ begin
 	
 	trans_out.raddr <= std_logic_vector(raddr);
 	trans_out.pkt_done <= '1' when state = ST_DONE else '0';
-	trans_out.we <= '1' when state = ST_HDR or (tx_we = '1' and first = '0') or state = ST_DONE or state = ST_ID else '0';
+	trans_out.we <= '1' when state = ST_HDR or (tx_we = '1' and first = '0') or state = ST_DONE else '0';
 	trans_out.waddr <= std_logic_vector(haddr) when (state = ST_BODY and tx_hdr = '1') else std_logic_vector(waddrh);
 	trans_out.wdata <= tx_data when state = ST_BODY else idata;
-	
-	next_pkt_id <= std_logic_vector(next_id);
-	
+
 	pkt_rx <= '1' when state = ST_IDLE and start = '1' else '0';
 	pkt_tx <= '1' when state = ST_DONE else '0';
 	

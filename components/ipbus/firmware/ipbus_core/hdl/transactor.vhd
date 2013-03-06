@@ -23,7 +23,6 @@ entity transactor is
 		ipb_in: in ipb_rbus;
 		trans_in: in ipbus_trans_in; -- Interface to packet buffers
 		trans_out: out ipbus_trans_out;
-		next_pkt_id: out std_logic_vector(15 downto 0);
 		cfg_vector_in: in std_logic_vector(127 downto 0);
 		cfg_vector_out: out std_logic_vector(127 downto 0);
 		pkt_rx: out std_logic; -- 'Activity LED' lines (need stretching externally)
@@ -34,7 +33,7 @@ end transactor;
 
 architecture rtl of transactor is
 
-  signal rx_data, tx_data, tx_data_sm: std_logic_vector(31 downto 0);
+  signal tx_data: std_logic_vector(31 downto 0);
   signal rx_ready, rx_next, byte_order, tx_we, tx_hdr, tx_err: std_logic;
   signal cfg_we: std_logic;
   signal cfg_addr: std_logic_vector(1 downto 0);
@@ -54,26 +53,18 @@ begin
 			tx_we => tx_we,
 			tx_hdr => tx_hdr,
 			tx_err => tx_err,
-			byte_order => byte_order,
-			next_pkt_id => next_pkt_id,
 			pkt_rx => pkt_rx,
 			pkt_tx => pkt_tx
 		);
-
-  rx_data <= trans_in.rdata when byte_order='0' else
-    trans_in.rdata(7 downto 0) & trans_in.rdata(15 downto 8) & trans_in.rdata(23 downto 16) & trans_in.rdata(31 downto 24);
-
-  tx_data <= tx_data_sm when byte_order='0' else 
-    tx_data_sm(7 downto 0) & tx_data_sm(15 downto 8) & tx_data_sm(23 downto 16) & tx_data_sm(31 downto 24);
     
   sm: entity work.transactor_sm
     port map(
     	clk => clk,
       rst => rst,
-      rx_data => rx_data,
+      rx_data => trans_in.rdata,
       rx_ready => rx_ready,
       rx_next => rx_next,
-      tx_data => tx_data_sm,
+      tx_data => tx_data,
       tx_we => tx_we,
       tx_hdr => tx_hdr,
       tx_err => tx_err,

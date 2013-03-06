@@ -90,7 +90,6 @@ begin
 		ipb_in => ipb_in,
 		trans_in => trans_in,
 		trans_out => trans_out,
-		next_pkt_id => next_pkt_id,
 		cfg_vector_in => cfg_out,
 		cfg_vector_out => cfg,
 		pkt_rx => pkt_rx,
