@@ -50,8 +50,7 @@ architecture rtl of ipbus_ctrl is
   signal my_mac_addr: std_logic_vector(47 downto 0);
   signal my_ip_addr: std_logic_vector(31 downto 0);
   signal pkt_rx, pkt_tx: std_logic;
-  signal next_pkt_id: std_logic_vector(15 downto 0);
-
+  
 begin
 
 	udp_if: entity work.udp_if port map(
@@ -67,7 +66,6 @@ begin
 		mac_rx_valid => mac_rx_valid,
 		mac_tx_ready => mac_tx_ready,
 		pkt_done => trans_out.pkt_done,
-		next_pkt_id => next_pkt_id,
 		raddr => trans_out.raddr,
 		waddr => trans_out.waddr,
 		wdata => trans_out.wdata,

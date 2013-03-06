@@ -33,7 +33,7 @@ architecture rtl of transactor_if is
 
   constant PROTO_VER: std_logic_vector(3 downto 0) := X"2";
 
-	type state_type is (ST_IDLE, ST_HDR, ST_PAUSE, ST_BODY, ST_DONE);
+	type state_type is (ST_IDLE, ST_HDR, ST_PREBODY, ST_BODY, ST_DONE);
 	signal state: state_type;
 	
 	signal raddr, waddr, haddr, waddrh: unsigned(addr_width - 1 downto 0);
@@ -57,7 +57,7 @@ begin
 				when ST_IDLE => -- Starting state
 					if start = '1' then
 						if trans_in.rdata(31 downto 16) = X"0000" then
-							state <= ST_PAUSE;
+							state <= ST_PREBODY;
 						else
 							state <= ST_HDR;
 						end if;
@@ -65,10 +65,10 @@ begin
 
 				when ST_HDR => -- Transfer packet info
 					if rctr = hlen then
-						state <= ST_PAUSE;
+						state <= ST_PREBODY;
 					end if;
 					
-				when ST_PAUSE =>
+				when ST_PREBODY =>
 					state <= ST_BODY;
 
 				when ST_BODY => -- Transfer body
@@ -113,7 +113,7 @@ begin
 
 			if state = ST_IDLE then
 				rctr <= X"0001";
-			elsif state = ST_PAUSE then
+			elsif state = ST_PREBODY then
 				rctr <= X"0002";
 			elsif state = ST_HDR or (state = ST_BODY and rx_next = '1') then
 				rctr <= rctr + 1;
@@ -129,7 +129,7 @@ begin
 				haddr <= waddr;
 			end if;
 			
-			if state = ST_PAUSE then
+			if state = ST_PREBODY then
 				first <= '1';
 			elsif tx_we = '1' then
 				first <= '0';
