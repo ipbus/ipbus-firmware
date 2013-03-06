@@ -85,7 +85,7 @@ header_block:  process (mac_clk)
     if rising_edge(mac_clk) then
       if rst_macclk = '1' then
         next_pkt_id_int := to_unsigned(1, 16);
-        header <= x"200000FF" & x"00001FF8" & x"00000001" & x"200001F0"
+        header <= x"200000F1" & x"00001FF8" & x"00000001" & x"200001F0"
 -- pragma translate_off
         after 4 ns
 -- pragma translate_on
