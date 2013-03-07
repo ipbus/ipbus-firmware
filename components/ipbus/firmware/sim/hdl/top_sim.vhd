@@ -88,7 +88,8 @@ begin
 			ipb_in => ipb_master_out,
 			ipb_out => ipb_master_in,
 			hostbus_out => open,
-			hostbus_in => open
+			hostbus_in.hostrddata => (others => '0'),
+			hostbus_in.hostmiimrdy => '0'
 		);
 
 end rtl;
