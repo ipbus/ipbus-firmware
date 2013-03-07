@@ -1,5 +1,5 @@
-hdl firmware/ipbus/firmware/example_designs/sim_hdl/top_sim.vhd
-hdl firmware/ipbus/firmware/example_designs/sim_hdl/clock_sim.vhd
+hdl firmware/ipbus/firmware/sim/hdl/top_sim.vhd
+hdl firmware/ipbus/firmware/sim/hdl/clock_sim.vhd
 hdl firmware/ipbus/firmware/ethernet/sim/eth_mac_sim.vhd
 hdl firmware/ipbus/firmware/ethernet/hdl/emac_hostbus_decl.vhd
 include firmware/ipbus/firmware/ipbus_core/cfg/file_list
