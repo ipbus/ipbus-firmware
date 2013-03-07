@@ -19,19 +19,12 @@ entity stretcher is
 end stretcher;
 
 architecture rtl of stretcher is
-	
-	component clock_divider_s6 port(
-		clk: in std_logic;
-		d25: out std_logic;
-		d28: out std_logic
-	);
-	end component;
 
 	signal d_sync, d_sync_d, d_edge, d25, d25_d, q_i: std_logic;
 	
 begin
 	
-	clkdiv: clock_divider_s6 port map(
+	clkdiv: clock_div port map(
 		clk => clk,
 		d25 => d25,
 		d28 => open
