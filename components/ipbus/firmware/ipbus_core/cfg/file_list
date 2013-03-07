@@ -26,5 +26,5 @@ hdl firmware/ipbus/firmware/ipbus_core/hdl/transactor_if.vhd
 hdl firmware/ipbus/firmware/ipbus_core/hdl/transactor_sm.vhd
 hdl firmware/ipbus/firmware/ipbus_core/hdl/transactor_cfg.vhd
 hdl firmware/ipbus/firmware/ipbus_core/hdl/stretcher.vhd
-hdl firmware/ipbus/firmware/example_designs/hdl/clock_divider_s6.v
+hdl firmware/ipbus/firmware/example_designs/hdl/clock_div.vhd
 

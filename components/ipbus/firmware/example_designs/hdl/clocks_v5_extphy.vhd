@@ -34,13 +34,6 @@ architecture rtl of clocks_v5_extphy is
 	signal nuke_i, nuke_d, nuke_d2: std_logic := '0';
 	signal rst, rst_ipb, rst_125: std_logic := '1';
 	
-	component clock_divider_s6 port(
-		clk: in std_logic;
-		d25: out std_logic;
-		d28: out std_logic
-	);
-	end component;
-	
 begin
 
 	bufg_125: BUFG port map(
@@ -74,7 +67,7 @@ begin
 			rst => '0'
 		);
 		
-	clkdiv: clock_divider_s6 port map(
+	clkdiv: clock_div port map(
 		clk => sysclk,
 		d25 => d25,
 		d28 => onehz

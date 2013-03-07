@@ -1,8 +1,6 @@
 hdl firmware/ipbus/firmware/example_designs/hdl/demo_sp605_basex/top_sp605_basex.vhd
 hdl firmware/ipbus/firmware/example_designs/ucf/sp605_basex.ucf
 hdl firmware/ipbus/firmware/example_designs/hdl/clocks_s6_basex.vhd
-hdl firmware/ipbus/firmware/example_designs/hdl/clock_divider_s6.v
-hdl firmware/ipbus/firmware/ethernet/hdl/emac_hostbus_decl.vhd
 hdl firmware/ipbus/firmware/ethernet/hdl/eth_s6_1000basex.vhd
 include firmware/ipbus/firmware/ipbus_core/cfg/file_list
 include firmware/ipbus/firmware/example_designs/cfg/file_list

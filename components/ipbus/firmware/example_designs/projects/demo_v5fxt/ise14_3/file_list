@@ -1,8 +1,6 @@
 hdl firmware/ipbus/firmware/example_designs/hdl/demo_v5fxt/top_v5fxt.vhd
 hdl firmware/ipbus/firmware/example_designs/ucf/v5fxt.ucf
 hdl firmware/ipbus/firmware/example_designs/hdl/clocks_v5_extphy.vhd
-hdl firmware/ipbus/firmware/example_designs/hdl/clock_divider_s6.v
-hdl firmware/ipbus/firmware/ethernet/hdl/emac_hostbus_decl.vhd
 hdl firmware/ipbus/firmware/ethernet/hdl/eth_v5_gmii.vhd
 hdl firmware/ipbus/firmware/ethernet/hdl/mac_arbiter_decl.vhd
 hdl firmware/ipbus/firmware/ethernet/hdl/mac_arbiter.vhd
