@@ -24,11 +24,12 @@ architecture rtl of stretcher is
 	
 begin
 	
-	clkdiv: clock_div port map(
-		clk => clk,
-		d25 => d25,
-		d28 => open
-	);
+	clkdiv: entity work.clock_div
+		port map(
+			clk => clk,
+			d25 => d25,
+			d28 => open
+		);
 
 	process(clk)
 	begin
