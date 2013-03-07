@@ -82,8 +82,8 @@ begin
 
 	slaves: entity work.slaves
 		port map(
-			clk => ipb_clk,
-			rst => rst,
+			ipb_clk => ipb_clk,
+			ipb_rst => rst,
 			ipb_in => ipb_master_out,
 			ipb_out => ipb_master_in
 		);
