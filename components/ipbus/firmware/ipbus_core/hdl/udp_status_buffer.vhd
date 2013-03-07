@@ -113,6 +113,7 @@ header_block:  process (mac_clk)
 history_block:  process (mac_clk)
   variable last_rst_ipb, new_event, event_pending: std_logic;
   variable event_data: std_logic_vector(7 downto 0);
+  variable arp_ping_ipbus, payload_status_resend: std_logic_vector(2 downto 0);
   begin
     if rising_edge(mac_clk) then
       if rst_macclk = '1' then
@@ -129,33 +130,37 @@ history_block:  process (mac_clk)
 	event_data := x"01";
       end if;
       if mac_rx_last = '1' then
-        if pkt_drop_arp = '0' then
-	  event_data := x"05";
-	elsif pkt_drop_ping = '0' then
-	  event_data := x"04";
-	elsif pkt_drop_payload = '0' then
-	  event_data := x"03";
-	elsif pkt_drop_resend = '0' then
-	  event_data := x"07";
-	elsif pkt_drop_status = '0' then
-	  event_data := x"06";
-	elsif pkt_drop_ipbus = '0' then
-	  event_data := x"08";
-	  new_event := '1';
-	elsif pkt_broadcast = '0' then
-	  event_data := x"02";
-	  new_event := '1';
-	end if;
+        arp_ping_ipbus := pkt_drop_arp & pkt_drop_ping & pkt_drop_ipbus;
+	payload_status_resend := pkt_drop_payload & pkt_drop_status & 
+	pkt_drop_resend;
+        case arp_ping_ipbus is
+	  when "011" =>
+	    event_data := x"07";
+	  when "101" =>
+	    event_data := x"06";
+	  when "110" =>
+	    case payload_status_resend is
+	      when "011" =>
+	        event_data := x"02";
+	      when "101" =>
+	        event_data := x"03";
+	      when "110" =>
+	        event_data := x"04";
+	      when Others =>
+	        event_data := x"05";
+	    end case;
+	  when Others =>
+	    if pkt_broadcast = '0' then
+	      event_data := x"0F";
+	    end if;
+        end case;
         if mac_rx_error = '1' then
-	  new_event := '1';
 	  event_data(7 downto 4) := x"8";
-	else
-	  event_pending := '1';
 	end if;
+	event_pending := '1';
       end if;
       if event_pending = '1' then
         if rxpayload_dropped = '1' or rxram_dropped = '1' then
-	  new_event := '1';
 	  event_data(7 downto 4) := x"4";
 	elsif rx_reset = '1' then
 	  new_event := '1';

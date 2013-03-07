@@ -29,13 +29,10 @@ architecture v3 of udp_packet_parser is
 
   signal pkt_drop_ip_sig, pkt_drop_ipbus_sig: std_logic;
   signal ipbus_status_mask, ipbus_hdr_mask: std_logic;
-  signal pkt_drop_reliable_sig, pkt_drop_unreliable_sig: std_logic;
 
 begin
 
   pkt_drop_ipbus <= pkt_drop_ipbus_sig;
-  pkt_drop_payload <= pkt_drop_reliable_sig and pkt_drop_unreliable_sig;
-  pkt_drop_reliable <= pkt_drop_reliable_sig;
 
 -- ARP:
 -- Ethernet DST_MAC(6), SRC_MAC(6), Ether_Type = x"0806"
@@ -234,57 +231,41 @@ ipbus_mask: process(mac_clk)
     end if;
   end process;
 
--- UDP reliable payload:
--- IPBus packet header x"20nnnnF0"
+-- UDP payload:
+-- IPBus packet header x"20nnnnF0" or x"200000F0"
 -- IPBus data...
 reliable:  process (mac_clk)
-  variable pkt_data: std_logic_vector(31 downto 0);
-  variable pkt_drop: std_logic;
+  variable reliable_data: std_logic_vector(31 downto 0);
+  variable unreliable_data: std_logic_vector(31 downto 0);
+  variable pkt_drop_reliable_i, pkt_drop_unreliable: std_logic;
   begin
     if rising_edge(mac_clk) then
       if rx_reset = '1' then
-        pkt_data := x"20" & next_pkt_id & x"F0";
-        pkt_drop := '0';
+        reliable_data := x"20" & next_pkt_id & x"F0";
+        unreliable_data := x"200000F0";
+        pkt_drop_reliable_i := '0';
+        pkt_drop_unreliable := '0';
       elsif mac_rx_valid = '1' then
         if pkt_drop_ipbus_sig = '1' then
-	  pkt_drop := '1';
+	  pkt_drop_reliable_i := '1';
+	  pkt_drop_unreliable := '1';
         elsif ipbus_hdr_mask = '0' then
-          if pkt_data(31 downto 24) /= mac_rx_data then
-            pkt_drop := '1';
+          if reliable_data(31 downto 24) /= mac_rx_data then
+            pkt_drop_reliable_i := '1';
           end if;
-          pkt_data := pkt_data(23 downto 0) & x"00";
+          if unreliable_data(31 downto 24) /= mac_rx_data then
+            pkt_drop_unreliable := '1';
+          end if;
+          reliable_data := reliable_data(23 downto 0) & x"00";
+          unreliable_data := unreliable_data(23 downto 0) & x"00";
         end if;
       end if;
-      pkt_drop_reliable_sig <= pkt_drop
+      pkt_drop_reliable <= pkt_drop_reliable_i
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
       ;
-    end if;
-  end process;
-
--- UDP unreliable payload:
--- IPBus packet header x"200000F0"
--- IPBus data...
-unreliable:  process (mac_clk)
-  variable pkt_data: std_logic_vector(31 downto 0);
-  variable pkt_drop: std_logic;
-  begin
-    if rising_edge(mac_clk) then
-      if rx_reset = '1' then
-        pkt_data := x"200000F0";
-        pkt_drop := '0';
-      elsif mac_rx_valid = '1' then
-        if pkt_drop_ipbus_sig = '1' then
-	  pkt_drop := '1';
-        elsif ipbus_hdr_mask = '0' then
-          if pkt_data(31 downto 24) /= mac_rx_data then
-            pkt_drop := '1';
-          end if;
-          pkt_data := pkt_data(23 downto 0) & x"00";
-        end if;
-      end if;
-      pkt_drop_unreliable_sig <= pkt_drop
+      pkt_drop_payload <= pkt_drop_reliable_i and pkt_drop_unreliable
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
