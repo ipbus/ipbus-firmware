@@ -12,6 +12,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use work.ipbus.all;
+use work.emac_hostbus_decl.all;
 
 entity top is
 end top;
@@ -85,7 +86,9 @@ begin
 			ipb_clk => ipb_clk,
 			ipb_rst => rst,
 			ipb_in => ipb_master_out,
-			ipb_out => ipb_master_in
+			ipb_out => ipb_master_in,
+			hostbus_out => open,
+			hostbus_in => open
 		);
 
 end rtl;
