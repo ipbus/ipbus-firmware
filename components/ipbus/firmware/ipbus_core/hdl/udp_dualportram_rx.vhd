@@ -23,7 +23,6 @@ attribute block_ram of RAM1 : signal is TRUE;
 attribute block_ram of RAM2 : signal is TRUE;
 attribute block_ram of RAM3 : signal is TRUE;
 attribute block_ram of RAM4 : signal is TRUE;
-signal rx_dob_i: std_logic_vector(31 downto 0);
 BEGIN
 
 write: process (clk125)

@@ -27,20 +27,15 @@ end udp_packet_parser;
 
 architecture v3 of udp_packet_parser is
 
-  signal pkt_drop_ip_sig, pkt_drop_udp_sig, pkt_drop_ping_sig: std_logic;
-  signal pkt_drop_reliable_sig, pkt_drop_resend_sig, pkt_drop_ipbus_sig,
-  pkt_drop_status_sig, pkt_drop_unreliable_sig: std_logic;
+  signal pkt_drop_ip_sig, pkt_drop_ipbus_sig: std_logic;
+  signal ipbus_status_mask, ipbus_hdr_mask: std_logic;
+  signal pkt_drop_reliable_sig, pkt_drop_unreliable_sig: std_logic;
 
 begin
 
-  pkt_drop_ping <= pkt_drop_ping_sig or pkt_drop_ip_sig;
-  pkt_drop_ipbus_sig <= pkt_drop_ip_sig or pkt_drop_udp_sig;
   pkt_drop_ipbus <= pkt_drop_ipbus_sig;
-  pkt_drop_payload <= (pkt_drop_reliable_sig and pkt_drop_unreliable_sig) or
-  pkt_drop_ipbus_sig;
-  pkt_drop_reliable <= pkt_drop_reliable_sig or pkt_drop_ipbus_sig;
-  pkt_drop_resend <= pkt_drop_resend_sig or pkt_drop_ipbus_sig;
-  pkt_drop_status <= pkt_drop_status_sig or pkt_drop_ipbus_sig;
+  pkt_drop_payload <= pkt_drop_reliable_sig and pkt_drop_unreliable_sig;
+  pkt_drop_reliable <= pkt_drop_reliable_sig;
 
 -- ARP:
 -- Ethernet DST_MAC(6), SRC_MAC(6), Ether_Type = x"0806"
@@ -146,7 +141,9 @@ ping:  process (mac_clk)
         pkt_data := x"01" & x"0800";
         pkt_drop := '0';
       elsif mac_rx_valid = '1' then
-        if pkt_mask(35) = '0' then
+        if pkt_drop_ip_sig = '1' then
+	  pkt_drop := '1';
+        elsif pkt_mask(35) = '0' then
           if pkt_data(23 downto 16) /= mac_rx_data then
             pkt_drop := '1';
           end if;
@@ -154,7 +151,7 @@ ping:  process (mac_clk)
         end if;
         pkt_mask := pkt_mask(34 downto 0) & '1';
       end if;
-      pkt_drop_ping_sig <= pkt_drop
+      pkt_drop_ping <= pkt_drop
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
@@ -174,7 +171,7 @@ ping:  process (mac_clk)
 -- IP DPA(4)
 -- UDP SRCPORT
 -- UDP DSTPORT (50001)
-udp_pkt:  process (mac_clk)
+ipbus_pkt:  process (mac_clk)
   variable pkt_data: std_logic_vector(23 downto 0);
   variable pkt_mask: std_logic_vector(37 downto 0);
   variable pkt_drop: std_logic;
@@ -187,7 +184,9 @@ udp_pkt:  process (mac_clk)
         pkt_data := x"11" & x"C351";
         pkt_drop := '0';
       elsif mac_rx_valid = '1' then
-        if pkt_mask(37) = '0' then
+        if pkt_drop_ip_sig = '1' then
+	  pkt_drop := '1';
+        elsif pkt_mask(37) = '0' then
           if pkt_data(23 downto 16) /= mac_rx_data then
             pkt_drop := '1';
           end if;
@@ -195,7 +194,39 @@ udp_pkt:  process (mac_clk)
         end if;
         pkt_mask := pkt_mask(36 downto 0) & '1';
       end if;
-      pkt_drop_udp_sig <= pkt_drop
+      pkt_drop_ipbus_sig <= pkt_drop
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+    end if;
+  end process;
+
+-- IPbus header parsers (switch 1 tick earlier...)
+ipbus_mask: process(mac_clk)
+  variable pkt_mask: std_logic_vector(44 downto 0);
+  variable last_mask, header_sel: std_logic;
+  begin
+    if rising_edge(mac_clk) then
+      if rx_reset = '1' then
+        pkt_mask := "111111" & "111111" & "11" &
+        "11" & "11" & "11" & "11" & "1" & "1" & "11" &
+        "1111" & "1111" & "11" & "1" & "00" & "11" & "0000";
+        last_mask := '1';
+	header_sel := '1';
+      elsif mac_rx_valid = '1' then
+        if pkt_mask(44) = '1' and last_mask = '0' then
+          header_sel := '0';
+        end if;
+	last_mask := pkt_mask(44);
+        pkt_mask := pkt_mask(43 downto 0) & '1';
+      end if;
+      ipbus_status_mask <= last_mask
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+      ipbus_hdr_mask <= last_mask or header_sel
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
@@ -204,41 +235,25 @@ udp_pkt:  process (mac_clk)
   end process;
 
 -- UDP reliable payload:
--- Ethernet
--- IP VERS, HL, TOS
--- IP LEN
--- IP ID
--- IP FLAG-FRAG
--- IP TTL, PROTO
--- IP CKSUM
--- IP SPA(4)
--- IP DPA(4)
--- UDP SRCPORT
--- UDP DSTPORT
--- UDP LEN
--- UDP CKSUM
--- IPBus packet header x"20XXXXF0"
+-- IPBus packet header x"20nnnnF0"
 -- IPBus data...
 reliable:  process (mac_clk)
   variable pkt_data: std_logic_vector(31 downto 0);
-  variable pkt_mask: std_logic_vector(45 downto 0);
   variable pkt_drop: std_logic;
   begin
     if rising_edge(mac_clk) then
       if rx_reset = '1' then
-        pkt_mask := "111111" & "111111" & "11" &
-        "11" & "11" & "11" & "11" & "1" & "1" & "11" &
-        "1111" & "1111" & "11" & "11" & "11" & "11" & "0000";
         pkt_data := x"20" & next_pkt_id & x"F0";
         pkt_drop := '0';
       elsif mac_rx_valid = '1' then
-        if pkt_mask(45) = '0' then
+        if pkt_drop_ipbus_sig = '1' then
+	  pkt_drop := '1';
+        elsif ipbus_hdr_mask = '0' then
           if pkt_data(31 downto 24) /= mac_rx_data then
             pkt_drop := '1';
           end if;
           pkt_data := pkt_data(23 downto 0) & x"00";
         end if;
-        pkt_mask := pkt_mask(44 downto 0) & '1';
       end if;
       pkt_drop_reliable_sig <= pkt_drop
 -- pragma translate_off
@@ -249,41 +264,25 @@ reliable:  process (mac_clk)
   end process;
 
 -- UDP unreliable payload:
--- Ethernet
--- IP VERS, HL, TOS
--- IP LEN
--- IP ID
--- IP FLAG-FRAG
--- IP TTL, PROTO
--- IP CKSUM
--- IP SPA(4)
--- IP DPA(4)
--- UDP SRCPORT
--- UDP DSTPORT
--- UDP LEN
--- UDP CKSUM
 -- IPBus packet header x"200000F0"
 -- IPBus data...
 unreliable:  process (mac_clk)
   variable pkt_data: std_logic_vector(31 downto 0);
-  variable pkt_mask: std_logic_vector(45 downto 0);
   variable pkt_drop: std_logic;
   begin
     if rising_edge(mac_clk) then
       if rx_reset = '1' then
-        pkt_mask := "111111" & "111111" & "11" &
-        "11" & "11" & "11" & "11" & "1" & "1" & "11" &
-        "1111" & "1111" & "11" & "11" & "11" & "11" & "0000";
         pkt_data := x"200000F0";
         pkt_drop := '0';
       elsif mac_rx_valid = '1' then
-        if pkt_mask(45) = '0' then
+        if pkt_drop_ipbus_sig = '1' then
+	  pkt_drop := '1';
+        elsif ipbus_hdr_mask = '0' then
           if pkt_data(31 downto 24) /= mac_rx_data then
             pkt_drop := '1';
           end if;
           pkt_data := pkt_data(23 downto 0) & x"00";
         end if;
-        pkt_mask := pkt_mask(44 downto 0) & '1';
       end if;
       pkt_drop_unreliable_sig <= pkt_drop
 -- pragma translate_off
@@ -294,42 +293,27 @@ unreliable:  process (mac_clk)
   end process;
 
 -- UDP status request:
--- Ethernet
--- IP VERS, HL, TOS
--- IP LEN
--- IP ID
--- IP FLAG-FRAG
--- IP TTL, PROTO
--- IP CKSUM
--- IP SPA(4)
--- IP DPA(4)
--- UDP SRCPORT
--- UDP DSTPORT
 -- UDP LEN (72 = x"48")
--- UDP CKSUM
 -- IPBus packet header x"200000F1"
 status_request:  process (mac_clk)
   variable pkt_data: std_logic_vector(47 downto 0);
-  variable pkt_mask: std_logic_vector(45 downto 0);
   variable pkt_drop: std_logic;
   begin
     if rising_edge(mac_clk) then
       if rx_reset = '1' then
-        pkt_mask := "111111" & "111111" & "11" &
-        "11" & "11" & "11" & "11" & "1" & "1" & "11" &
-        "1111" & "1111" & "11" & "11" & "00" & "11" & "0000";
         pkt_data := x"0048200000F1";
         pkt_drop := '0';
       elsif mac_rx_valid = '1' then
-        if pkt_mask(45) = '0' then
+        if pkt_drop_ipbus_sig = '1' then
+	  pkt_drop := '1';
+        elsif ipbus_status_mask = '0' then
           if pkt_data(47 downto 40) /= mac_rx_data then
             pkt_drop := '1';
           end if;
           pkt_data := pkt_data(39 downto 0) & x"00";
         end if;
-        pkt_mask := pkt_mask(44 downto 0) & '1';
       end if;
-      pkt_drop_status_sig <= pkt_drop
+      pkt_drop_status <= pkt_drop
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
@@ -338,42 +322,31 @@ status_request:  process (mac_clk)
   end process;
 
 -- UDP resend request:
--- Ethernet
--- IP VERS, HL, TOS
--- IP LEN
--- IP ID
--- IP FLAG-FRAG
--- IP TTL, PROTO
--- IP CKSUM
--- IP SPA(4)
--- IP DPA(4)
--- UDP SRCPORT
--- UDP DSTPORT
--- UDP LEN
--- UDP CKSUM
 -- IPBus packet header x"20XXXXF2"
-request:  process (mac_clk)
+resend:  process (mac_clk)
   variable pkt_data: std_logic_vector(15 downto 0);
-  variable pkt_mask: std_logic_vector(45 downto 0);
+  variable pkt_mask: std_logic_vector(3 downto 0);
   variable pkt_drop: std_logic;
   begin
     if rising_edge(mac_clk) then
       if rx_reset = '1' then
-        pkt_mask := "111111" & "111111" & "11" &
-        "11" & "11" & "11" & "11" & "1" & "1" & "11" &
-        "1111" & "1111" & "11" & "11" & "11" & "11" & "0110";
         pkt_data := x"20F2";
+	pkt_mask := "0110";
         pkt_drop := '0';
       elsif mac_rx_valid = '1' then
-        if pkt_mask(45) = '0' then
-          if pkt_data(15 downto 8) /= mac_rx_data then
-            pkt_drop := '1';
-          end if;
-          pkt_data := pkt_data(7 downto 0) & x"00";
+        if pkt_drop_ipbus_sig = '1' then
+	  pkt_drop := '1';
+        elsif ipbus_hdr_mask = '0' then
+	  if pkt_mask(3) = '0' then
+	    if pkt_data(15 downto 8) /= mac_rx_data then
+              pkt_drop := '1';
+            end if;
+            pkt_data := pkt_data(7 downto 0) & x"00";
+	  end if;
+	  pkt_mask := pkt_mask(2 downto 0) & '1';
         end if;
-        pkt_mask := pkt_mask(44 downto 0) & '1';
       end if;
-      pkt_drop_resend_sig <= pkt_drop
+      pkt_drop_resend <= pkt_drop
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
@@ -382,18 +355,18 @@ request:  process (mac_clk)
   end process;
 
 broadcast:  process (mac_clk)
-  variable pkt_data: std_logic_vector(47 downto 0);
+  variable pkt_mask: std_logic_vector(5 downto 0);
   variable broadcast_int: std_logic;
   begin
     if rising_edge(mac_clk) then
       if rx_reset = '1' then
-        pkt_data := x"FFFFFFFFFFFF";
+	pkt_mask := (Others => '0');
         broadcast_int := '1';
-      elsif mac_rx_valid = '1' then
-        if pkt_data(47 downto 40) /= mac_rx_data then
+      elsif mac_rx_valid = '1' and pkt_mask(5) = '0' then
+        if mac_rx_data /= x"FF" then
           broadcast_int := '0';
         end if;
-        pkt_data := pkt_data(39 downto 0) & x"00";
+        pkt_mask := pkt_mask(4 downto 0) & '1';
       end if;
       pkt_broadcast <= broadcast_int
 -- pragma translate_off
