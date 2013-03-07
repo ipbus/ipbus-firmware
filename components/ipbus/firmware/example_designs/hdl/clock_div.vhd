@@ -63,7 +63,7 @@ begin
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			if q(5) and not qr(5) then
+			if q(5) = '1' and qr(5) = '0' then
 				ctr <= ctr + 1;
 			end if;
 		end if;
