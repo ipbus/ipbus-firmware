@@ -31,8 +31,6 @@ end transactor_if;
 
 architecture rtl of transactor_if is
 
-  constant PROTO_VER: std_logic_vector(3 downto 0) := X"2";
-
 	type state_type is (ST_IDLE, ST_HDR, ST_PREBODY, ST_BODY, ST_DONE);
 	signal state: state_type;
 	
@@ -111,10 +109,8 @@ begin
 				waddr <= to_unsigned(1, addr_width);
 			end if;
 
-			if state = ST_IDLE then
+			if state = ST_IDLE or state = ST_PREBODY then
 				rctr <= X"0001";
-			elsif state = ST_PREBODY then
-				rctr <= X"0002";
 			elsif state = ST_HDR or (state = ST_BODY and rx_next = '1') then
 				rctr <= rctr + 1;
 			end if;
