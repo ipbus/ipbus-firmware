@@ -26,7 +26,7 @@ architecture rtl of clock_div is
 
 	signal q, qr: std_logic_vector(5 downto 0);
 	signal ctr: unsigned(2 downto 0) := "000";
-	signal ce: std_logic;
+	signal ce: std_logic_vector(5 downto 1);
 	
 begin
 
@@ -35,7 +35,7 @@ begin
 	
 	gen: for i in 5 downto 1 generate
 		
-		ce <= q(i-1) and not qr(i-1);
+		ce(i) <= q(i-1) and not qr(i-1);
 	
 		sr: srlc32e
 			generic map(
@@ -44,7 +44,7 @@ begin
 			port map(
 				q => q(i),
 				a => "11111",
-				ce => ce,
+				ce => ce(i),
 				clk => clk,
 				d => q(i)
 			);
