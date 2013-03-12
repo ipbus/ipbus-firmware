@@ -6,16 +6,19 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+
 use work.ipbus.ALL;
 use work.emac_hostbus_decl.all;
 
-entity slaves is port(
-	ipb_clk: in std_logic;
-	ipb_rst: in std_logic;
-	ipb_in: in ipb_wbus;
-	ipb_out: out ipb_rbus;
-	hostbus_out: out emac_hostbus_in;
-	hostbus_in: in emac_hostbus_out
+entity slaves is
+	port(
+		ipb_clk: in std_logic;
+		ipb_rst: in std_logic;
+		ipb_in: in ipb_wbus;
+		ipb_out: out ipb_rbus;
+		hostbus_out: out emac_hostbus_in;
+		hostbus_in: in emac_hostbus_out;
+		rst_out: out std_logic
 	);
 
 end slaves;
@@ -41,9 +44,16 @@ begin
 
 -- Slave 0: fixed pattern
 
-	ipbr(0).ipb_rdata <= X"abcdfedc";
-	ipbr(0).ipb_ack <= ipbw(0).ipb_strobe;
-	ipbr(0).ipb_err <= '0';
+	slave0: entity work.ipbus_ctrlreg
+		port map(
+			clk => ipb_clk,
+			reset => ipb_rst,
+			ipbus_in => ipbw(0),
+			ipbus_out => ipbr(0),
+			d => X"abcdfedc",
+			q(0) => rst_out,
+			q(31 downto 1) => open
+		);
 
 -- Slave 1: register
 

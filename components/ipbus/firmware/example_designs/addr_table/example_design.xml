@@ -1,0 +1,10 @@
+<!-- Default microHAL address table for	example	designs	-->
+
+<node id="TOP">
+	<node id="ctrl_reg" address="0x0" description="ctrl/stat register"/>
+		<node id="ctrl_reg.rst" address="0x0">
+		<node id="ctrl_reg.id" address="0x1">
+	<node id="reg" address="0x2" description="read-write register"/>
+	<node id="ram" address="0x1000" size="0x1000" description="1kword RAM"/>
+</node>
+
