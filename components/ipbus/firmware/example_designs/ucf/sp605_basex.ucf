@@ -7,6 +7,7 @@ NET clk125 TNM_NET=clk125;
 TIMESPEC TS_clk125 = PERIOD clk125 8ns;
 
 NET clocks/rst TIG;
+NET clocks/nuke_i TIG;
 
 NET gtp_clkp LOC=A12 | DIFF_TERM=TRUE | TNM_NET=gtpclk;
 NET gtp_clkn LOC=B12 | DIFF_TERM=TRUE;

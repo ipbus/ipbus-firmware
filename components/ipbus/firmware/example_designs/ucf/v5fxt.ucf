@@ -3,6 +3,9 @@ NET sys_clk_pin TNM_NET = sys_clk_pin;
 
 TIMESPEC TS_sys_clk_pin = PERIOD sys_clk_pin 10000 ps;
 
+NET clocks/rst TIG;
+NET clocks/nuke_i TIG;
+
 # Ethernet PHY
 
 TIMEGRP "gmii_tx"=PADS("gmii_tx*");
