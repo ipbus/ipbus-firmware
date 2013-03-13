@@ -36,7 +36,7 @@ architecture rtl of top is
 	signal ip_addr: std_logic_vector(31 downto 0);
 	signal hostbus_in: emac_hostbus_in;
 	signal hostbus_out: emac_hostbus_out;
-	signal pkt_rx_led, pkt_tx_led: std_logic;	
+	signal pkt_rx_led, pkt_tx_led, sys_rst: std_logic;	
 
 begin
 
@@ -48,7 +48,7 @@ begin
 		clko_125 => clk125,
 		clko_ipb => ipb_clk,
 		locked => locked,
-		nuke => '0',
+		nuke => sys_rst,
 		rsto_125 => rst_125,
 		rsto_ipb => rst_ipb,
 		onehz => onehz
@@ -123,7 +123,8 @@ begin
 		ipb_in => ipb_master_out,
 		ipb_out => ipb_master_in,
 		hostbus_out => hostbus_in,
-		hostbus_in => hostbus_out
+		hostbus_in => hostbus_out,
+		rst_out => sys_rst
 	);
 
 end rtl;

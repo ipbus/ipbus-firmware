@@ -41,6 +41,7 @@ architecture rtl of top is
 	signal hostbus_in: emac_hostbus_out;
 	signal mac_tx_data_bus: mac_arbiter_slv_array(N_IPB-1 downto 0);
 	signal mac_tx_valid_bus, mac_tx_last_bus, mac_tx_error_bus, mac_tx_ready_bus, pkt_rx_led_bus, pkt_tx_led_bus: mac_arbiter_sl_array(N_IPB-1 downto 0);
+	signal sys_rst_array: std_logic_vector(N_IPB-1 downto 0);
 	signal pkt_rx_led, pkt_tx_led: std_logic;
 	
 begin
@@ -54,7 +55,7 @@ begin
 		clko_200 => clk200,
 		clko_ipb => ipb_clk,
 		locked => locked,
-		nuke => '0',
+		nuke => sys_rst_array(0),
 		rsto_125 => rst_125,
 		rsto_ipb => rst_ipb,
 		onehz => onehz
@@ -158,6 +159,7 @@ begin
 			ipb_out => ipb_master_in,
 			hostbus_out => hostbus_out_array(i),
 			hostbus_in => hostbus_in
+			rst_out => sys_rst_array(i)
 		);
 	 
 	end generate;-- ipbus control logic
