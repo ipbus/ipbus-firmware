@@ -6,6 +6,9 @@ TIMESPEC TS_refclk125 = PERIOD "refclk125" 125MHz HIGH 50%;
 NET "osc_p" TNM_NET = osc_p;
 TIMESPEC TS_osc_p = PERIOD "osc_p" 125 MHz HIGH 50%;
 
+NET clocks/rst TIG;
+NET clocks/nuke_i TIG;
+
 INST "eth/*/gtx_dual_i" LOC = "GTX_DUAL_X1Y5";
 INST "enet_clkn" LOC = "AD3";
 INST "enet_clkp" LOC = "AD4";
