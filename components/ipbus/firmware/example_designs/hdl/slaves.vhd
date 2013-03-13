@@ -51,8 +51,7 @@ begin
 			ipbus_in => ipbw(0),
 			ipbus_out => ipbr(0),
 			d => X"abcdfedc",
-			q(0) => rst_out,
-			q(31 downto 1) => open
+			q(0) => rst_out
 		);
 
 -- Slave 1: register
