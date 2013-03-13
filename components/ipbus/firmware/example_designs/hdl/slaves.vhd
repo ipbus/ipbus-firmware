@@ -28,6 +28,7 @@ architecture rtl of slaves is
 	constant NSLV: positive := 3;
 	signal ipbw: ipb_wbus_array(NSLV-1 downto 0);
 	signal ipbr, ipbr_d: ipb_rbus_array(NSLV-1 downto 0);
+	signal ctrl_reg: std_logic_vector(31 downto 0);
 
 begin
 
@@ -51,8 +52,10 @@ begin
 			ipbus_in => ipbw(0),
 			ipbus_out => ipbr(0),
 			d => X"abcdfedc",
-			q(0) => rst_out
+			q => ctrl_reg
 		);
+		
+		rst_out <= ctrl_reg(0);
 
 -- Slave 1: register
 
