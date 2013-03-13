@@ -18,7 +18,7 @@ end clock_sim;
 
 architecture behavioural of clock_sim is
 
-  signal clk125, clk25: std_logic := '0';
+  signal clk125, clk25, nuke_del: std_logic := '0';
   signal reset_vec: std_logic_vector(3 downto 0) := X"f";
 
 begin
@@ -36,6 +36,7 @@ begin
     end if;
   end process;
 
-  rsto <= reset_vec(0) or nuke;
+  nuke_del <= nuke after 1ms;
+  rsto <= reset_vec(0) or nuke_del;
 
 end behavioural;

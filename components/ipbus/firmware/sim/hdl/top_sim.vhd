@@ -25,6 +25,7 @@ architecture rtl of top is
 	signal mac_rx_valid, mac_rx_last, mac_rx_error: std_logic;
 	signal ipb_master_out: ipb_wbus;
 	signal ipb_master_in: ipb_rbus;
+	signal sys_rst: std_logic;
 	
 begin
 
@@ -34,7 +35,7 @@ begin
 		port map(
 			clko125 => clk125,
 			clko25 => ipb_clk,
-			nuke => '0',
+			nuke => sys_rst,
 			rsto => rst
 		 );
 
@@ -89,7 +90,8 @@ begin
 			ipb_out => ipb_master_in,
 			hostbus_out => open,
 			hostbus_in.hostrddata => (others => '0'),
-			hostbus_in.hostmiimrdy => '0'
+			hostbus_in.hostmiimrdy => '0',
+			rst_out => sys_rst
 		);
 
 end rtl;
