@@ -9,6 +9,7 @@ TIMESPEC TS_tig_ipb_125 = FROM tnm_ipb_clk TO tnm_clk125 TIG;
 TIMESPEC TS_tig_125_ipb = FROM tnm_clk125 TO tnm_ipb_clk TIG;
 
 NET clocks/rst TIG;
+NET clocks/nuke_i TIG;
 
 NET leds<0> LOC=D17 |IOSTANDARD=LVCMOS25;
 NET leds<1> LOC=AB4 |IOSTANDARD=LVCMOS25;
