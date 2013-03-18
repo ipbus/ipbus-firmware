@@ -55,7 +55,7 @@ begin
 		
 	leds <= (pkt_rx_led, pkt_tx_led, locked, onehz);
 	
---	Ethernet MAC core and PHY interface
+-- Ethernet MAC core and PHY interface
 -- In this version, consists of hard MAC core and GMII interface to external PHY
 -- Can be replaced by any other MAC / PHY combination
 	
