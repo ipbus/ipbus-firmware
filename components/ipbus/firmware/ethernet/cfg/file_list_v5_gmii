@@ -2,5 +2,5 @@
 
 # This is the ISE 14.3 version
 
-hdl firmware/ipbus/firmware/ethernet/gen_hdl/v5_emac_v1_8/v5_emac_v1_8.vhd
+hdl ipbus/firmware/ethernet/gen_hdl/v5_emac_v1_8/v5_emac_v1_8.vhd
 

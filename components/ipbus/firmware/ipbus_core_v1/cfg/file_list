@@ -1,22 +1,22 @@
 # Xilinx ISE setup fragment for ipbus core
 
-hdl firmware/ipbus/firmware/ipbus_core_v1/hdl/ipbus_package.vhd
-hdl firmware/ipbus/firmware/ipbus_core_v1/hdl/ipbus_v_defs.v
-hdl firmware/ipbus/firmware/ipbus_core_v1/hdl/ipbus_bus_decl.vhd
-hdl firmware/ipbus/firmware/ipbus_core_v1/hdl/ipbus_ctrl_decl.vhd
-hdl firmware/ipbus/firmware/ipbus_core_v1/hdl/ipbus_ctrl.vhd
-hdl firmware/ipbus/firmware/ipbus_core_v1/hdl/arp.v
-hdl firmware/ipbus/firmware/ipbus_core_v1/hdl/icmp.v
-hdl firmware/ipbus/firmware/ipbus_core_v1/hdl/ip_checksum_8bit.v
-hdl firmware/ipbus/firmware/ipbus_core_v1/hdl/packet_handler.v
-hdl firmware/ipbus/firmware/ipbus_core_v1/hdl/rx_buffer.vhd
-hdl firmware/ipbus/firmware/ipbus_core_v1/hdl/sub_packetbuffer.v
-hdl firmware/ipbus/firmware/ipbus_core_v1/hdl/sub_packetreq.v
-hdl firmware/ipbus/firmware/ipbus_core_v1/hdl/sub_packetresp.v
-hdl firmware/ipbus/firmware/ipbus_core_v1/hdl/transactor.vhd
-hdl firmware/ipbus/firmware/ipbus_core_v1/hdl/transactor_rx.vhd
-hdl firmware/ipbus/firmware/ipbus_core_v1/hdl/transactor_sm.vhd
-hdl firmware/ipbus/firmware/ipbus_core_v1/hdl/transactor_tx.vhd
-hdl firmware/ipbus/firmware/ipbus_core_v1/hdl/tx_buffer.vhd
-hdl firmware/ipbus/firmware/ipbus_core_v1/hdl/udp_shim.vhd
+hdl ipbus/firmware/ipbus_core_v1/hdl/ipbus_package.vhd
+hdl ipbus/firmware/ipbus_core_v1/hdl/ipbus_v_defs.v
+hdl ipbus/firmware/ipbus_core_v1/hdl/ipbus_bus_decl.vhd
+hdl ipbus/firmware/ipbus_core_v1/hdl/ipbus_ctrl_decl.vhd
+hdl ipbus/firmware/ipbus_core_v1/hdl/ipbus_ctrl.vhd
+hdl ipbus/firmware/ipbus_core_v1/hdl/arp.v
+hdl ipbus/firmware/ipbus_core_v1/hdl/icmp.v
+hdl ipbus/firmware/ipbus_core_v1/hdl/ip_checksum_8bit.v
+hdl ipbus/firmware/ipbus_core_v1/hdl/packet_handler.v
+hdl ipbus/firmware/ipbus_core_v1/hdl/rx_buffer.vhd
+hdl ipbus/firmware/ipbus_core_v1/hdl/sub_packetbuffer.v
+hdl ipbus/firmware/ipbus_core_v1/hdl/sub_packetreq.v
+hdl ipbus/firmware/ipbus_core_v1/hdl/sub_packetresp.v
+hdl ipbus/firmware/ipbus_core_v1/hdl/transactor.vhd
+hdl ipbus/firmware/ipbus_core_v1/hdl/transactor_rx.vhd
+hdl ipbus/firmware/ipbus_core_v1/hdl/transactor_sm.vhd
+hdl ipbus/firmware/ipbus_core_v1/hdl/transactor_tx.vhd
+hdl ipbus/firmware/ipbus_core_v1/hdl/tx_buffer.vhd
+hdl ipbus/firmware/ipbus_core_v1/hdl/udp_shim.vhd
 
