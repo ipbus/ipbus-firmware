@@ -158,7 +158,7 @@ begin
     	ipb_in => ipb_master_out,
 			ipb_out => ipb_master_in,
 			hostbus_out => hostbus_out_array(i),
-			hostbus_in => hostbus_in
+			hostbus_in => hostbus_in,
 			rst_out => sys_rst_array(i)
 		);
 	 
