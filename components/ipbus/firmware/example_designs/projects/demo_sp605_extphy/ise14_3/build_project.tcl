@@ -1,4 +1,4 @@
-project open demo_atlys
+project open demo_sp605_extphy
 process run "Implement Design"
 project close
 

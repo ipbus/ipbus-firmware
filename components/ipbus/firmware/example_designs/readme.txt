@@ -31,14 +31,14 @@ cd work
 
 - Run the setup script
 
-. $REPOS_BUILD_DIR/setup.sh
+. $REPOS_FW_DIR/ipbus/firmware/example_designs/scripts/setup.sh
 
 - The scripts will build all necessary cores and set up an ISE project file which
 you can use in the ISE GUI.
 
 - To build the design (up to place-and-route), you can also use a script:
 
-xtclsh $REPOS_FW_DIR/ipbus/firmware/example_designs/scripts/build_project.tcl
+xtclsh $REPOS_BUILD_DIR/build_project.tcl
 
 For Windows platform, either create the ISE project file on linux and copy it,
 or set up the project manually using the project settings and file list from
