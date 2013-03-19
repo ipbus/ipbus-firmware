@@ -1,48 +1,48 @@
 How to compile the example designs
 
-DMN, 2013/1/20
+DMN, 2013-03-19
 
 Example designs for several evaluation boards are provided, along with scripts to
 set things up on a linux platform.
 
-Example designs are currently only supported on ISE14.2 or later. They will work
-on ISE13.4, but you will need to change the versions of the Xilinx IP blocks.
-ISE 14.1 has a variety of bugs, and should be avoided.
+Example designs are currently only supported on ISE14.3 or later.
 
 The setup steps are as follows:
 
-- Move to an appropriate working directory
+- Create and move to an appropriate working directory
 
-- Either check out the firmware base directory from the repository straight into
-your working area (i.e. so that you end up with a subdirectory named 'firmware'),
-or make a link named 'firmware' to the wherever your working copy exist:
+mkdir firmware
+cd firmware
 
-	svn co PATH_TO_REPOSITORY/trunk/uHAL/firmware
-	
-	or
-	
-	ln -s PATH_TO_WORKING_COPY firmware
-	
-- Copy one of the example design directories to your working directory
+- Check out the ipbus directory
 
-	cp -r firmware/example_designs/projects/DESIGN_NAME/ise14_3 DESIGN_NAME
-	
-- Enter the design directory and run the setup script
+svn co PATH_TO_REPOSITORY/trunk/components/ipbus
 
-	cd DESIGN_NAME
-	chmod u+x ./setup.sh
-	./setup.sh
-	
-- The scripts will set up an ISE project with the necessary HDL files, copy the
-XCO files for any necessary cores into the local working area, and compile the
-cores. This last step may take a few minutes.
+- Set the path to the firmware base directory and to the build scripts directory
+for the chosen example design
 
-- Open the XISE project file in the ISE GUI, and it should be ready to
-synthesise.
+EXPORT REPOS_FW_DIR=`pwd`
+EXPORT REPOS_BUILD_DIR=`pwd`/ipbus/firmware/example_designs/projects/demo_sp605_extphy/ise14_3
 
-For Windows platform, either create the XISE file on linux and copy it, or set
-up the project manually using the project settings and file list from the
-example design directory.
+- Creaet and move to a working directory for the example design:
 
-Bug reports to dave.newbold@cern.ch.
+mkdir work
+cd work
+
+- Run the setup script
+
+. $REPOS_BUILD_DIR/setup.sh
+
+- The scripts will build all necessary cores and set up an ISE project file which
+you can use in the ISE GUI.
+
+- To build the design (up to place-and-route), you can also use a script:
+
+xtclsh $REPOS_FW_DIR/ipbus/firmware/example_designs/scripts/build_project.tcl
+
+For Windows platform, either create the ISE project file on linux and copy it,
+or set up the project manually using the project settings and file list from
+the example design directory.
+
+Bug reports to the CACTUS TRAC list, please.
 
