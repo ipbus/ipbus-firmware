@@ -11,12 +11,15 @@ proc dofile {file} {
 		set l [split $f]
 		set cmd [lindex $l 0]
 		set arg [lindex $l 1]
+		set parg $::env(REPOS_FW_DIR)/$arg
 		if {$cmd == "hdl"} {
-			addfile $arg
+			addfile $parg
+		} elseif {$cmd == "ghdl"} {
+			addfile ipcore_dir/$arg
 		} elseif {$cmd == "core"} {
-			addcore $arg
+			addcore $parg
 		} elseif {$cmd == "include"} {
-			dofile $arg
+			dofile $parg
 		}
 	}
 }
@@ -34,5 +37,5 @@ proc addcore {file} {
 	eval addfile ipcore_dir/$bname
 }
 
-dofile file_list
+dofile $::env(REPOS_BUILD_DIR)/file_list
 

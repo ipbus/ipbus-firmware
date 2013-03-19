@@ -9,6 +9,6 @@ project set "Pack I/O Registers/Latches into IOBs" "For Inputs and Outputs" -pro
 project set "Enable Multi-Threading" "2" -process "Place & Route"
 project set "Enable BitStream Compression" TRUE -process "Generate Programming File"
 
-source addfiles.tcl
+source $::env(REPOS_BUILD_DIR)/addfiles.tcl
 
 project close
