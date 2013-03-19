@@ -1,8 +1,0 @@
-hdl ipbus/firmware/example_designs/hdl/demo_sp605_extphy/top_sp605_extphy.vhd
-hdl ipbus/firmware/example_designs/ucf/sp605_extphy.ucf
-hdl ipbus/firmware/example_designs/hdl/clocks_s6_extphy.vhd
-hdl ipbus/firmware/ethernet/hdl/eth_s6_gmii.vhd
-include ipbus/firmware/ipbus_core_v1/cfg/file_list
-include ipbus/firmware/example_designs/cfg/file_list
-core ipbus/firmware/ethernet/coregen/tri_mode_eth_mac_v5_4.xco
-core ipbus/firmware/ethernet/coregen/mac_fifo_axi4.xco
