@@ -1,8 +1,8 @@
-hdl firmware/ipbus/firmware/example_designs/hdl/demo_sp605_basex/top_sp605_basex.vhd
-hdl firmware/ipbus/firmware/example_designs/ucf/sp605_basex.ucf
-hdl firmware/ipbus/firmware/example_designs/hdl/clocks_s6_basex.vhd
-hdl firmware/ipbus/firmware/ethernet/hdl/eth_s6_1000basex.vhd
-include firmware/ipbus/firmware/ipbus_core/cfg/file_list
-include firmware/ipbus/firmware/example_designs/cfg/file_list
-include firmware/ipbus/firmware/ethernet/cfg/file_list_setup_gig_eth_pcs_pma_v11_4
+hdl ipbus/firmware/example_designs/hdl/demo_sp605_basex/top_sp605_basex.vhd
+hdl ipbus/firmware/example_designs/ucf/sp605_basex.ucf
+hdl ipbus/firmware/example_designs/hdl/clocks_s6_basex.vhd
+hdl ipbus/firmware/ethernet/hdl/eth_s6_1000basex.vhd
+include ipbus/firmware/ipbus_core/cfg/file_list
+include ipbus/firmware/example_designs/cfg/file_list
+include ipbus/firmware/ethernet/cfg/file_list_setup_gig_eth_pcs_pma_v11_4
 
