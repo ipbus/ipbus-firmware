@@ -4,5 +4,5 @@
 
 0	ctrl_reg	0x0	1
 1	reg		0x2	0
-2	ram		0x1000	12
+2	ram		0x1000	10
 
