@@ -202,17 +202,20 @@ begin
  		else '0';
   rmw_cyc <= '1' when trans_type = TRANS_RMWB or trans_type = TRANS_RMWS else '0';
   cfg_cyc <= '1' when trans_type = TRANS_RD_CFG or trans_type = TRANS_WR_CFG else '0';
- 
+   
   process(state, ipb_in.ipb_err, timer, write)
   begin
-  	if state = ST_BUS_CYCLE then
+  	err <= X"0";
+  	if state = ST_HDR then
+  		if rx_data(31 downto 28) /= "2" or rx_data(3 downto 0) /= "f" then
+  			err <= "0001";
+  		end if;
+  	elsif state = ST_BUS_CYCLE then
   		if ipb_in.ipb_err = '1' then
-  			err <= "001" & write;
+  			err <= "010" & write;
   		elsif timer = TIMEOUT then
   			err <= "011" & write;
   		end if;
-  	else
-  		err <= X"0";
   	end if;
   end process;
   
