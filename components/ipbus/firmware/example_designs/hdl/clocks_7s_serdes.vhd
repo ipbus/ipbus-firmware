@@ -19,11 +19,12 @@ entity clocks_7s_serdes is port(
 	clki_125: in std_logic;
 	clko_ipb: out std_logic;
 	sysclk_o: out std_logic;
-	ext_locked: in std_logic;
+	eth_locked: in std_logic;
 	locked: out std_logic;
 	nuke: in std_logic;
 	rsto_125: out std_logic;
 	rsto_ipb: out std_logic;
+	rsto_eth: out std_logic;
 	onehz: out std_logic
 	);
 
@@ -34,7 +35,7 @@ architecture rtl of clocks_7s_serdes is
 	signal dcm_locked, sysclk, sysclk_ub, clk_ipb_i, clk_ipb_b, clkfb: std_logic;
 	signal d25, d25_d: std_logic;
 	signal nuke_i, nuke_d, nuke_d2: std_logic := '0';
-	signal rst, rst_ipb, rst_125: std_logic := '1';
+	signal rst, rst_ipb, rst_125, rst_eth: std_logic := '1';
 
 begin
 	
@@ -85,7 +86,7 @@ begin
 		if rising_edge(sysclk) then
 			d25_d <= d25;
 			if d25='1' and d25_d='0' then
-				rst <= nuke_d2 or (not dcm_locked) or (not ext_locked);
+				rst <= nuke_d2 or not dcm_locked;
 				nuke_d <= nuke_i; -- Time bomb (allows return packet to be sent)
 				nuke_d2 <= nuke_d;
 			end if;
@@ -107,10 +108,19 @@ begin
 	process(clki_125)
 	begin
 		if rising_edge(clki_125) then
-			rst_125 <= rst;
+			rst_125 <= rst or not eth_locked;
 		end if;
 	end process;
 	
 	rsto_125 <= rst_125;
+	
+	process(sysclk)
+	begin
+		if rising_edge(sysclk) then
+			rst_eth <= rst;
+		end if;
+	end process;
+	
+	rsto_eth <= rst_eth;
 		
 end rtl;
