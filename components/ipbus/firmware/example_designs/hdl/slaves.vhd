@@ -31,7 +31,7 @@ architecture rtl of slaves is
 	signal ipbw: ipb_wbus_array(NSLV-1 downto 0);
 	signal ipbr, ipbr_d: ipb_rbus_array(NSLV-1 downto 0);
 	signal ctrl_reg: std_logic_vector(31 downto 0);
-	signal inj_ctrl: std_logic_vector(63 downto 0);
+	signal inj_ctrl, inj_stat: std_logic_vector(63 downto 0);
 
 begin
 
@@ -95,11 +95,12 @@ begin
 			reset => ipb_rst,
 			ipbus_in => ipbw(3),
 			ipbus_out => ipbr(3),
-			d => X"00" & eth_err_stat(47 downto 24) & X"00" & eth_err_stat(23 downto 0),
+			d => inj_stat,
 			q => inj_ctrl
 		);
 		
 	eth_err_ctrl <= inj_ctrl(49 downto 32) & inj_ctrl(17 downto 0);
+	inj_stat <= X"00" & eth_err_stat(47 downto 24) & X"00" & eth_err_stat(23 downto 0);
 
 -- Dummy ethernet MAC control signals
 
