@@ -18,7 +18,6 @@ entity eth_7s_1000basex is
 		gt_txp, gt_txn: out std_logic;
 		gt_rxp, gt_rxn: in std_logic;
 		clk125_out: out std_logic;
-		rsto: out std_logic;
 		rsti: in std_logic;
 		fr_clk: in std_logic;
 		locked: out std_logic;
@@ -92,13 +91,6 @@ begin
 	rst_int <= not locked_int or rsti;
 	rstn <= not rst_int;
 	
-	process(clk125)
-	begin
-		if rising_edge(clk125) then
-			rsto <= rst_int;
-		end if;
-	end process;
-
 	mac: entity work.emac_serdes_5_4 port map(
 		glbl_rstn => rstn,
 		rx_axi_rstn => '1',
