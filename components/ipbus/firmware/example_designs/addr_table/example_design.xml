@@ -1,13 +1,13 @@
 <!-- Default microHAL address table for	example	designs	-->
 
 <node id="TOP">
-	<node id="ctrl_reg" address="0x0" description="ctrl/stat register" tag="slave">
+	<node id="ctrl_reg" address="0x0" description="ctrl/stat register" tags="slave">
 		<node id="rst" address="0x0"/>
 		<node id="id" address="0x1"/>
 	</node>
-	<node id="reg" address="0x2" description="read-write register" tag="slave"/>
-	<node id="ram" address="0x1000" size="0x400" description="1kword RAM"  tag="slave"/>
-	<node id="err_inject" address="0x4" description="error injection ctrl/stat" tag="slave">
+	<node id="reg" address="0x2" description="read-write register" tags="slave"/>
+	<node id="ram" address="0x1000" size="0x400" description="1kword RAM"  tags="slave"/>
+	<node id="err_inject" address="0x4" description="error injection ctrl/stat" tags="slave">
 		<node id="rx_ctrl" address="0x0"/>
 		<node id="tx_ctrl" address="0x1"/>
 		<node id="rx_stat" address="0x2"/>
