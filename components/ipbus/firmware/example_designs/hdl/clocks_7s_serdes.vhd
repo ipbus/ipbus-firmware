@@ -85,7 +85,7 @@ begin
 		if rising_edge(sysclk) then
 			d25_d <= d25;
 			if d25='1' and d25_d='0' then
-				rst <= nuke_d2 or not dcm_locked or not ext_locked;
+				rst <= nuke_d2 or (not dcm_locked) or (not ext_locked);
 				nuke_d <= nuke_i; -- Time bomb (allows return packet to be sent)
 				nuke_d2 <= nuke_d;
 			end if;
