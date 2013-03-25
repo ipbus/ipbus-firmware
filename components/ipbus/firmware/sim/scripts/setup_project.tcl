@@ -17,4 +17,5 @@ source $::env(REPOS_FW_DIR)/ipbus/firmware/sim/scripts/addfiles_sim.tcl
 
 project calculateorder
 project close
+quit
 
