@@ -14,12 +14,14 @@ library unisim;
 use unisim.VComponents.all;
 
 entity clocks_7s_serdes is port(
-	sysclk_p, sysclk_n: in std_logic;
+	sysclk_p: in std_logic;
+	sysclk_n: in std_logic;
+	clki_125: in std_logic;
 	clko_ipb: out std_logic;
 	sysclk_o: out std_logic;
 	locked: out std_logic;
 	nuke: in std_logic;
-	rsto: out std_logic;
+	rsto_125: out std_logic;
 	rsto_ipb: out std_logic;
 	onehz: out std_logic
 	);
@@ -100,5 +102,14 @@ begin
 	end process;
 	
 	rsto_ipb <= rst_ipb;
+	
+	process(clki_125)
+	begin
+		if rising_edge(clki_125) then
+			rst_125 <= rst;
+		end if;
+	end process;
+	
+	rsto_125 <= rst_125;
 		
 end rtl;
