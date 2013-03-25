@@ -10,7 +10,7 @@ proc dofile {file} {
 		}
 		set l [split $f]
 		set cmd [lindex $l 0]
-		set arg [lindex $l 1]
+		set arg $::env(REPOS_FW_DIR)/[lindex $l 1]
 		if {$cmd == "hdl"} {
 			addfile $arg
 		} elseif {$cmd == "core"} {
@@ -29,5 +29,5 @@ proc addcore {file} {
 	addfile [file rootname $file].vhd
 }
 
-dofile file_list
+dofile $::env(REPOS_BUILD_DIR)/file_list
 
