@@ -100,6 +100,11 @@ address_block:  process(mac_clk)
           when 40 =>
 	    set_addr_int := '1';
 	    addr_to_set_int := to_unsigned(22, 6);
+-- RX ARP target MAC and IP addr bytes 32 to 41 => TX copy to sender...
+          when 30 =>
+	    set_addr_int := '1';
+	    addr_to_set_int := to_unsigned(42, 6);
+-- RX end of packet, just copy safely...
           when Others =>
 	    set_addr_int := '0';
 	    addr_to_set_int := (Others => '0');
