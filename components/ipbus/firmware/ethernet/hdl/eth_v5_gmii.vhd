@@ -195,11 +195,11 @@ begin
 	process(clk125) -- Shim between new and old-style MAC interfaces
 	begin
 		if rising_edge(clk125) then
-			tx_ready_i <= (tx_ready_i or txack) and not (tx_last or rst); -- Assume long rst pulse
+			tx_ready_i <= tx_ready_i and not (tx_last or rst); -- Assume long rst pulse
 		end if;
 	end process;
   
-	tx_ready <= tx_ready_i;
+	tx_ready <= tx_ready_i or txack;
 	
 	hostbus_out.hostrddata <= (others => '0');
 	hostbus_out.hostmiimrdy <= '0';
