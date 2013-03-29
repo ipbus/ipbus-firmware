@@ -15,7 +15,8 @@ use work.ipbus_trans_decl.all;
 entity ipbus_ctrl is 
 	generic(
 		MAC_CFG: ipb_mac_cfg := STATIC;
-		IP_CFG: ipb_ip_cfg := STATIC
+		IP_CFG: ipb_ip_cfg := STATIC;
+		N_OOB: natural := 0
 	);
   port(
 		mac_clk: in std_logic; -- Ethernet MAC clock (125MHz)
@@ -36,15 +37,17 @@ entity ipbus_ctrl is
 		mac_addr: in std_logic_vector(47 downto 0); -- Static MAC and IP addresses
 		ip_addr: in std_logic_vector(31 downto 0);
 		pkt_rx_led: out std_logic;
-		pkt_tx_led: out std_logic
+		pkt_tx_led: out std_logic;
+		oob_in: in ipbus_trans_in_array(N_OOB - 1 downto 0);
+		oob_out: out ibus_trans_out_array(N_OOB - 1 downto 0)
 	);
 
 end ipbus_ctrl;
 
 architecture rtl of ipbus_ctrl is
 
-  signal trans_in: ipbus_trans_in;
-  signal trans_out: ipbus_trans_out;
+  signal trans_in, trans_in_udp: ipbus_trans_in;
+  signal trans_out, trans_out_udp: ipbus_trans_out;
   signal udp_rxram_dropped, udp_rxpayload_dropped: std_logic;
   signal cfg, cfg_out: std_logic_vector(127 downto 0);
   signal my_mac_addr: std_logic_vector(47 downto 0);
@@ -65,21 +68,41 @@ begin
 		mac_rx_last => mac_rx_last,
 		mac_rx_valid => mac_rx_valid,
 		mac_tx_ready => mac_tx_ready,
-		pkt_done => trans_out.pkt_done,
-		raddr => trans_out.raddr,
-		waddr => trans_out.waddr,
-		wdata => trans_out.wdata,
-		we => trans_out.we,
-		busy => trans_in.busy,
+		pkt_done => trans_out_udp.pkt_done,
+		raddr => trans_out_udp.raddr,
+		waddr => trans_out_udp.waddr,
+		wdata => trans_out_udp.wdata,
+		we => trans_out_udp.we,
+		busy => trans_in_udp.busy,
 		mac_tx_data => mac_tx_data,
 		mac_tx_error => mac_tx_error,
 		mac_tx_last => mac_tx_last,
 		mac_tx_valid => mac_tx_valid,
-		pkt_rdy => trans_in.pkt_rdy,
-		rdata => trans_in.rdata,
+		pkt_rdy => trans_in_udp.pkt_rdy,
+		rdata => trans_in_udp.rdata,
 		rxpayload_dropped => udp_rxpayload_dropped,
 		rxram_dropped => udp_rxram_dropped
 	);
+	
+	arb_gen: if N_OOB > 0 generate
+		arb: entity work.trans_arb
+			generic map(NSRC => N_OOB + 1)
+			port map(
+				clk => ipb_clk,
+				rst => rst_ipb,
+				buf_in(0) => trans_in_udp,
+				buf_in(N_OOB downto 1) => oob_in,
+				buf_out(0) => trans_out_udp,
+				buf_out(N_OOB downto 1) => oob_out,
+				trans_out => trans_out,
+				trans_in => trans_in
+			);
+	end generate;
+	
+	n_arb_gen: if N_OOB = 0 generate
+		trans_in <= trans_in_udp;
+		trans_out_udp <= trans_out;
+	end generate
 	
 	trans: entity work.transactor port map(
 		clk => ipb_clk,
