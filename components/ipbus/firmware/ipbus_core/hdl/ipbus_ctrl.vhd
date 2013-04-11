@@ -39,7 +39,7 @@ entity ipbus_ctrl is
 		pkt_rx_led: out std_logic;
 		pkt_tx_led: out std_logic;
 		oob_in: in ipbus_trans_in_array(N_OOB - 1 downto 0);
-		oob_out: out ibus_trans_out_array(N_OOB - 1 downto 0)
+		oob_out: out ipbus_trans_out_array(N_OOB - 1 downto 0)
 	);
 
 end ipbus_ctrl;
