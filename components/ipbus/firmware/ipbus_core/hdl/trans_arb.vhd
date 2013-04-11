@@ -58,7 +58,7 @@ begin
 	end process;
 
 	trans_out.pkt_rdy <= buf_in(sel).pkt_rdy;
-	trans_out.raddr <= buf_in(sel).raddr;
+	trans_out.rdata <= buf_in(sel).rdata;
 	trans_out.busy <= buf_in(sel).busy;
 
   busgen: for i in NSRC-1 downto 0 generate
