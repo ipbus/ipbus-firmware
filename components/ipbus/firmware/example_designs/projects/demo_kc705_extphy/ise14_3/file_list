@@ -1,4 +1,4 @@
-hdl ipbus/firmware/example_designs/hdl/demo_sp605_extphy/top_sp605_extphy.vhd
+hdl ipbus/firmware/example_designs/hdl/demo_kc705_extphy/top_kc705_extphy.vhd
 hdl ipbus/firmware/example_designs/ucf/sp605_extphy.ucf
 hdl ipbus/firmware/example_designs/hdl/clocks_s6_extphy.vhd
 hdl ipbus/firmware/ethernet/hdl/eth_s6_gmii.vhd

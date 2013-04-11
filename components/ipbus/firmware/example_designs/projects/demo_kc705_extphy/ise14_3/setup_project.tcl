@@ -1,8 +1,8 @@
-project new demo_sp605_extphy
-project set family spartan6
-project set device xc6slx45t
-project set package fgg484
-project set speed -3
+project new demo_kc705_extphy
+project set family kintex7
+project set device xc7k325t
+project set package ffg900
+project set speed -2
 
 project set "Enable Multi-Threading" "2" -process "Map"
 project set "Pack I/O Registers/Latches into IOBs" "For Inputs and Outputs" -process "Map"

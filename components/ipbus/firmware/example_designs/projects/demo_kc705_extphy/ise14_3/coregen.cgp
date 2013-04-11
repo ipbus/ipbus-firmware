@@ -1,9 +1,10 @@
 SET busformat = BusFormatAngleBracketNotRipped
 SET designentry = VHDL
-SET device = xc6slx45t
-SET devicefamily = spartan6
+SET device = xc7k325t
+SET devicefamily = kintex7
 SET flowvendor = Foundation_ISE
-SET package = fgg484
-SET speedgrade = -3
+SET package = ffg900
+SET speedgrade = -2
 SET verilogsim = true
 SET vhdlsim = true
+
