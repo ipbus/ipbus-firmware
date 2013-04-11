@@ -43,7 +43,7 @@ architecture rtl of eth_7s_1000basex is
 	signal gmii_rx_clk: std_logic;
 	signal clkin, clk125, txoutclk_ub, txoutclk, clk125_ub: std_logic;
 	signal clk62_5_ub, clk62_5, clkfb: std_logic;
-	signal rstn, rst_int, phy_done, mmcm_locked, locked_int: std_logic;
+	signal rstn, phy_done, mmcm_locked, locked_int: std_logic;
 	signal status: std_logic_vector(15 downto 0);
 
 begin
@@ -86,11 +86,16 @@ begin
 		i => clk62_5_ub,
 		o => clk62_5);
 
-	locked_int <= mmcm_locked and phy_done;
+	process(fr_clk)
+	begin
+		if rising_edge(fr_clk) then
+			locked_int <= mmcm_locked and phy_done;
+		end if;
+	end process;
+
 	locked <= locked_int;
-	rst_int <= not locked_int or rsti;
-	rstn <= not rst_int;
-	
+	rstn <= not (not locked_int or rsti);
+
 	mac: entity work.emac_serdes_5_4 port map(
 		glbl_rstn => rstn,
 		rx_axi_rstn => '1',
