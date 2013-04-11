@@ -7,6 +7,7 @@ NET eth/txoutclk TNM_NET=txoutclk;
 TIMESPEC TS_txoutclk = PERIOD txoutclk 16ns;
 
 NET clocks/rst TIG;
+NET clocks/nuke_i TIG;
 
 NET gt_clkp LOC=G8 | DIFF_TERM=TRUE | TNM_NET=gt_clk;
 NET gt_clkn LOC=G7 | DIFF_TERM=TRUE;
