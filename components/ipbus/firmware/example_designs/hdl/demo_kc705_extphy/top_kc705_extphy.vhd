@@ -27,7 +27,7 @@ end top;
 
 architecture rtl of top is
 
-	signal clk125, ipb_clk, locked, rst_125, rst_ipb, onehz : STD_LOGIC;
+	signal clk125, clk200, ipb_clk, locked, rst_125, rst_ipb, onehz : STD_LOGIC;
 	signal mac_tx_data, mac_rx_data: std_logic_vector(7 downto 0);
 	signal mac_tx_valid, mac_tx_last, mac_tx_error, mac_tx_ready, mac_rx_valid, mac_rx_last, mac_rx_error: std_logic;
 	signal ipb_master_out : ipb_wbus;
@@ -42,16 +42,18 @@ begin
 
 --	DCM clock generation for internal bus, ethernet
 
-	clocks: entity work.clocks_s6_extphy port map(
-		sysclk_p => sysclk_p,
-		sysclk_n => sysclk_n,
-		clko_125 => clk125,
-		clko_ipb => ipb_clk,
-		locked => locked,
-		nuke => sys_rst,
-		rsto_125 => rst_125,
-		rsto_ipb => rst_ipb,
-		onehz => onehz
+	clocks: entity work.clocks_7s_extphy
+		port map(
+			sysclk_p => sysclk_p,
+			sysclk_n => sysclk_n,
+			clko_125 => clk125,
+			clko_200 => clk200,
+			clko_ipb => ipb_clk,
+			locked => locked,
+			nuke => sys_rst,
+			rsto_125 => rst_125,
+			rsto_ipb => rst_ipb,
+			onehz => onehz
 		);
 		
 	leds <= (pkt_rx_led, pkt_tx_led, locked, onehz);
@@ -60,29 +62,31 @@ begin
 -- In this version, consists of hard MAC core and GMII interface to external PHY
 -- Can be replaced by any other MAC / PHY combination
 	
-	eth: entity work.eth_s6_gmii port map(
-		clk125 => clk125,
-		rst => rst_125,
-		gmii_gtx_clk => gmii_gtx_clk,
-		gmii_tx_en => gmii_tx_en,
-		gmii_tx_er => gmii_tx_er,
-		gmii_txd => gmii_txd,
-		gmii_rx_clk => gmii_rx_clk,
-		gmii_rx_dv => gmii_rx_dv,
-		gmii_rx_er => gmii_rx_er,
-		gmii_rxd => gmii_rxd,
-		tx_data => mac_tx_data,
-		tx_valid => mac_tx_valid,
-		tx_last => mac_tx_last,
-		tx_error => mac_tx_error,
-		tx_ready => mac_tx_ready,
-		rx_data => mac_rx_data,
-		rx_valid => mac_rx_valid,
-		rx_last => mac_rx_last,
-		rx_error => mac_rx_error,
-		hostbus_in => hostbus_in,
-		hostbus_out => hostbus_out
-	);
+	eth: entity work.eth_7s_gmii
+		port map(
+			clk125 => clk125,
+			clk200 => clk200,
+			rst => rst_125,
+			gmii_gtx_clk => gmii_gtx_clk,
+			gmii_tx_en => gmii_tx_en,
+			gmii_tx_er => gmii_tx_er,
+			gmii_txd => gmii_txd,
+			gmii_rx_clk => gmii_rx_clk,
+			gmii_rx_dv => gmii_rx_dv,
+			gmii_rx_er => gmii_rx_er,
+			gmii_rxd => gmii_rxd,
+			tx_data => mac_tx_data,
+			tx_valid => mac_tx_valid,
+			tx_last => mac_tx_last,
+			tx_error => mac_tx_error,
+			tx_ready => mac_tx_ready,
+			rx_data => mac_rx_data,
+			rx_valid => mac_rx_valid,
+			rx_last => mac_rx_last,
+			rx_error => mac_rx_error,
+			hostbus_in => hostbus_in,
+			hostbus_out => hostbus_out
+		);
 	
 	phy_rstb <= '1';
 	
@@ -111,8 +115,8 @@ begin
 			pkt_tx_led => pkt_tx_led
 		);
 		
-	mac_addr <= X"020ddba115" & dip_switch & X"0"; -- Careful here, arbitrary addresses do not always work
-	ip_addr <= X"c0a8c8" & dip_switch & X"0"; -- 192.168.200.X
+	mac_addr <= X"020ddba11599"; -- Careful here, arbitrary addresses do not always work
+	ip_addr <= X"c0a80008"; -- 192.168.0.8
 
 -- ipbus slaves live in the entity below, and can expose top-level ports
 -- The ipbus fabric is instantiated within.

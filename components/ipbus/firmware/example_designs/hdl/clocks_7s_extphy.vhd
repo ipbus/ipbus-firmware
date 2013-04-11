@@ -14,7 +14,7 @@ use ieee.std_logic_1164.all;
 library unisim;
 use unisim.VComponents.all;
 
-entity clocks_7s is port(
+entity clocks_7s_extphy is port(
 	sysclk_p, sysclk_n: in std_logic;
 	clko_125: out std_logic;
 	clko_200: out std_logic;
@@ -26,9 +26,9 @@ entity clocks_7s is port(
 	onehz: out std_logic
 	);
 
-end clocks_7s;
+end clocks_7s_extphy;
 
-architecture rtl of clocks_7s is
+architecture rtl of clocks_7s_extphy is
 	
 	signal dcm_locked, sysclk, clk_ipb_i, clk_125_i, clkfb, clk_ipb_b, clk_125_b: std_logic;
 	signal d25, d25_d: std_logic;

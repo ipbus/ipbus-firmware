@@ -19,7 +19,6 @@ entity eth_7s_gmii is
 		clk125: in std_logic;
 		clk200: in std_logic;
 		rst: in std_logic;
-		locked: in std_logic;
 		gmii_gtx_clk: out std_logic;
 		gmii_txd: out std_logic_vector(7 downto 0);
 		gmii_tx_en: out std_logic;
@@ -44,6 +43,62 @@ entity eth_7s_gmii is
 end eth_7s_gmii;
 
 architecture rtl of eth_7s_gmii is
+
+	COMPONENT tri_mode_eth_mac_v5_4
+	  PORT (
+		 glbl_rstn : IN STD_LOGIC;
+		 rx_axi_rstn : IN STD_LOGIC;
+		 tx_axi_rstn : IN STD_LOGIC;
+		 rx_axi_clk : IN STD_LOGIC;
+		 rx_reset_out : OUT STD_LOGIC;
+		 rx_axis_mac_tdata : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+		 rx_axis_mac_tvalid : OUT STD_LOGIC;
+		 rx_axis_mac_tlast : OUT STD_LOGIC;
+		 rx_axis_mac_tuser : OUT STD_LOGIC;
+		 rx_statistics_vector : OUT STD_LOGIC_VECTOR(27 DOWNTO 0);
+		 rx_statistics_valid : OUT STD_LOGIC;
+		 tx_axi_clk : IN STD_LOGIC;
+		 tx_reset_out : OUT STD_LOGIC;
+		 tx_axis_mac_tdata : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+		 tx_axis_mac_tvalid : IN STD_LOGIC;
+		 tx_axis_mac_tlast : IN STD_LOGIC;
+		 tx_axis_mac_tuser : IN STD_LOGIC;
+		 tx_axis_mac_tready : OUT STD_LOGIC;
+		 tx_ifg_delay : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+		 tx_statistics_vector : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+		 tx_statistics_valid : OUT STD_LOGIC;
+		 pause_req : IN STD_LOGIC;
+		 pause_val : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+		 speed_is_100 : OUT STD_LOGIC;
+		 speed_is_10_100 : OUT STD_LOGIC;
+		 gmii_txd : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+		 gmii_tx_en : OUT STD_LOGIC;
+		 gmii_tx_er : OUT STD_LOGIC;
+		 gmii_rxd : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+		 gmii_rx_dv : IN STD_LOGIC;
+		 gmii_rx_er : IN STD_LOGIC;
+		 rx_mac_config_vector : IN STD_LOGIC_VECTOR(79 DOWNTO 0);
+		 tx_mac_config_vector : IN STD_LOGIC_VECTOR(79 DOWNTO 0)
+	  );
+	END COMPONENT;
+	
+	COMPONENT mac_fifo_axi4
+	  PORT (
+		 m_aclk : IN STD_LOGIC;
+		 s_aclk : IN STD_LOGIC;
+		 s_aresetn : IN STD_LOGIC;
+		 s_axis_tvalid : IN STD_LOGIC;
+		 s_axis_tready : OUT STD_LOGIC;
+		 s_axis_tdata : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+		 s_axis_tlast : IN STD_LOGIC;
+		 s_axis_tuser : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+		 m_axis_tvalid : OUT STD_LOGIC;
+		 m_axis_tready : IN STD_LOGIC;
+		 m_axis_tdata : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+		 m_axis_tlast : OUT STD_LOGIC;
+		 m_axis_tuser : OUT STD_LOGIC_VECTOR(0 DOWNTO 0)
+	  );
+	END COMPONENT;
 
 	signal rx_clk, rx_clk_io: std_logic;
 	signal txd_e, rxd_r: std_logic_vector(7 downto 0);
@@ -169,7 +224,7 @@ begin
 
 	rstn <= not rst;
 
-	emac0: entity work.v7_emac_v5_2 port map(
+	emac0: tri_mode_eth_mac_v5_4 port map(
 		glbl_rstn => rstn,
 		rx_axi_rstn => '1',
 		tx_axi_rstn => '1',
@@ -215,7 +270,7 @@ begin
 		end if;
 	end process;
 	
-	fifo: entity work.mac_fifo_axi4 port map(
+	fifo: mac_fifo_axi4 port map(
 		m_aclk => clk125,
 		s_aclk => rx_clk,
 		s_aresetn => rx_rst,

@@ -110,7 +110,7 @@ architecture rtl of eth_s6_gmii is
 	signal rx_data_e: std_logic_vector(7 downto 0);
 	signal rx_valid_e, rx_last_e, rx_user_e, rx_rst, rstn: std_logic;
 	signal rx_user_f, rx_user_ef: std_logic_vector(0 downto 0);
-	signal rx_valid_f, rx_valid_d, rx_valid_i: std_logic;
+	signal rx_valid_f, rx_valid_d: std_logic;
 	
 begin
 
@@ -273,30 +273,13 @@ begin
 		s_axis_tdata => rx_data_e,
 		s_axis_tlast => rx_last_e,
 		s_axis_tuser => rx_user_ef,
-		m_axis_tvalid => rx_valid_f,
-		m_axis_tready => rx_valid_i,
+		m_axis_tvalid => rx_valid,
+		m_axis_tready => '1',
 		m_axis_tdata => rx_data,
 		m_axis_tlast => rx_last,
 		m_axis_tuser => rx_user_f
 	); -- Clock domain crossing FIFO
 	
-	del: SRL16E
-		port map(
-			q => rx_valid_d,
-			a0 => '1',
-			a1 => '1',
-			a2 => '1',
-			a3 => '0',
-			ce => '1',
-			clk => clk125,
-			d => rx_valid_f
-		); -- Buffer delay to prevent FIFO emptying during packet
-		
---	rx_valid_i <= rx_valid_d and rx_valid_f;
---	rx_valid <= rx_valid_i;
-	rx_valid_i <= '1';
-	rx_valid <= rx_valid_f;
-		
 	hostbus_out.hostrddata <= (others => '0');
 	hostbus_out.hostmiimrdy <= '0';
 	
