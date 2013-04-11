@@ -94,8 +94,8 @@ begin
 				buf_in(N_OOB downto 1) => oob_in,
 				buf_out(0) => trans_out_udp,
 				buf_out(N_OOB downto 1) => oob_out,
-				trans_out => trans_out,
-				trans_in => trans_in
+				trans_out => trans_in,
+				trans_in => trans_out
 			);
 	end generate;
 	
