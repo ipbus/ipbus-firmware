@@ -102,7 +102,7 @@ begin
 	n_arb_gen: if N_OOB = 0 generate
 		trans_in <= trans_in_udp;
 		trans_out_udp <= trans_out;
-	end generate
+	end generate;
 	
 	trans: entity work.transactor port map(
 		clk => ipb_clk,

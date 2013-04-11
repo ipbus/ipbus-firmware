@@ -21,6 +21,7 @@ hdl ipbus/firmware/ipbus_core/hdl/udp_rxtransactor_if_simple.vhd
 hdl ipbus/firmware/ipbus_core/hdl/udp_tx_mux.vhd
 hdl ipbus/firmware/ipbus_core/hdl/udp_txtransactor_if_simple.vhd
 hdl ipbus/firmware/ipbus_core/hdl/udp_clock_crossing_if.vhd
+hdl ipbus/firmware/ipbus_core/hdl/trans_arb.vhd
 hdl ipbus/firmware/ipbus_core/hdl/transactor.vhd
 hdl ipbus/firmware/ipbus_core/hdl/transactor_if.vhd
 hdl ipbus/firmware/ipbus_core/hdl/transactor_sm.vhd
