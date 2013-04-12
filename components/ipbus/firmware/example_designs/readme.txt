@@ -21,8 +21,8 @@ svn co PATH_TO_REPOSITORY/trunk/components/ipbus
 - Set the path to the firmware base directory and to the build scripts directory
 for the chosen example design
 
-EXPORT REPOS_FW_DIR=`pwd`
-EXPORT REPOS_BUILD_DIR=`pwd`/ipbus/firmware/example_designs/projects/demo_sp605_extphy/ise14_3
+export REPOS_FW_DIR=`pwd`
+export REPOS_BUILD_DIR=`pwd`/ipbus/firmware/example_designs/projects/demo_sp605_extphy/ise14_3
 
 - Creaet and move to a working directory for the example design:
 
