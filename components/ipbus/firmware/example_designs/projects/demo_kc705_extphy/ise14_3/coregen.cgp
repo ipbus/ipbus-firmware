@@ -7,4 +7,3 @@ SET package = ffg900
 SET speedgrade = -2
 SET verilogsim = true
 SET vhdlsim = true
-
