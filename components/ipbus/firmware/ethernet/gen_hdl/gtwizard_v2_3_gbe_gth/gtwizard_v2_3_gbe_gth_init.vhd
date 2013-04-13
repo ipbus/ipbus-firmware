@@ -409,7 +409,9 @@ end component;
 --***********************************Parameter Declarations********************
 
     constant DLY : time := 1 ns;
-    constant STABLE_CLOCK_PERIOD  : integer := 20;  --Period of the stable clock driving this state-machine, unit is [ns]
+-- DMN CHANGE
+    constant STABLE_CLOCK_PERIOD  : integer := 8;  --Period of the stable clock driving this state-machine, unit is [ns]
+--    constant STABLE_CLOCK_PERIOD  : integer := 20;  --Period of the stable clock driving this state-machine, unit is [ns]
     constant RX_CDRLOCK_TIME      : integer := get_cdrlock_time(EXAMPLE_SIMULATION);       -- 200us
     constant WAIT_TIME_CDRLOCK    : integer := RX_CDRLOCK_TIME / STABLE_CLOCK_PERIOD;      -- 200 us time-out
     constant LPM_ADAPT_LOCK_TIMER : integer := get_lpm_adapt_lock_time(EXAMPLE_SIMULATION);
