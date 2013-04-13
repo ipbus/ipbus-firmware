@@ -486,7 +486,7 @@ begin
         CFOK_CFG2                               =>     (x"20"),
         CFOK_CFG3                               =>     (x"20"),
         ES_CLK_PHASE_SEL                        =>     ('0'),
-        PMA_RSV5                                =>     (x"0"pma),
+        PMA_RSV5                                =>     (x"0"),
         RESET_POWERSAVE_DISABLE                 =>     ('0'),
         USE_PCS_CLK_PHASE_SEL                   =>     ('0'),
         A_RXOSCALRESET                          =>     ('0'),
