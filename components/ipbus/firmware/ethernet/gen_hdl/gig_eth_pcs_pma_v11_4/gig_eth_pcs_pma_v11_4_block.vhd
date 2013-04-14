@@ -103,6 +103,9 @@ entity gig_eth_pcs_pma_v11_4_block is
 
       txoutclk             : out std_logic;                    -- txoutclk from GT transceiver (62.5MHz)
       resetdone            : out std_logic;                    -- The GT transceiver has completed its reset cycle
+-- DMN CHANGE
+			mmcm_reset: out std_logic;
+--
       mmcm_locked          : in std_logic;                     -- Locked indication from MMCM
       userclk              : in std_logic;                     -- 62.5MHz global clock.
       userclk2             : in std_logic;                     -- 125MHz global clock.
@@ -176,6 +179,9 @@ architecture block_level of gig_eth_pcs_pma_v11_4_block is
       rxp                 : in    std_logic;
       gtrefclk            : in    std_logic;
       pmareset            : in    std_logic;
+-- DMN CHANGE
+			mmcm_reset: out std_logic;
+--
       mmcm_locked         : in    std_logic;
       resetdone           : out   std_logic
    );
@@ -351,6 +357,9 @@ begin
       rxp                  => rxp,
       gtrefclk             => gtrefclk,
       pmareset             => pma_reset,
+-- DMN CHANGE
+			mmcm_reset => mmcm_reset,
+--
       mmcm_locked          => mmcm_locked,
       resetdone            => resetdone
    );

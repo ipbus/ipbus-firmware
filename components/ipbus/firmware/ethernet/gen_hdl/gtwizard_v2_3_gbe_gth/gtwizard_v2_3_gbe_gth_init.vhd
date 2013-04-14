@@ -684,7 +684,9 @@ gt0_rxresetfsm_i:  gtwizard_v2_3_gbe_gth_RX_STARTUP_FSM
         QPLLLOCK                        =>      tied_to_vcc_i,
         CPLLLOCK                        =>      gt0_cplllock_i,
         RXRESETDONE                     =>      gt0_rxresetdone_i,
-        MMCM_LOCK                       =>      tied_to_vcc_i,
+-- DMN CHANGE
+        MMCM_LOCK                       =>      mmcm_lock,
+--        MMCM_LOCK                       =>      tied_to_vcc_i,
         RECCLK_STABLE                   =>      gt0_recclk_stable_i,
         RECCLK_MONITOR_RESTART          =>      gt0_recclk_monitor_restart_i,
         DATA_VALID                      =>      GT0_DATA_VALID_IN,

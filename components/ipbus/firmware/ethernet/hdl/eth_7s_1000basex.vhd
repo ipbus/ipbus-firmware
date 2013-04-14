@@ -43,7 +43,7 @@ architecture rtl of eth_7s_1000basex is
 	signal gmii_rx_clk: std_logic;
 	signal clkin, clk125, txoutclk_ub, txoutclk, clk125_ub: std_logic;
 	signal clk62_5_ub, clk62_5, clkfb: std_logic;
-	signal rstn, phy_done, mmcm_locked, locked_int: std_logic;
+	signal rstn, phy_done, mmcm_locked, locked_int, mmcm_reset, mmcm_reset_phy: std_logic;
 	signal status: std_logic_vector(15 downto 0);
 
 begin
@@ -60,6 +60,8 @@ begin
 		o => txoutclk
 	);
 	
+	mmcm_reset <= rsti or mmcm_reset_phy;
+	
 	mcmm: MMCME2_BASE
 		generic map(
 			CLKIN1_PERIOD => 16.0,
@@ -72,7 +74,7 @@ begin
 			clkout2 => clk125_ub,
 			clkfbout => clkfb,
 			clkfbin => clkfb,
-			rst => rsti,
+			rst => mmcm_reset,
 			pwrdwn => '0',
 			locked => mmcm_locked);
 	
@@ -148,6 +150,7 @@ begin
 			userclk2 => clk125,
 			independent_clock_bufg => fr_clk,
 			pma_reset => rsti,
+			mmcm_reset => mmcm_reset_phy,
 			mmcm_locked => mmcm_locked,
 			gmii_txd => gmii_txd,
 			gmii_tx_en => gmii_tx_en,
