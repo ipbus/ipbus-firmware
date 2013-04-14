@@ -164,7 +164,10 @@ port
     ------------------------- Common Block - QPLL Ports ------------------------
     GT0_QPLLLOCK_OUT                        : out  std_logic;
     GT0_QPLLLOCKDETCLK_IN                   : in   std_logic;
-    GT0_QPLLRESET_IN                        : in   std_logic
+    GT0_QPLLRESET_IN                        : in   std_logic;
+    -- DMN CHANGE
+    mmcm_lock: in std_logic;
+    mmcm_reset: out std_logic
 
 
 );
@@ -636,9 +639,13 @@ gt0_txresetfsm_i:  gtwizard_v2_3_gbe_gth_TX_STARTUP_FSM
         QPLLLOCK                        =>      tied_to_vcc_i,
         CPLLLOCK                        =>      gt0_cplllock_i,
         TXRESETDONE                     =>      gt0_txresetdone_i,
-        MMCM_LOCK                       =>      tied_to_vcc_i,
+-- DMN CHANGE
+        MMCM_LOCK                       =>      mmcm_lock,
+--        MMCM_LOCK                       =>      tied_to_vcc_i,
         GTTXRESET                       =>      gt0_gttxreset_t,
-        MMCM_RESET                      =>      open,
+-- DMN CHANGE
+        MMCM_RESET                      =>      mmcm_reset,
+--        MMCM_RESET                      =>      open,
         QPLL_RESET                      =>      open,
         CPLL_RESET                      =>      gt0_cpllreset_t,
         TX_FSM_RESET_DONE               =>      GT0_TX_FSM_RESET_DONE_OUT,

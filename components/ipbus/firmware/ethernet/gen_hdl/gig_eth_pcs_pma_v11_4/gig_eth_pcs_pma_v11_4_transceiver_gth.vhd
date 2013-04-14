@@ -99,6 +99,9 @@ entity gig_eth_pcs_pma_v11_4_transceiver is
       rxp                 : in    std_logic;
       gtrefclk            : in    std_logic;
       pmareset            : in    std_logic;
+-- DMN CHANGE
+			mmcm_reset: out std_logic;
+--
       mmcm_locked         : in    std_logic;
       resetdone           : out   std_logic
    );
@@ -216,9 +219,12 @@ architecture wrapper of gig_eth_pcs_pma_v11_4_transceiver is
     ------------------------- Common Block - QPLL Ports ------------------------
     GT0_QPLLLOCK_OUT                        : out  std_logic;
     GT0_QPLLLOCKDETCLK_IN                   : in   std_logic;
-    GT0_QPLLRESET_IN                        : in   std_logic
+    GT0_QPLLRESET_IN                        : in   std_logic;
     ----------------- Transmit Ports - TX Ports for PCI Express ----------------
     --GT0_TXELECIDLE_IN                       : in   std_logic
+-- DMN CHANGE
+		mmcm_lock: in std_logic;
+		mmcm_reset: out std_logic
   );
   end component;
 
@@ -617,9 +623,12 @@ begin
         GT0_GTREFCLK0_COMMON_IN => gtrefclk,
         GT0_QPLLLOCK_OUT => open,
         GT0_QPLLLOCKDETCLK_IN => independent_clock,
-        GT0_QPLLRESET_IN => '0'
+        GT0_QPLLRESET_IN => '0',
     ----------------- Transmit Ports - TX Ports for PCI Express ----------------
         --GT0_TXELECIDLE_IN               =>      txpowerdown
+-- DMN CHANGE
+        mmcm_lock => mmcm_locked,
+        mmcm_reset => mmcm_reset
     );
 
 
