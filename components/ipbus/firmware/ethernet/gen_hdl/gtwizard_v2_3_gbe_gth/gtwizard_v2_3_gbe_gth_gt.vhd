@@ -300,7 +300,9 @@ begin
         PMA_RSV4                                =>     (x"0008"),
         RX_BIAS_CFG                             =>     ("000011000000000000010000"),
         DMONITOR_CFG                            =>     (x"000A00"),
-        RX_CM_SEL                               =>     ("01"),
+-- DMN CHANGE
+        RX_CM_SEL                               =>     ("11"),
+--        RX_CM_SEL                               =>     ("01"),
         RX_CM_TRIM                              =>     ("1010"),
         RX_DEBUG_CFG                            =>     ("00000000000000"),
         RX_OS_CFG                               =>     ("0000010000000"),
