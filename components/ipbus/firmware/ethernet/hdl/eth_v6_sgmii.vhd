@@ -96,5 +96,8 @@ begin
       rx_axi_rstn => rstn,
       tx_axi_rstn => rstn
    );
+   
+  hostbus_out.hostrddata <= (others => '0');
+	hostbus_out.hostmiimrdy <= '0';
 
 end rtl;

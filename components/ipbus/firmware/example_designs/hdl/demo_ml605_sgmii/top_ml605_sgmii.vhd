@@ -25,7 +25,7 @@ end top;
 
 architecture rtl of top is
 
-	signal clk125, clk200, ipb_clk, eth_locked, clk_locked, rst_125, rst_ipb, onehz : STD_LOGIC;
+	signal clk125, clk200, ipb_clk, eth_locked, clk_locked, rst_125, rst_ipb, rst_eth, onehz : STD_LOGIC;
 	signal mac_tx_data, mac_rx_data: std_logic_vector(7 downto 0);
 	signal mac_tx_valid, mac_tx_last, mac_tx_error, mac_tx_ready, mac_rx_valid, mac_rx_last, mac_rx_error: std_logic;
 	signal ipb_master_out : ipb_wbus;
@@ -56,7 +56,7 @@ begin
 			onehz => onehz
 		);
 		
-	leds <= ("0000" & pkt_rx_led, pkt_tx_led, locked, onehz);
+	leds <= ("000", eth_locked, pkt_rx_led, pkt_tx_led, clk_locked, onehz);
 	
 --	Ethernet MAC core and PHY interface
 	
