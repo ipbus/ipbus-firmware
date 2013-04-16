@@ -610,8 +610,8 @@ begin
    -- until the PLL has locked.
    --gt_reset_rx <= not cplllock or rxreset_int;
    --gt_reset_tx <= not cplllock or txreset_int;
-   gt_reset_rx <= not cplllock or (rxreset_int and resetdone_rx);
-   gt_reset_tx <= not cplllock or (txreset_int and resetdone_tx);
+   gt_reset_rx <= (rxreset_int and resetdone_rx);
+   gt_reset_tx <= (txreset_int and resetdone_tx);
 
    -- Output the PLL locked status
    plllkdet <= cplllock;
