@@ -13,7 +13,7 @@ use ieee.std_logic_1164.all;
 library unisim;
 use unisim.VComponents.all;
 
-entity clocks_7s_serdes is port(
+entity clocks_v6_serdes is port(
 	sysclk_p: in std_logic;
 	sysclk_n: in std_logic;
 	clki_125: in std_logic;
@@ -22,15 +22,15 @@ entity clocks_7s_serdes is port(
 	eth_locked: in std_logic;
 	locked: out std_logic;
 	nuke: in std_logic;
-	rsto_125: out std_logic;
 	rsto_ipb: out std_logic;
+	rsto_125: out std_logic;
 	rsto_eth: out std_logic;
 	onehz: out std_logic
 	);
 
-end clocks_7s_serdes;
+end clocks_v6_serdes;
 
-architecture rtl of clocks_7s_serdes is
+architecture rtl of clocks_v6_serdes is
 	
 	signal dcm_locked, sysclk, sysclk_ub, clk_ipb_i, clk_ipb_b, clkfb: std_logic;
 	signal d25, d25_d: std_logic;
@@ -44,14 +44,14 @@ begin
 		ib => sysclk_n,
 		o => sysclk_ub
 	);
-
+	
 	bufg_sys: BUFG port map(
 		i => sysclk_ub,
 		o => sysclk
 	);
 
-	sysclk_o <= sysclk;
-
+	sysclk_o => sysclk;
+	
 	bufgipb: BUFG port map(
 		i => clk_ipb_i,
 		o => clk_ipb_b
@@ -59,11 +59,11 @@ begin
 	
 	clko_ipb <= clk_ipb_b;
 	
-	mmcm: MMCME2_BASE
+	mmcm: MMCM_BASE
 		generic map(
-			clkfbout_mult_f => 10.0,
+			clkfbout_mult_f => 5.0,
 			clkout1_divide => 32,
-			clkin1_period => 10.0
+			clkin1_period => 5.0
 		)
 		port map(
 			clkin1 => sysclk,
@@ -74,7 +74,7 @@ begin
 			rst => '0',
 			pwrdwn => '0'
 		);
-	
+			
 	clkdiv: entity work.clock_div port map(
 		clk => sysclk,
 		d25 => d25,

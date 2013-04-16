@@ -1,8 +1,8 @@
-project new demo_kc705_extphy
-project set family kintex7
-project set device xc7k325t
-project set package ffg900
-project set speed -2
+project new demo_ml605_sgmii
+project set family virtex6
+project set device xc6vlx240t
+project set package ffg1156
+project set speed -1
 
 project set "Enable Multi-Threading" "2" -process "Map"
 project set "Pack I/O Registers/Latches into IOBs" "For Inputs and Outputs" -process "Map"

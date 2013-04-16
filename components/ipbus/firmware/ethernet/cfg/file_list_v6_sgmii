@@ -1,0 +1,6 @@
+# Xilinx ISE setup fragment for gig_eth_pcs_pma_v11_4
+
+# This is the stock ISE 14.3 version
+
+#core ipbus/firmware/ethernet/coregen/gig_eth_pcs_pma_v11_4.xco
+
