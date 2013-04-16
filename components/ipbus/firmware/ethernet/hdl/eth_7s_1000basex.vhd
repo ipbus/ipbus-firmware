@@ -151,7 +151,6 @@ begin
 			userclk2 => clk125,
 			independent_clock_bufg => fr_clk,
 			pma_reset => rsti,
-			mmcm_reset => mmcm_reset_phy,
 			mmcm_locked => mmcm_locked,
 			gmii_txd => gmii_txd,
 			gmii_tx_en => gmii_tx_en,
