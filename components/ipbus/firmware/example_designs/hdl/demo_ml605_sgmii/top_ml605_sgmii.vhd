@@ -45,7 +45,7 @@ begin
 			sysclk_p => sysclk_p,
 			sysclk_n => sysclk_n,
 			clki_125 => clk125,
-			sysclk_o => clk200
+			sysclk_o => clk200,
 			clko_ipb => ipb_clk,
 			eth_locked => eth_locked,
 			locked => clk_locked,

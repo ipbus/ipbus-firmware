@@ -50,7 +50,7 @@ begin
 		o => sysclk
 	);
 
-	sysclk_o => sysclk;
+	sysclk_o <= sysclk;
 	
 	bufgipb: BUFG port map(
 		i => clk_ipb_i,

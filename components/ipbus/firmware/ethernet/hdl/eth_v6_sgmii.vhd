@@ -18,17 +18,18 @@ entity eth_v6_sgmii is
 		sgmii_txp, sgmii_txn: out std_logic;
 		sgmii_rxp, sgmii_rxn: in std_logic;
 		sync_acq: out std_logic;
-		locked: out std_logic;
 		clk125_o: out std_logic;
 		rst: in std_logic;
-		txd: in std_logic_vector(7 downto 0);
-		txdvld: in std_logic;
-		txack: out std_logic;
-		rxclko: out std_logic;
-		rxd: out std_logic_vector(7 downto 0);
-		rxdvld: out std_logic;
-		rxgoodframe: out std_logic;
-		rxbadframe: out std_logic
+		locked: out std_logic;
+		tx_data: in std_logic_vector(7 downto 0);
+		tx_valid: in std_logic;
+		tx_last: in std_logic;
+		tx_error: in std_logic;
+		tx_ready: out std_logic;
+		rx_data: out std_logic_vector(7 downto 0);
+		rx_valid: out std_logic;
+		rx_last: out std_logic;
+		rx_error: out std_logic
 	);
 
 end eth_v6_sgmii;
@@ -36,7 +37,7 @@ end eth_v6_sgmii;
 architecture rtl of eth_v6_sgmii is
 
 	signal clkin, clk125, clk125_out: std_logic;
-	signal clkp, clkn: std_logic;
+	signal clkp, clkn, rstn, resetdone, syncacqstatus: std_logic;
 
 begin
 
@@ -55,41 +56,46 @@ begin
 
 	rxclko <= clk125;
 	clk125_o <= clk125;
+	
+	locked <= resetdone and syncacqstatus;
+	
+	rstn <= not rst;
 
-	sgmii: entity work.v6_emac_v1_5_sgmii_block port map(
-      CLK125_OUT => clk125_out,
-      CLK125 => clk125,
-      EMACCLIENTRXD => rxd,
-      EMACCLIENTRXDVLD => rxdvld,
-      EMACCLIENTRXGOODFRAME => rxgoodframe,
-      EMACCLIENTRXBADFRAME => rxbadframe,
-      EMACCLIENTRXFRAMEDROP => open,
-      EMACCLIENTRXSTATS => open,
-      EMACCLIENTRXSTATSVLD => open,
-      EMACCLIENTRXSTATSBYTEVLD => open,
-      CLIENTEMACTXD => txd,
-      CLIENTEMACTXDVLD => txdvld,
-      EMACCLIENTTXACK => txack,
-      CLIENTEMACTXFIRSTBYTE => '0',
-      CLIENTEMACTXUNDERRUN => '0',
-      EMACCLIENTTXCOLLISION => open,
-      EMACCLIENTTXRETRANSMIT => open,
-      CLIENTEMACTXIFGDELAY => (others => '0'),
-      EMACCLIENTTXSTATS => open,
-      EMACCLIENTTXSTATSVLD => open,
-      EMACCLIENTTXSTATSBYTEVLD => open,
-      CLIENTEMACPAUSEREQ => '0',
-      CLIENTEMACPAUSEVAL => (others => '0'),
-      EMACCLIENTSYNCACQSTATUS => sync_acq,
-      EMACANINTERRUPT => open,
-      TXP => sgmii_txp,
-      TXN => sgmii_txn,
-      RXP => sgmii_rxp,
-      RXN => sgmii_rxn,
-      PHYAD => (others => '0'),
-      RESETDONE => locked,
-      CLK_DS => clkin,
-      RESET => rst
+	sgmii: entity work.v6_emac_v2_3_sgmii_block port map(
+      clk125_out => clk125_out,
+      gtx_clk => clk125,
+      rx_statistics_vector => open,
+      rx_statistics_valid => open,
+      user_mac_aclk => clk125,
+      rx_reset => open,
+      rx_axis_mac_tdata => rx_data,
+      rx_axis_mac_tvalid => rx_valid,
+      rx_axis_mac_tlast => rx_last,
+      rx_axis_mac_tuser => rx_error,
+      tx_ifg_delay => (others => '0'),
+      tx_statistics_vector => open,
+      tx_statistics_valid => open,
+      tx_reset => open,
+      tx_axis_mac_tdata => tx_data,
+      tx_axis_mac_tvalid => tx_valid,
+      tx_axis_mac_tlast => tx_last,
+      tx_axis_mac_tuser => tx_error,
+      tx_axis_mac_tready => tx_ready,
+      tx_collision => open,
+      tx_retransmit => open,
+      pause_req => '0',
+      pause_val => (others => '0'),
+      txp => sgmii_txp,
+      txn => sgmii_txn,
+      rxp => sgmii_rxp,
+      rxn => sgmii_rxn,
+      phyad => (others => '0'),
+      resetdone => resetdone,
+      syncacqstatus => syncacqstatus,
+      clk_ds => clkin,
+      glbl_rstn => rstn,
+      rx_axi_rstn => rstn,
+      tx_axi_rstn => rstn
    );
 
 end rtl;
