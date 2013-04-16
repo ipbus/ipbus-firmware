@@ -1,8 +1,7 @@
 hdl ipbus/firmware/example_designs/hdl/demo_ml605_sgmii/top_ml605_sgmii.vhd
 hdl ipbus/firmware/example_designs/ucf/ml605_sgmii.ucf
 hdl ipbus/firmware/example_designs/hdl/clocks_v6_serdes.vhd
-hdl ipbus/firmware/ethernet/hdl/eth_v6_sgmii.vhd
+include ipbus/firmware/ethernet/cfg/file_list_v6_sgmii
 include ipbus/firmware/ipbus_core/cfg/file_list
 include ipbus/firmware/example_designs/cfg/file_list
-core ipbus/firmware/ethernet/coregen/v6_emac_v2_3_sgmii.xco
 
