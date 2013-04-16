@@ -54,7 +54,6 @@ begin
 		o => clk125
 	);
 
-	rxclko <= clk125;
 	clk125_o <= clk125;
 	
 	locked <= resetdone and syncacqstatus;
