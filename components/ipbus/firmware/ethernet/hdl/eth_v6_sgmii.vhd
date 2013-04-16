@@ -11,6 +11,8 @@ use ieee.std_logic_1164.all;
 
 library unisim;
 use unisim.VComponents.all;
+use work.emac_hostbus_decl.all;
+
 
 entity eth_v6_sgmii is
 	port(
@@ -29,7 +31,9 @@ entity eth_v6_sgmii is
 		rx_data: out std_logic_vector(7 downto 0);
 		rx_valid: out std_logic;
 		rx_last: out std_logic;
-		rx_error: out std_logic
+		rx_error: out std_logic;
+		hostbus_in: in emac_hostbus_in;
+		hostbus_out: out emac_hostbus_out
 	);
 
 end eth_v6_sgmii;
