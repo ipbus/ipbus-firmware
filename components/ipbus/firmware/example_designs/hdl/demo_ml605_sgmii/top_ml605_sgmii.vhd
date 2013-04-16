@@ -15,7 +15,7 @@ use work.emac_hostbus_decl.all;
 
 entity top is port(
 	sysclk_p, sysclk_n: in std_logic;
-	leds: out std_logic(7 downto 0);
+	leds: out std_logic_vector(7 downto 0);
 	sgmii_clkp, sgmii_clkn: in std_logic;
 	sgmii_txp, sgmii_txn: out std_logic;
 	sgmii_rxp, sgmii_rxn: in std_logic;
