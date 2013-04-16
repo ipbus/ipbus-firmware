@@ -1,7 +1,7 @@
 project new demo_ml605_sgmii
 project set family virtex6
 project set device xc6vlx240t
-project set package ffg1156
+project set package ff1156
 project set speed -1
 
 project set "Enable Multi-Threading" "2" -process "Map"
