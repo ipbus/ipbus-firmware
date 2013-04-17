@@ -39,6 +39,44 @@ end eth_7s_1000basex;
 
 architecture rtl of eth_7s_1000basex is
 
+	COMPONENT tri_mode_eth_mac_v5_5
+		PORT (
+			glbl_rstn : IN STD_LOGIC;
+			rx_axi_rstn : IN STD_LOGIC;
+			tx_axi_rstn : IN STD_LOGIC;
+			rx_axi_clk : IN STD_LOGIC;
+			rx_reset_out : OUT STD_LOGIC;
+			rx_axis_mac_tdata : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+			rx_axis_mac_tvalid : OUT STD_LOGIC;
+			rx_axis_mac_tlast : OUT STD_LOGIC;
+			rx_axis_mac_tuser : OUT STD_LOGIC;
+			rx_statistics_vector : OUT STD_LOGIC_VECTOR(27 DOWNTO 0);
+			rx_statistics_valid : OUT STD_LOGIC;
+			tx_axi_clk : IN STD_LOGIC;
+			tx_reset_out : OUT STD_LOGIC;
+			tx_axis_mac_tdata : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+			tx_axis_mac_tvalid : IN STD_LOGIC;
+			tx_axis_mac_tlast : IN STD_LOGIC;
+			tx_axis_mac_tuser : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+			tx_axis_mac_tready : OUT STD_LOGIC;
+			tx_ifg_delay : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+			tx_statistics_vector : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+			tx_statistics_valid : OUT STD_LOGIC;
+			pause_req : IN STD_LOGIC;
+			pause_val : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+			speed_is_100 : OUT STD_LOGIC;
+			speed_is_10_100 : OUT STD_LOGIC;
+			gmii_txd : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+			gmii_tx_en : OUT STD_LOGIC;
+			gmii_tx_er : OUT STD_LOGIC;
+			gmii_rxd : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+			gmii_rx_dv : IN STD_LOGIC;
+			gmii_rx_er : IN STD_LOGIC;
+			rx_mac_config_vector : IN STD_LOGIC_VECTOR(79 DOWNTO 0);
+			tx_mac_config_vector : IN STD_LOGIC_VECTOR(79 DOWNTO 0)
+		);
+	END COMPONENT;
+
 	signal gmii_txd, gmii_rxd: std_logic_vector(7 downto 0);
 	signal gmii_tx_en, gmii_tx_er, gmii_rx_dv, gmii_rx_er: std_logic;
 	signal gmii_rx_clk: std_logic;
@@ -99,46 +137,47 @@ begin
 	locked <= locked_int;
 	rstn <= not (not locked_int or rsti);
 
-	mac: entity work.emac_serdes_5_4 port map(
-		glbl_rstn => rstn,
-		rx_axi_rstn => '1',
-		tx_axi_rstn => '1',
-		rx_axi_clk => clk125,
-		rx_reset_out => open,
-		rx_axis_mac_tdata => rx_data,
-		rx_axis_mac_tvalid => rx_valid,
-		rx_axis_mac_tlast => rx_last,
-		rx_axis_mac_tuser => rx_error,
-		rx_statistics_vector => open,
-		rx_statistics_valid => open,
-		tx_axi_clk => clk125,
-		tx_reset_out => open,
-		tx_axis_mac_tdata => tx_data,
-		tx_axis_mac_tvalid => tx_valid,
-		tx_axis_mac_tlast => tx_last,
-		tx_axis_mac_tuser => tx_error,
-		tx_axis_mac_tready => tx_ready,
-		tx_ifg_delay => X"00",
-		tx_statistics_vector => open,
-		tx_statistics_valid => open,
-		pause_req => '0',
-		pause_val => X"0000",
-		speed_is_100 => open,
-		speed_is_10_100 => open,
-		gmii_txd => gmii_txd,
-		gmii_tx_en => gmii_tx_en,
-		gmii_tx_er => gmii_tx_er,
-		gmii_rxd => gmii_rxd,
-		gmii_rx_dv => gmii_rx_dv,
-		gmii_rx_er => gmii_rx_er,
-		rx_mac_config_vector => X"0000_0000_0000_0000_0802",
-		tx_mac_config_vector => X"0000_0000_0000_0000_0002"
-	);
+	mac: tri_mode_eth_mac_v5_5
+		port map(
+			glbl_rstn => rstn,
+			rx_axi_rstn => '1',
+			tx_axi_rstn => '1',
+			rx_axi_clk => clk125,
+			rx_reset_out => open,
+			rx_axis_mac_tdata => rx_data,
+			rx_axis_mac_tvalid => rx_valid,
+			rx_axis_mac_tlast => rx_last,
+			rx_axis_mac_tuser => rx_error,
+			rx_statistics_vector => open,
+			rx_statistics_valid => open,
+			tx_axi_clk => clk125,
+			tx_reset_out => open,
+			tx_axis_mac_tdata => tx_data,
+			tx_axis_mac_tvalid => tx_valid,
+			tx_axis_mac_tlast => tx_last,
+			tx_axis_mac_tuser => tx_error,
+			tx_axis_mac_tready => tx_ready,
+			tx_ifg_delay => X"00",
+			tx_statistics_vector => open,
+			tx_statistics_valid => open,
+			pause_req => '0',
+			pause_val => X"0000",
+			speed_is_100 => open,
+			speed_is_10_100 => open,
+			gmii_txd => gmii_txd,
+			gmii_tx_en => gmii_tx_en,
+			gmii_tx_er => gmii_tx_er,
+			gmii_rxd => gmii_rxd,
+			gmii_rx_dv => gmii_rx_dv,
+			gmii_rx_er => gmii_rx_er,
+			rx_mac_config_vector => X"0000_0000_0000_0000_0802",
+			tx_mac_config_vector => X"0000_0000_0000_0000_0002"
+		);
 
 	hostbus_out.hostrddata <= (others => '0');
 	hostbus_out.hostmiimrdy <= '0';
 
-	phy: entity work.gig_eth_pcs_pma_v11_4_block
+	phy: entity work.gig_eth_pcs_pma_v11_5_block
 		port map(
 			gtrefclk => clkin,
 			txp => gt_txp,
