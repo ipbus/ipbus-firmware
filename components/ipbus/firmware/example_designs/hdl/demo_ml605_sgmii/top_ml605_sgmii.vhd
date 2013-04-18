@@ -70,6 +70,7 @@ begin
 			sgmii_rxn => sgmii_rxn,		
 			clk125_o => clk125,
 			rst => rst_eth,
+			locked => eth_locked,
 			tx_data => mac_tx_data,
 			tx_valid => mac_tx_valid,
 			tx_last => mac_tx_last,
