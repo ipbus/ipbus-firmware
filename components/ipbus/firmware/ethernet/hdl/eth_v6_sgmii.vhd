@@ -96,6 +96,10 @@ begin
       resetdone => resetdone,
       syncacqstatus => syncacqstatus,
       clk_ds => clkin,
+      mdio_i => '1',
+      mdio_o => open,
+      mdio_t => open,
+      mdc_in => '0',
       glbl_rstn => rstn,
       rx_axi_rstn => rstn,
       tx_axi_rstn => rstn
@@ -105,3 +109,4 @@ begin
 	hostbus_out.hostmiimrdy <= '0';
 
 end rtl;
+
