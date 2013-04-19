@@ -101,8 +101,8 @@ begin
       mdio_t => open,
       mdc_in => '0',
       glbl_rstn => rstn,
-      rx_axi_rstn => rstn,
-      tx_axi_rstn => rstn
+      rx_axi_rstn => '1',
+      tx_axi_rstn => '1'
    );
    
   hostbus_out.hostrddata <= (others => '0');
