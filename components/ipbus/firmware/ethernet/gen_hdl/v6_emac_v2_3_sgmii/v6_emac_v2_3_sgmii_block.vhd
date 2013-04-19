@@ -439,16 +439,19 @@ begin
    user_mac_aclk   <= tx_mac_aclk_int;
    rx_mac_aclk_int <= tx_mac_aclk_int;
 
+-- DMN CHANGE
+
    -----------------------------------------------------------------------------
    -- Instantiate a BUFG for tx phy and user side logic
    -----------------------------------------------------------------------------
 
-    bufg_tx_axi_clk : BUFG
-    port map (
-      I                => tx_axi_clk_out,
-      O                => tx_mac_aclk_int
-   );
+--    bufg_tx_axi_clk : BUFG
+--    port map (
+--      I                => tx_axi_clk_out,
+--      O                => tx_mac_aclk_int
+--   );
 
+		tx_mac_aclk_int <= gtx_clk;
 
     ---------------------------------------------------------------------------
     -- Instantiate GTX for SGMII or 1000BASE-X PCS/PMA physical interface
