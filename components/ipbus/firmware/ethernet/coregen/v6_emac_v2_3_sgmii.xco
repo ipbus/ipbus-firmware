@@ -1,7 +1,7 @@
 ##############################################################
 #
 # Xilinx Core Generator version 14.5
-# Date: Tue Apr 16 08:47:59 2013
+# Date: Thu Apr 18 15:46:45 2013
 #
 ##############################################################
 #
@@ -24,15 +24,15 @@ SET createndf = false
 SET designentry = VHDL
 SET device = xc6vlx240t
 SET devicefamily = virtex6
-SET flowvendor = Other
+SET flowvendor = Foundation_ISE
 SET formalverification = false
 SET foundationsym = false
 SET implementationfiletype = Ngc
 SET package = ff1156
 SET removerpms = false
-SET simulationfiles = Behavioral
+SET simulationfiles = Structural
 SET speedgrade = -1
-SET verilogsim = false
+SET verilogsim = true
 SET vhdlsim = true
 # END Project Options
 # BEGIN Select
@@ -46,9 +46,9 @@ CSET client_side_data_width=8_bit
 CSET clock_enable=false
 CSET component_name=v6_emac_v2_3_sgmii
 CSET management_interface=false
-CSET mdio=false
+CSET mdio=true
 CSET number_of_address_table_entries=0
-CSET phy_an_enable=false
+CSET phy_an_enable=true
 CSET phy_ignore_adzero=false
 CSET phy_isolate=false
 CSET phy_link_timer_value=032
@@ -92,4 +92,4 @@ CSET unicast_pause_mac_address_6=FF
 MISC pkg_timestamp=2013-03-27T03:45:13Z
 # END Extra information
 GENERATE
-# CRC: 2e6a0056
+# CRC: 3af581d6
