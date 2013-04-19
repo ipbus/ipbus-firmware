@@ -6,8 +6,8 @@ TIMESPEC TS_sysclk = PERIOD sysclk 5ns;
 NET clk125 TNM_NET=clk125;
 TIMESPEC TS_clk125 = PERIOD clk125 8ns;
 
-NET eth/sgmii/tx_mac_aclk_int TNM_NET=clk125_mac;
-TIMESPEC TS_clk125_mac = PERIOD clk125_mac 8ns;
+#NET eth/sgmii/tx_mac_aclk_int TNM_NET=clk125_mac;
+#TIMESPEC TS_clk125_mac = PERIOD clk125_mac 8ns;
 
 NET clocks/rst TIG;
 NET clocks/nuke_i TIG;
