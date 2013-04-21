@@ -26,6 +26,7 @@ proc dofile {file} {
 
 proc addfile {file} {
 	xfile add $file
+	puts "*** Added file to project: $file"
 }
 
 proc addcore {file} {
