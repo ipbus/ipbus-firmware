@@ -25,11 +25,12 @@ proc dofile {file} {
 }
 
 proc addfile {file} {
+	puts "*** Adding file to project: $file"
 	xfile add $file
-	puts "*** Added file to project: $file"
 }
 
 proc addcore {file} {
+	puts "*** Building core: $file"
 	set bname [exec basename $file]
 	exec cp $file ipcore_dir
 	cd ipcore_dir
