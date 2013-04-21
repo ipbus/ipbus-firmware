@@ -18,7 +18,7 @@ proc dofile {file} {
 			addfile ipcore_dir/$arg
 		} elseif {$cmd == "core"} {
 			buildcore $parg
-			addfile ipcore/[exec basename $parg]
+			addfile ipcore_dir/[exec basename $parg]
 		} elseif {$cmd == "wcore"} {
 			buildcore $parg
 		} elseif {$cmd == "include"} {
