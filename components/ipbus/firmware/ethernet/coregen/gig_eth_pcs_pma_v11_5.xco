@@ -1,7 +1,7 @@
 ##############################################################
 #
 # Xilinx Core Generator version 14.5
-# Date: Wed Apr 17 19:56:50 2013
+# Date: Sun Apr 21 15:59:34 2013
 #
 ##############################################################
 #
@@ -24,7 +24,7 @@ SET createndf = false
 SET designentry = VHDL
 SET device = xc7vx690t
 SET devicefamily = virtex7
-SET flowvendor = Foundation_ISE
+SET flowvendor = Other
 SET formalverification = false
 SET foundationsym = false
 SET implementationfiletype = Ngc
@@ -32,7 +32,7 @@ SET package = ffg1927
 SET removerpms = false
 SET simulationfiles = Behavioral
 SET speedgrade = -2
-SET verilogsim = true
+SET verilogsim = false
 SET vhdlsim = true
 # END Project Options
 # BEGIN Select
@@ -54,4 +54,4 @@ CSET transceiver_tile=A
 MISC pkg_timestamp=2012-07-11T07:25:50Z
 # END Extra information
 GENERATE
-# CRC: e574790f
+# CRC: 87fe1b41
