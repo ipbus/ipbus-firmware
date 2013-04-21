@@ -17,7 +17,10 @@ proc dofile {file} {
 		} elseif {$cmd == "ghdl"} {
 			addfile ipcore_dir/$arg
 		} elseif {$cmd == "core"} {
-			addcore $parg
+			buildcore $parg
+			addfile ipcore/$bname
+		} elseif {$cmd == "wcore"} {
+			buildcore $parg
 		} elseif {$cmd == "include"} {
 			dofile $parg
 		}
@@ -29,14 +32,13 @@ proc addfile {file} {
 	xfile add $file
 }
 
-proc addcore {file} {
+proc buildcore {file} {
 	puts "*** Building core: $file"
 	set bname [exec basename $file]
 	exec cp $file ipcore_dir
 	cd ipcore_dir
 	exec coregen -r -b $bname -p coregen.cgp >& coregen.out
 	cd ..
-	eval addfile ipcore_dir/$bname
 }
 
 dofile $::env(REPOS_BUILD_DIR)/file_list
