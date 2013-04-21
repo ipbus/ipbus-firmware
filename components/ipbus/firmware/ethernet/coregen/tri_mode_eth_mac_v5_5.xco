@@ -1,7 +1,7 @@
 ##############################################################
 #
 # Xilinx Core Generator version 14.5
-# Date: Sun Apr 21 16:04:19 2013
+# Date: Sun Apr 21 16:52:45 2013
 #
 ##############################################################
 #
@@ -33,7 +33,7 @@ SET removerpms = false
 SET simulationfiles = Behavioral
 SET speedgrade = -2
 SET verilogsim = true
-SET vhdlsim = false
+SET vhdlsim = true
 # END Project Options
 # BEGIN Select
 SELECT Tri_Mode_Ethernet_MAC xilinx.com:ip:tri_mode_eth_mac:5.5
@@ -57,4 +57,4 @@ CSET statistics_width=64bit
 MISC pkg_timestamp=2012-11-02T16:09:01Z
 # END Extra information
 GENERATE
-# CRC: 5d71dbee
+# CRC: 93feeb12

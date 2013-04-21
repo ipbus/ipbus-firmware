@@ -1,7 +1,7 @@
 ##############################################################
 #
 # Xilinx Core Generator version 14.5
-# Date: Sun Apr 21 16:02:27 2013
+# Date: Sun Apr 21 16:50:53 2013
 #
 ##############################################################
 #
@@ -32,7 +32,7 @@ SET package = ffg1927
 SET removerpms = false
 SET simulationfiles = Behavioral
 SET speedgrade = -2
-SET verilogsim = false
+SET verilogsim = true
 SET vhdlsim = true
 # END Project Options
 # BEGIN Select
@@ -589,4 +589,4 @@ CSET use_gtz7=true
 MISC pkg_timestamp=2012-12-10T23:23:25Z
 # END Extra information
 GENERATE
-# CRC: e89ba170
+# CRC: cb2a0a83

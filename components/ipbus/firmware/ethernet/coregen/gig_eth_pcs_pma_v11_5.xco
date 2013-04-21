@@ -1,7 +1,7 @@
 ##############################################################
 #
 # Xilinx Core Generator version 14.5
-# Date: Sun Apr 21 15:59:34 2013
+# Date: Sun Apr 21 16:48:00 2013
 #
 ##############################################################
 #
@@ -32,7 +32,7 @@ SET package = ffg1927
 SET removerpms = false
 SET simulationfiles = Behavioral
 SET speedgrade = -2
-SET verilogsim = false
+SET verilogsim = true
 SET vhdlsim = true
 # END Project Options
 # BEGIN Select
@@ -54,4 +54,4 @@ CSET transceiver_tile=A
 MISC pkg_timestamp=2012-07-11T07:25:50Z
 # END Extra information
 GENERATE
-# CRC: 87fe1b41
+# CRC: 60dd7405
