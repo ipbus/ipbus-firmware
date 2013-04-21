@@ -152,7 +152,7 @@ architecture wrapper of gig_eth_pcs_pma_v11_5_transceiver is
 --    GT0_DRPDO_OUT                           : out  std_logic_vector(15 downto 0);
 --    GT0_DRPEN_IN                            : in   std_logic;
 --    GT0_DRPRDY_OUT                          : out  std_logic;
- --   GT0_DRPWE_IN                            : in   std_logic;
+--    GT0_DRPWE_IN                            : in   std_logic;
 
     SYSCLK_IN                               : in   std_logic;
     SOFT_RESET_IN                           : in   std_logic;
@@ -195,8 +195,8 @@ architecture wrapper of gig_eth_pcs_pma_v11_5_transceiver is
     GT0_RXUSRCLK_IN                         : in   std_logic;
     GT0_RXUSRCLK2_IN                        : in   std_logic;
     ------------ Receive Ports - RX Decision Feedback Equalizer(DFE) -----------
-    GT0_RXMONITOROUT_OUT                    : out  std_logic_vector(6 downto 0);
-    GT0_RXMONITORSEL_IN                     : in   std_logic_vector(1 downto 0);
+--    GT0_RXMONITOROUT_OUT                    : out  std_logic_vector(6 downto 0);
+--    GT0_RXMONITORSEL_IN                     : in   std_logic_vector(1 downto 0);
     ------- Receive Ports - RX Driver,OOB signalling,Coupling and Eq.,CDR ------
     GT0_GTHRXN_IN                           : in   std_logic;
     GT0_GTHRXP_IN                           : in   std_logic;
@@ -228,7 +228,7 @@ architecture wrapper of gig_eth_pcs_pma_v11_5_transceiver is
     ----------------------- Transmit Ports - TX PLL Ports ----------------------
     GT0_TXRESETDONE_OUT                     : out  std_logic;
     ----------------- Transmit Ports - TX Ports for PCI Express ----------------
-    GT0_TXELECIDLE_IN                       : in   std_logic;
+--    GT0_TXELECIDLE_IN                       : in   std_logic;
     ----------------- Transmit Ports - TX Ports for PCI Express ----------------
 
     --____________________________COMMON PORTS________________________________
@@ -608,8 +608,8 @@ begin
         GT0_RXUSRCLK_IN                 =>      usrclk,
         GT0_RXUSRCLK2_IN                =>      usrclk,
     ------------ Receive Ports - RX Decision Feedback Equalizer(DFE) -----------
-        GT0_RXMONITOROUT_OUT            =>    open,    
-        GT0_RXMONITORSEL_IN             =>    ("00"),  
+--        GT0_RXMONITOROUT_OUT            =>    open,    
+--        GT0_RXMONITORSEL_IN             =>    ("00"),  
     ------- Receive Ports - RX Driver,OOB signalling,Coupling and Eq.,CDR ------
         GT0_GTHRXN_IN                   =>      rxn,
         GT0_GTHRXP_IN                   =>      rxp,
@@ -641,7 +641,7 @@ begin
     ----------------------- Transmit Ports - TX PLL Ports ----------------------
         GT0_TXRESETDONE_OUT             =>      resetdone_tx,
     ----------------- Transmit Ports - TX Ports for PCI Express ----------------
-        GT0_TXELECIDLE_IN               =>      txpowerdown,
+--        GT0_TXELECIDLE_IN               =>      txpowerdown,
     ----------------- Transmit Ports - TX Ports for PCI Express ----------------
 
     --____________________________COMMON PORTS________________________________
