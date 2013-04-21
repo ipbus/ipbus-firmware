@@ -146,13 +146,13 @@ architecture wrapper of gig_eth_pcs_pma_v11_5_transceiver is
   port
   (
     ---------------------------- Channel - DRP Ports  --------------------------
-    GT0_DRPADDR_IN                          : in   std_logic_vector(8 downto 0);
-    GT0_DRPCLK_IN                           : in   std_logic;
-    GT0_DRPDI_IN                            : in   std_logic_vector(15 downto 0);
-    GT0_DRPDO_OUT                           : out  std_logic_vector(15 downto 0);
-    GT0_DRPEN_IN                            : in   std_logic;
-    GT0_DRPRDY_OUT                          : out  std_logic;
-    GT0_DRPWE_IN                            : in   std_logic;
+--    GT0_DRPADDR_IN                          : in   std_logic_vector(8 downto 0);
+--    GT0_DRPCLK_IN                           : in   std_logic;
+--    GT0_DRPDI_IN                            : in   std_logic_vector(15 downto 0);
+--    GT0_DRPDO_OUT                           : out  std_logic_vector(15 downto 0);
+--    GT0_DRPEN_IN                            : in   std_logic;
+--    GT0_DRPRDY_OUT                          : out  std_logic;
+ --   GT0_DRPWE_IN                            : in   std_logic;
 
     SYSCLK_IN                               : in   std_logic;
     SOFT_RESET_IN                           : in   std_logic;
@@ -560,13 +560,13 @@ begin
     )
     port map (
         ---------------------------- Channel - DRP Ports  --------------------------
-        GT0_DRPADDR_IN                  =>     drpaddr_in ,  
-        GT0_DRPCLK_IN                   =>     drpclk_in  ,  
-        GT0_DRPDI_IN                    =>     drpdi_in   ,  
-        GT0_DRPDO_OUT                   =>     drpdo_out  ,  
-        GT0_DRPEN_IN                    =>     drpen_in   , 
-        GT0_DRPRDY_OUT                  =>     drprdy_out , 
-        GT0_DRPWE_IN                    =>     drpwe_in   , 
+--        GT0_DRPADDR_IN                  =>     drpaddr_in ,  
+--        GT0_DRPCLK_IN                   =>     drpclk_in  ,  
+--        GT0_DRPDI_IN                    =>     drpdi_in   ,  
+--        GT0_DRPDO_OUT                   =>     drpdo_out  ,  
+--        GT0_DRPEN_IN                    =>     drpen_in   , 
+--        GT0_DRPRDY_OUT                  =>     drprdy_out , 
+--        GT0_DRPWE_IN                    =>     drpwe_in   , 
         SYSCLK_IN                       => independent_clock,
         SOFT_RESET_IN                   => pmareset,
         GT0_TX_FSM_RESET_DONE_OUT       => open,
