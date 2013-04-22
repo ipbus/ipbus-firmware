@@ -21,6 +21,8 @@ entity transactor is
 		rst: in std_logic; -- Sync reset
 		ipb_out: out ipb_wbus; -- IPbus bus signals
 		ipb_in: in ipb_rbus;
+		ipb_req: out std_logic; -- Bus arbitrator signals
+		ipb_grant: in std_logic;
 		trans_in: in ipbus_trans_in; -- Interface to packet buffers
 		trans_out: out ipbus_trans_out;
 		cfg_vector_in: in std_logic_vector(127 downto 0);
@@ -47,6 +49,8 @@ begin
 			rst => rst,
 			trans_in => trans_in,
 			trans_out => trans_out,
+			ipb_req => ipb_req,
+			ipb_grant => ipb_grant,
 			rx_ready => rx_ready,
 			rx_next => rx_next,
 			tx_data => tx_data,

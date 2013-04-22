@@ -34,8 +34,10 @@ entity ipbus_ctrl is
 		mac_tx_ready: in std_logic;
 		ipb_out: out ipb_wbus; -- IPbus bus signals
 		ipb_in: in ipb_rbus;
-		mac_addr: in std_logic_vector(47 downto 0); -- Static MAC and IP addresses
-		ip_addr: in std_logic_vector(31 downto 0);
+		ipb_req: out std_logic;
+		ipb_grant: in std_logic := '1';
+		mac_addr: in std_logic_vector(47 downto 0) := X"000000000000"; -- Static MAC and IP addresses
+		ip_addr: in std_logic_vector(31 downto 0) := X"00000000";
 		pkt_rx_led: out std_logic;
 		pkt_tx_led: out std_logic;
 		oob_in: in ipbus_trans_in_array(N_OOB - 1 downto 0) := (others => ('0', X"0000", '0'));
@@ -109,6 +111,8 @@ begin
 		rst => rst_ipb,
 		ipb_out => ipb_out,
 		ipb_in => ipb_in,
+		ipb_req => ipb_req,
+		ipb_grant => ipb_grant,
 		trans_in => trans_in,
 		trans_out => trans_out,
 		cfg_vector_in => cfg_out,

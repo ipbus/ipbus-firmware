@@ -15,6 +15,8 @@ entity transactor_if is
     rst: in std_logic;
     trans_in: in ipbus_trans_in;
     trans_out: out ipbus_trans_out;
+    ipb_req: out std_logic; -- Bus request
+    ipb_grant: in std_logic; -- Bus grant
     rx_ready: out std_logic; -- New data is available
     rx_next: in std_logic; -- Request for new data from transactor
     tx_data: in std_logic_vector(31 downto 0); -- Packet data from transactor
@@ -67,7 +69,9 @@ begin
 					end if;
 					
 				when ST_PREBODY =>
-					state <= ST_BODY;
+					if ipb_grant = '1' then
+						state <= ST_BODY;
+					end if;
 
 				when ST_BODY => -- Transfer body
 					if (rctr > blen and tx_hdr = '1') or tx_err = '1' then
@@ -133,6 +137,8 @@ begin
 			
 		end if;
 	end process;
+	
+	ipb_req <= '1' when state = ST_PREBODY or state = ST_BODY else '0';
 	
 	rx_ready <= '1' when state = ST_BODY and not (rctr > blen) else '0';
 		
