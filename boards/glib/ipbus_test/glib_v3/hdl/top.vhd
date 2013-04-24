@@ -19,7 +19,7 @@ end top;
 
 architecture rtl of top is
 
-	signal clk125, clk200, ipb_clk, eth_locked, clk_locked, rst_125, rst_ipb, rst_eth, onehz: std_logic;
+	signal clk125, ipb_clk, eth_locked, clk_locked, rst_125, rst_ipb, rst_eth, onehz: std_logic;
 	signal mac_tx_data, mac_rx_data: std_logic_vector(7 downto 0);
 	signal mac_tx_valid, mac_tx_last, mac_tx_error, mac_tx_ready, mac_rx_valid, mac_rx_last, mac_rx_error: std_logic;
 	signal ipb_master_out : ipb_wbus;
@@ -32,12 +32,12 @@ begin
 
 --	DCM clock generation for internal bus, ethernet
 
-	clocks: entity work.clocks_v6_serdes_125MHz
+	clocks: entity work.clocks_v6_serdes_40MHz
 		port map(
 			sysclk_p => sysclk_p,
 			sysclk_n => sysclk_n,
 			clki_125 => clk125,
-			sysclk_o => clk200,
+			sysclk_o => open,
 			clko_ipb => ipb_clk,
 			eth_locked => eth_locked,
 			locked => clk_locked,
