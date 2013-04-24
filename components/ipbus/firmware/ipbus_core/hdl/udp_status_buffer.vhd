@@ -40,10 +40,6 @@ architecture rtl of udp_status_buffer is
   signal tick: integer range 0 to 3;
   signal last_pkt_rdy_125: std_logic;
   
-  signal rst_ipb_s, rst_ipb_s2: std_logic;
-  
-  attribute 
-
 begin
 
 With tick select status_block <=
