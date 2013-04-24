@@ -13,7 +13,7 @@ use ieee.std_logic_1164.all;
 library unisim;
 use unisim.VComponents.all;
 
-entity clocks_v6_serdes is port(
+entity clocks_v6_serdes_125MHz is port(
 	sysclk_p: in std_logic;
 	sysclk_n: in std_logic;
 	clki_125: in std_logic;
@@ -28,9 +28,9 @@ entity clocks_v6_serdes is port(
 	onehz: out std_logic
 	);
 
-end clocks_v6_serdes;
+end clocks_v6_serdes_125MHz;
 
-architecture rtl of clocks_v6_serdes is
+architecture rtl of clocks_v6_serdes_125MHz is
 	
 	signal dcm_locked, sysclk, sysclk_ub, clk_ipb_i, clk_ipb_b, clkfb: std_logic;
 	signal d25, d25_d: std_logic;
