@@ -10,8 +10,9 @@
 --
 -- Dave Newbold, 23/2/11
 
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 use work.ipbus.ALL;
 use work.mac_arbiter_decl.all;
 use work.emac_hostbus_decl.all;
@@ -31,7 +32,7 @@ end top;
 architecture rtl of top is
 
 	constant N_IPB: integer := 4;
-	signal clk125, clk200, ipb_clk, locked, rst_125, rst_ipb, onehz : STD_LOGIC;
+	signal clk125, clk200, ipb_clk, locked, rst_125, rst_ipb, onehz: std_logic;
 	signal mac_tx_data, mac_rx_data: std_logic_vector(7 downto 0);
 	signal mac_tx_valid, mac_tx_last, mac_tx_error, mac_tx_ready, mac_rx_valid, mac_rx_last, mac_rx_error: std_logic;
 	signal ipb_master_out : ipb_wbus;
