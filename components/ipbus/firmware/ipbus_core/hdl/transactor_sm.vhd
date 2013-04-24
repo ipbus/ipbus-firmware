@@ -203,7 +203,7 @@ begin
   rmw_cyc <= '1' when trans_type = TRANS_RMWB or trans_type = TRANS_RMWS else '0';
   cfg_cyc <= '1' when trans_type = TRANS_RD_CFG or trans_type = TRANS_WR_CFG else '0';
    
-  process(state, ipb_in.ipb_err, timer, write)
+  process(state, rx_data, ipb_in.ipb_err, timer, write)
   begin
   	err <= X"0";
   	if state = ST_HDR then

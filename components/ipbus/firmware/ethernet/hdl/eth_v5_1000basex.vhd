@@ -32,7 +32,7 @@ entity eth_v5_1000basex is
 		rx_valid: out std_logic;
 		rx_last: out std_logic;
 		rx_error: out std_logic;
-		hostbus_in: in emac_hostbus_in;
+		hostbus_in: in emac_hostbus_in := ('0', "00", "0000000000", X"00000000", '0', '0', '0');
 		hostbus_out: out emac_hostbus_out;
 		rxpolarity: in std_logic := '0';
 		txpolarity: in std_logic := '0'

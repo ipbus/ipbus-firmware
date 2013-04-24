@@ -8,9 +8,9 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
-
 library unisim;
 use unisim.VComponents.all;
+use work.emac_hostbus_decl.all;
 
 entity eth_v6_gmii is
 	generic(
@@ -37,6 +37,9 @@ entity eth_v6_gmii is
 		rxdvld: out std_logic;
 		rxgoodframe: out std_logic;
 		rxbadframe: out std_logic
+		hostbus_in: in emac_hostbus_in := ('0', "00", "0000000000", X"00000000", '0', '0', '0');
+		hostbus_out: out emac_hostbus_out
+
 	);
 
 end eth_v6_gmii;
@@ -210,5 +213,8 @@ begin
 		MMCM_LOCKED => locked,
 		RESET => '0'
 	);
+	
+	hostbus_out.hostrddata <= (others => '0');
+	hostbus_out.hostmiimrdy <= '0';
 
 end rtl;

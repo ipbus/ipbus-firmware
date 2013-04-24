@@ -31,7 +31,7 @@ end top;
 
 architecture rtl of top is
 
-	constant N_IPB: integer := 4;
+	constant N_IPB: integer := 6;
 	signal clk125, clk200, ipb_clk, locked, rst_125, rst_ipb, onehz: std_logic;
 	signal mac_tx_data, mac_rx_data: std_logic_vector(7 downto 0);
 	signal mac_tx_valid, mac_tx_last, mac_tx_error, mac_tx_ready, mac_rx_valid, mac_rx_last, mac_rx_error: std_logic;
