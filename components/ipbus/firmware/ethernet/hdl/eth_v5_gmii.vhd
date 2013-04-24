@@ -87,6 +87,7 @@ begin
 			SIGNAL_PATTERN => "CLOCK"
 		)
 		port map(
+			datain => '0',
 			idatain => gmii_rx_clk,
 			dataout => gmii_rx_clk_del,
 			t => '1',
