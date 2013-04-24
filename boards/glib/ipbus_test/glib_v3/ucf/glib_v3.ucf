@@ -1,7 +1,7 @@
 NET sysclk_p LOC = M6 | IOSTANDARD = LVDS_25 | DIFF_TERM = TRUE |TNM_NET = sysclk;
 NET sysclk_n LOC = M5 | IOSTANDARD = LVDS_25 | DIFF_TERM = TRUE;
 
-TIMESPEC TS_sysclk = PERIOD sysclk 5ns;
+TIMESPEC TS_sysclk = PERIOD sysclk 8ns;
 
 NET eth/clk125_out TNM_NET=clk125;
 TIMESPEC TS_clk125 = PERIOD clk125 8ns;
