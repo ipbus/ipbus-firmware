@@ -124,6 +124,7 @@ ARCHITECTURE flat OF UDP_if IS
    signal pkt_done_125: std_logic;
    signal pkt_rdy_125: std_logic;
    signal we_125: std_logic;
+   signal ipb_rst_sync: std_logic;
 
 BEGIN
 
@@ -170,7 +171,8 @@ rx_last_kludge: process(mac_clk)
          arp_end_addr => arp_end_addr,
          arp_send => arp_send
       );
-   payload: entity work.udp_build_payload
+      
+    payload: entity work.udp_build_payload
       PORT MAP (
          mac_clk => mac_clk,
          rx_reset => rx_reset,
@@ -189,8 +191,9 @@ rx_last_kludge: process(mac_clk)
          int_data_payload => int_data_payload,
          int_valid_payload => int_valid_payload,
          cksum => rx_cksum,
-	 ipbus_in_hdr => ipbus_in_hdr
+         ipbus_in_hdr => ipbus_in_hdr
       );
+      
    ping: entity work.udp_build_ping
       PORT MAP (
          mac_clk => mac_clk,
@@ -241,7 +244,7 @@ rx_last_kludge: process(mac_clk)
       PORT MAP (
          mac_clk => mac_clk,
 	 rst_macclk => rst_macclk,
-	 rst_ipb => rst_ipb,
+	 rst_ipb => rst_ipb_sync,
 	 rx_reset => rx_reset,
 	 mac_rx_error => mac_rx_error,
 	 mac_rx_last => my_rx_last,
@@ -461,7 +464,8 @@ rx_last_kludge: process(mac_clk)
          pkt_done => pkt_done,
          we => we,
          busy => busy,
-	 pkt_rdy => pkt_rdy
+	 pkt_rdy => pkt_rdy,
+	 	ipb_rst_sync => ipb_rst_sync
       );
 
 END flat;
