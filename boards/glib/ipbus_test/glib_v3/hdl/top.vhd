@@ -9,6 +9,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 use work.ipbus.ALL;
 
 entity top is port(
+	
 	leds: out std_logic_vector(2 downto 0);
 	sgmii_clkp, sgmii_clkn: in std_logic;
 	sgmii_txp, sgmii_txn: out std_logic;
@@ -58,7 +59,7 @@ begin
 			sgmii_rxp => sgmii_rxp,
 			sgmii_rxn => sgmii_rxn,		
 			clk125_o => clk125,
-			rst => rst_eth,
+			rst => '0',
 			locked => eth_locked,
 			tx_data => mac_tx_data,
 			tx_valid => mac_tx_valid,
