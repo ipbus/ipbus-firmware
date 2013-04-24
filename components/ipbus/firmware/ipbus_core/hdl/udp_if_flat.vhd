@@ -124,7 +124,7 @@ ARCHITECTURE flat OF UDP_if IS
    signal pkt_done_125: std_logic;
    signal pkt_rdy_125: std_logic;
    signal we_125: std_logic;
-   signal ipb_rst_sync: std_logic;
+   signal rst_ipb_sync: std_logic;
 
 BEGIN
 
