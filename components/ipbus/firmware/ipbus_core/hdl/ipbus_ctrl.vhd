@@ -40,7 +40,7 @@ entity ipbus_ctrl is
 		ip_addr: in std_logic_vector(31 downto 0) := X"00000000";
 		pkt_rx_led: out std_logic;
 		pkt_tx_led: out std_logic;
-		oob_in: in ipbus_trans_in_array(N_OOB - 1 downto 0) := (others => ('0', X"0000", '0'));
+		oob_in: in ipbus_trans_in_array(N_OOB - 1 downto 0) := (others => ('0', X"00000000", '0'));
 		oob_out: out ipbus_trans_out_array(N_OOB - 1 downto 0)
 	);
 
