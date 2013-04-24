@@ -1,0 +1,14 @@
+NET "gbe_tx_p"       	LOC = T1	;	# MGTTXP2_114
+NET "gbe_tx_n" 	LOC = T2	;	# MGTTXN2_114
+NET "gbe_rx_p" 	LOC = U3	;	# MGTRXP2_114				
+NET "gbe_rx_n" 	LOC = U4	;	# MGTRXN2_114
+NET "gbe_int_n"	LOC = AL15	;	# IO_L3P_32
+NET "gbe_reset_n"	LOC = AK16	;	# IO_L19N_32
+NET "gbe_scl_mdc"	LOC = AL16	;	# IO_L19P_32
+NET "gbe_sda_mdio"  	LOC = AL14	;	# IO_L3N_32
+NET "clk125_2_p"                       LOC = M6                                                          ; # MGTREFCLK1P_115
+NET "clk125_2_n"                       LOC = M5                                                          ; # MGTREFCLK1N_115
+NET "clk125_2_p"                       TNM_NET = "clk125_2_p"                                            ;
+NET "clk125_2_n"                       TNM_NET = "clk125_2_n"                                            ;
+TIMESPEC TS_clk125_2_p =       PERIOD "clk125_2_p" 8 ns HIGH 50 %                                ;
+TIMESPEC TS_clk125_2_n =       PERIOD "clk125_2_n" TS_clk125_2_p PHASE 4 ns HIGH 50 %            ;
