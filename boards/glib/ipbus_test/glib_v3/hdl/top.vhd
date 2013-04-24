@@ -10,6 +10,7 @@ use work.ipbus.ALL;
 
 entity top is port(
 	sysclk_p, sysclk_n: in std_logic;
+	leds: out std_logic_vector(2 downto 0);
 	sgmii_clkp, sgmii_clkn: in std_logic;
 	sgmii_txp, sgmii_txn: out std_logic;
 	sgmii_rxp, sgmii_rxn: in std_logic;
@@ -48,7 +49,7 @@ begin
 			onehz => onehz
 		);
 		
---	leds <= "000" & eth_locked & pkt_rx_led & pkt_tx_led & clk_locked & onehz;
+		leds <= eth_locked & clk_locked & onehz;
 	
 --	Ethernet MAC core and PHY interface
 	
