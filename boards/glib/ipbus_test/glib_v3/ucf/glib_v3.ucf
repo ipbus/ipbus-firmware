@@ -1,14 +1,25 @@
-NET "gbe_tx_p"       	LOC = T1	;	# MGTTXP2_114
-NET "gbe_tx_n" 	LOC = T2	;	# MGTTXN2_114
-NET "gbe_rx_p" 	LOC = U3	;	# MGTRXP2_114				
-NET "gbe_rx_n" 	LOC = U4	;	# MGTRXN2_114
-NET "gbe_int_n"	LOC = AL15	;	# IO_L3P_32
-NET "gbe_reset_n"	LOC = AK16	;	# IO_L19N_32
-NET "gbe_scl_mdc"	LOC = AL16	;	# IO_L19P_32
-NET "gbe_sda_mdio"  	LOC = AL14	;	# IO_L3N_32
-NET "clk125_2_p"                       LOC = M6                                                          ; # MGTREFCLK1P_115
-NET "clk125_2_n"                       LOC = M5                                                          ; # MGTREFCLK1N_115
-NET "clk125_2_p"                       TNM_NET = "clk125_2_p"                                            ;
-NET "clk125_2_n"                       TNM_NET = "clk125_2_n"                                            ;
-TIMESPEC TS_clk125_2_p =       PERIOD "clk125_2_p" 8 ns HIGH 50 %                                ;
-TIMESPEC TS_clk125_2_n =       PERIOD "clk125_2_n" TS_clk125_2_p PHASE 4 ns HIGH 50 %            ;
+NET sysclk_p LOC = M6 | IOSTANDARD = LVDS_25 | DIFF_TERM = TRUE |TNM_NET = sysclk;
+NET sysclk_n LOC = M5 | IOSTANDARD = LVDS_25 | DIFF_TERM = TRUE;
+
+TIMESPEC TS_sysclk = PERIOD sysclk 5ns;
+
+NET clk125 TNM_NET=clk125;
+TIMESPEC TS_clk125 = PERIOD clk125 8ns;
+
+NET clocks/rst TIG;
+NET clocks/nuke_i TIG;
+
+NET sgmii_clkp LOC=V6 | DIFF_TERM=TRUE | TNM_NET=gtpclk;
+NET sgmii_clkn LOC=V5 | DIFF_TERM=TRUE;
+
+TIMESPEC TS_gtpclk = PERIOD gtpclk 8ns;
+
+INST eth/phy/*/gtxe1 LOC=GTXE1_X0Y10;
+
+NET sgmii_txp LOC=T1;
+NET sgmii_txn LOC=T2;
+NET sgmii_rxp LOC=U3;
+NET sgmii_rxn LOC=U4;
+
+NET phy_rstb LOC=AK16 | IOSTANDARD=LVCMOS25;
+

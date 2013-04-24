@@ -1,9 +1,5 @@
 -- Top-level design for ipbus demo
 --
--- This version is for xc6slx45 on Digilent ATLYS board
--- Uses the s6 soft TEMAC core with GMII inteface to an external Gb PHY
--- You will need a license for the core
---
 -- You must edit this file to set the IP and MAC addresses
 --
 -- Dave Newbold, 16/7/12
@@ -14,7 +10,6 @@ use work.ipbus.ALL;
 
 entity top is port(
 	sysclk_p, sysclk_n: in std_logic;
-	leds: out std_logic_vector(7 downto 0);
 	sgmii_clkp, sgmii_clkn: in std_logic;
 	sgmii_txp, sgmii_txn: out std_logic;
 	sgmii_rxp, sgmii_rxn: in std_logic;
@@ -37,7 +32,7 @@ begin
 
 --	DCM clock generation for internal bus, ethernet
 
-	clocks: entity work.clocks_v6_serdes
+	clocks: entity work.clocks_v6_serdes_125MHz
 		port map(
 			sysclk_p => sysclk_p,
 			sysclk_n => sysclk_n,
@@ -53,7 +48,7 @@ begin
 			onehz => onehz
 		);
 		
-	leds <= "000" & eth_locked & pkt_rx_led & pkt_tx_led & clk_locked & onehz;
+--	leds <= "000" & eth_locked & pkt_rx_led & pkt_tx_led & clk_locked & onehz;
 	
 --	Ethernet MAC core and PHY interface
 	

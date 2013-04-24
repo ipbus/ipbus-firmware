@@ -1,6 +1,6 @@
 SET busformat = BusFormatAngleBracketNotRipped
 SET designentry = VHDL
-SET device = xc6vlx240t
+SET device = xc6vlx130t
 SET devicefamily = virtex6
 SET flowvendor = Foundation_ISE
 SET package = ff1156
