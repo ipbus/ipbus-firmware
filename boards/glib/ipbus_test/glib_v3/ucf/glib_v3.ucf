@@ -14,7 +14,7 @@ NET sgmii_clkn LOC=V5 | DIFF_TERM=TRUE;
 
 TIMESPEC TS_gtpclk = PERIOD gtpclk 8ns;
 
-INST eth/phy/*/gtxe1 LOC=GTXE1_X0Y10;
+INST eth/*/gtxe1_i LOC=GTXE1_X0Y10;
 
 NET sgmii_txp LOC=T1;
 NET sgmii_txn LOC=T2;
