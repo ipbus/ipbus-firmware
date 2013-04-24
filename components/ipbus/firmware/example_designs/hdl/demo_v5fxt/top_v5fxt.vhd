@@ -155,7 +155,7 @@ begin
 		slaves: entity work.slaves port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => rst_ipb,
-    	ipb_in => ipb_master_out,
+			ipb_in => ipb_master_out,
 			ipb_out => ipb_master_in,
 			hostbus_out => hostbus_out_array(i),
 			hostbus_in => hostbus_in,
