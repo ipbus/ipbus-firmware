@@ -43,7 +43,7 @@ architecture rtl of eth_s6_1000basex is
 	signal clkin, clk125, gtpclkout, gtpclkout_buf, rstn: std_logic;
 	signal status: std_logic_vector(15 downto 0);
 
-	COMPONENT tri_mode_eth_mac_v5_4_serdes
+	COMPONENT tri_mode_eth_mac_v5_4
 	  PORT (
 		 glbl_rstn : IN STD_LOGIC;
 		 rx_axi_rstn : IN STD_LOGIC;
@@ -110,7 +110,7 @@ begin
 
 	rstn <= not rst;
 
-	mac: tri_mode_eth_mac_v5_4_serdes port map(
+	mac: tri_mode_eth_mac_v5_4 port map(
 		glbl_rstn => rstn,
 		rx_axi_rstn => '1',
 		tx_axi_rstn => '1',
@@ -160,9 +160,6 @@ begin
 		gmii_rx_er0 => gmii_rx_er,
 		gmii_isolate0 => open,
 		configuration_vector0 => "00000",
-		link_timer_value0 => "100111101", -- as per example design, ~10.4ms
-		an_adv_config_vector0 => "0000000000100000",
-		an_restart_config0 => '0',
 		status_vector0 => status,
 		reset0 => rst,
 		signal_detect0 => '1',
