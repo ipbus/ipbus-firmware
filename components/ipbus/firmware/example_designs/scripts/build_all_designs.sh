@@ -7,7 +7,7 @@ for dir in `ls ipbus/firmware/example_designs/projects`; do
 	cd $REPOS_FW_DIR
 	mkdir work_$dir
 	cd work_$dir
-	export REPOS_BUILD_DIR=$REPOS_FW_DIR/ipbus/firmware/example_designs/projects/$dir/ise14_3
+	export REPOS_BUILD_DIR=$REPOS_FW_DIR/ipbus/firmware/example_designs/projects/$dir/ise14
 	. $REPOS_FW_DIR/ipbus/firmware/example_designs/scripts/setup.sh >& setup_out.txt
 	xtclsh $REPOS_BUILD_DIR/build_project.tcl >& build_out.txt
 done
