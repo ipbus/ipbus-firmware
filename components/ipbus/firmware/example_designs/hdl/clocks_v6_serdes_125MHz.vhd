@@ -62,7 +62,7 @@ begin
 	mmcm: MMCM_BASE
 		generic map(
 			clkfbout_mult_f => 8.0,
-			clkout1_divide => 4,
+			clkout1_divide => 32,
 			clkin1_period => 8.0
 		)
 		port map(
