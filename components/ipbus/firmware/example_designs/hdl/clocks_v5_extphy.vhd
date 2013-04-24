@@ -63,7 +63,7 @@ begin
 			clkfx => clk_125_i,
 			clkdv => clk_ipb_i,
 			clk2x => clko_200, -- No BUFG on this one (IO delay freq. ref. only)
-			clkfb => open,
+			clkfb => clk125_b,
 			locked => dcm_locked,
 			rst => '0'
 		);
