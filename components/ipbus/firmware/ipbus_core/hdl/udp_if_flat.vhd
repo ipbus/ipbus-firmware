@@ -244,7 +244,7 @@ rx_last_kludge: process(mac_clk)
       PORT MAP (
          mac_clk => mac_clk,
 	 rst_macclk => rst_macclk,
-	 rst_ipb => rst_ipb_sync,
+	 rst_ipb_sync => rst_ipb_sync,
 	 rx_reset => rx_reset,
 	 mac_rx_error => mac_rx_error,
 	 mac_rx_last => my_rx_last,
@@ -465,7 +465,7 @@ rx_last_kludge: process(mac_clk)
          we => we,
          busy => busy,
 	 pkt_rdy => pkt_rdy,
-	 	ipb_rst_sync => ipb_rst_sync
+	 	rst_ipb_sync => rst_ipb_sync
       );
 
 END flat;
