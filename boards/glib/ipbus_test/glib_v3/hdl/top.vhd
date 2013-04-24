@@ -9,7 +9,6 @@ use IEEE.STD_LOGIC_1164.ALL;
 use work.ipbus.ALL;
 
 entity top is port(
-	sysclk_p, sysclk_n: in std_logic;
 	leds: out std_logic_vector(2 downto 0);
 	sgmii_clkp, sgmii_clkn: in std_logic;
 	sgmii_txp, sgmii_txn: out std_logic;
@@ -33,12 +32,9 @@ begin
 
 --	DCM clock generation for internal bus, ethernet
 
-	clocks: entity work.clocks_v6_serdes_40MHz
+	clocks: entity work.clocks_v6_serdes_noxtal
 		port map(
-			sysclk_p => sysclk_p,
-			sysclk_n => sysclk_n,
 			clki_125 => clk125,
-			sysclk_o => open,
 			clko_ipb => ipb_clk,
 			eth_locked => eth_locked,
 			locked => clk_locked,
@@ -49,7 +45,7 @@ begin
 			onehz => onehz
 		);
 		
-		leds <= eth_locked & clk_locked & onehz;
+	leds <= eth_locked & clk_locked & onehz;
 	
 --	Ethernet MAC core and PHY interface
 	
@@ -103,7 +99,7 @@ begin
 		);
 		
 	mac_addr <= X"020ddba1159a"; -- Careful here, arbitrary addresses do not always work
-	ip_addr <= X"c0a80010"; -- 192.168.0.10
+	ip_addr <= X"c0a80010"; -- 192.168.0.16
 
 -- ipbus slaves live in the entity below, and can expose top-level ports
 -- The ipbus fabric is instantiated within.
