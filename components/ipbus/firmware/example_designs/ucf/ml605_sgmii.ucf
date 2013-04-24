@@ -9,7 +9,7 @@ TIMESPEC TS_clk125 = PERIOD clk125 8ns;
 NET clocks/rst TIG;
 NET clocks/nuke_i TIG;
 
-INST eth/sgmii/v6_gtxwizard_top_inst/v6_gtxwizard_inst/gtx0_v6_gtxwizard_i/gtxe1_i LOC=GTXE1_X0Y19;
+INST eth/*/gtxe1_i LOC=GTXE1_X0Y19;
 
 INST sgmii_clkp LOC=H6 | DIFF_TERM=TRUE | TNM_NET = sgmii_clk;
 INST sgmii_clkn LOC=H5 | DIFF_TERM=TRUE;
