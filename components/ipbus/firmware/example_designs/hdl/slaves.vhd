@@ -6,9 +6,7 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-
 use work.ipbus.ALL;
-use work.emac_hostbus_decl.all;
 
 entity slaves is
 	port(
@@ -16,8 +14,6 @@ entity slaves is
 		ipb_rst: in std_logic;
 		ipb_in: in ipb_wbus;
 		ipb_out: out ipb_rbus;
-		hostbus_out: out emac_hostbus_in;
-		hostbus_in: in emac_hostbus_out;
 		rst_out: out std_logic;
 		eth_err_ctrl: out std_logic_vector(35 downto 0);
 		eth_err_stat: in std_logic_vector(47 downto 0) := X"000000000000"
@@ -101,15 +97,5 @@ begin
 		
 	eth_err_ctrl <= inj_ctrl(49 downto 32) & inj_ctrl(17 downto 0);
 	inj_stat <= X"00" & eth_err_stat(47 downto 24) & X"00" & eth_err_stat(23 downto 0);
-
--- Dummy ethernet MAC control signals
-
-	hostbus_out.hostclk <= '0';
-	hostbus_out.hostopcode <= (others => '0');
-	hostbus_out.hostaddr <= (others => '0');
-	hostbus_out.hostwrdata <= (others => '0');
-	hostbus_out.hostmiimsel <= '0';
-	hostbus_out.hostreq <= '0';
-	hostbus_out.hostemac1sel <= '0';
 			
 end rtl;

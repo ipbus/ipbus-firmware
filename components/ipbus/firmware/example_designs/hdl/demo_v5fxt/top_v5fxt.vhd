@@ -15,7 +15,6 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.ipbus.ALL;
 use work.mac_arbiter_decl.all;
-use work.emac_hostbus_decl.all;
 
 entity top is port(
 	sys_clk_pin : in STD_LOGIC;
@@ -37,9 +36,6 @@ architecture rtl of top is
 	signal mac_tx_valid, mac_tx_last, mac_tx_error, mac_tx_ready, mac_rx_valid, mac_rx_last, mac_rx_error: std_logic;
 	signal ipb_master_out : ipb_wbus;
 	signal ipb_master_in : ipb_rbus;
-	type hostbus_out_array_t is array(n_IPB -1 downto 0) of emac_hostbus_in;
-	signal hostbus_out_array: hostbus_out_array_t;
-	signal hostbus_in: emac_hostbus_out;
 	signal mac_tx_data_bus: mac_arbiter_slv_array(N_IPB-1 downto 0);
 	signal mac_tx_valid_bus, mac_tx_last_bus, mac_tx_error_bus, mac_tx_ready_bus, pkt_rx_led_bus, pkt_tx_led_bus: mac_arbiter_sl_array(N_IPB-1 downto 0);
 	signal sys_rst_array: std_logic_vector(N_IPB-1 downto 0);
@@ -92,9 +88,7 @@ begin
 		rx_data => mac_rx_data,
 		rx_valid => mac_rx_valid,
 		rx_last => mac_rx_last,
-		rx_error => mac_rx_error,
-		hostbus_in => hostbus_out_array(0),
-		hostbus_out => hostbus_in
+		rx_error => mac_rx_error
 	);
 	
 	phy_rstb <= '1';
@@ -158,8 +152,6 @@ begin
 			ipb_rst => rst_ipb,
 			ipb_in => ipb_master_out,
 			ipb_out => ipb_master_in,
-			hostbus_out => hostbus_out_array(i),
-			hostbus_in => hostbus_in,
 			rst_out => sys_rst_array(i)
 		);
 	 

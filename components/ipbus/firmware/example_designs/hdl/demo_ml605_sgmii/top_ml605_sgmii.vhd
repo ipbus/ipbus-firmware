@@ -11,7 +11,6 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use work.ipbus.ALL;
-use work.emac_hostbus_decl.all;
 
 entity top is port(
 	sysclk_p, sysclk_n: in std_logic;
@@ -32,8 +31,6 @@ architecture rtl of top is
 	signal ipb_master_in : ipb_rbus;
 	signal mac_addr: std_logic_vector(47 downto 0);
 	signal ip_addr: std_logic_vector(31 downto 0);
-	signal hostbus_in: emac_hostbus_in;
-	signal hostbus_out: emac_hostbus_out;
 	signal pkt_rx_led, pkt_tx_led, sys_rst: std_logic;	
 
 begin
@@ -80,8 +77,6 @@ begin
 			rx_valid => mac_rx_valid,
 			rx_last => mac_rx_last,
 			rx_error => mac_rx_error,
-			hostbus_in => hostbus_in,
-			hostbus_out => hostbus_out
 		);
 	
 	phy_rstb <= '1';
@@ -122,8 +117,6 @@ begin
 		ipb_rst => rst_ipb,
 		ipb_in => ipb_master_out,
 		ipb_out => ipb_master_in,
-		hostbus_out => hostbus_in,
-		hostbus_in => hostbus_out,
 		rst_out => sys_rst
 	);
 
