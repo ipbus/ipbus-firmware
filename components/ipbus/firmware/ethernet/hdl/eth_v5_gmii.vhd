@@ -89,6 +89,7 @@ begin
 		port map(
 			datain => '0',
 			idatain => gmii_rx_clk,
+			odatain => '0',
 			dataout => gmii_rx_clk_del,
 			t => '1',
 			ce => '0',
