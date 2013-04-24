@@ -31,7 +31,7 @@ end udp_clock_crossing_if;
 architecture rtl of udp_clock_crossing_if is
 
   signal pkt_done_buf, pkt_rdy_buf, busy_buf, we_buf : std_logic;
-  signal ipb_rst_buf: std_logic;
+  signal rst_ipb_buf: std_logic;
 
   attribute KEEP: string;
   attribute KEEP of pkt_done_buf: signal is "TRUE";
