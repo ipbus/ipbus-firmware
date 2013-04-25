@@ -147,7 +147,7 @@ begin
 		end if;
 	end process;
   
-	tx_ready <= tx_ready_i;
+	tx_ready <= tx_ready_i or txack;
 	
 	hostbus_out.hostrddata <= (others => '0');
 	hostbus_out.hostmiimrdy <= '0';
