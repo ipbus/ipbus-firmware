@@ -2,8 +2,9 @@
 
 core ipbus/firmware/ethernet/coregen/v5_emac_v1_8_serdes.xco
 hdl ipbus/firmware/ethernet/hdl/eth_v5_1000basex.vhd
-ghdl v5_emac_v1_8_serdes/example_design/v5_emac_v1_8_serdes_block.vhd
-ghdl v5_emac_v1_8_serdes/example_design/physical/gtx_dual_1000X.vhd
-ghdl v5_emac_v1_8_serdes/example_design/physical/rocketio_wrapper_gtx.vhd
-ghdl v5_emac_v1_8_serdes/example_design/physical/rocketio_wrapper_gtx_tile.vhd
+hdl ipbus/firmware/ethernet/gen_hdl/v5_emac_v1_8_serdes/v5_emac_v1_8_serdes_block.vhd
+hdl ipbus/firmware/ethernet/gen_hdl/v5_emac_v1_8_serdes/v5_emac_v1_8_serdes.vhd
+hdl ipbus/firmware/ethernet/gen_hdl/v5_emac_v1_8_serdes/gtx_dual_1000X.vhd
+hdl ipbus/firmware/ethernet/gen_hdl/v5_emac_v1_8_serdes/rocketio_wrapper_gtx.vhd
+hdl ipbus/firmware/ethernet/gen_hdl/v5_emac_v1_8_serdes/rocketio_wrapper_gtx_tile.vhd
 
