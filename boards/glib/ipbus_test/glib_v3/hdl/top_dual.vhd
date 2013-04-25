@@ -15,8 +15,9 @@ entity top is port(
 	sgmii_rxp, sgmii_rxn: in std_logic;
 	phy_rstb: out std_logic;
 	gt_txp, gt_txn: out std_logic;
-	gt_rxp, gt_rxn: in std_logic;
+	gt_rxp, gt_rxn: in std_logic
 	);
+
 end top;
 
 architecture rtl of top is
