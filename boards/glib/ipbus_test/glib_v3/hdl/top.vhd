@@ -40,7 +40,6 @@ begin
 			clki_125_fr => clk125_fr,
 			clki_125 => clk125,
 			clko_ipb => ipb_clk,
-			sysclk_o => open,
 			eth_locked => eth_locked,
 			locked => clk_locked,
 			nuke => sys_rst,
