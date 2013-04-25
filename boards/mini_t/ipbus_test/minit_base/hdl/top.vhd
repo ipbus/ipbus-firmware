@@ -9,10 +9,12 @@ use IEEE.STD_LOGIC_1164.ALL;
 use work.ipbus.all;
 
 entity top is port(
+		sysclk_p, sysclk_n: in std_logic;
 		gt_clkp, gt_clkn: in std_logic;
 		gt_txp, gt_txn: out std_logic;
 		gt_rxp, gt_rxn: in std_logic;
-		leds: out std_logic_vector(3 downto 0)
+		leds: out std_logic_vector(3 downto 0);
+		clk_cntrl: out std_logic_vector(23 downto 0)
 	);
 end top;
 
@@ -33,7 +35,8 @@ begin
 --	DCM clock generation for internal bus, ethernet
 
 	clocks: entity work.clocks_v5_serdes port map(
-		clki_125_fr => clk125_fr,
+		syclk_p => sysclk_p,
+		sysclk_n => sysclk_n,
 		clki_125 => clk125,
 		clko_ipb => ipb_clk,
 		eth_locked => eth_locked,
@@ -44,6 +47,8 @@ begin
 		rsto_eth => rst_eth,
 		onehz => onehz
 		);
+		
+	clk_cntrl <= X"004000";
 		
 	locked <= clk_locked and eth_locked;
 	leds <= pkt_rx_led & pkt_tx_led & locked & onehz;
@@ -58,7 +63,6 @@ begin
 		gt_rxp => gt_rxp,
 		gt_rxn => gt_rxn,
 		clk125_o => clk125,
-		clk125_fr => clk125_fr,
 		rsti => rst_eth,
 		locked => eth_locked,
 		tx_data => mac_tx_data,
