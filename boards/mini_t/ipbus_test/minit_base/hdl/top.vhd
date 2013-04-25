@@ -35,7 +35,6 @@ begin
 	clocks: entity work.clocks_v5_serdes port map(
 		clki_125_fr => clk125_fr,
 		clki_125 => clk125,
-		sysclk_o => clk100,
 		clko_ipb => ipb_clk,
 		eth_locked => eth_locked,
 		locked => clk_locked,
@@ -58,7 +57,7 @@ begin
 		gt_txn => gt_txn,
 		gt_rxp => gt_rxp,
 		gt_rxn => gt_rxn,
-		clk125_out => clk125,
+		clk125_o => clk125,
 		clk125_fr => clk125_fr,
 		rsti => rst_eth,
 		fr_clk => clk100,
