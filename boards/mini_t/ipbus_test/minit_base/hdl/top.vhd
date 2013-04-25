@@ -59,7 +59,7 @@ begin
 		gt_rxn => gt_rxn,
 		clk125_o => clk125,
 		clk125_fr => clk125_fr,
-		rsti => rst_eth,f
+		rsti => rst_eth,
 		locked => eth_locked,
 		tx_data => mac_tx_data,
 		tx_valid => mac_tx_valid,
