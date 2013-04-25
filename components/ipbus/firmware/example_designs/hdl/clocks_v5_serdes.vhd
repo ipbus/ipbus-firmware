@@ -54,7 +54,7 @@ begin
 		)
 		port map(
 			clkin => sysclk,
-			clk0 => clki_125,
+			clk0 => open,
 			clkdv => clk_ipb_i,
 			clkfb => '0',
 			locked => dcm_locked,
