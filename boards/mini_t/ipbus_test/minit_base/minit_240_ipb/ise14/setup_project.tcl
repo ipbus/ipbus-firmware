@@ -1,7 +1,7 @@
-project new mp7_485
-project set family virtex7
-project set device xc7vx485t
-project set package ffg1927
+project new minit_240_ipb
+project set family virtex5
+project set device xc5vtx240t
+project set package ff1759
 project set speed -2
 
 project set "Enable Multi-Threading" "2" -process "Map"
