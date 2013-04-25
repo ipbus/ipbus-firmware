@@ -35,7 +35,7 @@ begin
 --	DCM clock generation for internal bus, ethernet
 
 	clocks: entity work.clocks_v5_serdes port map(
-		syclk_p => sysclk_p,
+		sysclk_p => sysclk_p,
 		sysclk_n => sysclk_n,
 		clki_125 => clk125,
 		clko_ipb => ipb_clk,
