@@ -1,4 +1,4 @@
-project open mp7_485
+project open minit_240_ipb
 process run "Implement Design"
 project close
 
