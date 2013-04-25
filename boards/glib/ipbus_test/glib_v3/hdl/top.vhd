@@ -7,6 +7,8 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use work.ipbus.ALL;
+library unisim;
+use unisim.VComponents.all;
 
 entity top is port(
 	sysclk_p, sysclk_n: in std_logic;

@@ -2,8 +2,8 @@ NET sysclk_p LOC = AH6 | DIFF_TERM = TRUE | TNM_NET = sysclk;
 NET sysclk_n LOC = AH5 | DIFF_TERM = TRUE;
 TIMESPEC TS_sysclk = PERIOD sysclk 8ns;
 
-NET clk125_fr TNM_NET=clk125_fr;
-TIMESPEC TS_clk125_fr = PERIOD clk125_fr 8ns;
+#NET clk125_fr TNM_NET=clk125_fr;
+#TIMESPEC TS_clk125_fr = PERIOD clk125_fr 8ns;
 
 NET eth/clk125_out TNM_NET=clk125;
 TIMESPEC TS_clk125 = PERIOD clk125 8ns;
