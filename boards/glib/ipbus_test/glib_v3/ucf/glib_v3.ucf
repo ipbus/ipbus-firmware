@@ -1,6 +1,6 @@
-NET sysclk_p LOC = AH6 | DIFF_TERM = TRUE | TNM_NET = sysclk;
-NET sysclk_n LOC = AH5 | DIFF_TERM = TRUE;
-TIMESPEC TS_sysclk = PERIOD sysclk 8ns;
+#NET sysclk_p LOC = AH6 | DIFF_TERM = TRUE | TNM_NET = sysclk;
+#NET sysclk_n LOC = AH5 | DIFF_TERM = TRUE;
+#TIMESPEC TS_sysclk = PERIOD sysclk 8ns;
 
 #NET clk125_fr TNM_NET=clk125_fr;
 #TIMESPEC TS_clk125_fr = PERIOD clk125_fr 8ns;
@@ -11,9 +11,8 @@ TIMESPEC TS_clk125 = PERIOD clk125 8ns;
 NET clocks/rst TIG;
 NET clocks/nuke_i TIG;
 
-NET sgmii_clkp LOC=V6 | DIFF_TERM=TRUE | TNM_NET=gtpclk;
-NET sgmii_clkn LOC=V5 | DIFF_TERM=TRUE;
-
+NET sgmii_clkp LOC=M6 | DIFF_TERM=TRUE | TNM_NET=gtpclk;
+NET sgmii_clkn LOC=M5 | DIFF_TERM=TRUE;
 TIMESPEC TS_gtpclk = PERIOD gtpclk 8ns;
 
 INST eth/*/gtxe1_i LOC=GTXE1_X0Y10;
@@ -28,6 +27,4 @@ NET phy_rstb LOC=AK16 | IOSTANDARD=LVCMOS25;
 NET leds<0> LOC=AF31 | IOSTANDARD=LVCMOS25;
 NET leds<1> LOC=AB25 | IOSTANDARD=LVCMOS25;
 NET leds<2> LOC=AC25 | IOSTANDARD=LVCMOS25;
-
-NET pll_lock LOC=AD21 | IOSTANDARD=LVCMOS25;
 
