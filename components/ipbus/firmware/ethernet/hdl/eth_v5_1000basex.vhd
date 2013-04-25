@@ -22,7 +22,6 @@ entity eth_v5_1000basex is
 		gt_rxp, gt_rxn: in std_logic;
 		locked: out std_logic;
 		clk125_o : out std_logic;
-		clk125_fr: out std_logic;
 		rsti: in std_logic;
 		tx_data: in std_logic_vector(7 downto 0);
 		tx_valid: in std_logic;
@@ -55,13 +54,7 @@ begin
 			ib => gt_clkn,
 			o => clkin
 		);
-		
-	bufg_d: bufg
-		port map(
-			i => clkin,
-			o => clk125_fr
-		);
-	 
+
 	bufg_ref: bufg
 		port map(
 			i => refclk125,

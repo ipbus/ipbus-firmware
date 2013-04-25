@@ -14,7 +14,8 @@ library unisim;
 use unisim.VComponents.all;
 
 entity clocks_v5_serdes is port(
-	clki_125_fr: in std_logic;
+	sysclk_p: in std_logic;
+	sysclk_n: in std_logic;
 	clki_125: in std_logic;
 	clko_ipb: out std_logic;
 	eth_locked: in std_logic;
@@ -37,8 +38,19 @@ architecture rtl of clocks_v5_serdes is
 
 begin
 	
-	sysclk <= clki_125_fr;
+	bufg_sysclk: ibufgds
+		port map(
+			i => sysclk_p,
+			ib => sysclk_n,
+			o => sysclk_ub
+		);
 	
+	bufg_sysclk: bufg
+		port map(
+			i => sysclk_ub,
+			o => sysclk
+		);
+
 	bufgipb: BUFG port map(
 		i => clk_ipb_i,
 		o => clk_ipb_b
