@@ -21,6 +21,7 @@ entity eth_v6_sgmii is
 		sgmii_rxp, sgmii_rxn: in std_logic;
 		sync_acq: out std_logic;
 		clk125_o: out std_logic;
+		clk125_direct: out std_logic;
 		rst: in std_logic;
 		locked: out std_logic;
 		tx_data: in std_logic_vector(7 downto 0);
@@ -52,6 +53,11 @@ begin
       o => clkin,
       odiv2 => open
     );
+	 
+	bufg_d: bufg port map(
+		i => clkin,
+		o => clk125_direct
+	);
 
 	bufg0: bufg port map(
 		i => clk125_out,
