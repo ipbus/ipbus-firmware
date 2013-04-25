@@ -38,7 +38,7 @@ architecture rtl of clocks_v5_serdes is
 
 begin
 	
-	bufg_sysclk: ibufgds
+	ibufgds_sysclk: ibufgds
 		port map(
 			i => sysclk_p,
 			ib => sysclk_n,
