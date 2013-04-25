@@ -13,8 +13,8 @@ NET clocks/rst TIG;
 NET clocks/nuke_i TIG;
 
 INST eth/*/gtx_dual_i LOC=GTX_DUAL_X1Y5;
-INST enet_clkn LOC=AD3;
-INST enet_clkp LOC=AD4;
+INST gt_clkn LOC=AD3;
+INST gt_clkp LOC=AD4;
 
 NET leds<0> LOC=AM36 | IOSTANDARD=LVCMOS25;
 NET leds<1> LOC=AL35 | IOSTANDARD=LVCMOS25;
