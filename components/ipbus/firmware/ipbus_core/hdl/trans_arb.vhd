@@ -43,7 +43,7 @@ begin
 				src <= (others => '0');
 			elsif busy = '0' then
 				if buf_in(sel).pkt_rdy = '0' then
-					if src/=(NSRC-1) then
+					if src /= (NSRC - 1) then
 						src <= src + 1;
 					else
 						src <= (others=>'0');
@@ -61,7 +61,7 @@ begin
 	trans_out.rdata <= buf_in(sel).rdata;
 	trans_out.busy <= buf_in(sel).busy;
 
-  busgen: for i in NSRC-1 downto 0 generate
+  busgen: for i in NSRC - 1 downto 0 generate
   begin
     buf_out(i).pkt_done <= trans_in.pkt_done when sel = i else '0';
     buf_out(i).wdata <= trans_in.wdata;
