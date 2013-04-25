@@ -46,22 +46,20 @@ begin
 	
 	clko_ipb <= clk_ipb_b;
 	
-	mmcm: MMCM_BASE
+	dcm0: DCM_BASE
 		generic map(
-			clkfbout_mult_f => 5.0,
-			clkout1_divide => 32,
-			clkin1_period => 5.0
+			CLKIN_PERIOD => 8.0,
+			CLKDV_DIVIDE => 4.0,
+			CLK_FEEDBACK => "NONE"
 		)
 		port map(
-			clkin1 => sysclk,
-			clkfbin => clkfb,
-			clkfbout => clkfb,
-			clkout1 => clk_ipb_i,
+			clkin => sysclk,
+			clk0 => clk_125_i,
+			clkdv => clk_ipb_i,
 			locked => dcm_locked,
-			rst => '0',
-			pwrdwn => '0'
+			rst => '0'
 		);
-			
+	
 	clkdiv: entity work.clock_div port map(
 		clk => sysclk,
 		d25 => d25,
