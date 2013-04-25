@@ -9,7 +9,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 use work.ipbus.ALL;
 
 entity top is port(
-	sysclk_p, sysclk_n: in std_logic;
+--	sysclk_p, sysclk_n: in std_logic;
 	leds: out std_logic_vector(2 downto 0);
 	sgmii_clkp, sgmii_clkn: in std_logic;
 	sgmii_txp, sgmii_txn: out std_logic;
@@ -20,7 +20,7 @@ end top;
 
 architecture rtl of top is
 
-	signal clk125, ipb_clk, eth_locked, clk_locked, rst_125, rst_ipb, rst_eth, onehz: std_logic;
+	signal clk125, clk125_fr, ipb_clk, eth_locked, clk_locked, rst_125, rst_ipb, rst_eth, onehz: std_logic;
 	signal mac_tx_data, mac_rx_data: std_logic_vector(7 downto 0);
 	signal mac_tx_valid, mac_tx_last, mac_tx_error, mac_tx_ready, mac_rx_valid, mac_rx_last, mac_rx_error: std_logic;
 	signal ipb_master_out : ipb_wbus;
@@ -33,10 +33,11 @@ begin
 
 --	DCM clock generation for internal bus, ethernet
 
-	clocks: entity work.clocks_v6_serdes_40MHz
+	clocks: entity work.clocks_v6_serdes_noxtal
 		port map(
-			sysclk_p => sysclk_p,
-			sysclk_n => sysclk_n,
+--			sysclk_p => sysclk_p,
+--			sysclk_n => sysclk_n,
+			clki_125_fr => clk125_fr,
 			clki_125 => clk125,
 			clko_ipb => ipb_clk,
 			sysclk_o => open,
@@ -62,6 +63,7 @@ begin
 			sgmii_rxp => sgmii_rxp,
 			sgmii_rxn => sgmii_rxn,		
 			clk125_o => clk125,
+			clk125_fr => clk125_fr,
 			rst => rst_eth,
 			locked => eth_locked,
 			tx_data => mac_tx_data,
