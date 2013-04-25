@@ -1,6 +1,6 @@
 -- clocks_v6_serdes
 --
--- Generates a ~32MHz ipbus clock from an external 40MHz reference
+-- Generates a ~32MHz ipbus clock from 125MHz reference
 -- Includes reset logic for ipbus
 --
 -- Dave Newbold, April 2011
@@ -14,6 +14,7 @@ library unisim;
 use unisim.VComponents.all;
 
 entity clocks_v6_serdes_noxtal is port(
+	clki_125_fr: in std_logic;
 	clki_125: in std_logic;
 	clko_ipb: out std_logic;
 	eth_locked: in std_logic;
@@ -43,7 +44,7 @@ begin
 	
 	clko_ipb <= clk_ipb_b;
 	
-	sysclk <= clki_125;
+	sysclk <= clki_125_fr;
 	
 	mmcm: MMCM_BASE
 		generic map(
