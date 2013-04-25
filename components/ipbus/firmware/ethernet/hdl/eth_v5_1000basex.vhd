@@ -17,12 +17,13 @@ use work.emac_hostbus_decl.all;
 
 entity eth_v5_1000basex is
 	port(
-		basex_clkp, basex_clkn: in std_logic;
-		basex_txp, basex_txn: out std_logic;
-		basex_rxp, basex_rxn: in std_logic;
+		gt_clkp, gt_clkn: in std_logic;
+		gt_txp, gt_txn: out std_logic;
+		gt_rxp, gt_rxn: in std_logic;
 		locked: out std_logic;
 		clk125_o : out std_logic;
-		rst: in std_logic;
+		clk125_fr: out std_logic;
+		rsti: in std_logic;
 		tx_data: in std_logic_vector(7 downto 0);
 		tx_valid: in std_logic;
 		tx_last: in std_logic;
@@ -50,9 +51,15 @@ begin
 
 	clkbuf: ibufds
 		port map(
-			i => basex_clkp,
-			ib => basex_clkn,
+			i => gt_clkp,
+			ib => gt_clkn,
 			o => clkin
+		);
+		
+	bufg_d: bufg
+		port map(
+			i => clkin,
+			o => clk125_fr
 		);
 	 
 	bufg_ref: bufg
@@ -71,7 +78,7 @@ begin
 			clkfb => clk125_buf,
 			clkdv => clk62_5,
 			locked => dcm_locked,
-			rst => rst
+			rst => rsti
 		);
 
 	bufg_125: bufg
@@ -117,10 +124,10 @@ begin
 			CLIENTEMAC0PAUSEVAL => (others => '0'),
 			EMAC0CLIENTSYNCACQSTATUS => sync_acq,
 			EMAC0ANINTERRUPT => open,
-			TXP_0 => basex_txp,
-			TXN_0 => basex_txn,
-			RXP_0 => basex_rxp,
-			RXN_0 => basex_rxn,
+			TXP_0 => gt_txp,
+			TXN_0 => gt_txn,
+			RXP_0 => gt_rxp,
+			RXN_0 => gt_rxn,
 			PHYAD_0 => (others => '0'),
 			RESETDONE_0 => phy_locked,
 			TXN_1_UNUSED => open,
@@ -128,8 +135,8 @@ begin
 			RXN_1_UNUSED => '0',
 			RXP_1_UNUSED => '0',
 			CLK_DS => clkin,
-			GTRESET => rst,
-			RESET => rst,
+			GTRESET => rsti,
+			RESET => rsti,
 			rxpolarity(0) => rxpolarity,
 			rxpolarity(1) => '0',
 			txpolarity(0) => txpolarity,
@@ -143,7 +150,7 @@ begin
 	process(clk125_buf) -- Shim between new and old-style MAC interfaces
 	begin
 		if rising_edge(clk125_buf) then
-			tx_ready_i <= (tx_ready_i or txack) and not (tx_last or rst); -- Assume long rst pulse
+			tx_ready_i <= (tx_ready_i or txack) and not (tx_last or rsti); -- Assume long rst pulse
 		end if;
 	end process;
   
