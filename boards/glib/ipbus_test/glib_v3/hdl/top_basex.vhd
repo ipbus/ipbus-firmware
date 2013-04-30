@@ -10,10 +10,9 @@ use work.ipbus.ALL;
 
 entity top is port(
 	leds: out std_logic_vector(2 downto 0);
-	sgmii_clkp, sgmii_clkn: in std_logic;
-	sgmii_txp, sgmii_txn: out std_logic;
-	sgmii_rxp, sgmii_rxn: in std_logic;
-	phy_rstb: out std_logic
+	gt_clkp, gt_clkn: in std_logic;
+	gt_txp, gt_txn: out std_logic;
+	gt_rxp, gt_rxn: in std_logic
 	);
 end top;
 
@@ -50,14 +49,14 @@ begin
 	
 --	Ethernet MAC core and PHY interface
 	
-	eth: entity work.eth_v6_sgmii
+	eth: entity work.eth_v6_basex
 		port map(
-			sgmii_clkp => sgmii_clkp,
-			sgmii_clkn => sgmii_clkn,
-			sgmii_txp => sgmii_txp,
-			sgmii_txn => sgmii_txn,
-			sgmii_rxp => sgmii_rxp,
-			sgmii_rxn => sgmii_rxn,		
+			gt_clkp => gt_clkp,
+			gt_clkn => gt_clkn,
+			gt_txp => gt_txp,
+			gt_txn => gt_txn,
+			gt_rxp => gt_rxp,
+			gt_rxn => gt_rxn,		
 			clk125_o => clk125,
 			clk125_fr => clk125_fr,
 			rst => rst_eth,
