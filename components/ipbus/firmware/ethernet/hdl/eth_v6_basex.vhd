@@ -18,7 +18,6 @@ entity eth_v6_basex is
 		gt_clkp, gt_clkn: in std_logic;
 		gt_txp, gt_txn: out std_logic;
 		gt_rxp, gt_rxn: in std_logic;
-		sync_acq: out std_logic;
 		clk125_o: out std_logic;
 		clk125_fr: out std_logic;
 		rst: in std_logic;
