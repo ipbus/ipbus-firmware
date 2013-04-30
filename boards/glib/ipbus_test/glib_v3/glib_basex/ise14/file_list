@@ -1,0 +1,7 @@
+hdl glib_v3/hdl/top.vhd
+hdl glib_v3/ucf/glib_v3.ucf
+hdl ipbus/firmware/example_designs/hdl/clocks_v6_serdes_noxtal.vhd
+include ipbus/firmware/ethernet/cfg/file_list_v6_sgmii
+include ipbus/firmware/ipbus_core/cfg/file_list
+include ipbus/firmware/example_designs/cfg/file_list
+
