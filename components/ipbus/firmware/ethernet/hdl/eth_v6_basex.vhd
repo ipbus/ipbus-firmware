@@ -73,7 +73,6 @@ begin
       gtx_clk => clk125,
       rx_statistics_vector => open,
       rx_statistics_valid => open,
-      user_mac_aclk => open,
       rx_reset => open,
       rx_axis_mac_tdata => rx_data,
       rx_axis_mac_tvalid => rx_valid,
