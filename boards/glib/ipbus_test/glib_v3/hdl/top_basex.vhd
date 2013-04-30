@@ -72,8 +72,6 @@ begin
 			rx_error => mac_rx_error
 		);
 	
-	phy_rstb <= '1';
-	
 -- ipbus control logic
 
 	ipbus: entity work.ipbus_ctrl
