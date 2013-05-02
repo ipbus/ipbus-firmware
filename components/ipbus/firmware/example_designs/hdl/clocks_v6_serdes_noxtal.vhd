@@ -32,7 +32,7 @@ architecture rtl of clocks_v6_serdes_noxtal is
 	
 	signal dcm_locked, sysclk, sysclk_ub, clk_ipb_i, clk_ipb_b, clkfb: std_logic;
 	signal d25, d25_d: std_logic;
-	signal nuke_i, nuke_d, nuke_d2: std_logic := '0';
+	signal dcm_rst, nuke_i, nuke_d, nuke_d2: std_logic := '0';
 	signal rst, rst_ipb, rst_125, rst_eth: std_logic := '1';
 
 begin
@@ -58,7 +58,7 @@ begin
 			clkfbout => clkfb,
 			clkout1 => clk_ipb_i,
 			locked => dcm_locked,
-			rst => '0',
+			rst => dcm_rst,
 			pwrdwn => '0'
 		);
 			
@@ -73,6 +73,7 @@ begin
 		if rising_edge(sysclk) then
 			d25_d <= d25;
 			if d25='1' and d25_d='0' then
+				dcm_rst <= not (dcm_locked or dcm_rst);
 				rst <= nuke_d2 or not dcm_locked;
 				nuke_d <= nuke_i; -- Time bomb (allows return packet to be sent)
 				nuke_d2 <= nuke_d;
