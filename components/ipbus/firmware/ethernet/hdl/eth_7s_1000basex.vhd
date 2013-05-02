@@ -177,7 +177,7 @@ begin
 	hostbus_out.hostrddata <= (others => '0');
 	hostbus_out.hostmiimrdy <= '0';
 
-	phy: entity work.gig_eth_pcs_pma_v11_5_block
+	phy: entity work.gig_eth_pcs_pma_v11_4_block
 		port map(
 			drpaddr_in => (others => '0'),
 			drpclk_in => clk125,
