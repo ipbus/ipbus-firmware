@@ -17,4 +17,5 @@ ghdl gtwizard_v2_5_gbe_gth/example_design/gtwizard_v2_5_gbe_gth_rx_startup_fsm.v
 ghdl gtwizard_v2_5_gbe_gth/example_design/gtwizard_v2_5_gbe_gth_sync_block.vhd
 ghdl gtwizard_v2_5_gbe_gth.vhd
 ghdl gtwizard_v2_5_gbe_gth_gt.vhd
+ghdl gtwizard_v2_5_gbe_gth/example_design/gtwizard_v2_5_gbe_gth_gtrxreset_seq.vhd
 
