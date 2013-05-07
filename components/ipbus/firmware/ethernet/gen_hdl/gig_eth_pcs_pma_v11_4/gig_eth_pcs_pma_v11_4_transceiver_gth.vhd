@@ -179,7 +179,7 @@ architecture wrapper of gig_eth_pcs_pma_v11_4_transceiver is
     GT0_GTHRXN_IN                           : in   std_logic;
     GT0_GTHRXP_IN                           : in   std_logic;
     GT0_RXCDRLOCK_OUT                       : out  std_logic;
-    GT0_RXELECIDLE_OUT                      : out  std_logic;
+--    GT0_RXELECIDLE_OUT                      : out  std_logic;
     -------- Receive Ports - RX Elastic Buffer and Phase Alignment Ports -------
     GT0_RXBUFRESET_IN                       : in   std_logic;
     GT0_RXBUFSTATUS_OUT                     : out  std_logic_vector(2 downto 0);
@@ -573,7 +573,7 @@ begin
         GT0_GTHRXN_IN                   =>      rxn,
         GT0_GTHRXP_IN                   =>      rxp,
         GT0_RXCDRLOCK_OUT               =>      open,
-        GT0_RXELECIDLE_OUT              =>      rxelecidle,
+--        GT0_RXELECIDLE_OUT              =>      rxelecidle,
     -------- Receive Ports - RX Elastic Buffer and Phase Alignment Ports -------
         GT0_RXBUFRESET_IN               =>      rxreset_int,
         GT0_RXBUFSTATUS_OUT             =>      rxbufstatus,
