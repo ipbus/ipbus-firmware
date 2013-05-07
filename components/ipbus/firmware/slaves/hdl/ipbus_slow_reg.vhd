@@ -5,26 +5,31 @@
 -- We use one cycle of read / write latency to ease timing (probably not necessary)
 -- The q outputs change immediately on write (no latency).
 --
--- Dave Newbold, March 2011
+-- This version for debugging has adjustable latency
+--
+-- Dave Newbold, May 2013
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use ieee.numeric_std.all;
 use work.ipbus.all;
 
-entity ipbus_reg is
-	generic(addr_width: natural := 0);
+entity ipbus_slow_reg is
+	generic(
+		addr_width: natural := 0;
+		latency: natural := 0
+	);
 	port(
 		clk: in std_logic;
 		reset: in std_logic;
 		ipbus_in: in ipb_wbus;
 		ipbus_out: out ipb_rbus;
-		q: out STD_LOGIC_VECTOR(2**addr_width*32-1 downto 0)
+		q: out std_logic_vector(2**addr_width*32-1 downto 0)
 	);
 	
-end ipbus_reg;
+end ipbus_slow_reg;
 
-architecture rtl of ipbus_reg is
+architecture rtl of ipbus_slow_reg is
 
 	type reg_array is array(2**addr_width-1 downto 0) of std_logic_vector(31 downto 0);
 	signal reg: reg_array;
