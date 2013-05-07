@@ -156,6 +156,7 @@ architecture wrapper of gig_eth_pcs_pma_v11_5_transceiver is
 
     SYSCLK_IN                               : in   std_logic;
     SOFT_RESET_IN                           : in   std_logic;
+    DONT_RESET_ON_DATA_ERROR_IN             : in   std_logic;
     GT0_TX_FSM_RESET_DONE_OUT               : out  std_logic;
     GT0_RX_FSM_RESET_DONE_OUT               : out  std_logic;
     GT0_DATA_VALID_IN                       : in   std_logic;
@@ -569,6 +570,7 @@ begin
         GT0_DRPWE_IN                    =>     drpwe_in   , 
         SYSCLK_IN                       => independent_clock,
         SOFT_RESET_IN                   => pmareset,
+        DONT_RESET_ON_DATA_ERROR_IN => '0',
         GT0_TX_FSM_RESET_DONE_OUT       => open,
         GT0_RX_FSM_RESET_DONE_OUT       => open,
     GT0_DATA_VALID_IN                   => data_valid_reg2,
