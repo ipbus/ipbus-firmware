@@ -33,8 +33,9 @@ architecture rtl of ipbus_slow_reg is
 
 	type reg_array is array(2**addr_width-1 downto 0) of std_logic_vector(31 downto 0);
 	signal reg: reg_array;
+	signal cyc: (latency downto 0);
 	signal sel: integer;
-	signal ack: std_logic;
+	signal ack, stb_d: std_logic;
 
 begin
 
@@ -50,11 +51,19 @@ begin
 			end if;
 
 			ipbus_out.ipb_rdata <= reg(sel);
-			ack <= ipbus_in.ipb_strobe and not ack;
+			
+			stb_d <= ipbus.in_ipb_strobe;
+			cyc(0) <= ipbus_in.ipb_strobe and (ack or not stb_d);
+			if ipbus_in.ipb_strobe = '1' then
+				cyc(latency downto 1) <= cyc(latency - 1 downto 0);
+			else
+				cyc(latency downto 0) <= (others => '0');
+			end if;
 
 		end if;
 	end process;
 	
+	ack <= cyc(latency);
 	ipbus_out.ipb_ack <= ack;
 	ipbus_out.ipb_err <= '0';
 
