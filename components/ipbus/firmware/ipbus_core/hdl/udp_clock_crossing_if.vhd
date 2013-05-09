@@ -23,16 +23,13 @@ entity udp_clock_crossing_if is
     pkt_done: in std_logic;
     we: in std_logic;
     busy: out std_logic;
-    pkt_rdy: out std_logic;
---
-		rst_ipb_sync: out std_logic
+    pkt_rdy: out std_logic
   );
 end udp_clock_crossing_if;
 
 architecture rtl of udp_clock_crossing_if is
 
   signal pkt_done_buf, pkt_rdy_buf, busy_buf, we_buf, rst_ipb_buf : std_logic;
-  signal rst_ipb_buf: std_logic;
 
   attribute KEEP: string;
   attribute KEEP of pkt_done_buf: signal is "TRUE";
@@ -126,13 +123,5 @@ busy_ipb_clk: process(ipb_clk)
       ;
     end if;
   end process;    
-
-	ipb_rst_s: process(mac_clk)
-	begin
-		if rising_edge(mac_clk) then
-			rst_ipb_buf <= rst_ipb;
-			rst_ipb_sync <= rst_ipb_buf;
-		end if;
-	end process;
 
 end rtl;
