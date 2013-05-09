@@ -3,12 +3,16 @@ USE ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 ENTITY udp_DualPortRAM_rx IS
+generic(
+  BUFWIDTH: natural := 0;
+  ADDRWIDTH: natural := 0
+);
 port (
   clk125 : in std_logic;
   clk : in std_logic;
   rx_wea : in std_logic;
-  rx_addra : in std_logic_vector(12 downto 0);
-  rx_addrb : in std_logic_vector(10 downto 0);
+  rx_addra : in std_logic_vector(BUFWIDTH + ADDRWIDTH - 1 downto 0);
+  rx_addrb : in std_logic_vector(BUFWIDTH + ADDRWIDTH - 3 downto 0);
   rx_dia : in std_logic_vector(7 downto 0);
   rx_dob : out std_logic_vector(31 downto 0)
   );
@@ -16,7 +20,7 @@ END ENTITY udp_DualPortRAM_rx;
 
 --
 ARCHITECTURE striped OF udp_DualPortRAM_rx IS
-type ram_type is array (2047 downto 0) of std_logic_vector (7 downto 0);
+type ram_type is array (2**(BUFWIDTH + ADDRWIDTH) - 1 downto 0) of std_logic_vector (7 downto 0);
 signal ram1,ram2, ram3, ram4 : ram_type;
 attribute block_ram : boolean;
 attribute block_ram of RAM1 : signal is TRUE;
@@ -31,13 +35,13 @@ begin
     if (rx_wea = '1') then
       case rx_addra(1 downto 0) is
         when "00" =>
-          ram4(to_integer(unsigned(rx_addra(12 downto 2)))) <= rx_dia;
+          ram4(to_integer(unsigned(rx_addra(BUFWIDTH + ADDRWIDTH - 1 downto 2)))) <= rx_dia;
         when "01" =>
-          ram3(to_integer(unsigned(rx_addra(12 downto 2)))) <= rx_dia;
+          ram3(to_integer(unsigned(rx_addra(BUFWIDTH + ADDRWIDTH - 1 downto 2)))) <= rx_dia;
         when "10" =>
-          ram2(to_integer(unsigned(rx_addra(12 downto 2)))) <= rx_dia;
+          ram2(to_integer(unsigned(rx_addra(BUFWIDTH + ADDRWIDTH - 1 downto 2)))) <= rx_dia;
         when "11" =>
-          ram1(to_integer(unsigned(rx_addra(12 downto 2)))) <= rx_dia;
+          ram1(to_integer(unsigned(rx_addra(BUFWIDTH + ADDRWIDTH - 1 downto 2)))) <= rx_dia;
         when Others =>
       end case;
     end if;

@@ -7,6 +7,10 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity udp_status_buffer is
+  generic(
+    BUFWIDTH: natural := 0;
+    ADDRWIDTH: natural := 0
+  );
   port (
     mac_clk: in std_logic;
     rst_macclk: in std_logic;
@@ -79,12 +83,16 @@ pkt_rdy_block: process (mac_clk)
   end process;
 
 header_block:  process (mac_clk)
-  variable next_pkt_id_int: unsigned(15 downto 0);
+  variable next_pkt_id_int, bufsize, nbuf: unsigned(15 downto 0);
   begin
     if rising_edge(mac_clk) then
       if rst_macclk = '1' then
+        bufsize := to_unsigned((2**ADDRWIDTH) - 8, 16);
+        nbuf := to_unsigned(2**BUFWIDTH, 16);
         next_pkt_id_int := to_unsigned(1, 16);
-        header <= x"200000F1" & x"00001FF8" & x"00000001" & x"200001F0"
+        header <= x"200000F1" & x"0000" & 
+	std_logic_vector(bufsize) & x"0000" &
+	std_logic_vector(nbuf) & x"200001F0"
 -- pragma translate_off
         after 4 ns
 -- pragma translate_on

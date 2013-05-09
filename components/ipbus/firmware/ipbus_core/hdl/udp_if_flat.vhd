@@ -8,6 +8,14 @@ USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;
 
 ENTITY UDP_if IS
+generic(
+-- Number of address bits to select buffer
+-- Number of RX and TX buffers is 2**BUFWIDTH
+  BUFWIDTH: natural := 0;
+-- Number of address bits within each buffer
+-- Size of each buffer is 2**ADDRWIDTH
+  ADDRWIDTH: natural := 11
+);
    PORT( 
       mac_clk: IN std_logic;
       rst_macclk: IN std_logic;
@@ -239,6 +247,10 @@ rx_last_kludge: process(mac_clk)
 	 status_send => status_send
       );
    status_buffer: entity work.udp_status_buffer
+      GENERIC MAP (
+	BUFWIDTH => 0,
+	ADDRWIDTH => ADDRWIDTH
+      )
       PORT MAP (
          mac_clk => mac_clk,
 	 rst_macclk => rst_macclk,
@@ -335,32 +347,44 @@ rx_last_kludge: process(mac_clk)
          rxram_dropped => rxram_dropped_sig
       );
    internal_ram: entity work.udp_DualPortRAM
+      GENERIC MAP (
+	BUFWIDTH => 0,
+	ADDRWIDTH => ADDRWIDTH
+      )
       PORT MAP (
          ClkA => mac_clk,
          ClkB => mac_clk,
          wea => wea,
-         addra => addra,
-         addrb => addrb,
+         addra => addra(ADDRWIDTH - 1 downto 0),
+         addrb => addrb(ADDRWIDTH - 1 downto 0),
          dia => dia,
          dob => dob
       );
    ipbus_rx_ram: entity work.udp_DualPortRAM_rx
+      GENERIC MAP (
+	BUFWIDTH => BUFWIDTH,
+	ADDRWIDTH => ADDRWIDTH
+      )
       PORT MAP (
          clk125 => mac_clk,
          clk => ipb_clk,
          rx_wea => rx_wea,
-         rx_addra => rx_addra,
-         rx_addrb => rx_addrb,
+         rx_addra => rx_addra(ADDRWIDTH - 1 downto 0),
+         rx_addrb => rx_addrb(ADDRWIDTH - 3 downto 0),
          rx_dia => rx_dia,
          rx_dob => rx_dob
       );
    ipbus_tx_ram: entity work.udp_DualPortRAM_tx
+      GENERIC MAP (
+	BUFWIDTH => BUFWIDTH,
+	ADDRWIDTH => ADDRWIDTH
+      )
       PORT MAP (
          clk => ipb_clk,
          clk125 => mac_clk,
          tx_wea => tx_wea,
-         tx_addra => tx_addra,
-         tx_addrb => tx_addrb,
+         tx_addra => tx_addra(ADDRWIDTH - 3 downto 0),
+         tx_addrb => tx_addrb(ADDRWIDTH - 1 downto 0),
          tx_dia => tx_dia,
          tx_dob => tx_dob
       );

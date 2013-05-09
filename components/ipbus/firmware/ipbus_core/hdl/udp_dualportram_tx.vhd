@@ -3,12 +3,16 @@ USE ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 ENTITY udp_DualPortRAM_tx IS
+generic(
+  BUFWIDTH: natural := 0;
+  ADDRWIDTH: natural := 0
+);
 port (
   clk : in std_logic;
   clk125 : in std_logic;
   tx_wea : in std_logic;
-  tx_addra : in std_logic_vector(10 downto 0);
-  tx_addrb : in std_logic_vector(12 downto 0);
+  tx_addra : in std_logic_vector(BUFWIDTH + ADDRWIDTH - 3 downto 0);
+  tx_addrb : in std_logic_vector(BUFWIDTH + ADDRWIDTH - 1 downto 0);
   tx_dia : in std_logic_vector(31 downto 0);
   tx_dob : out std_logic_vector(7 downto 0)
   );
@@ -16,7 +20,7 @@ END ENTITY udp_DualPortRAM_tx;
 
 --
 ARCHITECTURE v3 OF udp_DualPortRAM_tx IS
-type ram_type is array (2047 downto 0) of std_logic_vector (31 downto 0);
+type ram_type is array (2**(BUFWIDTH + ADDRWIDTH - 2) - 1 downto 0) of std_logic_vector (31 downto 0);
 signal ram : ram_type;
 attribute block_ram : boolean;
 attribute block_ram of ram : signal is TRUE;
@@ -36,7 +40,7 @@ end process write;
 read: process (clk125)
 begin
   if (rising_edge(clk125)) then
-    ram_out <= ram(to_integer(unsigned(tx_addrb(12 downto 2))))
+    ram_out <= ram(to_integer(unsigned(tx_addrb(BUFWIDTH + ADDRWIDTH - 1 downto 2))))
 -- pragma translate_off
     after 4 ns
 -- pragma translate_on
