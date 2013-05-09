@@ -10,7 +10,7 @@ entity udp_status_buffer is
   port (
     mac_clk: in std_logic;
     rst_macclk: in std_logic;
-    rst_ipb_sync: in std_logic;
+    rst_ipb_125: in std_logic;
     rx_reset: in std_logic;
     mac_rx_error: in std_logic;
     mac_rx_last: in std_logic;
@@ -39,7 +39,7 @@ architecture rtl of udp_status_buffer is
   signal header, history, ipbus_in, ipbus_out: std_logic_vector(127 downto 0);
   signal tick: integer range 0 to 3;
   signal last_pkt_rdy_125: std_logic;
-  
+
 begin
 
 With tick select status_block <=
@@ -125,7 +125,7 @@ history_block:  process (mac_clk)
         ;
       end if;
       new_event := '0';
-      if rst_ipb_sync = '1' and last_rst_ipb = '0' then
+      if rst_ipb_125 = '1' and not last_rst_ipb = '1' then
         new_event := '1';
 	event_data := x"01";
       end if;
@@ -174,7 +174,7 @@ history_block:  process (mac_clk)
 -- pragma translate_on
         ;
       end if;
-      last_rst_ipb := rst_ipb_sync;
+      last_rst_ipb := rst_ipb_125;
     end if;
   end process;
 

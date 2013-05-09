@@ -15,6 +15,7 @@ entity udp_clock_crossing_if is
     udpram_busy: in std_logic;
     pkt_done_125: out std_logic;
     we_125: out std_logic;
+    rst_ipb_125: out std_logic;
 --
     ipb_clk: in std_logic; 
     rst_ipb: in std_logic;
@@ -30,7 +31,7 @@ end udp_clock_crossing_if;
 
 architecture rtl of udp_clock_crossing_if is
 
-  signal pkt_done_buf, pkt_rdy_buf, busy_buf, we_buf : std_logic;
+  signal pkt_done_buf, pkt_rdy_buf, busy_buf, we_buf, rst_ipb_buf : std_logic;
   signal rst_ipb_buf: std_logic;
 
   attribute KEEP: string;
@@ -85,6 +86,22 @@ we_mac_clk: process(mac_clk)
 -- pragma translate_on
       ;
       we_125 <= we_buf
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+    end if;
+  end process;      
+
+rst_ipb_clk: process(mac_clk)
+  begin
+    if rising_edge(mac_clk) then
+      rst_ipb_buf <= rst_ipb
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+      rst_ipb_125 <= rst_ipb_buf
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on

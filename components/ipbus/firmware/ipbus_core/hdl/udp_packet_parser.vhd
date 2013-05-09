@@ -78,7 +78,7 @@ arp:  process (mac_clk)
 -- IP VERS = x"4", HL = x"5", TOS = x"00"
 -- IP LEN
 -- IP ID
--- IP FLAG-FRAG = x"4000"
+-- IP FLAG-FRAG = x"4000" or x"0000"
 -- IP TTL, PROTO
 -- IP CKSUM
 -- IP SPA(4)
@@ -86,6 +86,8 @@ arp:  process (mac_clk)
 ip_pkt:  process (mac_clk)
   variable pkt_data: std_logic_vector(127 downto 0);
   variable pkt_mask: std_logic_vector(33 downto 0);
+  variable msk_data: std_logic_vector(7 downto 0);
+  variable msk_mask: std_logic_vector(9 downto 0);
   variable pkt_drop: std_logic;
   begin
     if rising_edge(mac_clk) then
@@ -93,14 +95,22 @@ ip_pkt:  process (mac_clk)
         pkt_mask := "000000" & "111111" & "00" &
         "00" & "11" & "11" & "00" & "1" & "1" & "11" &
         "1111" & "0000";
-        pkt_data := MAC_addr & x"0800" & x"4500" & x"4000" & IP_addr;
+        msk_mask := "111111" & "11" & "10";
+        pkt_data := MAC_addr & x"0800" & x"4500" & x"0000" & IP_addr;
+	msk_data := (Others => '1');
         pkt_drop := '0';
       elsif mac_rx_valid = '1' then
         if pkt_mask(33) = '0' then
-          if pkt_data(127 downto 120) /= mac_rx_data then
+          if pkt_data(127 downto 120) /= (mac_rx_data and msk_data) then
             pkt_drop := '1';
           end if;
           pkt_data := pkt_data(119 downto 0) & x"00";
+	  if msk_mask(9) = '0' then
+	    msk_data := "10111111";
+	  else
+	    msk_data := (Others => '1');
+	  end if;
+	  msk_mask := msk_mask(8 downto 0) & '1';
         end if;
         pkt_mask := pkt_mask(32 downto 0) & '1';
       end if;
@@ -113,11 +123,11 @@ ip_pkt:  process (mac_clk)
   end process;
 
 -- Ping:
--- Ethernet DST_MAC(6), SRC_MAC(6), Ether_Type = x"0800"
--- IP VERS = x"4", HL = x"5", TOS = x"00"
+-- Ethernet
+-- IP VERS, HL, TOS
 -- IP LEN
 -- IP ID
--- IP FLAG-FRAG = x"4000"
+-- IP FLAG-FRAG
 -- IP TTL, PROTO = x"01"
 -- IP CKSUM
 -- IP SPA(4)
