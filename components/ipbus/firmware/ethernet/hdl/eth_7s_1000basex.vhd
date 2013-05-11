@@ -19,8 +19,8 @@ entity eth_7s_1000basex is
 		gt_txp, gt_txn: out std_logic;
 		gt_rxp, gt_rxn: in std_logic;
 		clk125_out: out std_logic;
+		clk125_fr: out std_logic;
 		rsti: in std_logic;
-		fr_clk: in std_logic;
 		locked: out std_logic;
 		tx_data: in std_logic_vector(7 downto 0);
 		tx_valid: in std_logic;
@@ -80,7 +80,7 @@ architecture rtl of eth_7s_1000basex is
 	signal gmii_txd, gmii_rxd: std_logic_vector(7 downto 0);
 	signal gmii_tx_en, gmii_tx_er, gmii_rx_dv, gmii_rx_er: std_logic;
 	signal gmii_rx_clk: std_logic;
-	signal clkin, clk125, txoutclk_ub, txoutclk, clk125_ub: std_logic;
+	signal clkin, clk125, txoutclk_ub, txoutclk, clk125_ub, clk_fr: std_logic;
 	signal clk62_5_ub, clk62_5, clkfb: std_logic;
 	signal rstn, phy_done, mmcm_locked, locked_int, mmcm_reset, mmcm_reset_phy: std_logic;
 	signal status: std_logic_vector(15 downto 0);
@@ -94,6 +94,13 @@ begin
 		ceb => '0'
 	);
 	
+	bufg_fr: BUFG port map(
+		i => clkin,
+		o => clk_fr
+	);
+	
+	clk125_fr <= clk_fr;
+
 	bufg_tx: BUFG port map(
 		i => txoutclk_ub,
 		o => txoutclk
@@ -127,9 +134,9 @@ begin
 		i => clk62_5_ub,
 		o => clk62_5);
 
-	process(fr_clk)
+	process(clk_fr)
 	begin
-		if rising_edge(fr_clk) then
+		if rising_edge(clk_fr) then
 			locked_int <= mmcm_locked and phy_done;
 		end if;
 	end process;
@@ -196,7 +203,7 @@ begin
 			mmcm_locked => mmcm_locked,
 			userclk => clk62_5,
 			userclk2 => clk125,
-			independent_clock_bufg => fr_clk,
+			independent_clock_bufg => clk_fr,
 			pma_reset => rsti,
 			gmii_txd => gmii_txd,
 			gmii_tx_en => gmii_tx_en,

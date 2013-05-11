@@ -1,7 +1,6 @@
--- clocks_v6_serdes
+-- clocks_7s_serdes
 --
--- Generates a ~32MHz ipbus clock from an external 200MHz reference
--- Includes reset logic for ipbus
+-- Input is a free-running 125MHz clock (taken straight from MGT clock buffer)
 --
 -- Dave Newbold, April 2011
 --
@@ -14,18 +13,16 @@ library unisim;
 use unisim.VComponents.all;
 
 entity clocks_7s_serdes is port(
-	sysclk_p: in std_logic;
-	sysclk_n: in std_logic;
-	clki_125: in std_logic;
-	clko_ipb: out std_logic;
-	sysclk_o: out std_logic;
-	eth_locked: in std_logic;
-	locked: out std_logic;
-	nuke: in std_logic;
-	rsto_125: out std_logic;
-	rsto_ipb: out std_logic;
-	rsto_eth: out std_logic;
-	onehz: out std_logic
+	clki_fr: in std_logic; -- Input free-running clock (125MHz)
+	clki_125: in std_logic; -- Ethernet domain clk125
+	clko_ipb: out std_logic; -- ipbus domain clock (31MHz)
+	eth_locked: in std_logic; -- ethernet locked signal
+	locked: out std_logic; -- global locked signal
+	nuke: in std_logic; -- hard reset input
+	rsto_125: out std_logic; -- clk125 domain reset (held until ethernet locked)
+	rsto_ipb: out std_logic; -- ipbus domain reset
+	rsto_eth: out std_logic; -- ethernet startup reset (required!)
+	onehz: out std_logic -- blinkenlights output
 	);
 
 end clocks_7s_serdes;
@@ -39,18 +36,7 @@ architecture rtl of clocks_7s_serdes is
 
 begin
 	
-	ibufgds0: IBUFGDS port map(
-		i => sysclk_p,
-		ib => sysclk_n,
-		o => sysclk_ub
-	);
-
-	bufg_sys: BUFG port map(
-		i => sysclk_ub,
-		o => sysclk
-	);
-
-	sysclk_o <= sysclk;
+	sysclk <= clki_fr;
 
 	bufgipb: BUFG port map(
 		i => clk_ipb_i,
@@ -61,9 +47,9 @@ begin
 	
 	mmcm: MMCME2_BASE
 		generic map(
-			clkfbout_mult_f => 10.0,
+			clkfbout_mult_f => 8.0,
 			clkout1_divide => 32,
-			clkin1_period => 10.0
+			clkin1_period => 8.0
 		)
 		port map(
 			clkin1 => sysclk,
