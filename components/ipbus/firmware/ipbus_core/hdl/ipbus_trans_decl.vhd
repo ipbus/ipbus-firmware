@@ -23,7 +23,6 @@ package ipbus_trans_decl is
 		end record;
 
 	type ipbus_trans_in_array is array(natural range <>) of ipbus_trans_in;
-
 		
 	-- Signals from transactor to buffer
 	

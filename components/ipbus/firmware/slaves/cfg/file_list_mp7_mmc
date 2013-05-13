@@ -1,5 +1,5 @@
 hdl ipbus/firmware/slaves/hdl/trans_buffer.vhd
 core ipbus/firmware/slaves/coregen/sdpram_16x10_32x9.xco
 core ipbus/firmware/slaves/coregen/sdpram_32x9_16x10.xco
-hdl ipbus/firmware/slaves/uclink_mp7.vhd
+hdl ipbus/firmware/slaves/hdl/uclink_mp7.vhd
 
