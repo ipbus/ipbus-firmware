@@ -57,7 +57,7 @@ begin
 			if ipbus_in.ipb_strobe = '1' then
 				cyc(latency downto 1) <= cyc(latency - 1 downto 0);
 			else
-				cyc(latency downto 0) <= (others => '0');
+				cyc(latency downto 1) <= (others => '0');
 			end if;
 
 		end if;
