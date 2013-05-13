@@ -59,6 +59,8 @@ architecture rtl of trans_buffer is
 	signal req_d, mode, done_m, done_m_s: std_logic;
 	signal mode_ipb, mode_ipb_s, mode_ipb_d, rdy, done: std_logic;
 	signal addr: unsigned(9 downto 0);
+	signal addr_sl: std_logic_vector(9 downto 0);
+	signal we_in, we_out: std_logic_vector(0 downto 0); 
 	
 	attribute KEEP: string;
 	attribute KEEP of done_m_s: signal is "TRUE"; -- Synchroniser not to be optimised into shreg
@@ -116,25 +118,30 @@ begin
 		end if;
 	end process;
 	
+	we_in(0) <= m_we;
+	addr_sl <= std_logic_vector(addr)
+	
 	ram_in: sdpram_16x10_32x9
 		port map(
 			clka => clk_m,
-			wea => m_we,
-			addra => addr,
+			wea => we_in,
+			addra => addr_sl,
 			dina => m_wdata,
 			clkb => clk_ipb,
 			addrb => t_in.raddr,
 			doutb => t_out.rdata
 		);
-		
+	
+	we_out(0) <= t_in.we;
+	
 	ram_out: sdpram_32x9_16x10
 		port map(
 			clka => clk_ipb,
-			wea => t_in.we,
+			wea => we_out,
 			addra => t_in.waddr,
 			dina => t_in.wdata,
 			clkb => clk_m,
-			addrb => addr,
+			addrb => addr_sl,
 			doutb => m_rdata
 		);
 
