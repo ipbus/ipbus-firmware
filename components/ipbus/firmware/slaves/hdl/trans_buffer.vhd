@@ -128,7 +128,7 @@ begin
 			addra => addr_sl,
 			dina => m_wdata,
 			clkb => clk_ipb,
-			addrb => t_in.raddr,
+			addrb => t_in.raddr(8 downto 0),
 			doutb => t_out.rdata
 		);
 	
@@ -138,7 +138,7 @@ begin
 		port map(
 			clka => clk_ipb,
 			wea => we_out,
-			addra => t_in.waddr,
+			addra => t_in.waddr(8 downto 0),
 			dina => t_in.wdata,
 			clkb => clk_m,
 			addrb => addr_sl,
