@@ -9,12 +9,23 @@ USE ieee.numeric_std.all;
 
 ENTITY UDP_if IS
 generic(
--- Number of address bits to select buffer
+-- Number of address bits to select RX or TX buffer
 -- Number of RX and TX buffers is 2**BUFWIDTH
   BUFWIDTH: natural := 0;
+
+-- Numer of address bits for internal buffer
+  INTERNALWIDTH: natural := 1;
+
 -- Number of address bits within each buffer
 -- Size of each buffer is 2**ADDRWIDTH
-  ADDRWIDTH: natural := 11
+  ADDRWIDTH: natural := 11;
+
+-- UDP port for IPbus traffic in this instance
+  IPBUSPORT: std_logic_vector(15 DOWNTO 0) := x"C351";
+
+-- Flag whether this instance ignores everything except IPBus traffic
+  SECONDARYPORT: std_logic := '0'
+
 );
    PORT( 
       mac_clk: IN std_logic;
@@ -133,6 +144,11 @@ ARCHITECTURE flat OF UDP_if IS
    signal pkt_rdy_125: std_logic;
    signal we_125: std_logic;
    signal rst_ipb_125: std_logic;
+--
+   SIGNAL rxram_write_buf, rxram_send_buf: std_logic_vector(INTERNALWIDTH - 1 downto 0);
+   SIGNAL rxram_sent, internal_busy, rxram_req_send, rxram_send_x: std_logic;
+   SIGNAL rxram_end_addr_x: std_logic_vector(12 downto 0);
+   SIGNAL rxram_addra, rxram_addrb: std_logic_vector(INTERNALWIDTH + ADDRWIDTH - 1 downto 0);
 
 BEGIN
 
@@ -146,6 +162,9 @@ BEGIN
    rx_clr_sum <= clr_sum_ping or clr_sum_payload;
    rx_int_valid <= int_valid_ping or int_valid_payload;
    rx_int_data <= int_data_payload when int_valid_payload = '1' else int_data_ping;
+
+   rxram_addra <= rxram_write_buf & addra(ADDRWIDTH - 1 downto 0);
+   rxram_addrb <= rxram_send_buf & addrb(ADDRWIDTH - 1 downto 0);
 
 -- force rx_last to match documentation!
 rx_last_kludge: process(mac_clk)
@@ -248,7 +267,7 @@ rx_last_kludge: process(mac_clk)
       );
    status_buffer: entity work.udp_status_buffer
       GENERIC MAP (
-	BUFWIDTH => 0,
+	BUFWIDTH => BUFWIDTH,
 	ADDRWIDTH => ADDRWIDTH
       )
       PORT MAP (
@@ -298,6 +317,10 @@ rx_last_kludge: process(mac_clk)
          rx_reset => rx_reset
       );
    rx_packet_parser: entity work.udp_packet_parser
+      GENERIC MAP (
+	IPBUSPORT => IPBUSPORT,
+	SECONDARYPORT => SECONDARYPORT
+      )
       PORT MAP (
          mac_clk => mac_clk,
 	 rx_reset => rx_reset,
@@ -338,7 +361,7 @@ rx_last_kludge: process(mac_clk)
 	 status_end_addr => status_end_addr,
 	 status_send => status_send,
 	 mac_rx_valid => mac_rx_valid,
-         rxram_busy => rxram_busy,
+         rxram_busy => internal_busy,
          dia => dia,
          addra => addra,
          wea => wea,
@@ -348,17 +371,51 @@ rx_last_kludge: process(mac_clk)
       );
    internal_ram: entity work.udp_DualPortRAM
       GENERIC MAP (
-	BUFWIDTH => 0,
+	BUFWIDTH => INTERNALWIDTH,
 	ADDRWIDTH => ADDRWIDTH
       )
       PORT MAP (
          ClkA => mac_clk,
          ClkB => mac_clk,
          wea => wea,
-         addra => addra(ADDRWIDTH - 1 downto 0),
-         addrb => addrb(ADDRWIDTH - 1 downto 0),
+         addra => rxram_addra,
+         addrb => rxram_addrb,
          dia => dia,
          dob => dob
+      );
+   internal_ram_selector: entity work.udp_buffer_selector
+      GENERIC MAP (
+	BUFWIDTH => INTERNALWIDTH
+      )
+      PORT MAP (
+        mac_clk => mac_clk,
+	rst_macclk => rst_macclk,
+	written => rxram_send,
+	we => wea,
+	sent => rxram_sent,
+	req_resend => '0',
+	resend_buf => (Others => '0'),
+	busy => internal_busy,
+	write_buf => rxram_write_buf,
+	req_send => rxram_req_send,
+	send_buf => rxram_send_buf
+      );
+   internal_ram_shim: entity work.udp_rxram_shim
+      GENERIC MAP (
+	BUFWIDTH => INTERNALWIDTH
+      )
+      PORT MAP (
+        mac_clk => mac_clk,
+	rst_macclk => rst_macclk,
+	rxram_end_addr => rxram_end_addr,
+	rxram_send => rxram_send,
+	rxram_write_buf => rxram_write_buf,
+	rxram_req_send => rxram_req_send,
+	rxram_send_buf => rxram_send_buf,
+	rxram_busy => rxram_busy,
+	rxram_end_addr_x => rxram_end_addr_x,
+	rxram_send_x => rxram_send_x,
+	rxram_sent => rxram_sent
       );
    ipbus_rx_ram: entity work.udp_DualPortRAM_rx
       GENERIC MAP (
@@ -428,8 +485,8 @@ rx_last_kludge: process(mac_clk)
       PORT MAP (
          mac_clk => mac_clk,
          rst_macclk => rst_macclk,
-         rxram_end_addr => rxram_end_addr,
-         rxram_send => rxram_send,
+         rxram_end_addr => rxram_end_addr_x,
+         rxram_send => rxram_send_x,
          rxram_busy => rxram_busy,
          addrb => addrb,
          dob => dob,

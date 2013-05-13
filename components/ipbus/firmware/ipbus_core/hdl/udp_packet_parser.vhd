@@ -6,6 +6,10 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 entity udp_packet_parser is
+  generic(
+    IPBUSPORT: std_logic_vector(15 DOWNTO 0) := x"C351";
+    SECONDARYPORT: std_logic := '0'
+  );
   port (
     mac_clk: in std_logic;
     rx_reset: in std_logic;
@@ -27,11 +31,14 @@ end udp_packet_parser;
 
 architecture v3 of udp_packet_parser is
 
+  signal pkt_drop_arp_sig, pkt_drop_ping_sig: std_logic;
   signal pkt_drop_ip_sig, pkt_drop_ipbus_sig: std_logic;
   signal ipbus_status_mask, ipbus_hdr_mask: std_logic;
 
 begin
 
+  pkt_drop_arp <= pkt_drop_arp_sig or SECONDARYPORT;
+  pkt_drop_ping <= pkt_drop_ping_sig or SECONDARYPORT;
   pkt_drop_ipbus <= pkt_drop_ipbus_sig;
 
 -- ARP:
@@ -65,7 +72,7 @@ arp:  process (mac_clk)
         end if;
         pkt_mask := pkt_mask(40 downto 0) & '1';
       end if;
-      pkt_drop_arp <= pkt_drop
+      pkt_drop_arp_sig <= pkt_drop
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
@@ -158,7 +165,7 @@ ping:  process (mac_clk)
         end if;
         pkt_mask := pkt_mask(34 downto 0) & '1';
       end if;
-      pkt_drop_ping <= pkt_drop
+      pkt_drop_ping_sig <= pkt_drop
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
@@ -188,7 +195,7 @@ ipbus_pkt:  process (mac_clk)
         pkt_mask := "111111" & "111111" & "11" &
         "11" & "11" & "11" & "11" & "1" & "0" & "11" &
         "1111" & "1111" & "11" & "00";
-        pkt_data := x"11" & x"C351";
+        pkt_data := x"11" & IPBUSPORT;
         pkt_drop := '0';
       elsif mac_rx_valid = '1' then
         if pkt_drop_ip_sig = '1' then
