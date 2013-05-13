@@ -119,7 +119,7 @@ begin
 	end process;
 	
 	we_in(0) <= m_we;
-	addr_sl <= std_logic_vector(addr)
+	addr_sl <= std_logic_vector(addr);
 	
 	ram_in: sdpram_16x10_32x9
 		port map(
