@@ -35,7 +35,7 @@ PORT
 );
 END ENTITY uclink_mp7;
 
-ARCHITECTURE rtl OF uclink_mp7_top IS
+ARCHITECTURE rtl OF uclink_mp7 IS
 
   SIGNAL data_in_raw : std_logic_vector(15 DOWNTO 0) := (OTHERS => '0');
 
