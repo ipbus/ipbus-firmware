@@ -55,6 +55,8 @@ architecture rtl of ipbus_ctrl is
   signal my_mac_addr: std_logic_vector(47 downto 0);
   signal my_ip_addr: std_logic_vector(31 downto 0);
   signal pkt_rx, pkt_tx: std_logic;
+  signal buf_in_a: ipbus_trans_in_array(N_OOB downto 0);
+  signal buf_out_a: ipbus_trans_out_array(N_OOB downto 0);
   
 begin
 
@@ -87,18 +89,22 @@ begin
 	);
 	
 	arb_gen: if N_OOB > 0 generate
+
+		buf_in_a <= oob_in & trans_in_udp;
+		trans_out_udp <= buf_out_a(0);
+		oob_out <= buf_out_a(N_OOB downto 1);
+
 		arb: entity work.trans_arb
 			generic map(NSRC => N_OOB + 1)
 			port map(
 				clk => ipb_clk,
 				rst => rst_ipb,
-				buf_in(0) => trans_in_udp,
-				buf_in(N_OOB downto 1) => oob_in,
-				buf_out(0) => trans_out_udp,
-				buf_out(N_OOB downto 1) => oob_out,
+				buf_in => buf_in_a,
+				buf_out => buf_out_a,
 				trans_out => trans_in,
 				trans_in => trans_out
 			);
+
 	end generate;
 	
 	n_arb_gen: if N_OOB = 0 generate

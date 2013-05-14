@@ -12,7 +12,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use work.ipbus.all;
-use work.emac_hostbus_decl.all;
 
 entity top is
 end top;
@@ -59,24 +58,24 @@ begin
 -- ipbus control logic
 
 	ipbus: entity work.ipbus_ctrl
-	 port map(
-	 		mac_clk => clk125,
-	 		rst_macclk => rst,
-	 		ipb_clk => ipb_clk,
-		  rst_ipb => rst,
-		  mac_rx_data => mac_rx_data,
-		  mac_rx_valid => mac_rx_valid,
-		  mac_rx_last => mac_rx_last,
-		  mac_rx_error => mac_rx_error,
-		  mac_tx_data => mac_tx_data,
-		  mac_tx_valid => mac_tx_valid,
-		  mac_tx_last => mac_tx_last,
-		  mac_tx_error => mac_tx_error,
-		  mac_tx_ready => mac_tx_ready,
-		  ipb_out => ipb_master_out,
-		  ipb_in => ipb_master_in,
-		  mac_addr => X"a0b0c0d1e1f1", -- Careful here, abitrary addresses do not necessarily work
-		  ip_addr => X"c0a8c902" -- 192.168.201.2
+		port map(
+			mac_clk => clk125,
+			rst_macclk => rst,
+			ipb_clk => ipb_clk,
+			rst_ipb => rst,
+			mac_rx_data => mac_rx_data,
+			mac_rx_valid => mac_rx_valid,
+			mac_rx_last => mac_rx_last,
+			mac_rx_error => mac_rx_error,
+			mac_tx_data => mac_tx_data,
+			mac_tx_valid => mac_tx_valid,
+			mac_tx_last => mac_tx_last,
+			mac_tx_error => mac_tx_error,
+			mac_tx_ready => mac_tx_ready,
+			ipb_out => ipb_master_out,
+			ipb_in => ipb_master_in,
+			mac_addr => X"a0b0c0d1e1f1", -- Careful here, abitrary addresses do not necessarily work
+			ip_addr => X"c0a8c902" -- 192.168.201.2
 		);
 
 -- ipbus slaves live in the entity below, and can expose top-level ports
@@ -88,11 +87,7 @@ begin
 			ipb_rst => rst,
 			ipb_in => ipb_master_out,
 			ipb_out => ipb_master_in,
-			hostbus_out => open,
-			hostbus_in.hostrddata => (others => '0'),
-			hostbus_in.hostmiimrdy => '0',
 			rst_out => sys_rst
 		);
 
 end rtl;
-

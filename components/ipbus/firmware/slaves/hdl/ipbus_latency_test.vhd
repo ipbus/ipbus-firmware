@@ -33,7 +33,7 @@ begin
 
 	slv_ipbus_in.ipb_addr <= ipbus_in.ipb_addr;
 	slv_ipbus_in.ipb_wdata <= ipbus_in.ipb_wdata;
-	slv_ipbus_in.ipb_write <= ipbus_in.ipb_write;
+	slv_ipbus_in.ipb_write	 <= ipbus_in.ipb_write;
 	
 	ipbus_out.ipb_rdata <= slv_ipbus_out.ipb_rdata;
 	ipbus_out.ipb_err <= slv_ipbus_out.ipb_err;
