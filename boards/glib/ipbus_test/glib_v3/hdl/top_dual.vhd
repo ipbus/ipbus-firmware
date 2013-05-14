@@ -82,7 +82,7 @@ begin
 			rx_error => mac_rx_error
 		);
 	
-	phy_rstb <= '1';
+	phy_rstb <= not rst_ipb;
 	
 -- ipbus control logic
 
