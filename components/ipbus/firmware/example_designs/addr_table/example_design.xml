@@ -6,7 +6,7 @@
 		<node id="id" address="0x1"/>
 	</node>
 	<node id="reg" address="0x2" description="read-write register" tags="slave"/>
-	<node id="ram" address="0x1000" size="0x400" description="1kword RAM"  tags="slave"/>
+	<node id="ram" address="0x1000" mode="block" size="0x400" description="1kword RAM"  tags="slave"/>
 	<node id="err_inject" address="0x4" description="error injection ctrl/stat" tags="slave">
 		<node id="rx_ctrl" address="0x0"/>
 		<node id="tx_ctrl" address="0x1"/>

@@ -1,7 +1,3 @@
-# Xilinx ISE setup fragment for gig_eth_pcs_pma_v11_4
-
-# This is the stock ISE 14.3 version
-
 hdl ipbus/firmware/ethernet/hdl/eth_v6_sgmii.vhd
 core ipbus/firmware/ethernet/coregen/v6_emac_v2_3_sgmii.xco
 hdl ipbus/firmware/ethernet/gen_hdl/v6_emac_v2_3_sgmii/v6_emac_v2_3_sgmii_block.vhd
