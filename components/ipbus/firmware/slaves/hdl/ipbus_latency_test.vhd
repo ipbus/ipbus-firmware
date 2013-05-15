@@ -11,7 +11,7 @@ use work.ipbus.all;
 
 entity ipbus_latency_test is
 	generic(
-		latency: natural := 0
+		latency: natural := 1
 	);
 	port(
 		clk: in std_logic;
