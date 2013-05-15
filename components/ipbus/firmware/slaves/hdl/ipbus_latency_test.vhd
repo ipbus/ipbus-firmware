@@ -19,7 +19,7 @@ entity ipbus_latency_test is
 		ipbus_in: in ipb_wbus;
 		ipbus_out: out ipb_rbus;
 		slv_ipbus_out: out ipb_wbus;
-		slv_ipbus_in: in ipb_rbus; 
+		slv_ipbus_in: in ipb_rbus
 	);
 	
 end ipbus_latency_test;
@@ -38,7 +38,7 @@ begin
 	ipbus_out.ipb_rdata <= slv_ipbus_in.ipb_rdata;
 	ipbus_out.ipb_err <= slv_ipbus_in.ipb_err;
 	
-	ack_del(0) <= slv_ipbus_out.ipb_ack;
+	ack_del(0) <= slv_ipbus_in.ipb_ack;
 	
 	process(clk)
 	begin
