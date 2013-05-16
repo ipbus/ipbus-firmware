@@ -11,9 +11,10 @@ ENTITY UDP_if IS
 generic(
 -- Number of address bits to select RX or TX buffer
 -- Number of RX and TX buffers is 2**BUFWIDTH
-  BUFWIDTH: natural := 0;
+  BUFWIDTH: natural := 2;
 
--- Numer of address bits for internal buffer
+-- Numer of address bits to select internal buffer
+-- Number of internal buffers is 2**INTERNALWIDTH
   INTERNALWIDTH: natural := 1;
 
 -- Number of address bits within each buffer
@@ -39,7 +40,8 @@ generic(
       mac_rx_last: IN std_logic;
       mac_rx_valid: IN std_logic;
       mac_tx_ready: IN std_logic;
-      pkt_done: IN std_logic;
+      pkt_done_read: IN std_logic;
+      pkt_done_write: IN std_logic;
       raddr: IN std_logic_vector(11 DOWNTO 0);
       waddr: IN std_logic_vector(11 DOWNTO 0);
       wdata: IN std_logic_vector(31 DOWNTO 0);
@@ -51,8 +53,8 @@ generic(
       mac_tx_valid: OUT std_logic;
       pkt_rdy: OUT std_logic;
       rdata: OUT std_logic_vector(31 DOWNTO 0);
-      rxpayload_dropped: OUT std_logic;
-      rxram_dropped: OUT std_logic
+      rxpacket_ignored: OUT std_logic;
+      rxpacket_dropped: OUT std_logic
    );
 
 END UDP_if ;
@@ -138,9 +140,7 @@ ARCHITECTURE flat OF UDP_if IS
    signal rxram_dropped_sig, rxpayload_dropped_sig: std_logic;
    signal pkt_drop_ipbus, pkt_drop_reliable: std_logic;
    signal next_pkt_id: std_logic_vector(15 downto 0); -- Next expected packet ID
-
 --
-   signal pkt_done_125: std_logic;
    signal pkt_rdy_125: std_logic;
    signal we_125: std_logic;
    signal rst_ipb_125: std_logic;
@@ -149,13 +149,21 @@ ARCHITECTURE flat OF UDP_if IS
    SIGNAL rxram_sent, internal_busy, rxram_req_send, rxram_send_x: std_logic;
    SIGNAL rxram_end_addr_x: std_logic_vector(12 downto 0);
    SIGNAL rxram_addra, rxram_addrb: std_logic_vector(INTERNALWIDTH + ADDRWIDTH - 1 downto 0);
-
+--
+   SIGNAL rx_read_buffer, rx_read_buffer_125: std_logic_vector(BUFWIDTH - 1 downto 0);
+   SIGNAL rx_write_buffer, tx_read_buffer: std_logic_vector(BUFWIDTH - 1 downto 0);
+   SIGNAL tx_write_buffer, tx_write_buffer_125, resend_buf: std_logic_vector(BUFWIDTH - 1 downto 0);
+   SIGNAL rx_full_addra, tx_full_addrb: std_logic_vector(BUFWIDTH + ADDRWIDTH - 1 downto 0);
+   SIGNAL rx_full_addrb, tx_full_addra: std_logic_vector(BUFWIDTH + ADDRWIDTH - 3 downto 0);
+   signal pkt_resend, pkt_rcvd, rx_ram_busy, rx_req_send, udpram_sent: std_logic;
+   signal busy_125, pkt_done_read_125, rx_ram_sent, tx_ram_written: std_logic;
+   signal resend_pkt_id: std_logic_vector(15 downto 0);
+   signal clean_buf: std_logic_vector(2**BUFWIDTH - 1 downto 0);
+   
 BEGIN
 
--- nasty kludge to not rename port, but this is really rxpacket_dropped
-   rxram_dropped <= rxram_dropped_sig or rxpayload_dropped_sig;
--- nasty kludge to not rename port, but this is really rxpacket_ignored
-   rxpayload_dropped <= my_rx_last and pkt_drop_arp and pkt_drop_ping and
+   rxpacket_dropped <= rxram_dropped_sig or rxpayload_dropped_sig;
+   rxpacket_ignored <= my_rx_last and pkt_drop_arp and pkt_drop_ping and
    pkt_drop_payload and pkt_drop_resend and pkt_drop_status;
 
    rx_do_sum <= do_sum_ping or do_sum_payload;
@@ -165,6 +173,12 @@ BEGIN
 
    rxram_addra <= rxram_write_buf & addra(ADDRWIDTH - 1 downto 0);
    rxram_addrb <= rxram_send_buf & addrb(ADDRWIDTH - 1 downto 0);
+
+   rx_full_addra <= rx_write_buffer & payload_addr(ADDRWIDTH - 1 downto 0);
+   rx_full_addrb <= rx_read_buffer & raddr(ADDRWIDTH - 3 downto 0);
+
+   tx_full_addra <= tx_write_buffer & waddr(ADDRWIDTH - 3 downto 0);
+   tx_full_addrb <= tx_read_buffer & udpaddrb(ADDRWIDTH - 1 downto 0);
 
 -- force rx_last to match documentation!
 rx_last_kludge: process(mac_clk)
@@ -241,12 +255,15 @@ rx_last_kludge: process(mac_clk)
       );
    resend: entity work.udp_build_resend
       PORT MAP (
-         mac_clk => mac_clk,
-         mac_rx_valid => mac_rx_valid,
-         mac_rx_last => my_rx_last,
-         mac_rx_error => mac_rx_error,
-         pkt_drop_resend => pkt_drop_resend,
-         req_resend => req_resend
+	 mac_clk => mac_clk,
+	 rx_reset => rx_reset,
+	 mac_rx_data => mac_rx_data,
+	 mac_rx_error => mac_rx_error,
+	 mac_rx_last => my_rx_last,
+	 mac_rx_valid => mac_rx_valid,
+	 pkt_drop_resend => pkt_drop_resend,
+	 pkt_resend => pkt_resend,
+	 resend_pkt_id => resend_pkt_id
       );
    status: entity work.udp_build_status
       PORT MAP (
@@ -288,7 +305,7 @@ rx_last_kludge: process(mac_clk)
 	 pkt_drop_reliable => pkt_drop_reliable,
 	 pkt_drop_resend => pkt_drop_resend,
 	 pkt_drop_status => pkt_drop_status,
-	 pkt_rdy_125 => pkt_rdy_125,
+	 pkt_rcvd => pkt_rcvd,
 	 rxpayload_dropped => rxpayload_dropped_sig,
 	 rxram_dropped => rxram_dropped_sig,
 	 status_request => status_request,
@@ -398,7 +415,8 @@ rx_last_kludge: process(mac_clk)
 	busy => internal_busy,
 	write_buf => rxram_write_buf,
 	req_send => rxram_req_send,
-	send_buf => rxram_send_buf
+	send_buf => rxram_send_buf,
+	clean_buf => open
       );
    internal_ram_shim: entity work.udp_rxram_shim
       GENERIC MAP (
@@ -426,10 +444,28 @@ rx_last_kludge: process(mac_clk)
          clk125 => mac_clk,
          clk => ipb_clk,
          rx_wea => rx_wea,
-         rx_addra => rx_addra(ADDRWIDTH - 1 downto 0),
-         rx_addrb => rx_addrb(ADDRWIDTH - 3 downto 0),
-         rx_dia => rx_dia,
-         rx_dob => rx_dob
+         rx_addra => rx_full_addra,
+         rx_addrb => rx_full_addrb,
+         rx_dia => payload_data,
+         rx_dob => rdata
+      );
+   rx_ram_selector: entity work.udp_buffer_selector
+      GENERIC MAP (
+	BUFWIDTH => BUFWIDTH
+      )
+      PORT MAP (
+        mac_clk => mac_clk,
+	rst_macclk => rst_macclk,
+	written => pkt_rcvd,
+	we => rx_wea,
+	sent => rx_ram_sent,
+	req_resend => '0',
+	resend_buf => (Others => '0'),
+	busy => rx_ram_busy,
+	write_buf => rx_write_buffer,
+	req_send => rx_req_send,
+	send_buf => rx_read_buffer_125,
+	clean_buf => open
       );
    ipbus_tx_ram: entity work.udp_DualPortRAM_tx
       GENERIC MAP (
@@ -439,11 +475,29 @@ rx_last_kludge: process(mac_clk)
       PORT MAP (
          clk => ipb_clk,
          clk125 => mac_clk,
-         tx_wea => tx_wea,
-         tx_addra => tx_addra(ADDRWIDTH - 3 downto 0),
-         tx_addrb => tx_addrb(ADDRWIDTH - 1 downto 0),
-         tx_dia => tx_dia,
-         tx_dob => tx_dob
+         tx_wea => we,
+         tx_addra => tx_full_addra,
+         tx_addrb => tx_full_addrb,
+         tx_dia => wdata,
+         tx_dob => udpdob
+      );
+   tx_ram_selector: entity work.udp_buffer_selector
+      GENERIC MAP (
+	BUFWIDTH => BUFWIDTH
+      )
+      PORT MAP (
+        mac_clk => mac_clk,
+	rst_macclk => rst_macclk,
+	written => tx_ram_written,
+	we => we_125,
+	sent => udpram_sent,
+	req_resend => req_resend,
+	resend_buf => resend_buf,
+	busy => busy_125,
+	write_buf => tx_write_buffer_125,
+	req_send => udpram_send,
+	send_buf => tx_read_buffer,
+	clean_buf => clean_buf
       );
    tx_byte_sum: entity work.udp_byte_sum
       PORT MAP (
@@ -462,23 +516,15 @@ rx_last_kludge: process(mac_clk)
       PORT MAP (
          mac_clk => mac_clk,
          rst_macclk => rst_macclk,
-         payload_data => payload_data,
-         payload_addr => payload_addr,
-         payload_we => payload_we,
-         payload_send => payload_send,
-	 pkt_done_125 => pkt_done_125,
          rx_reset => rx_reset,
+         payload_send => payload_send,
+         payload_we => payload_we,
+	 pkt_done_read_125 => pkt_done_read_125,
+	 rx_ram_busy => rx_ram_busy,
+	 rx_req_send => rx_req_send,
+	 pkt_rcvd => pkt_rcvd,
 	 pkt_rdy_125 => pkt_rdy_125,
-         ipb_clk => ipb_clk,
-         rst_ipb => rst_ipb,
-         pkt_done => pkt_done,
-         raddr => raddr,
-         rdata => rdata,
          rx_wea => rx_wea,
-         rx_addra => rx_addra,
-         rx_addrb => rx_addrb,
-         rx_dia => rx_dia,
-         rx_dob => rx_dob,
          rxpayload_dropped => rxpayload_dropped_sig
       );
    tx_main: entity work.udp_tx_mux
@@ -509,42 +555,48 @@ rx_last_kludge: process(mac_clk)
 	 ipbus_out_valid => ipbus_out_valid
       );
    tx_transactor: entity work.udp_txtransactor_if
+      GENERIC MAP (
+	BUFWIDTH => BUFWIDTH
+      )
       PORT MAP (
          mac_clk => mac_clk,
          rst_macclk => rst_macclk,
+	 pkt_resend => pkt_resend,
+	 resend_pkt_id => resend_pkt_id,
+	 ipbus_out_hdr => ipbus_out_hdr,
+	 ipbus_out_valid => ipbus_out_valid,
+	 tx_read_buffer => tx_read_buffer,
+	 udpram_busy => udpram_busy,
+	 clean_buf => clean_buf,
          req_resend => req_resend,
-	 pkt_done_125 => pkt_done_125,
-	 we_125 => we_125,
-         udpaddrb => udpaddrb,
-         udpram_send => udpram_send,
-         udpdob => udpdob,
-         ipb_clk => ipb_clk,
-         rst_ipb => rst_ipb,
-         pkt_done => pkt_done,
-         we => we,
-         waddr => waddr,
-         wdata => wdata,
-         tx_wea => tx_wea,
-         tx_addra => tx_addra,
-         tx_addrb => tx_addrb,
-         tx_dia => tx_dia,
-         tx_dob => tx_dob
+	 resend_buf => resend_buf,
+	 udpram_sent => udpram_sent
       );
    clock_crossing_if: entity work.udp_clock_crossing_if
+      GENERIC MAP (
+	BUFWIDTH => BUFWIDTH
+      )
       PORT MAP (
          mac_clk => mac_clk,
-         rst_macclk => rst_macclk,
 	 pkt_rdy_125 => pkt_rdy_125,
-         udpram_busy => udpram_busy,
-	 pkt_done_125 => pkt_done_125,
+         busy_125 => busy_125,
+	 rx_read_buffer_125 => rx_read_buffer_125,
+	 tx_write_buffer_125 => tx_write_buffer_125,
+	 pkt_done_read_125 => pkt_done_read_125,
+	 rx_ram_sent => rx_ram_sent,
+	 tx_ram_written => tx_ram_written,
 	 we_125 => we_125,
 	 rst_ipb_125 => rst_ipb_125,
+--
          ipb_clk => ipb_clk,
          rst_ipb => rst_ipb,
-         pkt_done => pkt_done,
+         pkt_done_read => pkt_done_read,
+         pkt_done_write => pkt_done_write,
          we => we,
          busy => busy,
-	 pkt_rdy => pkt_rdy
+	 pkt_rdy => pkt_rdy,
+	 rx_read_buffer => rx_read_buffer,
+	 tx_write_buffer => tx_write_buffer
       );
 
 END flat;

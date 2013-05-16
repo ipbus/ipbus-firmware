@@ -29,7 +29,7 @@ entity udp_status_buffer is
     pkt_drop_reliable: in std_logic;
     pkt_drop_resend: in std_logic;
     pkt_drop_status: in std_logic;
-    pkt_rdy_125: in std_logic;
+    pkt_rcvd: in std_logic;
     rxpayload_dropped: in std_logic;
     rxram_dropped: in std_logic;
     status_request: in std_logic;
@@ -42,7 +42,6 @@ architecture rtl of udp_status_buffer is
 
   signal header, history, ipbus_in, ipbus_out: std_logic_vector(127 downto 0);
   signal tick: integer range 0 to 3;
-  signal last_pkt_rdy_125: std_logic;
 
 begin
 
@@ -71,17 +70,6 @@ select_block:  process (mac_clk)
     end if;
   end process;
 
-pkt_rdy_block: process (mac_clk)
-  begin
-   if rising_edge(mac_clk) then
-     last_pkt_rdy_125 <= pkt_rdy_125
--- pragma translate_off
-      after 4 ns
--- pragma translate_on
-      ;
-    end if;
-  end process;
-
 header_block:  process (mac_clk)
   variable next_pkt_id_int, bufsize, nbuf: unsigned(15 downto 0);
   begin
@@ -97,8 +85,7 @@ header_block:  process (mac_clk)
         after 4 ns
 -- pragma translate_on
         ;
-      elsif pkt_rdy_125 = '1' and last_pkt_rdy_125 = '0' and 
-      pkt_drop_reliable = '0' then
+      elsif pkt_rcvd = '1' and pkt_drop_reliable = '0' then
         if next_pkt_id_int = x"FFFF" then
 	  next_pkt_id_int := to_unsigned(1, 16);
 	else
@@ -196,7 +183,7 @@ ipbus_in_block:  process (mac_clk)
 -- pragma translate_on
         ;
       end if;
-      if pkt_rdy_125 = '1' and last_pkt_rdy_125 = '0' then
+      if pkt_rcvd = '1' then
         ipbus_in <= ipbus_in(95 downto 0) & ipbus_in_hdr
 -- pragma translate_off
         after 4 ns

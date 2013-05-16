@@ -16,9 +16,22 @@ entity ipbus_ctrl is
 	generic(
 		MAC_CFG: ipb_mac_cfg := STATIC;
 		IP_CFG: ipb_ip_cfg := STATIC;
+-- Number of address bits to select RX or TX buffer in UDP I/F
+-- Number of RX and TX buffers is 2**BUFWIDTH
+		BUFWIDTH: natural := 2;
+-- Numer of address bits to select internal buffer in UDP I/F
+-- Number of internal buffers is 2**INTERNALWIDTH
+		INTERNALWIDTH: natural := 1;
+-- Number of address bits within each buffer in UDP I/F
+-- Size of each buffer is 2**ADDRWIDTH
+		ADDRWIDTH: natural := 11;
+-- UDP port for IPbus traffic in this instance of UDP I/F
+		IPBUSPORT: std_logic_vector(15 DOWNTO 0) := x"C351";
+-- Flag whether this UDP I/F instance ignores everything except IPBus traffic
+		SECONDARYPORT: std_logic := '0';
 		N_OOB: natural := 0
 	);
-  port(
+	port(
 		mac_clk: in std_logic; -- Ethernet MAC clock (125MHz)
 		rst_macclk: in std_logic; -- MAC clock domain sync reset
 		ipb_clk: in std_logic; -- IPbus clock
@@ -50,7 +63,7 @@ architecture rtl of ipbus_ctrl is
 
   signal trans_in, trans_in_udp: ipbus_trans_in;
   signal trans_out, trans_out_udp: ipbus_trans_out;
-  signal udp_rxram_dropped, udp_rxpayload_dropped: std_logic;
+  signal udp_rxpacket_ignored, udp_rxpacket_dropped: std_logic;
   signal cfg, cfg_out: std_logic_vector(127 downto 0);
   signal my_mac_addr: std_logic_vector(47 downto 0);
   signal my_ip_addr: std_logic_vector(31 downto 0);
@@ -60,7 +73,14 @@ architecture rtl of ipbus_ctrl is
   
 begin
 
-	udp_if: entity work.udp_if port map(
+	udp_if: entity work.udp_if generic map(
+		BUFWIDTH => BUFWIDTH,
+		INTERNALWIDTH => INTERNALWIDTH,
+		ADDRWIDTH => ADDRWIDTH,
+		IPBUSPORT => IPBUSPORT,
+		SECONDARYPORT => SECONDARYPORT
+	)
+	port map(
 		mac_clk => mac_clk,
 		rst_macclk => rst_macclk,
 		ipb_clk => ipb_clk,
@@ -72,7 +92,8 @@ begin
 		mac_rx_last => mac_rx_last,
 		mac_rx_valid => mac_rx_valid,
 		mac_tx_ready => mac_tx_ready,
-		pkt_done => trans_out_udp.pkt_done,
+		pkt_done_read => trans_out_udp.pkt_done,
+		pkt_done_write => trans_out_udp.pkt_done,
 		raddr => trans_out_udp.raddr,
 		waddr => trans_out_udp.waddr,
 		wdata => trans_out_udp.wdata,
@@ -84,8 +105,8 @@ begin
 		mac_tx_valid => mac_tx_valid,
 		pkt_rdy => trans_in_udp.pkt_rdy,
 		rdata => trans_in_udp.rdata,
-		rxpayload_dropped => udp_rxpayload_dropped,
-		rxram_dropped => udp_rxram_dropped
+		rxpacket_ignored => udp_rxpacket_ignored,
+		rxpacket_dropped => udp_rxpacket_dropped
 	);
 	
 	arb_gen: if N_OOB > 0 generate

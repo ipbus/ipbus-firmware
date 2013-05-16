@@ -1,5 +1,5 @@
 -- Simple interface to tx side of transactor...
--- single RAM
+-- Even simpler, but now multi-buffer RAM!
 --
 -- Dave Sankey, September 2012
 
@@ -8,67 +8,85 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity udp_txtransactor_if is
+  generic(
+    BUFWIDTH: natural := 0
+  );
   port (
     mac_clk: in std_logic;
     rst_macclk: in std_logic;
 --
-    req_resend: in std_logic;
+    pkt_resend: in std_logic;
+    resend_pkt_id: in std_logic_vector(15 downto 0);
 --
-    pkt_done_125: in std_logic;
-    we_125: in std_logic;
-    udpaddrb: in std_logic_vector(12 downto 0);
-    udpram_send: out std_logic;
-    udpdob: out std_logic_vector(7 downto 0);
+    ipbus_out_hdr: in std_logic_vector(31 downto 0);
+    ipbus_out_valid: in std_logic;
+    tx_read_buffer: in std_logic_vector(BUFWIDTH - 1 downto 0);
 --
-    ipb_clk: in std_logic; 
-    rst_ipb: in std_logic;
+    udpram_busy: in std_logic;
+    clean_buf: in std_logic_vector(2**BUFWIDTH - 1 downto 0);
 --
-    pkt_done: in std_logic;
-    we: in std_logic;
-    waddr: in std_logic_vector(11 downto 0);
-    wdata: in std_logic_vector(31 downto 0);
---
-    tx_wea : out std_logic;
-    tx_addra : out std_logic_vector(10 downto 0);
-    tx_addrb : out std_logic_vector(12 downto 0);
-    tx_dia : out std_logic_vector(31 downto 0);
-    tx_dob : in std_logic_vector(7 downto 0)
+    req_resend: out std_logic;
+    resend_buf: out std_logic_vector(BUFWIDTH - 1 downto 0);
+    udpram_sent: out std_logic
   );
 end udp_txtransactor_if;
 
 architecture simple of udp_txtransactor_if is
 
-  signal ram_written : std_logic;
+  type pktid_buf is array (2**BUFWIDTH - 1 downto 0) of std_logic_vector(15 downto 0);
+  signal pkt_id_buf: pktid_buf;
 
 begin
 
--- IPBus clock domain
-  tx_wea <= we;
-  tx_addra <= waddr(10 downto 0);
-  tx_dia <= wdata;
-
--- mac_clk clock domain
-  tx_addrb <= udpaddrb;
-  udpdob <= tx_dob;
-
-  udpram_send <= pkt_done_125 or (req_resend and ram_written);
-
-ram_status: process (mac_clk)
-  variable ram_written_i: std_logic;
+pkt_id_block: process (mac_clk)
   begin
     if rising_edge(mac_clk) then
       if rst_macclk = '1' then
-	ram_written_i := '0';
-      elsif pkt_done_125 = '1' then
-        ram_written_i := '1';
-      elsif we_125 = '1' then 
-	ram_written_i := '0';
+	pkt_id_buf <= (Others => (Others => '0'));
+      elsif ipbus_out_valid = '1' then
+	pkt_id_buf(to_integer(unsigned(tx_read_buffer))) <= ipbus_out_hdr(23 downto 8);
       end if;
-      ram_written <= ram_written_i
+    end if;
+  end process;
+
+resend_block: process (mac_clk)
+  variable req_resend_i: std_logic;
+  variable resend_buf_i: std_logic_vector(BUFWIDTH - 1 downto 0);
+  begin
+    if rising_edge(mac_clk) then
+      req_resend_i := '0';
+      resend_buf_i := (Others => '0');
+      if pkt_resend = '1' then
+        for i in 0 to 2**BUFWIDTH - 1 loop
+          if pkt_id_buf(i) = resend_pkt_id and clean_buf(i) = '1' then
+	    req_resend_i := '1';
+	    resend_buf_i := std_logic_vector(to_unsigned(i, BUFWIDTH));
+	  end if;
+        end loop;
+      end if;
+      req_resend <= req_resend_i
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
       ;
+      resend_buf <= resend_buf_i
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+    end if;
+  end process;
+
+sent_block: process (mac_clk)
+  variable last_busy: std_logic;
+  begin
+    if rising_edge(mac_clk) then
+      udpram_sent <= last_busy and not udpram_busy
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+      last_busy := udpram_busy;
     end if;
   end process;
 

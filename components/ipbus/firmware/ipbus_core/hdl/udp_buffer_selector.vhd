@@ -24,7 +24,8 @@ ENTITY udp_buffer_selector IS
     write_buf: out std_logic_vector(BUFWIDTH - 1 downto 0);
 --
     req_send: out std_logic;
-    send_buf: out std_logic_vector(BUFWIDTH - 1 downto 0)
+    send_buf: out std_logic_vector(BUFWIDTH - 1 downto 0);
+    clean_buf: out std_logic_vector(2**BUFWIDTH - 1 downto 0)
   );
 end udp_buffer_selector;
 
@@ -39,6 +40,7 @@ begin
   write_buf <= std_logic_vector(write_sig);
   send_buf <= std_logic_vector(send_sig);
   busy <= busy_sig;
+  clean_buf <= clean;
 
 free_block: process (mac_clk)
   variable free_i: std_logic_vector(2**BUFWIDTH - 1 downto 0);
