@@ -195,9 +195,10 @@ architecture wrapper of gig_eth_pcs_pma_v11_5_transceiver is
     GT0_RXUSRCLK_IN                         : in   std_logic;
     GT0_RXUSRCLK2_IN                        : in   std_logic;
     ------------ Receive Ports - RX Decision Feedback Equalizer(DFE) -----------
-    GT0_RXDFELPMRESET_IN                    : in   std_logic;
-    GT0_RXMONITOROUT_OUT                    : out  std_logic_vector(6 downto 0);
-    GT0_RXMONITORSEL_IN                     : in   std_logic_vector(1 downto 0);
+-- DMN_CHANGE
+--    GT0_RXDFELPMRESET_IN                    : in   std_logic;
+--    GT0_RXMONITOROUT_OUT                    : out  std_logic_vector(6 downto 0);
+--    GT0_RXMONITORSEL_IN                     : in   std_logic_vector(1 downto 0);
     ------- Receive Ports - RX Driver,OOB signalling,Coupling and Eq.,CDR ------
     GT0_GTXRXN_IN                           : in   std_logic;
     GT0_GTXRXP_IN                           : in   std_logic;
