@@ -44,7 +44,7 @@ begin
 	begin
 		if rising_edge(clk) then
 			if rst = '1' or ipbus_in.ipb_strobe = '0' then
-				ack_del <= (others => '0');
+				ack_del(latency downto 1) <= (others => '0');
 				got_ack <= '0';
 			else
 				ack_del(latency downto 1) <= ack_del(latency - 1 downto 0);
