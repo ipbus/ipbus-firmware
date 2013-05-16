@@ -606,9 +606,10 @@ begin
         GT0_RXUSRCLK_IN                 =>      usrclk,
         GT0_RXUSRCLK2_IN                =>      usrclk,
         ------------ Receive Ports - RX Decision Feedback Equalizer(DFE) -----------
-        GT0_RXDFELPMRESET_IN            =>   '0',
-        GT0_RXMONITOROUT_OUT            =>   open,
-        GT0_RXMONITORSEL_IN             =>   "00",
+-- DMN_CHANGE
+--        GT0_RXDFELPMRESET_IN            =>   '0',
+--        GT0_RXMONITOROUT_OUT            =>   open,
+--        GT0_RXMONITORSEL_IN             =>   "00",
         ------- Receive Ports - RX Driver,OOB signalling,Coupling and Eq.,CDR --
         GT0_GTXRXN_IN                   =>      rxn,
         GT0_GTXRXP_IN                   =>      rxp,
