@@ -1,9 +1,5 @@
 -- Top-level design for ipbus demo
 --
--- This version is for xc6slx45t on SP605 eval board
--- Uses the s6 soft TEMAC core with baseX inteface to an SFP
--- You will need a license for the core
---
 -- You must edit this file to set the IP and MAC addresses
 --
 -- Dave Newbold, 17/7/12

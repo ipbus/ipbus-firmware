@@ -1,4 +1,4 @@
-project new demo_kc705_extphy
+project new demo_kc705_basex
 project set family kintex7
 project set device xc7k325t
 project set package ffg900

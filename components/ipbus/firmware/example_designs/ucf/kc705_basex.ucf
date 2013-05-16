@@ -1,8 +1,3 @@
-NET sysclk_p LOC = AD12 | IOSTANDARD = LVDS | TNM_NET = sysclk;
-NET sysclk_n LOC = AD11 | IOSTANDARD = LVDS; # External termination
-
-TIMESPEC TS_sysclk = PERIOD sysclk 5ns;
-
 NET eth/txoutclk TNM_NET=txoutclk;
 TIMESPEC TS_txoutclk = PERIOD txoutclk 16ns;
 
@@ -14,12 +9,7 @@ NET gt_clkn LOC=G7 | DIFF_TERM=TRUE;
 
 TIMESPEC TS_gt_clk = PERIOD gt_clk 8ns;
 
-INST eth/phy/transceiver_inst/gtwizard_inst/gt0_gtwizard_i/gtxe2_i LOC=GTXE2_CHANNEL_X0Y10;
-
-NET gt_txp LOC=H2;
-NET gt_txn LOC=H1;
-NET gt_rxp LOC=G4;
-NET gt_rxn LOC=G3;
+INST eth/phy/*/gtxe2_i LOC=GTXE2_CHANNEL_X0Y10;
 
 NET sfp_los LOC=P19 | IOSTANDARD=LVCMOS25;
 

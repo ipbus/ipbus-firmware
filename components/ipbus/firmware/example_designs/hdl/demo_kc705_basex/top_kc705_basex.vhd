@@ -1,9 +1,5 @@
 -- Top-level design for ipbus demo
 --
--- This version is for xc6slx45 on Digilent ATLYS board
--- Uses the s6 soft TEMAC core with GMII inteface to an external Gb PHY
--- You will need a license for the core
---
 -- You must edit this file to set the IP and MAC addresses
 --
 -- Dave Newbold, 16/7/12
@@ -13,20 +9,19 @@ use IEEE.STD_LOGIC_1164.ALL;
 use work.ipbus.ALL;
 
 entity top is port(
-	sysclk_p, sysclk_n: in STD_LOGIC;
-	leds: out STD_LOGIC_VECTOR(3 downto 0);
-	gmii_gtx_clk, gmii_tx_en, gmii_tx_er : out STD_LOGIC;
-	gmii_txd : out STD_LOGIC_VECTOR(7 downto 0);
-	gmii_rx_clk, gmii_rx_dv, gmii_rx_er: in STD_LOGIC;
-	gmii_rxd : in STD_LOGIC_VECTOR(7 downto 0);
-	phy_rstb : out STD_LOGIC;
-	dip_switch: in std_logic_vector(3 downto 0)
+	gt_clkp, gt_clkn: in std_logic;
+	gt_txp, gt_txn: out std_logic;
+	gt_rxp, gt_rxn: in std_logic;
+	sfp_los: in std_logic;
+	leds: out STD_LOGIC_VECTOR(3 downto 0)
 	);
+
 end top;
 
 architecture rtl of top is
 
-	signal clk125, clk200, ipb_clk, locked, rst_125, rst_ipb, onehz : STD_LOGIC;
+	signal clk125_fr, clk125, clk100, ipb_clk, clk_locked, locked, eth_locked: std_logic;
+	signal rst_125, rst_ipb, rst_eth, onehz: std_logic;
 	signal mac_tx_data, mac_rx_data: std_logic_vector(7 downto 0);
 	signal mac_tx_valid, mac_tx_last, mac_tx_error, mac_tx_ready, mac_rx_valid, mac_rx_last, mac_rx_error: std_logic;
 	signal ipb_master_out : ipb_wbus;
@@ -39,39 +34,37 @@ begin
 
 --	DCM clock generation for internal bus, ethernet
 
-	clocks: entity work.clocks_7s_extphy
+	clocks: entity work.clocks_7s_serdes
 		port map(
-			sysclk_p => sysclk_p,
-			sysclk_n => sysclk_n,
+			clki_fr => clk125_fr,
 			clko_125 => clk125,
-			clko_200 => clk200,
 			clko_ipb => ipb_clk,
-			locked => locked,
+			eth_locked => eth_locked,
+			locked => clk_locked,
 			nuke => sys_rst,
 			rsto_125 => rst_125,
 			rsto_ipb => rst_ipb,
+			rsto_eth => rst_eth,
 			onehz => onehz
 		);
-		
+	
+	locked <= clk_locked and eth_locked;
 	leds <= (pkt_rx_led, pkt_tx_led, locked, onehz);
 	
---	Ethernet MAC core and PHY interface
--- In this version, consists of hard MAC core and GMII interface to external PHY
--- Can be replaced by any other MAC / PHY combination
+-- Ethernet MAC core and PHY interface
 	
-	eth: entity work.eth_7s_gmii
+	eth: entity work.eth_7s_1000basex
 		port map(
-			clk125 => clk125,
-			clk200 => clk200,
-			rst => rst_125,
-			gmii_gtx_clk => gmii_gtx_clk,
-			gmii_tx_en => gmii_tx_en,
-			gmii_tx_er => gmii_tx_er,
-			gmii_txd => gmii_txd,
-			gmii_rx_clk => gmii_rx_clk,
-			gmii_rx_dv => gmii_rx_dv,
-			gmii_rx_er => gmii_rx_er,
-			gmii_rxd => gmii_rxd,
+			gt_clkp => gt_clkp,
+			gt_clkn => gt_clkn,
+			gt_txp => gt_txp,
+			gt_txn => gt_txn,
+			gt_rxp => gt_rxp,
+			gt_rxn => gt_rxn,
+			clk125_out => clk125,
+			clk125_fr => clk125_fr,
+			rsti => rst_eth,
+			locked => eth_locked,
 			tx_data => mac_tx_data,
 			tx_valid => mac_tx_valid,
 			tx_last => mac_tx_last,
@@ -82,7 +75,7 @@ begin
 			rx_last => mac_rx_last,
 			rx_error => mac_rx_error
 		);
-	
+
 	phy_rstb <= '1';
 	
 -- ipbus control logic
@@ -110,8 +103,8 @@ begin
 			pkt_tx_led => pkt_tx_led
 		);
 		
-	mac_addr <= X"020ddba11599"; -- Careful here, arbitrary addresses do not always work
-	ip_addr <= X"c0a80008"; -- 192.168.0.8
+	mac_addr <= X"020ddba11583"; -- Careful here, arbitrary addresses do not always work
+	ip_addr <= X"c0a80083"; -- 192.168.0.131
 
 -- ipbus slaves live in the entity below, and can expose top-level ports
 -- The ipbus fabric is instantiated within.
