@@ -37,7 +37,7 @@ begin
 	clocks: entity work.clocks_7s_serdes
 		port map(
 			clki_fr => clk125_fr,
-			clko_125 => clk125,
+			clki_125 => clk125,
 			clko_ipb => ipb_clk,
 			eth_locked => eth_locked,
 			locked => clk_locked,
@@ -75,8 +75,6 @@ begin
 			rx_last => mac_rx_last,
 			rx_error => mac_rx_error
 		);
-
-	phy_rstb <= '1';
 	
 -- ipbus control logic
 
