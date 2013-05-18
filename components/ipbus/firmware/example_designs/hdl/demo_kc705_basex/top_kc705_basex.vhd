@@ -61,6 +61,7 @@ begin
 			gt_txn => gt_txn,
 			gt_rxp => gt_rxp,
 			gt_rxn => gt_rxn,
+			sig_detn => sfp_los,
 			clk125_out => clk125,
 			clk125_fr => clk125_fr,
 			rsti => rst_eth,

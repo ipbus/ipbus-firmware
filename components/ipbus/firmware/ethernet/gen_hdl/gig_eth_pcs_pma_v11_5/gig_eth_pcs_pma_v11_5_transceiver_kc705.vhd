@@ -201,6 +201,9 @@ architecture wrapper of gig_eth_pcs_pma_v11_5_transceiver is
 --    GT0_RXDFELPMRESET_IN                    : in   std_logic;
 --    GT0_RXMONITOROUT_OUT                    : out  std_logic_vector(6 downto 0);
 --    GT0_RXMONITORSEL_IN                     : in   std_logic_vector(1 downto 0);
+-- DMN_CHANGE
+    ----------------- Receive Ports - RX Polarity Control Ports ----------------
+    GT0_RXPOLARITY_IN                       : in   std_logic;
     ------- Receive Ports - RX Driver,OOB signalling,Coupling and Eq.,CDR ------
     GT0_GTXRXN_IN                           : in   std_logic;
     GT0_GTXRXP_IN                           : in   std_logic;
@@ -231,6 +234,9 @@ architecture wrapper of gig_eth_pcs_pma_v11_5_transceiver is
     GT0_TXBUFSTATUS_OUT                     : out  std_logic_vector(1 downto 0);
     ----------------------- Transmit Ports - TX PLL Ports ----------------------
     GT0_TXRESETDONE_OUT                     : out  std_logic;
+-- DMN_CHANGE
+    ----------------- Transmit Ports - TX Polarity Control Ports ---------------
+    GT0_TXPOLARITY_IN                       : in   std_logic;
     ----------------- Transmit Ports - TX Ports for PCI Express ----------------
     GT0_TXELECIDLE_IN                       : in   std_logic;
     --____________________________COMMON PORTS________________________________
@@ -614,6 +620,9 @@ begin
 --        GT0_RXDFELPMRESET_IN            =>   '0',
 --        GT0_RXMONITOROUT_OUT            =>   open,
 --        GT0_RXMONITORSEL_IN             =>   "00",
+-- DMN_CHANGE
+    	----------------- Receive Ports - RX Polarity Control Ports ----------------
+    	GT0_RXPOLARITY_IN => '1',
         ------- Receive Ports - RX Driver,OOB signalling,Coupling and Eq.,CDR --
         GT0_GTXRXN_IN                   =>      rxn,
         GT0_GTXRXP_IN                   =>      rxp,
@@ -645,6 +654,9 @@ begin
         ----------------------- Transmit Ports - TX PLL Ports ------------------
         GT0_TXRESETDONE_OUT             =>      resetdone_tx,
         GT0_TXELECIDLE_IN               =>      txpowerdown,
+-- DMN_CHANGE
+	    ----------------- Transmit Ports - TX Polarity Control Ports ---------------
+    	GT0_TXPOLARITY_IN => '0',
         --____________________________COMMON PORTS________________________________
         ---------------------- Common Block  - Ref Clock Ports ---------------------
         GT0_GTREFCLK0_COMMON_IN         =>      gtrefclk,

@@ -18,6 +18,7 @@ entity eth_7s_1000basex is
 		gt_clkp, gt_clkn: in std_logic;
 		gt_txp, gt_txn: out std_logic;
 		gt_rxp, gt_rxn: in std_logic;
+		sig_detn: in std_logic := '1';
 		clk125_out: out std_logic;
 		clk125_fr: out std_logic;
 		rsti: in std_logic;
@@ -82,7 +83,7 @@ architecture rtl of eth_7s_1000basex is
 	signal gmii_rx_clk: std_logic;
 	signal clkin, clk125, txoutclk_ub, txoutclk, clk125_ub, clk_fr: std_logic;
 	signal clk62_5_ub, clk62_5, clkfb: std_logic;
-	signal rstn, phy_done, mmcm_locked, locked_int: std_logic;
+	signal rstn, phy_done, mmcm_locked, locked_int, sig_det: std_logic;
 	signal status: std_logic_vector(15 downto 0);
 
 begin
@@ -182,6 +183,8 @@ begin
 	hostbus_out.hostrddata <= (others => '0');
 	hostbus_out.hostmiimrdy <= '0';
 
+	sig_det <= not sig_detn;
+
 	phy: entity work.gig_eth_pcs_pma_v11_5_block
 		port map(
 			drpaddr_in => (others => '0'),
@@ -213,7 +216,7 @@ begin
 			configuration_vector => "00000",
 			status_vector => status,
 			reset => rsti,
-			signal_detect => '1'
+			signal_detect => sig_det
 		);
 
 end rtl;
