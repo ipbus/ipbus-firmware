@@ -1,4 +1,4 @@
 project open demo_atlys
-process run "Implement Design"
+process run "Generate Programming File"
 project close
 

@@ -1,4 +1,4 @@
 project open demo_kc705_extphy
-process run "Implement Design"
+process run "Generate Programming File"
 project close
 

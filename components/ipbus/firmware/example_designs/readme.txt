@@ -22,7 +22,7 @@ svn co PATH_TO_REPOSITORY/trunk/components/ipbus
 for the chosen example design
 
 export REPOS_FW_DIR=`pwd`
-export REPOS_BUILD_DIR=`pwd`/ipbus/firmware/example_designs/projects/demo_sp605_extphy/ise14_3
+export REPOS_BUILD_DIR=`pwd`/ipbus/firmware/example_designs/projects/demo_sp605_extphy/ise14
 
 - Creaet and move to a working directory for the example design:
 

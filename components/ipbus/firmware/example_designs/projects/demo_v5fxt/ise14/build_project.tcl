@@ -1,4 +1,4 @@
 project open demo_v5fxt
-process run "Implement Design"
+process run "Generate Programming File"
 project close
 
