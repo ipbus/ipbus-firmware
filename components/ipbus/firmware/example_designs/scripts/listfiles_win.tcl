@@ -13,14 +13,12 @@ proc dofile {file} {
 		set arg [lindex $l 1]
 		set parg $::env(REPOS_FW_DIR)/$arg
 		if {$cmd == "hdl"} {
-			addfile $arg
+			addfile ../$arg
 		} elseif {$cmd == "ghdl"} {
 			addfile ipcore_dir/$arg
 		} elseif {$cmd == "core"} {
-			puts "CORE_XCO: $arg"
 			addfile ipcore_dir/[exec basename $arg]
 		} elseif {$cmd == "wcore"} {
-			puts "CORE_XCO: $arg"
 		} elseif {$cmd == "include"} {
 			dofile $parg
 		}
