@@ -114,8 +114,8 @@ begin
 			reset => ipb_rst,
 			ipbus_in => ipbw(5),
 			ipbus_out => ipbr(5),
-			rx_pkt => pkt_ctr_rx,
-			tx_pkt => pkt_ctr_tx
+			pkt_rx => pkt_ctr_rx,
+			pkt_tx => pkt_ctr_tx
 		);
 
 -- Slave 6: 1kword RAM
