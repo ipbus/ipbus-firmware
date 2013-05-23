@@ -61,35 +61,35 @@ begin
 			pkt_tx => pkt_tx
 		);
     
-  sm: entity work.transactor_sm
-    port map(
-    	clk => clk,
-      rst => rst,
-      rx_data => trans_in.rdata,
-      rx_ready => rx_ready,
-      rx_next => rx_next,
-      tx_data => tx_data,
-      tx_we => tx_we,
-      tx_hdr => tx_hdr,
-      tx_err => tx_err,
-      ipb_out => ipb_out,
-      ipb_in => ipb_in,
-      cfg_we => cfg_we,
-      cfg_addr => cfg_addr,
-      cfg_din => cfg_dout,
-      cfg_dout => cfg_din
-    );
+	sm: entity work.transactor_sm
+    	port map(
+			clk => clk,
+			rst => rst,
+			rx_data => trans_in.rdata,
+			rx_ready => rx_ready,
+			rx_next => rx_next,
+			tx_data => tx_data,
+			tx_we => tx_we,
+			tx_hdr => tx_hdr,
+			tx_err => tx_err,
+			ipb_out => ipb_out,
+			ipb_in => ipb_in,
+			cfg_we => cfg_we,
+			cfg_addr => cfg_addr,
+			cfg_din => cfg_dout,
+			cfg_dout => cfg_din
+		);
 
-  cfg: entity work.transactor_cfg
-  	port map(
-  		clk => clk,
-  		rst => rst,
-  		we => cfg_we,
-  		addr => cfg_addr,
-  		din => cfg_din,
-  		dout => cfg_dout,
-  		vec_in => cfg_vector_in,
-  		vec_out => cfg_vector_out
-  	);    
+	cfg: entity work.transactor_cfg
+		port map(
+			clk => clk,
+			rst => rst,
+			we => cfg_we,
+			addr => cfg_addr,
+			din => cfg_din,
+			dout => cfg_dout,
+			vec_in => cfg_vector_in,
+			vec_out => cfg_vector_out
+		);    
 
 end rtl;

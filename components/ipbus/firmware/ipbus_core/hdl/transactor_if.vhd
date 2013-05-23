@@ -46,12 +46,12 @@ begin
 	start <= trans_in.pkt_rdy and not trans_in.busy;	
 
 	process(clk)
-  begin
-  	if rising_edge(clk) then
-  
-  		if rst = '1' then
-  			state <= ST_IDLE;
-  		else
+	begin
+		if rising_edge(clk) then
+
+			if rst = '1' then
+				state <= ST_IDLE;
+			else
 				case state is
 
 				when ST_IDLE => -- Starting state
@@ -67,7 +67,7 @@ begin
 					if rctr = hlen then
 						state <= ST_PREBODY;
 					end if;
-					
+
 				when ST_PREBODY =>
 					if ipb_grant = '1' then
 						state <= ST_BODY;
@@ -157,4 +157,3 @@ begin
 	pkt_tx <= '1' when state = ST_DONE else '0';
 	
 end rtl;
-

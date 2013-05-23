@@ -5,5 +5,4 @@ hdl ipbus/firmware/ethernet/hdl/eth_s6_1000basex.vhd
 include ipbus/firmware/ipbus_core/cfg/file_list
 include ipbus/firmware/example_designs/cfg/file_list
 include ipbus/firmware/ethernet/cfg/file_list_gig_eth_pcs_pma_v11_4
-core ipbus/firmware/ethernet/coregen/tri_mode_eth_mac_v5_4.xco
 

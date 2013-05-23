@@ -51,6 +51,8 @@ entity ipbus_ctrl is
 		ipb_grant: in std_logic := '1';
 		mac_addr: in std_logic_vector(47 downto 0) := X"000000000000"; -- Static MAC and IP addresses
 		ip_addr: in std_logic_vector(31 downto 0) := X"00000000";
+		pkt_rx: out std_logic;
+		pkt_tx: out std_logic;
 		pkt_rx_led: out std_logic;
 		pkt_tx_led: out std_logic;
 		oob_in: in ipbus_trans_in_array(N_OOB - 1 downto 0) := (others => ('0', X"00000000", '0'));
@@ -144,8 +146,8 @@ begin
 		trans_out => trans_out,
 		cfg_vector_in => cfg_out,
 		cfg_vector_out => cfg,
-		pkt_rx => pkt_rx,
-		pkt_tx => pkt_tx
+		pkt_rx => pkt_rx_i,
+		pkt_tx => pkt_tx_i
 	);
 	
 	cfg_out <= my_ip_addr & X"0000" & my_mac_addr & X"00000000";
@@ -161,15 +163,17 @@ begin
 
 	stretch_rx: entity work.stretcher port map(
 		clk => mac_clk,
-		d => pkt_rx,
+		d => pkt_rx_i,
 		q => pkt_rx_led
 	);
 	
 	stretch_tx: entity work.stretcher port map(
 		clk => mac_clk,
-		d => pkt_tx,
+		d => pkt_tx_i,
 		q => pkt_tx_led
 	);
+	
+	pkt_rx <= pkt_rx_i;
+	pkt_tx <= pkt_tx_i;
 			
 end rtl;
-
