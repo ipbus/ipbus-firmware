@@ -16,14 +16,16 @@ entity slaves is
 		ipb_out: out ipb_rbus;
 		rst_out: out std_logic;
 		eth_err_ctrl: out std_logic_vector(35 downto 0);
-		eth_err_stat: in std_logic_vector(47 downto 0) := X"000000000000"
+		eth_err_stat: in std_logic_vector(47 downto 0) := X"000000000000";
+		pkt_ctr_rx: in std_logic;
+		pkt_ctr_tx: in std_logic
 	);
 
 end slaves;
 
 architecture rtl of slaves is
 
-	constant NSLV: positive := 4;
+	constant NSLV: positive := 7;
 	signal ipbw: ipb_wbus_array(NSLV-1 downto 0);
 	signal ipbr, ipbr_d: ipb_rbus_array(NSLV-1 downto 0);
 	signal ctrl_reg: std_logic_vector(31 downto 0);
@@ -97,5 +99,34 @@ begin
 		
 	eth_err_ctrl <= inj_ctrl(49 downto 32) & inj_ctrl(17 downto 0);
 	inj_stat <= X"00" & eth_err_stat(47 downto 24) & X"00" & eth_err_stat(23 downto 0);
-			
+	
+-- Slave 4: dump register (does nothing, allows full-speed testing)
+
+	ipbr(4).ipb_ack <= ipbw(4).ipb_strobe;
+	ipbr(4).ipb_err <= '0';
+	ipbr(4).ipb_rdata <= X"abcdabcd";
+	
+-- Slave 5: peephole RAM
+
+	slave5: entity work.ipbus_peephole_ram
+		generic map(addr_width => 10)
+		port map(
+			clk => ipb_clk,
+			reset => ipb_rst,
+			ipbus_in => ipbw(5),
+			ipbus_out => ipbr(5)
+		);
+		
+-- Slave 6: transactor packet counter
+
+	slave6: entity work.ipbus_pkt_ctr
+		port map(
+			clk => ipb_clk,
+			reset => ipb_rst,
+			ipbus_in => ipbw(6),
+			ipbus_out => ipbr(6),
+			rx_pkt => pkt_ctr_rx,
+			tx_pkt => pkt_ctr_tx
+		);
+
 end rtl;
