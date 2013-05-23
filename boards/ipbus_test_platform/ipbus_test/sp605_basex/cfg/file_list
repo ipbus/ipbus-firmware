@@ -2,9 +2,9 @@
 
 hdl ipbus/firmware/example_designs/hdl/clock_div.vhd
 hdl ipbus/firmware/ethernet/hdl/emac_hostbus_decl.vhd
-hdl ipbus/firmware/example_designs/hdl/slaves.vhd
+hdl ipbus_test/hdl/slaves.vhd
 hdl ipbus/firmware/ipbus_core/hdl/ipbus_fabric.vhd
-hdl ipbus/firmware/example_designs/hdl/ipbus_addr_decode.vhd
+hdl ipbus_test/hdl/ipbus_addr_decode.vhd
 hdl ipbus/firmware/slaves/hdl/ipbus_reg.vhd
 hdl ipbus/firmware/slaves/hdl/ipbus_ctrlreg.vhd
 hdl ipbus/firmware/slaves/hdl/ipbus_ram.vhd
