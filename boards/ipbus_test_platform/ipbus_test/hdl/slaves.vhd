@@ -72,7 +72,7 @@ begin
 
 -- Slave 2: dump register (does nothing, allows full-speed testing)
 
-	ipbr(2).ipb_ack <= ipbw(4).ipb_strobe;
+	ipbr(2).ipb_ack <= ipbw(2).ipb_strobe;
 	ipbr(2).ipb_err <= '0';
 	ipbr(2).ipb_rdata <= X"abcdabcd";
 	
