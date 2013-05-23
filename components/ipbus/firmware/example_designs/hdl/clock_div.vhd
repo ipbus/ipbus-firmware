@@ -22,8 +22,6 @@ end clock_div;
 
 architecture rtl of clock_div is
 
-	
-
 	signal q, qr: std_logic_vector(5 downto 0);
 	signal ctr: unsigned(2 downto 0) := "000";
 	signal ce: std_logic_vector(5 downto 1);
