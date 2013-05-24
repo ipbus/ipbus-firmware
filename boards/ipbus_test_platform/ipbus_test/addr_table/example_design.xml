@@ -14,10 +14,13 @@
 		<node id="tx_stat" address="0x3"/>
 	</node>
 	<node id="dump" address="0x3" description="dump register" tags="slave"/>
-	<node id="pram" address="0x8" description="1kword RAM" tags="slave">
+	<node id="pram" address="0x8" description="1kword peephole RAM" tags="slave">
 		<node id="addr" address="0x0"/>
 		<node id="data" address="0x1" mode="port"/>
 	</node>
-	<node id="pkt_cnt" address="0xa" description="packet counter" tags="slave"/>
+	<node id="pkt_cnt" address="0xa" description="packet counter" tags="slave">
+		<node id="rx_cnt" address="0x0"/>
+		<node id="tx_cnt" address="0x1"/>
+	</node>
 </node>
 

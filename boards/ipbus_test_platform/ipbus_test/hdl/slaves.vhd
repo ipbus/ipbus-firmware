@@ -76,7 +76,7 @@ begin
 	ipbr(2).ipb_err <= '0';
 	ipbr(2).ipb_rdata <= X"abcdabcd";
 	
-- Slave 3: ethernet error injection
+-- Slave 3: ethernet error injection
 
 	slave3: entity work.ipbus_ctrlreg
 		generic map(
