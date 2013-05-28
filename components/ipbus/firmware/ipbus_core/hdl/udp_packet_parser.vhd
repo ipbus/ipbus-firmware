@@ -306,8 +306,8 @@ littleendian:  process (mac_clk)
   begin
     if rising_edge(mac_clk) then
       if rx_reset = '1' then
-        reliable_data := x"20" & next_pkt_id(7 downto 0) &
-	next_pkt_id(15 downto 8)  & x"F0";
+        reliable_data := x"F0" & next_pkt_id(7 downto 0) &
+	next_pkt_id(15 downto 8)  & x"20";
         unreliable_data := x"F0000020";
         pkt_drop_reliable_i := '0';
         pkt_drop_unreliable := '0';
