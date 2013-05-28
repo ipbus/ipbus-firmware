@@ -15,6 +15,7 @@ entity udp_build_payload is
     mac_rx_last: in std_logic;
     mac_rx_error: in std_logic;
     pkt_drop_payload: in std_logic;
+    pkt_byteswap: in std_logic;
     outbyte: in std_logic_vector(7 downto 0);
     payload_data: out std_logic_vector(7 downto 0);
     payload_addr: out std_logic_vector(12 downto 0);
@@ -32,16 +33,19 @@ end udp_build_payload;
 architecture rtl of udp_build_payload is
 
   signal payload_we_sig, set_addr, send_pending: std_logic;
-  signal send_buf, load_buf, low_addr: std_logic;
+  signal send_buf, load_buf, low_addr, next_low, byteswap: std_logic;
   signal buf_to_load: std_logic_vector(15 downto 0);
-  signal address, addr_to_set: unsigned(12 downto 0);
+  signal address, addr_to_set, next_addr: unsigned(12 downto 0);
   signal payload_data_sig: std_logic_vector(7 downto 0);
 
 begin
 
   payload_we <= payload_we_sig;
-  payload_addr <= std_logic_vector(address);
   payload_data <= payload_data_sig;
+
+  With byteswap select payload_addr <=
+  std_logic_vector(address(12 downto 2) & not address(1 downto 0)) when '1',
+  std_logic_vector(address) when Others;
 
 send_packet:  process (mac_clk)
   variable send_pending_i, send_i, last_we: std_logic;
@@ -100,7 +104,7 @@ send_packet:  process (mac_clk)
 -- UDP LEN
 -- UDP CKSUM
 -- UDP data...
-address_block:  process(mac_clk)
+set_address_block:  process(mac_clk)
   variable addr_to_set_int: unsigned(5 downto 0);
   variable set_addr_int, cksum_pending: std_logic;
   begin
@@ -379,9 +383,45 @@ do_cksum:  process(mac_clk)
     end if;
   end process;
 
-next_addr:  process(mac_clk)
-  variable addr_int, next_addr, addr_to_set_buf: unsigned(12 downto 0);
-  variable set_addr_buf, low_addr_i, next_low: std_logic;
+next_addr_block:  process(mac_clk)
+  variable addr_int, next_addr_int, addr_to_set_buf: unsigned(12 downto 0);
+  variable set_addr_buf, next_low_int: std_logic;
+  begin
+    if rising_edge(mac_clk) then
+      if set_addr = '1' then
+        addr_to_set_buf := addr_to_set;
+	set_addr_buf := '1';
+      end if;
+      if rx_reset = '1' or mac_rx_valid = '1' or send_pending = '1' then
+        if set_addr_buf = '1' then
+          addr_int := addr_to_set_buf;
+	  set_addr_buf := '0';
+	elsif pkt_drop_payload = '0' then
+          addr_int := next_addr_int;
+	end if;
+      end if;
+      next_addr_int := addr_int + 1;
+      if next_addr(12 downto 6) = "0000000" then
+        next_low_int := '1';
+      else
+        next_low_int := '0';
+      end if;
+      next_addr <= next_addr_int
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+      next_low <= next_low_int
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+    end if;
+  end process;
+
+address_block:  process(mac_clk)
+  variable addr_int, addr_to_set_buf: unsigned(12 downto 0);
+  variable set_addr_buf, low_addr_i: std_logic;
   begin
     if rising_edge(mac_clk) then
       if set_addr = '1' then
@@ -408,12 +448,29 @@ next_addr:  process(mac_clk)
       after 4 ns
 -- pragma translate_on
       ;
-      next_addr := addr_int + 1;
-      if next_addr(12 downto 6) = "0000000" then
-        next_low := '1';
-      else
-        next_low := '0';
+    end if;
+  end process;
+
+byteswap_block:  process(mac_clk)
+  variable set_addr_buf, byteswap_int: std_logic;
+  begin
+    if rising_edge(mac_clk) then
+      if set_addr = '1' then
+ 	set_addr_buf := '1';
       end if;
+      if rx_reset = '1' or mac_rx_valid = '1' or send_pending = '1' then
+        if set_addr_buf = '1' then
+	  byteswap_int := '0';
+	  set_addr_buf := '0';
+	elsif next_low = '1' and next_addr(5 downto 0) = to_unsigned(52, 6) then
+	  byteswap_int := pkt_byteswap;
+	end if;
+      end if;
+      byteswap <= byteswap_int
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
     end if;
   end process;
 

@@ -19,6 +19,7 @@ entity udp_packet_parser is
     IP_addr: in std_logic_vector(31 downto 0);
     next_pkt_id: in std_logic_vector(15 downto 0);
     pkt_broadcast: out std_logic;
+    pkt_byteswap: out std_logic;
     pkt_drop_arp: out std_logic;
     pkt_drop_ipbus: out std_logic;
     pkt_drop_payload: out std_logic;
@@ -33,6 +34,8 @@ architecture v3 of udp_packet_parser is
 
   signal pkt_drop_arp_sig, pkt_drop_ping_sig: std_logic;
   signal pkt_drop_ip_sig, pkt_drop_ipbus_sig: std_logic;
+  signal pkt_drop_payload_sig, pkt_payload_drop_sig: std_logic;
+  signal pkt_drop_reliable_sig, pkt_reliable_drop_sig: std_logic;
   signal ipbus_status_mask, ipbus_hdr_mask: std_logic;
 
 begin
@@ -40,6 +43,9 @@ begin
   pkt_drop_arp <= pkt_drop_arp_sig or SECONDARYPORT;
   pkt_drop_ping <= pkt_drop_ping_sig or SECONDARYPORT;
   pkt_drop_ipbus <= pkt_drop_ipbus_sig;
+  pkt_drop_payload <= pkt_drop_payload_sig and pkt_payload_drop_sig;
+  pkt_drop_reliable <= pkt_drop_reliable_sig and pkt_reliable_drop_sig;
+  pkt_byteswap <= pkt_drop_payload_sig;
 
 -- ARP:
 -- Ethernet DST_MAC(6), SRC_MAC(6), Ether_Type = x"0806"
@@ -251,7 +257,7 @@ ipbus_mask: process(mac_clk)
 -- UDP payload:
 -- IPBus packet header x"20nnnnF0" or x"200000F0"
 -- IPBus data...
-reliable:  process (mac_clk)
+bigendian:  process (mac_clk)
   variable reliable_data: std_logic_vector(31 downto 0);
   variable unreliable_data: std_logic_vector(31 downto 0);
   variable pkt_drop_reliable_i, pkt_drop_unreliable: std_logic;
@@ -277,12 +283,55 @@ reliable:  process (mac_clk)
           unreliable_data := unreliable_data(23 downto 0) & x"00";
         end if;
       end if;
-      pkt_drop_reliable <= pkt_drop_reliable_i
+      pkt_drop_reliable_sig <= pkt_drop_reliable_i
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
       ;
-      pkt_drop_payload <= pkt_drop_reliable_i and pkt_drop_unreliable
+      pkt_drop_payload_sig <= pkt_drop_reliable_i and pkt_drop_unreliable
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+    end if;
+  end process;
+
+-- UDP payload:
+-- IPBus packet header x"F0nnnn20" or x"F0000020"
+-- IPBus data...
+littleendian:  process (mac_clk)
+  variable reliable_data: std_logic_vector(31 downto 0);
+  variable unreliable_data: std_logic_vector(31 downto 0);
+  variable pkt_drop_reliable_i, pkt_drop_unreliable: std_logic;
+  begin
+    if rising_edge(mac_clk) then
+      if rx_reset = '1' then
+        reliable_data := x"20" & next_pkt_id(7 downto 0) &
+	next_pkt_id(15 downto 8)  & x"F0";
+        unreliable_data := x"F0000020";
+        pkt_drop_reliable_i := '0';
+        pkt_drop_unreliable := '0';
+      elsif mac_rx_valid = '1' then
+        if pkt_drop_ipbus_sig = '1' then
+	  pkt_drop_reliable_i := '1';
+	  pkt_drop_unreliable := '1';
+        elsif ipbus_hdr_mask = '0' then
+          if reliable_data(31 downto 24) /= mac_rx_data then
+            pkt_drop_reliable_i := '1';
+          end if;
+          if unreliable_data(31 downto 24) /= mac_rx_data then
+            pkt_drop_unreliable := '1';
+          end if;
+          reliable_data := reliable_data(23 downto 0) & x"00";
+          unreliable_data := unreliable_data(23 downto 0) & x"00";
+        end if;
+      end if;
+      pkt_reliable_drop_sig <= pkt_drop_reliable_i
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+      pkt_payload_drop_sig <= pkt_drop_reliable_i and pkt_drop_unreliable
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on

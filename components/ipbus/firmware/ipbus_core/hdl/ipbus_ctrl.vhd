@@ -69,7 +69,7 @@ architecture rtl of ipbus_ctrl is
   signal cfg, cfg_out: std_logic_vector(127 downto 0);
   signal my_mac_addr: std_logic_vector(47 downto 0);
   signal my_ip_addr: std_logic_vector(31 downto 0);
-  signal pkt_rx, pkt_tx: std_logic;
+  signal pkt_rx_i, pkt_tx_i: std_logic;
   signal buf_in_a: ipbus_trans_in_array(N_OOB downto 0);
   signal buf_out_a: ipbus_trans_out_array(N_OOB downto 0);
   

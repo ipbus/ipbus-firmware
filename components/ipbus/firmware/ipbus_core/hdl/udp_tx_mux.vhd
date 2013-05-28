@@ -56,18 +56,22 @@ architecture rtl of udp_tx_mux is
   signal ip_len, ip_cksum, udp_len: std_logic_vector(15 downto 0);
   signal udp_counter: unsigned(4 downto 0);
   signal udp_counting: std_logic;
+  signal byteswap_sig, byteswapping: std_logic;
 
 begin
 
   rxram_busy <= rxram_busy_sig;
   udpram_busy <= udpram_busy_sig;
   addrb <= addr_sig;
-  udpaddrb <= addr_sig;
   mac_tx_data <= mac_tx_data_sig;
   mac_tx_last <= mac_tx_last_sig;
   mac_tx_valid <= mac_tx_valid_sig;
   mac_tx_ready_sig <= mac_tx_ready and mac_tx_valid_sig;
   mac_tx_error <= '0';
+
+  With byteswapping select udpaddrb <=
+  addr_sig(12 downto 2) & not addr_sig(1 downto 0) when '1',
+  addr_sig when Others;
 
 rx_event:  process(mac_clk)
   variable rxram_busy_int, last_rxram_active: std_logic;
@@ -395,11 +399,12 @@ udp_build_data:  process(mac_clk)
 
 next_addr:  process(mac_clk)
   variable addr_int, next_addr: unsigned(12 downto 0);
-  variable low_addr_int: std_logic;
+  variable low_addr_int, byteswapping_int: std_logic;
   begin
     if rising_edge(mac_clk) then
       if set_addr = '1' then
         addr_int := unsigned(addr_to_set);
+	byteswapping_int := '0';
       elsif mac_tx_ready_sig = '1' or counting = '1' then 
         addr_int := next_addr;
       end if;
@@ -410,10 +415,18 @@ next_addr:  process(mac_clk)
       ;
       if addr_int(12 downto 6) = "0000000" then
         low_addr_int := '1';
+	if addr_int(5 downto 0) = to_unsigned(52, 6) then
+	  byteswapping_int := byteswap_sig;
+	end if;
       else
 	low_addr_int := '0';
       end if;
       low_addr <= low_addr_int
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+      byteswapping <= byteswapping_int
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
@@ -462,17 +475,21 @@ send_data:  process(mac_clk)
 
 do_ipbus_hdr: process(mac_clk)
   variable ipbus_hdr_int: std_logic_vector(31 downto 0);
-  variable ipbus_out_valid_int: std_logic;
+  variable ipbus_out_valid_int, byteswap_int: std_logic;
   begin
     if rising_edge(mac_clk) then
       if rst_macclk = '1' then
 	ipbus_hdr_int := (Others => '0');
 	ipbus_out_valid_int := '0';
+	byteswap_int := '0';
       elsif udpram_active = '1' and low_addr = '1' and mac_tx_ready_sig = '1' then
         case to_integer(unsigned(addr_sig(5 downto 0))) is
 	  when 50 =>
 	    ipbus_hdr_int(31 downto 24) := mac_tx_data_sig;
 	    ipbus_out_valid_int := '0';
+	    if mac_tx_data_sig = x"F0" then
+	      byteswap_int := '1';
+	    end if;
 	  when 51 =>
 	    ipbus_hdr_int(23 downto 16) := mac_tx_data_sig;
 	    ipbus_out_valid_int := '0';
@@ -494,6 +511,11 @@ do_ipbus_hdr: process(mac_clk)
 -- pragma translate_on
       ;
       ipbus_out_hdr <= ipbus_hdr_int
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+      byteswap_sig <= byteswap_int
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on

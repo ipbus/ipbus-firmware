@@ -76,20 +76,11 @@ ARCHITECTURE flat OF UDP_if IS
    SIGNAL payload_send: std_logic;
    SIGNAL payload_we: std_logic;
    SIGNAL req_resend: std_logic;
-   SIGNAL rx_addra: std_logic_vector(12 DOWNTO 0);
-   SIGNAL rx_addrb: std_logic_vector(10 DOWNTO 0);
-   SIGNAL rx_dia: std_logic_vector(7 DOWNTO 0);
-   SIGNAL rx_dob: std_logic_vector(31 DOWNTO 0);
    SIGNAL rx_reset: std_logic;
    SIGNAL rx_wea: std_logic;
    SIGNAL rxram_busy: std_logic;
    SIGNAL rxram_end_addr: std_logic_vector(12 DOWNTO 0);
    SIGNAL rxram_send: std_logic;
-   SIGNAL tx_addra: std_logic_vector(10 DOWNTO 0);
-   SIGNAL tx_addrb: std_logic_vector(12 DOWNTO 0);
-   SIGNAL tx_dia: std_logic_vector(31 DOWNTO 0);
-   SIGNAL tx_dob: std_logic_vector(7 DOWNTO 0);
-   SIGNAL tx_wea: std_logic;
    SIGNAL udpaddrb: std_logic_vector(12 DOWNTO 0);
    SIGNAL udpdob: std_logic_vector(7 DOWNTO 0);
    SIGNAL udpram_busy: std_logic;
@@ -138,7 +129,7 @@ ARCHITECTURE flat OF UDP_if IS
    signal ipbus_in_hdr, ipbus_out_hdr: std_logic_vector(31 downto 0);
    signal pkt_broadcast, ipbus_out_valid: std_logic;
    signal rxram_dropped_sig, rxpayload_dropped_sig: std_logic;
-   signal pkt_drop_ipbus, pkt_drop_reliable: std_logic;
+   signal pkt_drop_ipbus, pkt_drop_reliable, pkt_byteswap: std_logic;
    signal next_pkt_id: std_logic_vector(15 downto 0); -- Next expected packet ID
 --
    signal pkt_rdy_125: std_logic;
@@ -221,6 +212,7 @@ rx_last_kludge: process(mac_clk)
          mac_rx_last => my_rx_last,
          mac_rx_error => mac_rx_error,
          pkt_drop_payload => pkt_drop_payload,
+	 pkt_byteswap => pkt_byteswap,
          outbyte => rx_outbyte,
          payload_data => payload_data,
          payload_addr => payload_addr,
@@ -347,6 +339,7 @@ rx_last_kludge: process(mac_clk)
 	 IP_addr => IP_addr,
 	 next_pkt_id => next_pkt_id,
 	 pkt_broadcast => pkt_broadcast,
+	 pkt_byteswap => pkt_byteswap,
 	 pkt_drop_arp => pkt_drop_arp,
 	 pkt_drop_ipbus => pkt_drop_ipbus,
 	 pkt_drop_payload => pkt_drop_payload,
