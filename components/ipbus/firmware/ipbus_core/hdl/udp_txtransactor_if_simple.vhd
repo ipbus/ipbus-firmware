@@ -25,6 +25,7 @@ entity udp_txtransactor_if is
     udpram_busy: in std_logic;
     clean_buf: in std_logic_vector(2**BUFWIDTH - 1 downto 0);
 --
+    req_not_found: out std_logic;
     req_resend: out std_logic;
     resend_buf: out std_logic_vector(BUFWIDTH - 1 downto 0);
     udpram_sent: out std_logic
@@ -56,11 +57,12 @@ pkt_id_block: process (mac_clk)
   end process;
 
 resend_block: process (mac_clk)
-  variable req_resend_i: std_logic;
+  variable req_resend_i, req_not_found_i: std_logic;
   variable resend_buf_i: std_logic_vector(BUFWIDTH - 1 downto 0);
   begin
     if rising_edge(mac_clk) then
       req_resend_i := '0';
+      req_not_found_i := '0';
       resend_buf_i := (Others => '0');
       if pkt_resend = '1' then
         for i in 0 to 2**BUFWIDTH - 1 loop
@@ -69,7 +71,13 @@ resend_block: process (mac_clk)
 	    resend_buf_i := std_logic_vector(to_unsigned(i, BUFWIDTH));
 	  end if;
         end loop;
+	req_not_found_i := not req_resend_i;
       end if;
+      req_not_found <= req_not_found_i
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
       req_resend <= req_resend_i
 -- pragma translate_off
       after 4 ns

@@ -147,13 +147,13 @@ ARCHITECTURE flat OF UDP_if IS
    SIGNAL rx_full_addra, tx_full_addrb: std_logic_vector(BUFWIDTH + ADDRWIDTH - 1 downto 0);
    SIGNAL rx_full_addrb, tx_full_addra: std_logic_vector(BUFWIDTH + ADDRWIDTH - 3 downto 0);
    signal pkt_resend, pkt_rcvd, rx_ram_busy, rx_req_send, udpram_sent: std_logic;
-   signal busy_125, pkt_done_read_125, rx_ram_sent, tx_ram_written: std_logic;
+   signal busy_125, pkt_done_read_125, rx_ram_sent, tx_ram_written, rxreq_not_found: std_logic;
    signal resend_pkt_id: std_logic_vector(15 downto 0);
    signal clean_buf: std_logic_vector(2**BUFWIDTH - 1 downto 0);
    
 BEGIN
 
-   rxpacket_dropped <= rxram_dropped_sig or rxpayload_dropped_sig;
+   rxpacket_dropped <= rxram_dropped_sig or rxpayload_dropped_sig or rxreq_not_found;
    rxpacket_ignored <= my_rx_last and pkt_drop_arp and pkt_drop_ping and
    pkt_drop_payload and pkt_drop_resend and pkt_drop_status;
 
@@ -298,6 +298,7 @@ rx_last_kludge: process(mac_clk)
 	 pkt_drop_resend => pkt_drop_resend,
 	 pkt_drop_status => pkt_drop_status,
 	 pkt_rcvd => pkt_rcvd,
+	 req_not_found => rxreq_not_found,
 	 rxpayload_dropped => rxpayload_dropped_sig,
 	 rxram_dropped => rxram_dropped_sig,
 	 status_request => status_request,
@@ -561,6 +562,7 @@ rx_last_kludge: process(mac_clk)
 	 tx_read_buffer => tx_read_buffer,
 	 udpram_busy => udpram_busy,
 	 clean_buf => clean_buf,
+	 req_not_found => rxreq_not_found,
          req_resend => req_resend,
 	 resend_buf => resend_buf,
 	 udpram_sent => udpram_sent

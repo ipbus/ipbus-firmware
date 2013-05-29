@@ -30,6 +30,7 @@ entity udp_status_buffer is
     pkt_drop_resend: in std_logic;
     pkt_drop_status: in std_logic;
     pkt_rcvd: in std_logic;
+    req_not_found: in std_logic;
     rxpayload_dropped: in std_logic;
     rxram_dropped: in std_logic;
     status_request: in std_logic;
@@ -155,7 +156,8 @@ history_block:  process (mac_clk)
 	event_pending := '1';
       end if;
       if event_pending = '1' then
-        if rxpayload_dropped = '1' or rxram_dropped = '1' then
+        if rxpayload_dropped = '1' or rxram_dropped = '1' or
+	req_not_found = '1' then
 	  event_data(7 downto 4) := x"4";
 	elsif rx_reset = '1' then
 	  new_event := '1';
