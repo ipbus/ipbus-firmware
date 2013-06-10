@@ -26,6 +26,7 @@ entity udp_status_buffer is
     pkt_drop_ipbus: in std_logic;
     pkt_drop_payload: in std_logic;
     pkt_drop_ping: in std_logic;
+    pkt_drop_rarp: in std_logic;
     pkt_drop_reliable: in std_logic;
     pkt_drop_resend: in std_logic;
     pkt_drop_status: in std_logic;
@@ -109,7 +110,8 @@ header_block:  process (mac_clk)
 history_block:  process (mac_clk)
   variable last_rst_ipb, new_event, event_pending: std_logic;
   variable event_data: std_logic_vector(7 downto 0);
-  variable arp_ping_ipbus, payload_status_resend: std_logic_vector(2 downto 0);
+  variable rarp_arp_ping_ipbus: std_logic_vector(3 downto 0);
+  variable payload_status_resend: std_logic_vector(2 downto 0);
   begin
     if rising_edge(mac_clk) then
       if rst_macclk = '1' then
@@ -126,15 +128,18 @@ history_block:  process (mac_clk)
 	event_data := x"01";
       end if;
       if mac_rx_last = '1' then
-        arp_ping_ipbus := pkt_drop_arp & pkt_drop_ping & pkt_drop_ipbus;
+        rarp_arp_ping_ipbus := pkt_drop_rarp & pkt_drop_arp & 
+	pkt_drop_ping & pkt_drop_ipbus;
 	payload_status_resend := pkt_drop_payload & pkt_drop_status & 
 	pkt_drop_resend;
-        case arp_ping_ipbus is
-	  when "011" =>
+        case rarp_arp_ping_ipbus is
+	  when "0111" =>
+	    event_data := x"08";
+	  when "1011" =>
 	    event_data := x"07";
-	  when "101" =>
+	  when "1101" =>
 	    event_data := x"06";
-	  when "110" =>
+	  when "1110" =>
 	    case payload_status_resend is
 	      when "011" =>
 	        event_data := x"02";

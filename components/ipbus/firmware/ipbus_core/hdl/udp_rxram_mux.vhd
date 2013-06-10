@@ -11,6 +11,13 @@ entity udp_rxram_mux is
     mac_clk: in std_logic;
     rx_reset: in std_logic;
 --
+    rarp_mode: in std_logic;
+    rarp_addr: in std_logic_vector(12 downto 0);
+    rarp_data: in std_logic_vector(7 downto 0);
+    rarp_end_addr: in std_logic_vector(12 downto 0);
+    rarp_send: in std_logic;
+    rarp_we: in std_logic;
+--
     pkt_drop_arp: in std_logic;
     arp_data: in std_logic_vector(7 downto 0);
     arp_addr: in std_logic_vector(12 downto 0);
@@ -56,7 +63,7 @@ do_ram_ready:  process(mac_clk)
   variable ram_ready_int, rxram_dropped_int: std_logic;
   begin
     if rising_edge(mac_clk) then
-      if rx_reset = '1' then
+      if rx_reset = '1' or rarp_mode = '1' then
         ram_ready_int := '1';
       elsif mac_rx_valid = '1' and rxram_busy = '1' then 
         ram_ready_int := '0';
@@ -84,7 +91,10 @@ send_packet:  process(mac_clk)
   variable rxram_send_int: std_logic;
   begin
     if rising_edge(mac_clk) then
-      if arp_send = '1' then
+      if rarp_send = '1' then
+        rxram_end_addr_int := rarp_end_addr;
+	rxram_send_int := '1';
+      elsif arp_send = '1' then
         rxram_end_addr_int := arp_end_addr;
 	rxram_send_int := '1';
       elsif ping_send = '1' then
@@ -117,7 +127,11 @@ build_packet:  process(mac_clk)
   begin
     if rising_edge(mac_clk) then
       if ram_ready = '1' then
-        if pkt_drop_arp = '0' then
+        if rarp_mode = '1' then
+          dia_int := rarp_data;
+	  addra_int := rarp_addr;
+	  wea_int := rarp_we;
+        elsif pkt_drop_arp = '0' then
           dia_int := arp_data;
 	  addra_int := arp_addr;
 	  wea_int := arp_we;

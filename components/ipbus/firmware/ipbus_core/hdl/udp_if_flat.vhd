@@ -51,6 +51,7 @@ generic(
       mac_tx_error: OUT std_logic;
       mac_tx_last: OUT std_logic;
       mac_tx_valid: OUT std_logic;
+      My_IP_addr: OUT std_logic_vector(31 DOWNTO 0);
       pkt_rdy: OUT std_logic;
       rdata: OUT std_logic_vector(31 DOWNTO 0);
       rxpacket_ignored: OUT std_logic;
@@ -86,6 +87,15 @@ ARCHITECTURE flat OF UDP_if IS
    SIGNAL udpram_busy: std_logic;
    SIGNAL udpram_send: std_logic;
    SIGNAL wea: std_logic;
+--
+   SIGNAL My_IP_addr_sig: std_logic_vector(31 DOWNTO 0);
+   SIGNAL pkt_drop_rarp: std_logic;
+   SIGNAL rarp_addr: std_logic_vector(12 DOWNTO 0);
+   SIGNAL rarp_data: std_logic_vector(7 DOWNTO 0);
+   SIGNAL rarp_end_addr: std_logic_vector(12 DOWNTO 0);
+   SIGNAL rarp_mode: std_logic;
+   SIGNAL rarp_send: std_logic;
+   SIGNAL rarp_we: std_logic;
 --
    SIGNAL arp_addr: std_logic_vector(12 DOWNTO 0);
    SIGNAL arp_data: std_logic_vector(7 DOWNTO 0);
@@ -155,7 +165,7 @@ BEGIN
 
    rxpacket_dropped <= rxram_dropped_sig or rxpayload_dropped_sig or rxreq_not_found;
    rxpacket_ignored <= my_rx_last and pkt_drop_arp and pkt_drop_ping and
-   pkt_drop_payload and pkt_drop_resend and pkt_drop_status;
+   pkt_drop_payload and pkt_drop_rarp and pkt_drop_resend and pkt_drop_status;
 
    rx_do_sum <= do_sum_ping or do_sum_payload;
    rx_clr_sum <= clr_sum_ping or clr_sum_payload;
@@ -185,7 +195,35 @@ rx_last_kludge: process(mac_clk)
 
    my_rx_last <= mac_rx_last and not last_rx_last;
 
+   My_IP_addr <= My_IP_addr_sig;
+
    -- Instance port mappings.
+   IPADDR: entity work.udp_ipaddr_block
+      PORT MAP (
+         mac_clk => mac_clk,
+         rst_macclk => rst_macclk,
+	 rx_reset => rx_reset,
+	 IP_addr => IP_addr,
+	 mac_rx_data => mac_rx_data,
+	 mac_rx_error => mac_rx_error,
+	 mac_rx_last => my_rx_last,
+	 mac_rx_valid => mac_rx_valid,
+	 pkt_drop_rarp => pkt_drop_rarp,
+	 My_IP_addr => My_IP_addr_sig,
+         rarp_mode => rarp_mode
+     );
+   RARP: entity work.udp_rarp_block
+      PORT MAP (
+         mac_clk => mac_clk,
+         rst_macclk => rst_macclk,
+         MAC_addr => MAC_addr,
+         rarp_mode => rarp_mode,
+         rarp_addr => rarp_addr,
+         rarp_data => rarp_data,
+         rarp_end_addr => rarp_end_addr,
+         rarp_send => rarp_send,
+         rarp_we => rarp_we
+      );
    ARP: entity work.udp_build_arp
       PORT MAP (
          mac_clk => mac_clk,
@@ -196,7 +234,7 @@ rx_last_kludge: process(mac_clk)
          mac_rx_error => mac_rx_error,
          pkt_drop_arp => pkt_drop_arp,
          MAC_addr => MAC_addr,
-         IP_addr => IP_addr,
+         My_IP_addr => My_IP_addr_sig,
          arp_data => arp_data,
          arp_addr => arp_addr,
          arp_we => arp_we,
@@ -294,6 +332,7 @@ rx_last_kludge: process(mac_clk)
 	 pkt_drop_ipbus => pkt_drop_ipbus,
 	 pkt_drop_payload => pkt_drop_payload,
 	 pkt_drop_ping => pkt_drop_ping,
+	 pkt_drop_rarp => pkt_drop_rarp,
 	 pkt_drop_reliable => pkt_drop_reliable,
 	 pkt_drop_resend => pkt_drop_resend,
 	 pkt_drop_status => pkt_drop_status,
@@ -337,7 +376,7 @@ rx_last_kludge: process(mac_clk)
 	 mac_rx_data => mac_rx_data,
 	 mac_rx_valid => mac_rx_valid,
 	 MAC_addr => MAC_addr,
-	 IP_addr => IP_addr,
+	 My_IP_addr => My_IP_addr_sig,
 	 next_pkt_id => next_pkt_id,
 	 pkt_broadcast => pkt_broadcast,
 	 pkt_byteswap => pkt_byteswap,
@@ -345,6 +384,7 @@ rx_last_kludge: process(mac_clk)
 	 pkt_drop_ipbus => pkt_drop_ipbus,
 	 pkt_drop_payload => pkt_drop_payload,
 	 pkt_drop_ping => pkt_drop_ping,
+	 pkt_drop_rarp => pkt_drop_rarp,
 	 pkt_drop_reliable => pkt_drop_reliable,
 	 pkt_drop_resend => pkt_drop_resend,
 	 pkt_drop_status => pkt_drop_status
@@ -353,6 +393,12 @@ rx_last_kludge: process(mac_clk)
       PORT MAP (
          mac_clk => mac_clk,
          rx_reset => rx_reset,
+	 rarp_mode => rarp_mode,
+	 rarp_addr => rarp_addr,
+	 rarp_data => rarp_data,
+	 rarp_end_addr => rarp_end_addr,
+	 rarp_send => rarp_send,
+	 rarp_we => rarp_we,
          pkt_drop_arp => pkt_drop_arp,
          arp_data => arp_data,
          arp_addr => arp_addr,

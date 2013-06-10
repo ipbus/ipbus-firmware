@@ -16,7 +16,7 @@ entity udp_build_arp is
     mac_rx_error: in std_logic;
     pkt_drop_arp: in std_logic;
     MAC_addr: in std_logic_vector(47 downto 0);
-    IP_addr: in std_logic_vector(31 downto 0);
+    My_IP_addr: in std_logic_vector(31 downto 0);
     arp_data: out std_logic_vector(7 downto 0);
     arp_addr: out std_logic_vector(12 downto 0);
     arp_we: out std_logic;
@@ -158,7 +158,7 @@ build_packet:  process (mac_clk)
 -- RX ARP target MAC bytes 32 to 37 => TX write sender MAC bytes 22 to 27...
           when 26 =>
 	    load_buf_int := '1';
-	    buf_to_load_int := IP_addr & x"0000";
+	    buf_to_load_int := My_IP_addr & x"0000";
 -- RX ARP target IP addr bytes 38 to 41 => TX write sender IP addr bytes 28 to 31...
           when Others =>
 	    load_buf_int := '0';

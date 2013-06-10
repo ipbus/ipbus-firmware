@@ -16,7 +16,9 @@ hdl ipbus/firmware/ipbus_core/hdl/udp_do_rx_reset.vhd
 hdl ipbus/firmware/ipbus_core/hdl/udp_dualportram.vhd
 hdl ipbus/firmware/ipbus_core/hdl/udp_dualportram_rx.vhd
 hdl ipbus/firmware/ipbus_core/hdl/udp_dualportram_tx.vhd
+hdl ipbus/firmware/ipbus_core/hdl/udp_ipaddr_block.vhd
 hdl ipbus/firmware/ipbus_core/hdl/udp_packet_parser.vhd
+hdl ipbus/firmware/ipbus_core/hdl/udp_rarp_block.vhd
 hdl ipbus/firmware/ipbus_core/hdl/udp_rxram_mux.vhd
 hdl ipbus/firmware/ipbus_core/hdl/udp_rxram_shim.vhd
 hdl ipbus/firmware/ipbus_core/hdl/udp_rxtransactor_if_simple.vhd
