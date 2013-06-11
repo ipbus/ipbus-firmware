@@ -12,7 +12,9 @@ entity top is port(
 	leds: out std_logic_vector(2 downto 0);
 	gt_clkp, gt_clkn: in std_logic;
 	gt_txp, gt_txn: out std_logic;
-	gt_rxp, gt_rxn: in std_logic
+	gt_rxp, gt_rxn: in std_logic;
+	
+	v6_cpld : inout std_logic_vector(0 to 5)
 	);
 end top;
 
@@ -26,6 +28,7 @@ architecture rtl of top is
 	signal mac_addr: std_logic_vector(47 downto 0);
 	signal ip_addr: std_logic_vector(31 downto 0);
 	signal pkt_rx_led, pkt_tx_led, sys_rst: std_logic;	
+	signal amc_slot: std_logic_vector(3 downto 0);
 
 begin
 
@@ -46,7 +49,11 @@ begin
 		);
 		
 	leds <= eth_locked & clk_locked & onehz;
-	
+	amc_slot(3) <= v6_cpld(3);
+	amc_slot(2) <= v6_cpld(2);
+	amc_slot(1) <= v6_cpld(1);
+	amc_slot(0) <= v6_cpld(0);
+
 --	Ethernet MAC core and PHY interface
 	
 	eth: entity work.eth_v6_basex
@@ -97,8 +104,8 @@ begin
 			pkt_tx_led => pkt_tx_led
 		);
 		
-	mac_addr <= X"020ddba1159a"; -- Careful here, arbitrary addresses do not always work
-	ip_addr <= X"c0a80010"; -- 192.168.0.16
+	mac_addr <= X"080030f1003" & (not amc_slot(3)) & amc_slot(2 downto 0);
+	ip_addr <= X"00000000"; -- 0.0.0.0 means use RARP
 
 -- ipbus slaves live in the entity below, and can expose top-level ports
 -- The ipbus fabric is instantiated within.
