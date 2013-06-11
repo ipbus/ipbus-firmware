@@ -25,7 +25,7 @@ architecture rtl of udp_rarp_block is
   signal rarp_we_sig: std_logic;
   signal address: unsigned(5 downto 0);
   signal rarp_req, tick: std_logic;
-  signal rndm: std_logic_vector(5 downto 0);
+  signal rndm: std_logic_vector(4 downto 0);
 
 begin
 
@@ -130,6 +130,7 @@ tick_counter:  process(mac_clk)
       if rst_macclk = '1' then
         counter_int := (Others => '0');
 	tick_int := '0';
+-- tick goes at 8 Hz
       elsif counter_int = x"FFFFFF" then
 -- pragma translate_off
 -- kludge for simulation in finite number of ticks!
@@ -163,7 +164,7 @@ random: process(mac_clk)
 	x := y;
 	y := (y xor ("0" & y(15 downto 1))) xor (t xor ("000" & t(15 downto 3)));
       end if;
-      rndm <= y(5 downto 0)
+      rndm <= y(4 downto 0)
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
@@ -172,21 +173,22 @@ random: process(mac_clk)
   end process;
 
 rarp_req_block: process(mac_clk)
-  variable req_count, req_end: unsigned(7 downto 0);
+  variable req_count, req_end: unsigned(5 downto 0);
   variable rarp_req_int: std_logic;
   begin
     if rising_edge(mac_clk) then
       if rst_macclk = '1' then
         req_count := (Others => '0');
-	req_end := unsigned(MAC_addr(5 downto 0) & "10");
+-- initial delay from bottom of MAC address...
+	req_end := unsigned(MAC_addr(4 downto 0) & "1");
 -- pragma translate_off
 -- kludge for simulation in finite number of ticks!
-	req_end := to_unsigned(1, 8);
+	req_end := to_unsigned(1, 6);
 -- pragma translate_on
 	rarp_req_int := '0';
       elsif req_count = req_end then
         req_count := (Others => '0');
-	req_end := unsigned(rndm & "10");
+	req_end := unsigned(rndm & "1");
 	rarp_req_int := RARP_mode;
       elsif tick = '1' then
         req_count := req_count + 1;
