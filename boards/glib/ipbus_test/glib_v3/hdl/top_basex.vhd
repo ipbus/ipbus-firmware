@@ -103,8 +103,10 @@ begin
 			pkt_rx_led => pkt_rx_led,
 			pkt_tx_led => pkt_tx_led
 		);
-		
-	mac_addr <= X"080030f1003" & (not amc_slot(3)) & amc_slot(2 downto 0);
+
+-- the following MAC address is constructed for RAL GLIBs in B904,
+-- to give the proper assigned CERN MAC addresses to boards in slots 3,4,9,10		
+	mac_addr <= X"080030f1003" & (not amc_slot(3) xor (amc_slot(0) xor amc_slot(1))) & amc_slot(2 downto 0);
 	ip_addr <= X"00000000"; -- 0.0.0.0 means use RARP
 
 -- ipbus slaves live in the entity below, and can expose top-level ports
