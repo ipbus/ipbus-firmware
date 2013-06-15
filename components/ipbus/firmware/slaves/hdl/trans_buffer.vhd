@@ -57,7 +57,7 @@ architecture rtl of trans_buffer is
 	END COMPONENT;
 
 	signal req_d, mode, done_m, done_m_s: std_logic;
-	signal mode_ipb, mode_ipb_s, mode_ipb_d, rdy, done: std_logic;
+	signal mode_ipb, mode_ipb_s, mode_ipb_d, rdy, done_catch: std_logic;
 	signal addr: unsigned(9 downto 0);
 	signal addr_sl: std_logic_vector(9 downto 0);
 	signal we_in, we_out: std_logic_vector(0 downto 0); 
@@ -91,7 +91,7 @@ begin
 	process(clk_m) -- Synchroniser clk_ipb -> clk_m
 	begin
 		if rising_edge(clk_m) then
-			done_m_s <= done;
+			done_m_s <= done_catch;
 			done_m <= done_m_s;
 		end if;
 	end process;
@@ -100,7 +100,7 @@ begin
 	begin
 		if rising_edge(clk_ipb) then
 			rdy <= (rdy or (mode_ipb and not mode_ipb_d)) and not t_in.pkt_done and mode_ipb;
-			done <= (done or t_in.pkt_done) and not (mode_ipb and not mode_ipb_d);
+			done_catch <= (done_catch or t_in.pkt_done) and mode_ipb;
 		end if;
 	end process;
 	

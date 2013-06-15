@@ -9,8 +9,9 @@
 --        b3: done
 --
 -- Clock domain crossing is not really done properly here (it's just
--- for testing). This means to write, set the data first, then assert b0.
--- To read, assert b1, then read the data.
+-- for testing), so only ever change one control bit at a time:
+-- 	To write, set the data first, then assert b0.
+-- 	To read, assert b1, then read the data.
 --
 -- Dave Newbold, March 2011
 
