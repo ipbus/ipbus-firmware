@@ -1,5 +1,6 @@
 -- mp7 <-> uC link for MP7 top
 -- Simon Fayer, Imperial College, Feb 2013
+-- Updated with bug fixes, June 2013
 
 LIBRARY ieee;
 LIBRARY work;
@@ -135,7 +136,7 @@ BEGIN
     IF done_uc_new = '0' and (samp_uc_new = "11") THEN
       done_uc_new <= '1';
       buf_req <= '1';
-    ELSIF (samp_uc_new = "11") THEN
+    ELSIF (samp_uc_new = "00") THEN
       done_uc_new <= '0';
     END IF;
   END PROCESS;
