@@ -105,7 +105,7 @@ begin
 		mac_tx_error => mac_tx_error,
 		mac_tx_last => mac_tx_last,
 		mac_tx_valid => mac_tx_valid,
-		My_IP_addr => my_ip_adder_udp,
+		My_IP_addr => my_ip_addr_udp,
 		pkt_rdy => trans_in_udp.pkt_rdy,
 		rdata => trans_in_udp.rdata,
 		rxpacket_ignored => udp_rxpacket_ignored,
