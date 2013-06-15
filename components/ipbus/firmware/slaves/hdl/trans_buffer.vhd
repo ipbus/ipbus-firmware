@@ -100,7 +100,7 @@ begin
 	begin
 		if rising_edge(clk_ipb) then
 			rdy <= (rdy or (mode_ipb and not mode_ipb_d)) and not t_in.pkt_done and mode_ipb;
-			done <= (done or t_in.pkt_done) and not mode_ipb;
+			done <= (done or t_in.pkt_done) and not (mode_ipb and not mode_ipb_d);
 		end if;
 	end process;
 	
