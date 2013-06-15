@@ -42,11 +42,11 @@ begin
 				busy <= '0';
 				src <= (others => '0');
 			elsif busy = '0' then
-				if buf_in(sel).pkt_rdy = '0' then
+				if buf_in(sel).pkt_rdy /= '1' then
 					if src /= (NSRC - 1) then
 						src <= src + 1;
 					else
-						src <= (others=>'0');
+						src <= (others => '0');
 					end if;
 				else
 					busy <= '1';

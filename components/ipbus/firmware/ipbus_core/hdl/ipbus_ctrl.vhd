@@ -68,7 +68,7 @@ architecture rtl of ipbus_ctrl is
   signal udp_rxpacket_ignored, udp_rxpacket_dropped: std_logic;
   signal cfg, cfg_out: std_logic_vector(127 downto 0);
   signal my_mac_addr: std_logic_vector(47 downto 0);
-  signal my_ip_addr, my_ip_addr_rarp: std_logic_vector(31 downto 0);
+  signal my_ip_addr, my_ip_addr_udp: std_logic_vector(31 downto 0);
   signal pkt_rx_i, pkt_tx_i: std_logic;
   signal buf_in_a: ipbus_trans_in_array(N_OOB downto 0);
   signal buf_out_a: ipbus_trans_out_array(N_OOB downto 0);
@@ -105,7 +105,7 @@ begin
 		mac_tx_error => mac_tx_error,
 		mac_tx_last => mac_tx_last,
 		mac_tx_valid => mac_tx_valid,
-		My_IP_addr => my_ip_addr_rarp,
+		My_IP_addr => my_ip_adder_udp,
 		pkt_rdy => trans_in_udp.pkt_rdy,
 		rdata => trans_in_udp.rdata,
 		rxpacket_ignored => udp_rxpacket_ignored,
@@ -151,7 +151,7 @@ begin
 		pkt_tx => pkt_tx_i
 	);
 	
-	cfg_out <= my_ip_addr & X"0000" & my_mac_addr & X"00000000";
+	cfg_out <= my_ip_addr_udp & X"0000" & my_mac_addr & X"00000000";
 	
 	with MAC_CFG select my_mac_addr <=
 		mac_addr when STATIC,
@@ -160,7 +160,7 @@ begin
 	with IP_CFG select my_ip_addr <=
 		ip_addr when STATIC,
 		cfg(127 downto 96) when CFG_SPACE,
-		my_ip_addr_rarp when others; -- Fixme when RARP is done
+		X"00000000" when others;
 
 	stretch_rx: entity work.stretcher port map(
 		clk => mac_clk,
