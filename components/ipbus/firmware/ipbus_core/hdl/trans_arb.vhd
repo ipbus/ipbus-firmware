@@ -27,8 +27,8 @@ end trans_arb;
 
 architecture rtl of trans_arb is
   
- 	signal src: unsigned(1 downto 0) := "00"; -- Up to four ports...
-	signal sel: integer;
+ 	signal src: unsigned(1 downto 0); -- Up to four ports...
+	signal sel: integer := 0;
 	signal busy: std_logic;
   
 begin
