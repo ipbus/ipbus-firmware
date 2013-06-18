@@ -107,7 +107,7 @@ begin
 	
 	end generate;
 			
-	ipb_out.ipb_rdata <= cq(ctrl_sel) when ctrl_cyc_r else sq(stat_sel);
+	ipb_out.ipb_rdata <= cq(ctrl_sel) when ctrl_cyc_r = '1' else sq(stat_sel);
 	
 	ipb_out.ipb_ack <= (ctrl_cyc_w and cack(ctrl_sel) and cp) or ctrl_cyc_r or (stat_cyc and sack(stat_sel) and sp);
 	ipb_out.ipb_err <= '0';
