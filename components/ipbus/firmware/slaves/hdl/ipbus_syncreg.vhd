@@ -26,9 +26,9 @@ entity ipbus_syncreg is
 	);
 	port(
 		clk: in std_logic;
-		reset: in std_logic;
-		ipbus_in: in ipb_wbus;
-		ipbus_out: out ipb_rbus;
+		rst: in std_logic;
+		ipb_in: in ipb_wbus;
+		ipb_out: out ipb_rbus;
 		slv_clk: in std_logic;
 		d: in std_logic_vector(2 ** stat_addr_width * 32 - 1 downto 0);
 		q: out std_logic_vector(2 ** ctrl_addr_width * 32 - 1 downto 0);
@@ -46,32 +46,33 @@ architecture rtl of ipbus_syncreg is
 	signal cq: carray;
 	type sarray is array(2 ** stat_addr_width - 1 downto 0) of std_logic_vector(31 downto 0); 
 	signal sq: sarray;
-	signal cstb, cp: std_logic;
+	signal cp: std_logic;
 	signal cwe, cbusy, cack: std_logic_vector(2 ** ctrl_addr_width - 1 downto 0);
-	signal sstb, sp: std_logic;
+	signal sp: std_logic;
 	signal sre, sbusy, sack: std_logic_vector(2 ** stat_addr_width - 1 downto 0);
 
 begin
 
 	addr_width_max <= ctrl_addr_width when ctrl_addr_width > stat_addr_width else stat_addr_width;
-	ctrl_sel <= to_integer(unsigned(ipbus_in.ipb_addr(ctrl_addr_width - 1 downto 0))) when ctrl_addr_width > 0 else 0;
-	stat_sel <= to_integer(unsigned(ipbus_in.ipb_addr(stat_addr_width - 1 downto 0))) when stat_addr_width > 0 else 0;
+	ctrl_sel <= to_integer(unsigned(ipb_in.ipb_addr(ctrl_addr_width - 1 downto 0))) when ctrl_addr_width > 0 else 0;
+	stat_sel <= to_integer(unsigned(ipb_in.ipb_addr(stat_addr_width - 1 downto 0))) when stat_addr_width > 0 else 0;
 
-	ctrl_cyc_w <= ipbus_in.ipb_strobe and ipbus_in.ipb_write and not ipbus_in.ipb_addr(addr_width_max);
-	ctrl_cyc_r <= ipbus_in.ipb_strobe and not ipbus_in.ipb_write and not ipbus_in.ipb_addr(addr_width_max);
-	stat_cyc <= ipbus_in.ipb_strobe and not ipbys_in.ipb_write and ipbus_in.ipb_addr(addr_width_max);
+	ctrl_cyc_w <= ipb_in.ipb_strobe and ipb_in.ipb_write and not ipb_in.ipb_addr(addr_width_max);
+	ctrl_cyc_r <= ipb_in.ipb_strobe and not ipb_in.ipb_write and not ipb_in.ipb_addr(addr_width_max);
+	stat_cyc <= ipb_in.ipb_strobe and not ipb_in.ipb_write and ipb_in.ipb_addr(addr_width_max);
 		
 	w_gen: for i in 2 ** ctrl_addr_width - 1 downto 0 generate
 	
-		cwe(i) <= '1' when cstb = '1' and ctrl_sel = i else '0';
+		cwe(i) <= '1' when ctrl_cyc_w = '1' and ctrl_sel = i else '0';
 		
 		wsync: entity work.syncreg_w
 			port map(
 				m_clk => clk,
+				m_rst => rst,
 				m_we => cwe(i),
 				m_busy => cbusy(i),
 				m_ack => cack(i),
-				m_d => ipbus_in.ipb_wdata,
+				m_d => ipb_in.ipb_wdata,
 				m_q => cq(i),
 				s_clk => slv_clk,
 				s_q => q((i+1)*32-1 downto i*32),
@@ -79,24 +80,23 @@ begin
 			);
 
 	end generate;
-	
-	cstb <= ctrl_cyc_w and ipbus_in.ipb_write;
-	
+		
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			cp <= (cp or (cstb and not cbusy(ctrl_sel)) and cstb;
-			sp <= (sp or (sstb and not sbusy(stat_sel)) and sstb;
+			cp <= (cp or (ctrl_cyc_w and not cbusy(ctrl_sel)) and ctrl_cyc_w;
+			sp <= (sp or (stat_cyc and not sbusy(stat_sel)) and stat_cyc;
 		end if;
 	end process;
 	
 	r_gen: for i in 2 ** stat_addr_width - 1 downto 0 generate
 
-		sre(i) <= '1' when sstb = '1' and stat_sel = i else '0';
+		sre(i) <= '1' when stat_cyc = '1' and stat_sel = i else '0';
 	
 		rsync: entity work.syncreg_r
 			port map(
 				m_clk => clk,
+				m_rst => rst,
 				m_re => sre(i),
 				m_busy => sbusy(i),
 				m_ack => sack(i),
@@ -106,8 +106,6 @@ begin
 			);
 	
 	end generate;
-	
-	sstb <= stat_cyc and not ipbus_in.ipb_write;
 			
 	ipbus_out.ipb_rdata <= cq(ctrl_sel) when ctrl_cyc else sq(stat_sel);
 	

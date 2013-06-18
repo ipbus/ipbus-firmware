@@ -16,6 +16,7 @@ entity syncreg_r is
 	);
 	port(
 		m_clk: in std_logic;
+		m_rst: in std_logic;
 		m_re: in std_logic;
 		m_busy: out std_logic;
 		m_ack: out std_logic;
@@ -52,7 +53,7 @@ begin
 			m1 <= s3; -- Clock domain crossing for ack handshake
 			m2 <= m1;
 			m3 <= m2;
-			busy <= (busy or m_re) and not ack;
+			busy <= (busy or m_re) and not (ack or m_rst);
 		end if;
 	end process;
 	

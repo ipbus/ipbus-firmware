@@ -18,6 +18,7 @@ entity syncreg_w is
 	);
 	port(
 		m_clk: in std_logic;
+		m_rst: in std_logic;
 		m_we: in std_logic;
 		m_busy: out std_logic;
 		m_ack: out std_logic;
@@ -44,7 +45,9 @@ begin
 	process(m_clk)
 	begin
 		if rising_edge(m_clk) then
-			if we_v = '1' then
+			if m_rst = '1' then
+				q <= (others => '0');
+			elsif we_v = '1' then
 				q <= m_d;
 			end if;
 		end if;
@@ -61,7 +64,7 @@ begin
 			m1 <= s3; -- Clock domain crossing for ack handshake
 			m2 <= m1;
 			m3 <= m2;
-			busy <= (busy or we_v) and not ack;
+			busy <= (busy or we_v) and not (ack or m_rst);
 		end if;
 	end process;
 	
