@@ -14,7 +14,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 entity syncreg_w is
 	generic(
-		size: positive := 32;
+		size: positive := 32
 	);
 	port(
 		m_clk: in std_logic;

@@ -16,7 +16,7 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-use ieee.std_logic_misc.all;
+use ieee.numeric_std.all;
 use work.ipbus.all;
 
 entity ipbus_syncreg is
@@ -84,8 +84,8 @@ begin
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			cp <= (cp or (ctrl_cyc_w and not cbusy(ctrl_sel)) and ctrl_cyc_w;
-			sp <= (sp or (stat_cyc and not sbusy(stat_sel)) and stat_cyc;
+			cp <= (cp or (ctrl_cyc_w and not cbusy(ctrl_sel))) and ctrl_cyc_w;
+			sp <= (sp or (stat_cyc and not sbusy(stat_sel))) and stat_cyc;
 		end if;
 	end process;
 	
@@ -102,15 +102,15 @@ begin
 				m_ack => sack(i),
 				m_q => sq(i),
 				s_clk => slv_clk,
-				s_d => d((i+1)*32-1 downto i*32),
+				s_d => d((i+1)*32-1 downto i*32)
 			);
 	
 	end generate;
 			
-	ipbus_out.ipb_rdata <= cq(ctrl_sel) when ctrl_cyc else sq(stat_sel);
+	ipb_out.ipb_rdata <= cq(ctrl_sel) when ctrl_cyc_r else sq(stat_sel);
 	
-	ipbus_out.ipb_ack <= (ctrl_cyc_w and cack(ctrl_sel) and cp) or ctrl_cyc_r or (stat_cyc and sack(stat_sel) and sp);
-	ipbus_out.ipb_err <= '0';
+	ipb_out.ipb_ack <= (ctrl_cyc_w and cack(ctrl_sel) and cp) or ctrl_cyc_r or (stat_cyc and sack(stat_sel) and sp);
+	ipb_out.ipb_err <= '0';
 	
 end rtl;
 
