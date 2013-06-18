@@ -39,7 +39,7 @@ end ipbus_syncreg;
 
 architecture rtl of ipbus_syncreg is
 
-	signal ctrl_sel, stat_sel: integer;
+	signal ctrl_sel, stat_sel: integer := 0;
 	signal addr_width_max: natural;
 	signal ctrl_cyc_w, ctrl_cyc_r, stat_cyc: std_logic;
 	type carray is array(2 ** ctrl_addr_width - 1 downto 0) of std_logic_vector(31 downto 0); 
