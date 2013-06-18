@@ -219,7 +219,7 @@ begin
 	tx_data <= (hdr(31 downto 16) & std_logic_vector(words_done) & hdr(7 downto 4) & err_d) when state = ST_HDR else data_out;
 	tx_we <= '1' when state = ST_HDR or (ack and not write) = '1' else '0';
 	tx_hdr <= '1' when state = ST_HDR else '0';
-	tx_err <= '1' when err /= X"0" else '0';
+	tx_err <= '1' when err_d /= X"0" else '0';
 
 	cfg_addr <= std_logic_vector(addr(1 downto 0));
 	cfg_we <= '1' when state = ST_BUS_CYCLE and cfg_cyc = '1' and trans_type = TRANS_WR_CFG else '0';
