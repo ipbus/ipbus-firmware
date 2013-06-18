@@ -489,6 +489,8 @@ do_ipbus_hdr: process(mac_clk)
 	    ipbus_out_valid_int := '0';
 	    if mac_tx_data_sig = x"F0" then
 	      byteswap_int := '1';
+	    else
+	      byteswap_int := '1';
 	    end if;
 	  when 51 =>
 	    ipbus_hdr_int(23 downto 16) := mac_tx_data_sig;
