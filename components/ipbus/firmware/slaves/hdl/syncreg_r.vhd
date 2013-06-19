@@ -29,7 +29,6 @@ end syncreg_r;
 
 architecture rtl of syncreg_r is
 		
-	signal q: std_logic_vector(size - 1 downto 0);
 	signal we, busy, ack, s1, s2, s3, m1, m2, m3: std_logic;
 	
 	attribute KEEP: string;
