@@ -198,7 +198,7 @@ do_udp_counter: process(mac_clk)
         counting := '0';
 	counter := (Others => '0');
       elsif counting = '1' then
-        if counter = to_unsigned(25, 5) then
+        if counter = to_unsigned(27, 5) then
           counting := '0';
 	  counter := (Others => '0');
         else
@@ -254,29 +254,29 @@ udp_control_build:  process(mac_clk)
 	    int_valid_int := '1';
 	  when 5 =>
 	    do_sum_int := '1';
-	  when 10 =>
+	  when 12 =>
 -- now start on IP length, 20 + 8...
 	    cksum_int := '0';
 	    clr_sum_int := '1';
 	    do_sum_int := '1';
-	  when 11 =>
+	  when 13 =>
 	    clr_sum_int := '0';
 	    do_sum_int := '1';
-	  when 12 =>
+	  when 14 =>
 	    do_sum_int := '1';
-	  when 13 =>
+	  when 15 =>
 	    do_sum_int := '1';
-	  when 16 =>
+	  when 18 =>
 -- then end address 14 + 5...
 	    do_sum_int := '1';
-	  when 17 =>
+	  when 19 =>
 	    do_sum_int := '1';
-	  when 20 =>
+	  when 22 =>
 -- finally UDP length when bytes are reversed -39...
 	    do_sum_int := '1';
-	  when 21 =>
+	  when 23 =>
 	    do_sum_int := '1';
-	  when 25 =>
+	  when 27 =>
 	    int_valid_int := '0';
 	  when Others =>
 	    clr_sum_int := '0';
@@ -333,37 +333,37 @@ udp_build_data:  process(mac_clk)
 	    int_data_int := pay_len(15 downto 8);
 	  when 5 =>
 	    int_data_int := pay_len(7 downto 0);
-	  when 9 =>
+	  when 11 =>
 -- capture cksum...
 	    ip_cksum_int(15 downto 8) := not outbyte;
-	  when 10 =>
+	  when 12 =>
 	    ip_cksum_int(7 downto 0) := not outbyte;
 -- now start on IP length, first headers 20 + 8 + 4...
 	    int_data_int := (Others => '0');
-	  when 11 =>
+	  when 13 =>
 	    int_data_int := x"20";
-	  when 12 =>
+	  when 14 =>
 -- then payload length...
 	    int_data_int := pay_len(15 downto 8);
-	  when 13 =>
+	  when 15 =>
 	    int_data_int := pay_len(7 downto 0);
-	  when 16 =>
+	  when 18 =>
 	    ip_len_int(7 downto 0) := outbyte;
 -- then end address 14 (ethernet length) + 5 (mem offset)...
 	    int_data_int := (Others => '0');
-	  when 17 =>
+	  when 19 =>
 	    ip_len_int(15 downto 8) := outbyte;
 	    int_data_int := x"13";
-	  when 20 =>
+	  when 22 =>
 	    udpram_end_addr_int(7 downto 0) := outbyte;
 -- finally UDP length when bytes are reversed -39 (= 20 + 14 + 5)...
 	    int_data_int := (Others => '1');
-	  when 21 =>
+	  when 23 =>
 	    udpram_end_addr_int(12 downto 8) := outbyte(4 downto 0);
 	    int_data_int := x"D9";
-	  when 24 =>
+	  when 26 =>
 	    udp_len_int(7 downto 0) := outbyte;
-	  when 25 =>
+	  when 27 =>
 	    udp_len_int(15 downto 8) := outbyte;
 	  when Others =>
 	    int_data_int := (Others => '0');
