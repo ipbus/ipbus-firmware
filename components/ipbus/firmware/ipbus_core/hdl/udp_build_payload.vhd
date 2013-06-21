@@ -219,18 +219,19 @@ build_packet:  process(mac_clk)
 -- RX IP sender addr bytes 26 to 29 => TX copy to target addr bytes 36 to 39...
             when 40 =>
 	      send_buf_int := '1';
+-- RX UDP length and cksum bytes 38 to 41 => TX write zeros bytes 44 to 47...
+            when 44 =>
 	      buf_to_load_int(7 downto 0) := outbyte;
 -- capture IP cksum value and start payload length calculation...
--- RX UDP length and cksum bytes 38 to 41 => TX write zeros bytes 44 to 47...
-            when 41 =>
+            when 45 =>
 	      buf_to_load_int(15 downto 8) := outbyte;
 -- capture IP cksum value and continue payload length calculation...
             when 46 =>
 	      send_buf_int := '0';
-            when 48 =>
+            when 52 =>
 -- capture payload length calculation...
               payload_len(7 downto 0) := outbyte;
-            when 49 =>
+            when 53 =>
 -- capture payload length calculation...
               payload_len(15 downto 8) := outbyte;
 -- RX rest of packet => TX copy rest of packet...
@@ -322,7 +323,7 @@ do_cksum:  process(mac_clk)
 	    do_sum_int := '0';
 -- cksum calculation complete...
 -- RX UDP source port bytes 34 to 35 => TX copy to dest port bytes 42 to 43...
-          when 40 =>
+          when 44 =>
 -- capture IP cksum value and start payload length calculation...
 	    do_sum_int := '1';
 	    clr_sum_int := '1';
@@ -330,20 +331,21 @@ do_cksum:  process(mac_clk)
 	    int_valid_int := '1';
 	    int_data_int := payload_len(15 downto 8);
 -- RX UDP length and cksum bytes 38 to 41 => TX write zeros bytes 44 to 47...
-          when 41 =>
+          when 45 =>
 -- capture IP cksum value and continue payload length calculation...
 	    clr_sum_int := '0';
             int_valid_int := '1';
 	    int_data_int := payload_len(7 downto 0);
-          when 44 =>
+          when 46 =>
 -- continue payload length calculation (loading -8)...
 	    int_valid_int := '1';
 	    int_data_int := x"FF";
-          when 45 =>
+          when 47 =>
 -- continue payload length calculation (loading -8)...
 	    int_valid_int := '1';
 	    int_data_int := x"F8";
-          when 46 =>
+          when 48 =>
+	    int_valid_int := '0';
 	    do_sum_int := '0';
           when Others =>
 	    clr_sum_int := '0';

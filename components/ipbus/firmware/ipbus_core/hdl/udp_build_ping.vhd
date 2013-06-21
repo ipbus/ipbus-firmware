@@ -197,10 +197,10 @@ build_packet:  process (mac_clk)
 -- RX cksum bytes 36 to 37...
 	      send_buf_int := '0';
 -- RX rest of packet => TX copy rest of packet...
-            when 41 =>
+            when 43 =>
 -- capture ICMP cksum value
               buf_to_load_int(15 downto 8) := outbyte;
-            when 42 =>
+            when 44 =>
 -- capture ICMP cksum value
               buf_to_load_int(7 downto 0) := outbyte;
             when Others =>
