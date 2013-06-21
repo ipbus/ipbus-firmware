@@ -58,10 +58,10 @@ begin
 	
 	mmcm: MMCME2_BASE
 		generic map(
-			clkin1_period => 8.0
+			clkin1_period => 8.0,
 			clkfbout_mult_f => 8.0, -- VCO freq 1000MHz
 			clkout1_divide => 32,
-			clkout2_divider => 25,
+			clkout2_divider => 25
 		)
 		port map(
 			clkin1 => sysclk,

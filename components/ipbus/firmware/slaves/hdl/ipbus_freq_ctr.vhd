@@ -19,7 +19,7 @@ entity ipbus_freq_ctr is
 		rst: in std_logic;
 		ipb_in: in ipb_wbus;
 		ipb_out: out ipb_rbus;
-		clkin: in std_logic_vector(2 ** (addr_width + 1) - 1 downto 0);
+		clkin: in std_logic_vector(2 ** (addr_width + 1) - 1 downto 0)
 	);
 	
 end ipbus_freq_ctr;
