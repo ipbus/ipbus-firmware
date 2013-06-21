@@ -1,7 +1,7 @@
 -- ipbus_freq_ctr
 --
 -- Simple clock monitor (inspired by Greg's version)
--- Counts number of pulses on a number of incoming clocks in 4096 cycles of ipbus clock
+-- Counts number of pulses on a number of incoming clocks in 64k cycles of ipbus clock
 -- i.e. for ~32MHz ipb clock, deals with up to 500MHz.
 -- Will not deal with very slow clocks (<10MHz) reliably.
 --
@@ -17,8 +17,8 @@ entity ipbus_freq_ctr is
 	port(
 		clk: in std_logic;
 		rst: in std_logic;
-		ipbus_in: in ipb_wbus;
-		ipbus_out: out ipb_rbus;
+		ipb_in: in ipb_wbus;
+		ipb_out: out ipb_rbus;
 		clkin: in std_logic_vector(2 ** (addr_width + 1) - 1 downto 0);
 	);
 	
@@ -27,9 +27,9 @@ end ipbus_freq_ctr;
 architecture rtl of ipbus_freq_ctr is
 
 	constant n_clk: natural := 2 ** (addr_width + 1);
-	signal ctr_s: unsigned(11 downto 0) := X"000";
-	type ctr_array is array(n_clk - 1 downto 0) of unsigned(15 downto 0);
-	signal ctr: ctr_array := (others => X"0000");
+	signal ctr_s: unsigned(15 downto 0) := X"0000";
+	type ctr_array is array(n_clk - 1 downto 0) of unsigned(23 downto 0);
+	signal ctr: ctr_array := (others => X"00000000");
 	signal samp, samp_i: ctr_array;
 	signal go: std_logic;
 	signal go_s, go_s2, go_s3: std_logic_vector(n_clk - 1 downto 0);
@@ -52,10 +52,10 @@ begin
 	
 	go <= '1' when ctr_s = X"0000" else '0';
 
-	sel <= to_integer(unsigned(ipbus_in.ipb_addr(addr_width - 1 downto 0))) when addr_width > 0 else 0;	
-	ipbus_out.ipb_rdata <= samp_i(2 * sel + 1) & samp_i(2 * sel);
-	ipbus_out.ipb_ack <= ipbus_in.ipb_strobe and not ipbus_in.ipb_write;
-	ipbus_out.ipb_err <= '0';
+	sel <= to_integer(unsigned(ipb_in.ipb_addr(addr_width - 1 downto 0))) when addr_width > 0 else 0;	
+	ipb_out.ipb_rdata <= X"00" & samp_i(sel);
+	ipb_out.ipb_ack <= ipb_in.ipb_strobe and not ipb_in.ipb_write;
+	ipb_out.ipb_err <= '0';
 
 	c_gen: for i in n_clk - 1 downto 0 generate
 		process(clkin(i))
