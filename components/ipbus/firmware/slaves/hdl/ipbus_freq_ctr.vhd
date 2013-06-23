@@ -19,14 +19,14 @@ entity ipbus_freq_ctr is
 		rst: in std_logic;
 		ipb_in: in ipb_wbus;
 		ipb_out: out ipb_rbus;
-		clkin: in std_logic_vector(2 ** (addr_width + 1) - 1 downto 0)
+		clkin: in std_logic_vector(2 ** addr_width - 1 downto 0)
 	);
 	
 end ipbus_freq_ctr;
 
 architecture rtl of ipbus_freq_ctr is
 
-	constant n_clk: natural := 2 ** (addr_width + 1);
+	constant n_clk: natural := 2 ** addr_width;
 	signal ctr_s: unsigned(15 downto 0) := X"0000";
 	type ctr_array is array(n_clk - 1 downto 0) of unsigned(23 downto 0);
 	signal ctr: ctr_array := (others => X"00000000");
