@@ -29,7 +29,7 @@ architecture rtl of ipbus_freq_ctr is
 	constant n_clk: natural := 2 ** addr_width;
 	signal ctr_s: unsigned(15 downto 0) := X"0000";
 	type ctr_array is array(n_clk - 1 downto 0) of unsigned(23 downto 0);
-	signal ctr: ctr_array := (others => X"00000000");
+	signal ctr: ctr_array := (others => X"000000");
 	signal samp, samp_i: ctr_array;
 	signal go: std_logic;
 	signal go_s, go_s2, go_s3: std_logic_vector(n_clk - 1 downto 0);
