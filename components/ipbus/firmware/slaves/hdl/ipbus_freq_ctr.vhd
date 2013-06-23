@@ -53,7 +53,7 @@ begin
 	go <= '1' when ctr_s = X"0000" else '0';
 
 	sel <= to_integer(unsigned(ipb_in.ipb_addr(addr_width - 1 downto 0))) when addr_width > 0 else 0;	
-	ipb_out.ipb_rdata <= X"00" & samp_i(sel);
+	ipb_out.ipb_rdata <= X"00" & std_logic_vector(samp_i(sel));
 	ipb_out.ipb_ack <= ipb_in.ipb_strobe and not ipb_in.ipb_write;
 	ipb_out.ipb_err <= '0';
 
