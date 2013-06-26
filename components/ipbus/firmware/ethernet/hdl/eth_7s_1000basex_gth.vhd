@@ -13,7 +13,7 @@ library unisim;
 use unisim.VComponents.all;
 use work.emac_hostbus_decl.all;
 
-entity eth_7s_1000basex_gth is
+entity eth_7s_1000basex is
 	port(
 		gt_clkp, gt_clkn: in std_logic;
 		gt_txp, gt_txn: out std_logic;
@@ -35,9 +35,9 @@ entity eth_7s_1000basex_gth is
 		hostbus_out: out emac_hostbus_out
 	);
 
-end eth_7s_1000basex_gth;
+end eth_7s_1000basex;
 
-architecture rtl of eth_7s_1000basex_gth is
+architecture rtl of eth_7s_1000basex is
 
 	COMPONENT tri_mode_eth_mac_v5_5
 		PORT (
@@ -184,13 +184,13 @@ begin
 
 	phy: entity work.gig_eth_pcs_pma_v11_5_block
 		port map(
-			drpaddr_in => (others => '0'),
-			drpclk_in => clk125,
-			drpdi_in => (others => '0'),
-			drpdo_out => open,
-			drpen_in => '0',
-			drprdy_out => open,
-			drpwe_in => '0',
+--			drpaddr_in => (others => '0'),
+--			drpclk_in => clk125,
+--			drpdi_in => (others => '0'),
+--			drpdo_out => open,
+--			drpen_in => '0',
+--			drprdy_out => open,
+--			drpwe_in => '0',
 			gtrefclk => clkin,
 			txp => gt_txp,
 			txn => gt_txn,
@@ -217,3 +217,4 @@ begin
 		);
 
 end rtl;
+
