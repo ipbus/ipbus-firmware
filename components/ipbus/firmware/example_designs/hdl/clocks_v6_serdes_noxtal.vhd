@@ -58,7 +58,7 @@ begin
 	
 	mmcm: MMCM_BASE
 		generic map(
-			clkin1_period => 8.0
+			clkin1_period => 8.0,
 			clkfbout_mult_f => 8.0,
 			clkout1_divide => 32,
 			clkout2_divide => 25
