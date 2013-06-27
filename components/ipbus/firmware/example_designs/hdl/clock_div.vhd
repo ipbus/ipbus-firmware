@@ -12,16 +12,16 @@ use ieee.std_logic_unsigned.all;
 library unisim;
 use unisim.VComponents.all;
 
-entity clock_div_v6 is
+entity clock_div is
 	port(
 		clk: in std_logic;
 		d25: out std_logic;
 		d28: out std_logic
 	);
 
-end clock_div_v6;
+end clock_div;
 
-architecture rtl of clock_div_v6 is
+architecture rtl of clock_div is
 
 signal rst_b: std_logic;
 
