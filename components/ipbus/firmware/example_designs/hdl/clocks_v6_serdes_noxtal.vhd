@@ -17,12 +17,14 @@ entity clocks_v6_serdes_noxtal is port(
 	clki_125_fr: in std_logic;
 	clki_125: in std_logic;
 	clko_ipb: out std_logic;
+	clk_p40: out std_logic;
 	eth_locked: in std_logic;
 	locked: out std_logic;
 	nuke: in std_logic;
 	rsto_ipb: out std_logic;
 	rsto_125: out std_logic;
 	rsto_eth: out std_logic;
+	rsto: out std_logic;
 	onehz: out std_logic
 	);
 
@@ -31,6 +33,7 @@ end clocks_v6_serdes_noxtal;
 architecture rtl of clocks_v6_serdes_noxtal is
 	
 	signal dcm_locked, sysclk, sysclk_ub, clk_ipb_i, clk_ipb_b, clkfb: std_logic;
+	signal clk_p40_i, clk_p40_b: std_logic;
 	signal d25, d25_d: std_logic;
 	signal dcm_rst, nuke_i, nuke_d, nuke_d2: std_logic := '0';
 	signal rst, rst_ipb, rst_125, rst_eth: std_logic := '1';
@@ -46,17 +49,26 @@ begin
 	
 	sysclk <= clki_125_fr;
 	
+	bufgp40: BUFG port map(
+		i => clk_p40_i,
+		o => clk_p40_b
+	);
+	
+	clko_p40 <= clk_p40_b;
+	
 	mmcm: MMCM_BASE
 		generic map(
+			clkin1_period => 8.0
 			clkfbout_mult_f => 8.0,
 			clkout1_divide => 32,
-			clkin1_period => 8.0
+			clkout2_divide => 25
 		)
 		port map(
 			clkin1 => sysclk,
 			clkfbin => clkfb,
 			clkfbout => clkfb,
 			clkout1 => clk_ipb_i,
+			clkout2 => clk_p40_i,
 			locked => dcm_locked,
 			rst => dcm_rst,
 			pwrdwn => '0'
@@ -110,6 +122,8 @@ begin
 	end process;
 	
 	rsto_eth <= rst_eth;
+	
+	rsto <= rst;
 		
 end rtl;
 
