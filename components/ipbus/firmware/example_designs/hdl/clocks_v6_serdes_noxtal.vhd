@@ -17,7 +17,7 @@ entity clocks_v6_serdes_noxtal is port(
 	clki_125_fr: in std_logic;
 	clki_125: in std_logic;
 	clko_ipb: out std_logic;
-	clk_p40: out std_logic;
+	clko_p40: out std_logic;
 	eth_locked: in std_logic;
 	locked: out std_logic;
 	nuke: in std_logic;
@@ -74,7 +74,7 @@ begin
 			pwrdwn => '0'
 		);
 			
-	clkdiv: entity work.clock_div_v6 port map(
+	clkdiv: entity work.clock_div port map(
 		clk => sysclk,
 		d25 => d25,
 		d28 => onehz

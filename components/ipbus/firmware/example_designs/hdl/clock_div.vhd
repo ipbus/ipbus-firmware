@@ -1,72 +1,55 @@
--- clock_div
+-- clock_div_v6
 --
--- Dave Newbold, March 2013
+-- Dave Newbold, March 2013. Rewritten by Paschalis Vichoudis, June 2013
 --
 -- $Id$
 
 library ieee;
 use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
+--use ieee.numeric_std.all;
+use ieee.std_logic_unsigned.all;
 
 library unisim;
 use unisim.VComponents.all;
 
-entity clock_div is
+entity clock_div_v6 is
 	port(
 		clk: in std_logic;
 		d25: out std_logic;
 		d28: out std_logic
 	);
 
-end clock_div;
+end clock_div_v6;
 
-architecture rtl of clock_div is
+architecture rtl of clock_div_v6 is
 
-	signal q, qr: std_logic_vector(5 downto 0);
-	signal ctr: unsigned(2 downto 0) := "000";
-	signal ce: std_logic_vector(5 downto 1);
-	
+signal rst_b: std_logic;
+
 begin
 
-	q(0) <= '1';
-	qr(0) <= '0';
-	
-	gen: for i in 5 downto 1 generate
-		
-		ce(i) <= q(i-1) and not qr(i-1);
-	
-		sr: srlc32e
-			generic map(
-				INIT => X"80000000"
-			)
-			port map(
-				q => q(i),
-				a => "11111",
-				ce => ce(i),
-				clk => clk,
-				d => q(i)
-			);
-			
-	end generate;
-	
-	process(clk)
+	reset_gen : component srl16
+   port map 
+	(				
+		 a0 	=> '1'  ,
+		 a1 	=> '1'  ,
+		 a2 	=> '1'  ,
+		 a3 	=> '1'  ,
+		 clk 	=> clk  ,
+		 d 	=> '1'  ,
+		 q 	=> rst_b
+	);	
+
+
+	process(rst_b, clk)
+		variable cnt : std_logic_vector(27 downto 0);
 	begin
-		if rising_edge(clk) then
-			qr(5 downto 1) <= q(5 downto 1);
-		end if;
+	if rst_b = '0' then
+		cnt:=(others => '0');
+	elsif rising_edge(clk) then
+		d28 <= cnt(27);
+		d25 <= cnt(24);
+		cnt:=cnt+1;
+	end if;
 	end process;
-	
-	d25 <= q(5);
-	
-	process(clk)
-	begin
-		if rising_edge(clk) then
-			if q(5) = '1' and qr(5) = '0' then
-				ctr <= ctr + 1;
-			end if;
-		end if;
-	end process;
-	
-	d28 <= ctr(2);
 
 end rtl;
