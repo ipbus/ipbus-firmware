@@ -8,12 +8,14 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-entity clock_sim is port(
-  clko125: out std_logic;
-  clko25: out std_logic;
-  clko40: out std_logic;
-  nuke: in std_logic;
-  rsto: out std_logic);
+entity clock_sim is
+	port(
+	  clko125: out std_logic;
+	  clko25: out std_logic;
+	  clko40: out std_logic;
+	  nuke: in std_logic;
+	  rsto: out std_logic
+  );
 
 end clock_sim;
 
