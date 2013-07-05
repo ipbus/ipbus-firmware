@@ -33,7 +33,7 @@ architecture rtl of ipbus_freq_ctr is
 	signal samp, samp_i: ctr_array;
 	signal go: std_logic;
 	signal go_s, go_s2, go_s3: std_logic_vector(n_clk - 1 downto 0);
-	signal sel: integer;
+	signal sel: integer := 0;
 	
 	attribute KEEP: string;
 	attribute KEEP of go_s: signal is "TRUE"; -- Synchroniser not to be optimised into shreg
