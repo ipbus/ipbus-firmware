@@ -80,12 +80,12 @@ begin
 			);
 
 	end generate;
-		
+	
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			cp <= (cp or (ctrl_cyc_w and not cbusy(ctrl_sel))) and ctrl_cyc_w;
-			sp <= (sp or (stat_cyc and not sbusy(stat_sel))) and stat_cyc;
+			cp <= (cp or (ctrl_cyc_w and not cbusy(ctrl_sel))) and ctrl_cyc_w and not cack(ctrl_sel);
+			sp <= (sp or (stat_cyc and not sbusy(stat_sel))) and stat_cyc and not sack(stat_sel);
 		end if;
 	end process;
 	
