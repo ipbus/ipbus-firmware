@@ -67,6 +67,9 @@ begin
 				ctr(i) <= ctr(i) + 1;
 				if go_s2(i) = '1' and go_s3(i) = '0' then
 					samp(i) <= ctr(i);
+					ctr(i) <= X"000000";
+				else
+					ctr(i) <= ctr(i) + 1;
 				end if;
 			end if;
 		end process;
