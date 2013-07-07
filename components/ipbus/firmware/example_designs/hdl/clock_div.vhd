@@ -15,6 +15,7 @@ use unisim.VComponents.all;
 entity clock_div is
 	port(
 		clk: in std_logic;
+		d17: out std_logic;
 		d25: out std_logic;
 		d28: out std_logic
 	);
@@ -48,6 +49,7 @@ begin
 	elsif rising_edge(clk) then
 		d28 <= cnt(27);
 		d25 <= cnt(24);
+		d17 <= cnt(16);
 		cnt:=cnt+1;
 	end if;
 	end process;

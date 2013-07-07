@@ -31,7 +31,7 @@ architecture rtl of clocks_v6 is
 	
 	signal locked_int, sysclk, clk_ipb_i, clk_125_i, clkfb, clk_ipb_b, clk_125_b: std_logic;
 	signal rst: std_logic := '1';
-	signal d25, d25_d: std_logic;
+	signal d17, d17_d: std_logic;
 	
 	component clock_divider_s6 port(
 		clk: in std_logic;
@@ -86,7 +86,7 @@ begin
 	
 	clkdiv: clock_divider_s6 port map(
 		clk => sysclk,
-		d25 => d25,
+		d17 => d17,
 		d28 => onehz
 	);
 	
@@ -95,8 +95,8 @@ begin
 	process(sysclk)
 	begin
 		if rising_edge(sysclk) then
-			d25_d <= d25;
-			if d25='1' and d25_d='0' then
+			d17_d <= d17;
+			if d17='1' and d17_d='0' then
 				rst <= not locked_int;
 			end if;
 		end if;

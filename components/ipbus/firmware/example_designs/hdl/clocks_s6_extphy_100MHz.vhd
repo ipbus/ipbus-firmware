@@ -29,7 +29,7 @@ end clocks_s6_extphy_100MHz;
 architecture rtl of clocks_s6_extphy_100MHz is
 
 	signal clk_ipb_i, clk_ipb_b, clk_125_i, clk_125_b, sysclk_b: std_logic;
-	signal d25, d25_d, dcm_locked: std_logic;
+	signal d17, d17_d, dcm_locked: std_logic;
 	signal nuke_i, nuke_d, nuke_d2: std_logic := '0';
 	signal rst, rst_ipb, rst_125: std_logic := '1';
 	
@@ -71,15 +71,15 @@ begin
 		
 	clkdiv: entity work.clock_div port map(
 		clk => sysclk_b,
-		d25 => d25,
+		d17 => d17,
 		d28 => onehz
 	);
 	
 	process(sysclk_b)
 	begin
 		if rising_edge(sysclk_b) then
-			d25_d <= d25;
-			if d25='1' and d25_d='0' then
+			d17_d <= d17;
+			if d17='1' and d17_d='0' then
 				rst <= nuke_d2 or not dcm_locked;
 				nuke_d <= nuke_i; -- Time bomb (allows return packet to be sent)
 				nuke_d2 <= nuke_d;

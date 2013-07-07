@@ -33,7 +33,7 @@ end clocks_v6_serdes_125MHz;
 architecture rtl of clocks_v6_serdes_125MHz is
 	
 	signal dcm_locked, sysclk, sysclk_ub, clk_ipb_i, clk_ipb_b, clkfb: std_logic;
-	signal d25, d25_d: std_logic;
+	signal d17, d17_d: std_logic;
 	signal nuke_i, nuke_d, nuke_d2: std_logic := '0';
 	signal rst, rst_ipb, rst_125, rst_eth: std_logic := '1';
 
@@ -77,15 +77,15 @@ begin
 			
 	clkdiv: entity work.clock_div port map(
 		clk => sysclk,
-		d25 => d25,
+		d17 => d17,
 		d28 => onehz
 	);
 	
 	process(sysclk)
 	begin
 		if rising_edge(sysclk) then
-			d25_d <= d25;
-			if d25='1' and d25_d='0' then
+			d17_d <= d17;
+			if d17='1' and d17_d='0' then
 				rst <= nuke_d2 or not dcm_locked;
 				nuke_d <= nuke_i; -- Time bomb (allows return packet to be sent)
 				nuke_d2 <= nuke_d;
