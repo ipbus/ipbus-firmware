@@ -5,7 +5,6 @@
 -- 	New requests are ignored while busy is high
 -- 	Ack signals a completed transfer
 -- On slave side, stb indicates that a new word is available on that cycle
--- 	It must be used or registered on that cycle only
 --
 -- Dave Newbold, June 2013
 
@@ -41,20 +40,6 @@ architecture rtl of syncreg_w is
 	attribute KEEP of m1: signal is "TRUE"; -- Synchroniser not to be optimised into shreg
 	
 begin
-
-	process(m_clk)
-	begin
-		if rising_edge(m_clk) then
-			if m_rst = '1' then
-				q <= (others => '0');
-			elsif we_v = '1' then
-				q <= m_d;
-			end if;
-		end if;
-	end process;
-	
-	m_q <= q;
-	s_q <= q;
 	
 	we_v <= m_we and not busy;
 	
@@ -76,10 +61,17 @@ begin
 			s1 <= busy; -- Clock domain crossing for we handshake
 			s2 <= s1;
 			s3 <= s2;
+			if m_rst = '1' then -- Assume long pulse on rst
+				q <= (others => '0');
+			elsif s2 = '1' and s3 = '0' then
+				q <= m_d;
+			end if;
+			s_stb <= s2 and not s3;
 		end if;
 	end process;
 	
-	s_stb <= s2 and not s3;
+	m_q <= q;
+	s_q <= q;
 	
 	m_busy <= busy;
 	m_ack <= ack;
