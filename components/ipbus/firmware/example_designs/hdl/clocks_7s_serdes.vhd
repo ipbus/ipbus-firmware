@@ -18,6 +18,7 @@ entity clocks_7s_serdes is
 		clki_125: in std_logic; -- Ethernet domain clk125
 		clko_ipb: out std_logic; -- ipbus domain clock (31MHz)
 		clko_p40: out std_logic; -- pseudo-40MHz clock
+		clko_200: out std_logic; -- 200MHz clock for idelayctrl
 		eth_locked: in std_logic; -- ethernet locked signal
 		locked: out std_logic; -- global locked signal
 		nuke: in std_logic; -- hard reset input
@@ -61,7 +62,8 @@ begin
 			clkin1_period => 8.0,
 			clkfbout_mult_f => 8.0, -- VCO freq 1000MHz
 			clkout1_divide => 32,
-			clkout2_divide => 25
+			clkout2_divide => 25,
+			clkout3_divide => 5
 		)
 		port map(
 			clkin1 => sysclk,
@@ -69,6 +71,7 @@ begin
 			clkfbout => clkfb,
 			clkout1 => clk_ipb_i,
 			clkout2 => clk_p40_i,
+			clkout3 => clko_200, -- No BUFG needed here, goes to idelayctrl on local routing
 			locked => dcm_locked,
 			rst => '0',
 			pwrdwn => '0'

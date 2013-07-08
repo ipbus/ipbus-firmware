@@ -13,19 +13,21 @@ use ieee.std_logic_1164.all;
 library unisim;
 use unisim.VComponents.all;
 
-entity clocks_v6_serdes_noxtal is port(
-	clki_125_fr: in std_logic;
-	clki_125: in std_logic;
-	clko_ipb: out std_logic;
-	clko_p40: out std_logic;
-	eth_locked: in std_logic;
-	locked: out std_logic;
-	nuke: in std_logic;
-	rsto_ipb: out std_logic;
-	rsto_125: out std_logic;
-	rsto_eth: out std_logic;
-	rsto: out std_logic;
-	onehz: out std_logic
+entity clocks_v6_serdes_noxtal is
+	port(
+		clki_125_fr: in std_logic;
+		clki_125: in std_logic;
+		clko_ipb: out std_logic;
+		clko_p40: out std_logic;
+		clko_200: out std_logic; -- 200MHz clock for idelayctrl
+		eth_locked: in std_logic;
+		locked: out std_logic;
+		nuke: in std_logic;
+		rsto_ipb: out std_logic;
+		rsto_125: out std_logic;
+		rsto_eth: out std_logic;
+		rsto: out std_logic;
+		onehz: out std_logic
 	);
 
 end clocks_v6_serdes_noxtal;
@@ -59,9 +61,10 @@ begin
 	mmcm: MMCM_BASE
 		generic map(
 			clkin1_period => 8.0,
-			clkfbout_mult_f => 8.0,
+			clkfbout_mult_f => 8.0, -- VCO freq 1000MHz
 			clkout1_divide => 32,
-			clkout2_divide => 25
+			clkout2_divide => 25,
+			clkout3_divide => 5
 		)
 		port map(
 			clkin1 => sysclk,
@@ -69,6 +72,7 @@ begin
 			clkfbout => clkfb,
 			clkout1 => clk_ipb_i,
 			clkout2 => clk_p40_i,
+			clkout3 => clko_200, -- No BUFG needed here, goes to idelayctrl on local routing
 			locked => dcm_locked,
 			rst => dcm_rst,
 			pwrdwn => '0'
