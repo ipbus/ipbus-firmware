@@ -1,0 +1,6 @@
+# Xilinx ISE setup fragment for gig_eth_pcs_pma_v11_5
+
+hdl ipbus/firmware/ethernet/hdl/eth_s6_1000basex.vhd
+hdl ipbus/firmware/ethernet/hdl/emac_hostbus_decl.vhd
+include ipbus/firmware/ethernet/cfg/file_list_gig_eth_pcs_pma_v11_4
+

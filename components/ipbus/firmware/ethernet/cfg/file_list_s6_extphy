@@ -1,0 +1,7 @@
+# Xilinx ISE setup fragment for gig_eth_pcs_pma_v11_5
+
+hdl ipbus/firmware/ethernet/hdl/eth_s6_gmii.vhd
+hdl ipbus/firmware/ethernet/hdl/emac_hostbus_decl.vhd
+core ipbus/firmware/ethernet/coregen/tri_mode_eth_mac_v5_4.xco
+core ipbus/firmware/ethernet/coregen/mac_fifo_axi4.xco
+
