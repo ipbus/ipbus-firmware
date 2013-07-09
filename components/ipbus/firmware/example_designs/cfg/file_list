@@ -6,4 +6,6 @@ hdl ipbus/firmware/example_designs/hdl/ipbus_addr_decode.vhd
 hdl ipbus/firmware/slaves/hdl/ipbus_reg.vhd
 hdl ipbus/firmware/slaves/hdl/ipbus_ctrlreg.vhd
 hdl ipbus/firmware/slaves/hdl/ipbus_ram.vhd
+hdl ipbus/firmware/slaves/hdl/ipbus_peephole_ram.vhd
+hdl ipbus/firmware/slaves/hdl/ipbus_pkt_ctr.vhd
 
