@@ -26,6 +26,7 @@ entity top is port(
 	phy_rstb : out STD_LOGIC;
 	dip_switch: in std_logic_vector(3 downto 0)
 	);
+
 end top;
 
 architecture rtl of top is

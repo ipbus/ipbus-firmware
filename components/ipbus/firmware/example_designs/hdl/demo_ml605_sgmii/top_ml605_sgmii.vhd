@@ -31,7 +31,7 @@ architecture rtl of top is
 	signal ipb_master_in : ipb_rbus;
 	signal mac_addr: std_logic_vector(47 downto 0);
 	signal ip_addr: std_logic_vector(31 downto 0);
-	signal pkt_rx_led, pkt_tx_led, sys_rst: std_logic;	
+	signal pkt_rx, pkt_tx, pkt_rx_led, pkt_tx_led, sys_rst: std_logic;	
 
 begin
 
@@ -102,6 +102,8 @@ begin
 			ipb_in => ipb_master_in,
 			mac_addr => mac_addr,
 			ip_addr => ip_addr,
+			pkt_rx => pkt_rx,
+			pkt_tx => pkt_tx,
 			pkt_rx_led => pkt_rx_led,
 			pkt_tx_led => pkt_tx_led
 		);
@@ -117,7 +119,9 @@ begin
 		ipb_rst => rst_ipb,
 		ipb_in => ipb_master_out,
 		ipb_out => ipb_master_in,
-		rst_out => sys_rst
+		rst_out => sys_rst,
+		pkt_rx => pkt_rx,
+		pkt_tx => pkt_tx
 	);
 
 end rtl;
