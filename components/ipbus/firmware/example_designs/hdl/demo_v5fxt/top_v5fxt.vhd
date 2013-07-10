@@ -38,7 +38,8 @@ architecture rtl of top is
 	signal ipb_master_out : ipb_wbus;
 	signal ipb_master_in : ipb_rbus;
 	signal mac_tx_data_bus: mac_arbiter_slv_array(N_IPB-1 downto 0);
-	signal mac_tx_valid_bus, mac_tx_last_bus, mac_tx_error_bus, mac_tx_ready_bus, pkt_rx_led_bus, pkt_tx_led_bus: mac_arbiter_sl_array(N_IPB-1 downto 0);
+	signal mac_tx_valid_bus, mac_tx_last_bus, mac_tx_error_bus, mac_tx_ready_bus: mac_arbiter_sl_array(N_IPB-1 downto 0);
+	signal pkt_rx_bus, pkt_tx_bus, pkt_rx_led_bus, pkt_tx_led_bus: mac_arbiter_sl_array(N_IPB-1 downto 0);
 	signal sys_rst_array: std_logic_vector(N_IPB-1 downto 0);
 	signal pkt_rx_led, pkt_tx_led: std_logic;
 	
@@ -141,6 +142,8 @@ begin
 				ipb_in => ipb_master_in,
 				mac_addr => mac_addr,
 				ip_addr => ip_addr,
+				pkt_rx => pkt_rx_bus(i),
+				pkt_tx => pkt_tx_bus(i),
 				pkt_rx_led => pkt_rx_led_bus(i),
 				pkt_tx_led => pkt_tx_led_bus(i)
 			);
@@ -153,7 +156,9 @@ begin
 			ipb_rst => rst_ipb,
 			ipb_in => ipb_master_out,
 			ipb_out => ipb_master_in,
-			rst_out => sys_rst_array(i)
+			rst_out => sys_rst_array(i),
+			pkt_rx => pkt_rx_bus(i),
+			pkt_tx => pkt_tx_bus(i)
 		);
 	 
 	end generate;-- ipbus control logic
