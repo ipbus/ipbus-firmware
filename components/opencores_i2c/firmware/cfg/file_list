@@ -1,1 +1,5 @@
 hdl opencores_i2c/firmware/hdl/i2c_master_top.vhd
+hdl opencores_i2c/firmware/hdl/i2c_master_registers.vhd
+hdl opencores_i2c/firmware/hdl/i2c_master_byte_ctrl.vhd
+hdl opencores_i2c/firmware/hdl/i2c_master_bit_ctrl.vhd
+
