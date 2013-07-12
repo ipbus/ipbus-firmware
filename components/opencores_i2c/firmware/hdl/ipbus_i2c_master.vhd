@@ -23,7 +23,7 @@ end ipbus_i2c_master;
 
 architecture rtl of ipbus_i2c_master is
 
-	signal stb, ack, scl_i, sda, sda_enb: std_logic;
+	signal stb, ack, scl_i, sda_enb: std_logic;
 
 begin
 
