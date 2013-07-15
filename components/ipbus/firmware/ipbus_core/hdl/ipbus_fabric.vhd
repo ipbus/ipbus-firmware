@@ -37,7 +37,6 @@ begin
 		sel <= ipbus_addr_sel(ipb_in.ipb_addr);
 	end process;
 
-	mux_rdata(NSLV) <= (others => '0');
 	ored_ack(NSLV) <= '0';
 	ored_err(NSLV) <= '0';
 	
