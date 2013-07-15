@@ -1,19 +1,21 @@
 -- The ipbus bus fabric, address select logic, data multiplexers
 --
--- The address table is encoded in ipbus_addr_decode package - no need to change
--- anything in this file.
+-- This version just does a flat address decode according to some specified
+-- bits in the address
 --
 -- Dave Newbold, February 2011
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+use ieee.numeric_std.all;
 use work.ipbus.ALL;
-use work.ipbus_addr_decode.ALL;
 
-entity ipbus_fabric is
+entity ipbus_fabric_simple is
   generic(
     NSLV: positive;
     STROBE_GAP: boolean := false
+    DECODE_BASE: natural;
+    DECODE_BITS: natural
    );
   port(
     ipb_in: in ipb_wbus;
@@ -22,9 +24,9 @@ entity ipbus_fabric is
     ipb_from_slaves: in ipb_rbus_array(NSLV - 1 downto 0)
    );
 
-end ipbus_fabric;
+end ipbus_fabric_simple;
 
-architecture rtl of ipbus_fabric is
+architecture rtl of ipbus_fabric_simple is
 
 	signal sel: integer;
 	signal ored_ack, ored_err: std_logic_vector(NSLV downto 0);
@@ -32,12 +34,8 @@ architecture rtl of ipbus_fabric is
 
 begin
 
-	process(ipb_in.ipb_addr)
-	begin
-		sel <= ipbus_addr_sel(ipb_in.ipb_addr);
-	end process;
+	sel <= to_integer(unsigned(ipbus_in.ipb_addr(DECODE_BASE + DECODE_BITS downto DECODE_BASE)));
 
-	mux_rdata(NSLV) <= (others => '0');
 	ored_ack(NSLV) <= '0';
 	ored_err(NSLV) <= '0';
 	
@@ -49,7 +47,7 @@ begin
 
 		ipb_to_slaves(i).ipb_addr <= ipb_in.ipb_addr;
 		ipb_to_slaves(i).ipb_wdata <= ipb_in.ipb_wdata;
-		ipb_to_slaves(i).ipb_strobe <= qstrobe when sel=i else '0';
+		ipb_to_slaves(i).ipb_strobe <= qstrobe when sel = i else '0';
 		ipb_to_slaves(i).ipb_write <= ipb_in.ipb_write;
 		ored_ack(i) <= ored_ack(i+1) or ipb_from_slaves(i).ipb_ack;
 		ored_err(i) <= ored_err(i+1) or ipb_from_slaves(i).ipb_err;		

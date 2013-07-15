@@ -1,0 +1,4 @@
+hdl ipbus/firmware/slaves/hdl/ipbus_syncreg.vhd
+hdl ipbus/firmware/slaves/hdl/syncreg_w.vhd
+hdl ipbus/firmware/slaves/hdl/syncreg_r.vhd
+
