@@ -101,7 +101,7 @@ begin
 	
 	clk125_fr <= clk_fr;
 
-	bufg_tx: BUFG port map(
+	bufg_tx: BUFH port map(
 		i => txoutclk_ub,
 		o => txoutclk
 	);
@@ -122,7 +122,7 @@ begin
 			pwrdwn => '0',
 			locked => mmcm_locked);
 	
-	bufr_125: BUFH
+	bufr_125: BUFG
 		port map(
 			i => clk125_ub,
 			o => clk125
