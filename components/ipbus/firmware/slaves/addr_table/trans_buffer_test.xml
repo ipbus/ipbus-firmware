@@ -1,0 +1,10 @@
+<node description="Transactor interface test block" tags="slave">
+	<node id="data" address="0x0"/>
+	<node id="cmd" address="0x1">
+		<node id="write" address="0x1"/>
+		<node id="read" address="0x2"/>
+		<node id="req" address="0x4"/>
+		<node id="done" address="0x8"/>
+	</node>
+</node>
+

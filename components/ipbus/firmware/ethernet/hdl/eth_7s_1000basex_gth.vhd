@@ -122,22 +122,18 @@ begin
 			pwrdwn => '0',
 			locked => mmcm_locked);
 	
-	bufr_125: BUFR
+	bufr_125: BUFH
 		port map(
 			i => clk125_ub,
 			o => clk125
-			ce => '1',
-			clr => '0'
 		);
 
 	clk125_out <= clk125;
 
-	bufr_62_5: BUFR
+	bufr_62_5: BUFH
 		port map(
 			i => clk62_5_ub,
-			o => clk62_5,
-			ce => '1',
-			clk => '0'
+			o => clk62_5
 		);
 
 	process(clk_fr)
