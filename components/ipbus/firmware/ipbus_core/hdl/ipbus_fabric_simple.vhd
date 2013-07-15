@@ -13,7 +13,7 @@ use work.ipbus.ALL;
 entity ipbus_fabric_simple is
   generic(
     NSLV: positive;
-    STROBE_GAP: boolean := false
+    STROBE_GAP: boolean := false;
     DECODE_BASE: natural;
     DECODE_BITS: natural
    );
