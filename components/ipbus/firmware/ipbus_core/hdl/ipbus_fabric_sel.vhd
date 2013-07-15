@@ -28,13 +28,13 @@ end ipbus_fabric_sel;
 
 architecture rtl of ipbus_fabric_sel is
 
-	signal sel: integer;
+	signal sel_i: integer;
 	signal ored_ack, ored_err: std_logic_vector(NSLV downto 0);
 	signal qstrobe: std_logic;
 
 begin
 
-	sel <= to_integer(unsigned(sel));
+	sel_i <= to_integer(unsigned(sel));
 
 	ored_ack(NSLV) <= '0';
 	ored_err(NSLV) <= '0';
@@ -47,14 +47,14 @@ begin
 
 		ipb_to_slaves(i).ipb_addr <= ipb_in.ipb_addr;
 		ipb_to_slaves(i).ipb_wdata <= ipb_in.ipb_wdata;
-		ipb_to_slaves(i).ipb_strobe <= qstrobe when sel = i else '0';
+		ipb_to_slaves(i).ipb_strobe <= qstrobe when sel_i = i else '0';
 		ipb_to_slaves(i).ipb_write <= ipb_in.ipb_write;
 		ored_ack(i) <= ored_ack(i+1) or ipb_from_slaves(i).ipb_ack;
 		ored_err(i) <= ored_err(i+1) or ipb_from_slaves(i).ipb_err;		
 
 	end generate;
 
-  ipb_out.ipb_rdata <= ipb_from_slaves(sel).ipb_rdata;
+  ipb_out.ipb_rdata <= ipb_from_slaves(sel_i).ipb_rdata;
   ipb_out.ipb_ack <= ored_ack(0);
   ipb_out.ipb_err <= ored_err(0);
   
