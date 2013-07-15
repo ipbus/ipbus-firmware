@@ -6,7 +6,7 @@
 -- Dave Newbold, February 2011
 
 library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
+us e IEEE.STD_LOGIC_1164.ALL;
 use work.ipbus.ALL;
 use work.ipbus_addr_decode.ALL;
 

@@ -36,8 +36,6 @@ begin
   fabric: entity work.ipbus_fabric
     generic map(NSLV => NSLV)
     port map(
-      ipb_clk => ipb_clk,
-      rst => ipb_rst,
       ipb_in => ipb_in,
       ipb_out => ipb_out,
       ipb_to_slaves => ipbw,
