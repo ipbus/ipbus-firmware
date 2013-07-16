@@ -24,7 +24,7 @@ end clock_div;
 
 architecture rtl of clock_div is
 
-signal rst_b: std_logic;
+	signal rst_b: std_logic;
 
 begin
 
