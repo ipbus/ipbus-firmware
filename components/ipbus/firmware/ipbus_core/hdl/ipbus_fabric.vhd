@@ -55,7 +55,7 @@ begin
 
 	end generate;
 
-  ipb_out.ipb_rdata <= ipb_from_slaves(sel).ipb_rdata;
+  ipb_out.ipb_rdata <= ipb_from_slaves(sel).ipb_rdata when sel /= 99 else (others => '0');
   ipb_out.ipb_ack <= ored_ack(0);
   ipb_out.ipb_err <= ored_err(0);
   
