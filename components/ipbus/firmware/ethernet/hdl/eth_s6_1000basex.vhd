@@ -142,8 +142,8 @@ begin
 		gmii_rxd => gmii_rxd,
 		gmii_rx_dv => gmii_rx_dv,
 		gmii_rx_er => gmii_rx_er,
-		rx_mac_config_vector => X"0000_0000_0000_0000_0802",
-		tx_mac_config_vector => X"0000_0000_0000_0000_0002"
+		rx_mac_config_vector => X"0000_0000_0000_0000_0812",
+		tx_mac_config_vector => X"0000_0000_0000_0000_0012"
 	);
 
 	hostbus_out.hostrddata <= (others => '0');

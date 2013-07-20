@@ -250,8 +250,8 @@ begin
 		gmii_rxd => rxd_r,
 		gmii_rx_dv => rx_dv_r,
 		gmii_rx_er => rx_er_r,
-		rx_mac_config_vector => X"0000_0000_0000_0000_0802",
-		tx_mac_config_vector => X"0000_0000_0000_0000_0002"
+		rx_mac_config_vector => X"0000_0000_0000_0000_0812",
+		tx_mac_config_vector => X"0000_0000_0000_0000_0012"
 	);
 	
 	rx_user_ef(0) <= rx_user_e;
