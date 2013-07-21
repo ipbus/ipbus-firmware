@@ -1,14 +1,14 @@
 # Horrible hacky TCL script to build ISE project from hierarchy of source lists
 
-proc dofile {file} {
-	set fp [open $file r]
+proc dofile {f} {
+	set fp [open $f r]
 	set files [read $fp]
 	close $fp
-	foreach f [split $files "\n"] {
-		if {$f == "" || [string index $f 0] == "#"} {
+	foreach f2 [split $files "\n"] {
+		if {$f2 == "" || [string index $f2 0] == "#"} {
 			continue
 		}
-		set l [split $f]
+		set l [split $f2]
 		set cmd [lindex $l 0]
 		set arg1 [lindex $l 1]
 		set arg2 [lindex $1 2]
@@ -28,22 +28,22 @@ proc dofile {file} {
 	}
 }
 
-proc addfile {file lib} {
-	puts "*** Adding file to project: $file"
+proc addfile {f lib} {
+	puts "*** Adding file to project: $f"
 	if {$lib == ""} {
-		xfile add $file
+		xfile add $f
 	} else {
 		if {[lsearch $libs $lib] == -1} {
 			xfile lib_vhdl new $lib
 			lappend libs $lib
 		}
-		xfile add $file -lib_vhdl $mlib
+		xfile add $f -lib_vhdl $mlib
 	}		
 }
 
-proc buildcore {file} {
-	puts "*** Building core: $file"
-	set bname [exec basename $file]
+proc buildcore {f} {
+	puts "*** Building core: $f"
+	set bname [exec basename $f]
 	exec cp $file ipcore_dir
 	cd ipcore_dir
 	exec coregen -r -b $bname -p coregen.cgp >& coregen.out
