@@ -44,7 +44,7 @@ proc addfile {f lib} {
 proc buildcore {f} {
 	puts "*** Building core: $f"
 	set bname [exec basename $f]
-	exec cp $file ipcore_dir
+	exec cp $f ipcore_dir
 	cd ipcore_dir
 	exec coregen -r -b $bname -p coregen.cgp >& coregen.out
 	cd ..
