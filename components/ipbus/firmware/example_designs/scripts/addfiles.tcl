@@ -11,7 +11,7 @@ proc dofile {f} {
 		set l [split $f2]
 		set cmd [lindex $l 0]
 		set arg1 [lindex $l 1]
-		set arg2 [lindex $1 2]
+		set arg2 [lindex $l 2]
 		set parg $::env(REPOS_FW_DIR)/$arg1
 		if {$cmd == "hdl"} {
 			addfile $parg $arg2
