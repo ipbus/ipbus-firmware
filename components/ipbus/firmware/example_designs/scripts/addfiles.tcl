@@ -12,12 +12,12 @@ proc dofile {f} {
 		set cmd [lindex $l 0]
 		set arg1 [lindex $l 1]
 		set arg2 [lindex $l 2]
-		if {$cmd != "ghdl"} [
+		if {$cmd != "ghdl"} {
 			set f_list [glob $::env(REPOS_FW_DIR)/$arg1]
 		} else {
 			set f_list [glob ipcore_dir/$arg1]
 		}			
-		foreach f_loc {$f_list} {	
+		foreach f_loc $f_list {	
 			set f_loc_s [exec basename $f3]
 			if {$cmd == "hdl"} {
 				addfile $f_loc $arg2
