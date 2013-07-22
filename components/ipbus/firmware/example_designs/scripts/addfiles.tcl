@@ -4,26 +4,32 @@ proc dofile {f} {
 	set fp [open $f r]
 	set files [read $fp]
 	close $fp
-	foreach f2 [split $files "\n"] {
-		if {$f2 == "" || [string index $f2 0] == "#"} {
+	foreach f_line [split $files "\n"] {
+		if {$f_line == "" || [string index $f_line 0] == "#"} {
 			continue
 		}
-		set l [split $f2]
+		set l [split $f_line]
 		set cmd [lindex $l 0]
 		set arg1 [lindex $l 1]
 		set arg2 [lindex $l 2]
-		foreach f3 [glob $::env(REPOS_FW_DIR)/$arg1] {	
+		if {$cmd != "ghdl"} [
+			set f_list [glob $::env(REPOS_FW_DIR)/$arg1]
+		} else {
+			set f_list [glob ipcore_dir/$arg1]
+		}			
+		foreach f_loc $f_list {	
+			set f_loc_s [exec basename $f3]
 			if {$cmd == "hdl"} {
-				addfile $f3 $arg2
+				addfile $f_loc $arg2
 			} elseif {$cmd == "ghdl"} {
-				addfile ipcore_dir/[exec basename $f3] $arg2
+				addfile ipcore_dir/$f_loc_s $arg2
 			} elseif {$cmd == "core"} {
-				buildcore $f3
-				addfile ipcore_dir/[exec basename $f3] $arg2
+				buildcore $f_loc
+				addfile ipcore_dir/$f_loc_s $arg2
 			} elseif {$cmd == "wcore"} {
-				buildcore $f3
+				buildcore $f_loc
 			} elseif {$cmd == "include"} {
-				dofile $f3
+				dofile $f_loc
 			}
 		}
 	}
