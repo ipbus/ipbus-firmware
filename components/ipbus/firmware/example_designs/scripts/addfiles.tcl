@@ -45,7 +45,7 @@ proc addfile {f lib} {
 			lib_vhdl new $lib
 			lappend libs $lib
 		}
-		xfile add $f -lib_vhdl $mlib
+		xfile add $f -lib_vhdl $lib
 	}		
 }
 
