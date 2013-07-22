@@ -12,18 +12,20 @@ proc dofile {f} {
 		set cmd [lindex $l 0]
 		set arg1 [lindex $l 1]
 		set arg2 [lindex $l 2]
-		set parg $::env(REPOS_FW_DIR)/$arg1
-		if {$cmd == "hdl"} {
-			addfile $parg $arg2
-		} elseif {$cmd == "ghdl"} {
-			addfile ipcore_dir/$arg1 $arg2
-		} elseif {$cmd == "core"} {
-			buildcore $parg
-			addfile ipcore_dir/[exec basename $parg] $arg2
-		} elseif {$cmd == "wcore"} {
-			buildcore $parg
-		} elseif {$cmd == "include"} {
-			dofile $parg
+		foreach f3 [glob $arg1] {	
+			set parg $::env(REPOS_FW_DIR)/$arg1
+			if {$cmd == "hdl"} {
+				addfile $parg $arg2
+			} elseif {$cmd == "ghdl"} {
+				addfile ipcore_dir/$arg1 $arg2
+			} elseif {$cmd == "core"} {
+				buildcore $parg
+				addfile ipcore_dir/[exec basename $parg] $arg2
+			} elseif {$cmd == "wcore"} {
+				buildcore $parg
+			} elseif {$cmd == "include"} {
+				dofile $parg
+			}
 		}
 	}
 }
