@@ -22,7 +22,7 @@ proc dofile {f} {
 			if {$cmd == "hdl"} {
 				addfile $f_loc $arg2
 			} elseif {$cmd == "ghdl"} {
-				addfile ipcore_dir/$f_loc_s $arg2
+				addfile ipcore_dir/$f_loc $arg2
 			} elseif {$cmd == "core"} {
 				buildcore $f_loc
 				addfile ipcore_dir/$f_loc_s $arg2
