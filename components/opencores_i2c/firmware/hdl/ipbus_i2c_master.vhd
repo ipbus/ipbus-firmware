@@ -16,7 +16,8 @@ entity ipbus_i2c_master is
 		ipb_in: in ipb_wbus;
 		ipb_out: out ipb_rbus;
 		scl: out std_logic;
-		sda: inout std_logic
+		sda_o: out std_logic;
+		sda_i: in std_logic
 	);
 	
 end ipbus_i2c_master;
@@ -42,7 +43,7 @@ begin
 		wb_ack_o => ack,
 		scl_pad_i => scl_i,
 		scl_padoen_o => scl_i,
-		sda_pad_i => sda,
+		sda_pad_i => sda_i,
 		sda_padoen_o => sda_enb
 	);
 	
@@ -51,7 +52,7 @@ begin
 	ipb_out.ipb_err <= '0';
 	
 	scl <= scl_i;
-	sda <= '0' when sda_enb = '0' else 'Z';
+	sda_o <= '0' when sda_enb = '0' else 'Z';
 	
 end rtl;
 
