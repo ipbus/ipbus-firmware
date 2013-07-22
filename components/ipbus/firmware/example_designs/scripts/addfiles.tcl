@@ -18,7 +18,7 @@ proc dofile {f} {
 			set f_list [glob ipcore_dir/$arg1]
 		}			
 		foreach f_loc $f_list {	
-			set f_loc_s [exec basename $f3]
+			set f_loc_s [exec basename $f_loc]
 			if {$cmd == "hdl"} {
 				addfile $f_loc $arg2
 			} elseif {$cmd == "ghdl"} {
