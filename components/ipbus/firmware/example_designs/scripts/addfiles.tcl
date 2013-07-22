@@ -36,6 +36,7 @@ proc dofile {f} {
 }
 
 proc addfile {f lib} {
+	global libs
 	puts "*** Adding file to project: $f"
 	if {$lib == ""} {
 		xfile add $f
