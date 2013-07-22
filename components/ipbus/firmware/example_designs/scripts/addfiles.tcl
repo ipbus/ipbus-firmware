@@ -42,7 +42,7 @@ proc addfile {f lib} {
 		xfile add $f
 	} else {
 		if {[lsearch $libs $lib] == -1} {
-			xfile lib_vhdl new $lib
+			lib_vhdl new $lib
 			lappend libs $lib
 		}
 		xfile add $f -lib_vhdl $mlib
