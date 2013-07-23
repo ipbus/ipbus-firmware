@@ -23,8 +23,8 @@ entity ipbus_dpram is
 		ipb_in: in ipb_wbus;
 		ipb_out: out ipb_rbus;
 		rclk: in std_logic;
-		we: in std_logic;
-		d: in std_logic_vector(31 downto 0);
+		we: in std_logic := '0';
+		d: in std_logic_vector(31 downto 0) := (others => '0');
 		q: out std_logic_vector(31 downto 0);
 		addr: in std_logic_vector(ADDR_WIDTH downto 0)
 	);
