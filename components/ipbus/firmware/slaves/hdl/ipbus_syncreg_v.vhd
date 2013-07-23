@@ -20,7 +20,7 @@ use ieee.numeric_std.all;
 use work.ipbus.all;
 use work.ipbus_reg_types.all;
 
-entity ipbus_syncreg is
+entity ipbus_syncreg_v is
 	generic(
 		ctrl_addr_width : natural := 0;
 		stat_addr_width : natural := 0
@@ -31,24 +31,20 @@ entity ipbus_syncreg is
 		ipb_in: in ipb_wbus;
 		ipb_out: out ipb_rbus;
 		slv_clk: in std_logic;
-		
-		
-		d: in std_logic_vector(2 ** stat_addr_width * 32 - 1 downto 0);
-		q: out std_logic_vector(2 ** ctrl_addr_width * 32 - 1 downto 0);
+		d: in ipb_reg_v(2 ** stat_addr_width - 1 downto 0);
+		q: out ipb_reg_v(2 ** ctrl_addr_width - 1 downto 0);
 		stb: out std_logic_vector(2 ** ctrl_addr_width - 1 downto 0)
 	);
 	
-end ipbus_syncreg;
+end ipbus_syncreg_v;
 
-architecture rtl of ipbus_syncreg is
+architecture rtl of ipbus_syncreg_v is
 
 	signal ctrl_sel, stat_sel: integer := 0;
 	signal addr_width_max: natural;
 	signal ctrl_cyc_w, ctrl_cyc_r, stat_cyc: std_logic;
-	type carray is array(2 ** ctrl_addr_width - 1 downto 0) of std_logic_vector(31 downto 0); 
-	signal cq: carray;
-	type sarray is array(2 ** stat_addr_width - 1 downto 0) of std_logic_vector(31 downto 0); 
-	signal sq: sarray;
+	signal cq: ipb_reg_v(2 ** ctrl_addr_width - 1 downto 0);
+	signal sq: ipb_reg_v(2 ** stat_addr_width - 1 downto 0);
 	signal cp: std_logic;
 	signal cwe, cbusy, cack: std_logic_vector(2 ** ctrl_addr_width - 1 downto 0);
 	signal sp: std_logic;
@@ -78,7 +74,7 @@ begin
 				m_d => ipb_in.ipb_wdata,
 				m_q => cq(i),
 				s_clk => slv_clk,
-				s_q => q((i+1)*32-1 downto i*32),
+				s_q => q(i),
 				s_stb => stb(i)
 			);
 
@@ -105,7 +101,7 @@ begin
 				m_ack => sack(i),
 				m_q => sq(i),
 				s_clk => slv_clk,
-				s_d => d((i+1)*32-1 downto i*32)
+				s_d => d(i)
 			);
 	
 	end generate;

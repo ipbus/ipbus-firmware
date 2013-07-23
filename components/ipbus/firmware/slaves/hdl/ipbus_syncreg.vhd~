@@ -18,7 +18,6 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use ieee.numeric_std.all;
 use work.ipbus.all;
-use work.ipbus_reg_types.all;
 
 entity ipbus_syncreg is
 	generic(
@@ -31,8 +30,6 @@ entity ipbus_syncreg is
 		ipb_in: in ipb_wbus;
 		ipb_out: out ipb_rbus;
 		slv_clk: in std_logic;
-		
-		
 		d: in std_logic_vector(2 ** stat_addr_width * 32 - 1 downto 0);
 		q: out std_logic_vector(2 ** ctrl_addr_width * 32 - 1 downto 0);
 		stb: out std_logic_vector(2 ** ctrl_addr_width - 1 downto 0)
@@ -83,12 +80,12 @@ begin
 			);
 
 	end generate;
-	
+		
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			cp <= (cp or (ctrl_cyc_w and not cbusy(ctrl_sel))) and ctrl_cyc_w and not cack(ctrl_sel);
-			sp <= (sp or (stat_cyc and not sbusy(stat_sel))) and stat_cyc and not sack(stat_sel);
+			cp <= (cp or (ctrl_cyc_w and not cbusy(ctrl_sel))) and ctrl_cyc_w;
+			sp <= (sp or (stat_cyc and not sbusy(stat_sel))) and stat_cyc;
 		end if;
 	end process;
 	
