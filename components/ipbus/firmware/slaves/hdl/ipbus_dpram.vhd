@@ -26,7 +26,7 @@ entity ipbus_dpram is
 		we: in std_logic := '0';
 		d: in std_logic_vector(31 downto 0) := (others => '0');
 		q: out std_logic_vector(31 downto 0);
-		addr: in std_logic_vector(ADDR_WIDTH downto 0)
+		addr: in std_logic_vector(ADDR_WIDTH - 1 downto 0)
 	);
 	
 end ipbus_dpram;
