@@ -1,10 +1,11 @@
 -- ipbus_dpram
 --
--- generic 32b wide dual-port memory with ipbus access on one port
+-- Generic 32b wide dual-port memory with ipbus access on one port
 --
 -- Should lead to an inferred block RAM in Xilinx parts with modern tools
 --
 -- Note the wait state on ipbus access - full speed access is not possible
+-- Can combine with peephole_ram access method for full speed access.
 --
 -- Dave Newbold, July 2013
 
