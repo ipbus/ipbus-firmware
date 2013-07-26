@@ -47,7 +47,7 @@ begin
 	begin
 		if rising_edge(clk) then
 			if ipb_in.ipb_strobe='1' and ipb_in.ipb_write='1' then
-				ram(sel) <= ipb_in.ipb_wdata;
+				ram(sel) := ipb_in.ipb_wdata;
 			end if;
 			ipb_out.ipb_rdata <= ram(sel);
 			ack <= ipb_in.ipb_strobe and not ack;
@@ -63,7 +63,7 @@ begin
 	begin
 		if rising_edge(rclk) then
 			if we = '1' then
-				ram(rsel) <= d;
+				ram(rsel) := d;
 			end if;
 			q <= ram(rsel);
 		end if;
