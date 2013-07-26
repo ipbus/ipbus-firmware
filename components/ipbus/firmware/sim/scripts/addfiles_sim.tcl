@@ -31,7 +31,7 @@ proc addfile {f lib} {
 }
 
 proc addcore {f lib} {
-	addfile [file rootname $f].vhd
+	addfile [file rootname $f].vhd $lib
 }
 
 dofile $::env(REPOS_BUILD_DIR)/file_list
