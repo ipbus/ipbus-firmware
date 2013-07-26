@@ -57,7 +57,7 @@ begin
 			if ipbus_in.ipb_addr(addr_width_max) = '0' then
 				ipbus_out.ipb_rdata <= reg(ctrl_sel);
 			else
-				ipbus_out.ipb_rdata <= d(32 * (stat_sel + 1) - 1 downto 32 * stat_sel); 
+				ipbus_out.ipb_rdata <= d(stat_sel); 
 			end if;
 			
 			ack <= ipbus_in.ipb_strobe and not ack;
