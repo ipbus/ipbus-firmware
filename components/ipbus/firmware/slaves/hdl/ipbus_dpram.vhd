@@ -41,21 +41,21 @@ architecture rtl of ipbus_dpram is
 
 begin
 
-	sel <= to_integer(unsigned(ipbus_in.ipb_addr(addr_width-1 downto 0)));
+	sel <= to_integer(unsigned(ipb_in.ipb_addr(addr_width-1 downto 0)));
 
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			if ipbus_in.ipb_strobe='1' and ipbus_in.ipb_write='1' then
-				ram(sel) <= ipbus_in.ipb_wdata;
+			if ipb_in.ipb_strobe='1' and ipb_in.ipb_write='1' then
+				ram(sel) <= ipb_in.ipb_wdata;
 			end if;
-			ipbus_out.ipb_rdata <= ram(sel);
-			ack <= ipbus_in.ipb_strobe and not ack;
+			ipb_out.ipb_rdata <= ram(sel);
+			ack <= ipb_in.ipb_strobe and not ack;
 		end if;
 	end process;
 	
-	ipbus_out.ipb_ack <= ack;
-	ipbus_out.ipb_err <= '0';
+	ipb_out.ipb_ack <= ack;
+	ipb_out.ipb_err <= '0';
 	
 	rsel <= to_integer(unsigned(addr));
 	
