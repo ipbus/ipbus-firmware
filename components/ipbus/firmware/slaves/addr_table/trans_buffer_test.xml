@@ -1,4 +1,4 @@
-<node description="Transactor interface test block" tags="slave">
+<node description="Transactor interface test block" size="0x2" tags="slave">
 	<node id="data" address="0x0"/>
 	<node id="cmd" address="0x1">
 		<node id="write" mask="0x1"/>

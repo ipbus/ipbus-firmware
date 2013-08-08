@@ -44,7 +44,7 @@ begin
 		scl_pad_i => scl_i,
 		scl_padoen_o => scl_i,
 		sda_pad_i => sda_i,
-		sda_padoen_o => sda_enb
+		sda_padoen_o => sda_o
 	);
 	
 	ipb_out.ipb_rdata(31 downto 8) <= (others => '0');
@@ -52,7 +52,6 @@ begin
 	ipb_out.ipb_err <= '0';
 	
 	scl <= scl_i;
-	sda_o <= '0' when sda_enb = '0' else 'Z';
 	
 end rtl;
 

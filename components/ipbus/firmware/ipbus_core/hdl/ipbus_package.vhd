@@ -7,20 +7,20 @@ package ipbus is
 	type ipb_wbus is
   		record
   			ipb_addr: std_logic_vector(31 downto 0);
-      		ipb_wdata: std_logic_vector(31 downto 0);
-      		ipb_strobe: std_logic;
-      		ipb_write: std_logic;
+      	ipb_wdata: std_logic_vector(31 downto 0);
+      	ipb_strobe: std_logic;
+      	ipb_write: std_logic;
     	end record;
 
 	type ipb_wbus_array is array(natural range <>) of ipb_wbus;
 	 
 -- The signals going from slaves to master	 
 	type ipb_rbus is
-    	record
+    record
 			ipb_rdata: std_logic_vector(31 downto 0);
 			ipb_ack: std_logic;
 			ipb_err: std_logic;
-    	end record;
+    end record;
 
 	type ipb_rbus_array is array(natural range <>) of ipb_rbus;
 	
