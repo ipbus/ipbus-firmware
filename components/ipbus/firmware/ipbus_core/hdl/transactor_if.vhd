@@ -57,7 +57,11 @@ begin
 				when ST_IDLE => -- Starting state
 					if start = '1' then
 						if trans_in.rdata(31 downto 16) = X"0000" then
-							state <= ST_PREBODY;
+							if trans_in.rdata(15 downto 0) = X"0000" then
+								state <= ST_DONE;
+							else
+								state <= ST_PREBODY;
+							end if;
 						else
 							state <= ST_HDR;
 						end if;
@@ -65,7 +69,11 @@ begin
 
 				when ST_HDR => -- Transfer packet info
 					if rctr = hlen then
-						state <= ST_PREBODY;
+						if blen = X"0000" then
+							state <= ST_DONE;
+						else
+							state <= ST_PREBODY;
+						end if;
 					end if;
 
 				when ST_PREBODY =>
