@@ -57,8 +57,18 @@ begin
 				reg(sel) <= ipbus_in.ipb_wdata;
 			end if;
 
-			ctrl_valid <= '1' when sel < N_CTRL else '0';
-			stat_valid <= '1' when sel < N_STAT else '0';
+			if sel < N_CTRL then
+				ctrl_valid <= '1';
+			else
+				ctrl_valid <= '0';
+			end if;
+			
+			if sel < N_STAT then
+				stat_valid <= '1';
+			else
+				stat_valid <= '0';
+			end if;
+
 			ack <= ipbus_in.ipb_strobe and not ack;
 
 		end if;
