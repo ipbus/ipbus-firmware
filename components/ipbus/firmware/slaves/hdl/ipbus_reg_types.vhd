@@ -22,7 +22,7 @@ package ipbus_reg_types is
     if LEFT > RIGHT then return LEFT;
     else return RIGHT;
     end if;
-  end MAX;
+  end integer_max;
 	
 end ipbus_reg_types;
 
