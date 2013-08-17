@@ -37,8 +37,9 @@ architecture rtl of ipbus_ctrlreg_v is
 	constant ADDR_WIDTH: integer := integer_max(calc_width(N_CTRL), calc_width(N_STAT));
 
 	signal sel: integer := 0;
-	signal reg: ipb_reg_v(CTRL_WIDTH - 1 downto 0);
+	signal reg: ipb_reg_v(calc_width(N_CTRL) - 1 downto 0);
 	signal ctrl_out, stat_out: std_logic_vector(31 downto 0);
+	signal ctrl_valid, stat_valid: std_logic;
 	signal ack: std_logic;
 
 begin
@@ -51,9 +52,9 @@ begin
 	begin
 		if rising_edge(clk) then
 			if reset='1' then
-				reg <= (others=>(others=>'0'));
-			elsif ipbus_in.ipb_strobe='1' and ipbus_in.ipb_write='1' then
-				reg(ctrl_sel) <= ipbus_in.ipb_wdata;
+				reg <= (others => (others => '0' ) );
+			elsif ipbus_in.ipb_strobe = '1' and ipbus_in.ipb_write = '1' and ctrl_valid = '1' then
+				reg(sel) <= ipbus_in.ipb_wdata;
 			end if;
 
 			ctrl_valid <= '1' when sel < N_CTRL else '0';
