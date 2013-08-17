@@ -45,8 +45,6 @@ architecture rtl of ipbus_ctrlreg_v is
 begin
 
 	sel <= to_integer(unsigned(ipbus_in.ipb_addr(ADDR_WIDTH - 1 downto 0)));
-	ctrl_valid <= '1' when sel < N_CTRL else '0';
-	stat_valid <= '1' when sel < N_STAT else '0';
 	
 	process(clk)
 	begin
