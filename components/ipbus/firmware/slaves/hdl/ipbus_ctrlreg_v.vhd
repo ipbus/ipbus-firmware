@@ -18,33 +18,38 @@ use work.ipbus_reg_types.all;
 
 entity ipbus_ctrlreg_v is
 	generic(
-		ctrl_addr_width : natural := 0;
-		stat_addr_width : natural := 0
+		N_CTRL: positive := 1;
+		N_STAT: positive := 1
 	);
 	port(
 		clk: in std_logic;
 		reset: in std_logic;
 		ipbus_in: in ipb_wbus;
 		ipbus_out: out ipb_rbus;
-		d: in ipb_reg_v(2 ** stat_addr_width - 1 downto 0);
-		q: out ipb_reg_v(2 ** ctrl_addr_width - 1 downto 0)
+		d: in ipb_reg_v(N_STAT - 1 downto 0);
+		q: out ipb_reg_v(N_CTRL - 1 downto 0)
 	);
 	
 end ipbus_ctrlreg_v;
 
 architecture rtl of ipbus_ctrlreg_v is
 
-	signal reg: ipb_reg_v(2 ** ctrl_addr_width - 1 downto 0);
+	constant CTRL_WIDTH: integer := calc_width(N_CTRL);
+	constant STAT_WIDTH: integer := calc_width(N_STAT);
+	constant ADDR_WIDTH: integer := max(CTRL_WIDTH, STAT_WIDTH);
+
+	signal reg: ipb_reg_v(CTRL_WIDTH - 1 downto 0);
+	signal ctrl_out, stat_out: std_logic_vector(31 downto 0);
 	signal ctrl_sel, stat_sel: integer;
 	signal addr_width_max: natural;
 	signal ack: std_logic;
 
 begin
 
-	addr_width_max <= ctrl_addr_width when ctrl_addr_width > stat_addr_width else stat_addr_width;
-	ctrl_sel <= to_integer(unsigned(ipbus_in.ipb_addr(ctrl_addr_width - 1 downto 0))) when ctrl_addr_width > 0 else 0;
-	stat_sel <= to_integer(unsigned(ipbus_in.ipb_addr(stat_addr_width - 1 downto 0))) when stat_addr_width > 0 else 0;
-
+	sel <= to_integer(unsigned(ipbus_in.ipb_addr(ADDR_WIDTH - 1 downto 0)));
+	ctrl_valid <= '1' when sel < N_CTRL else '0';
+	stat_valid <= '1' when sel < N_STAT else '0';
+	
 	process(clk)
 	begin
 		if rising_edge(clk) then
@@ -54,17 +59,18 @@ begin
 				reg(ctrl_sel) <= ipbus_in.ipb_wdata;
 			end if;
 
-			if ipbus_in.ipb_addr(addr_width_max) = '0' then
-				ipbus_out.ipb_rdata <= reg(ctrl_sel);
-			else
-				ipbus_out.ipb_rdata <= d(stat_sel); 
-			end if;
-			
+			ctrl_valid <= '1' when sel < N_CTRL else '0';
+			stat_valid <= '1' when sel < N_STAT else '0';
 			ack <= ipbus_in.ipb_strobe and not ack;
 
 		end if;
 	end process;
 	
+	ctrl_out <= reg(sel) when ctrl_valid = '1' else (others => '0');
+	stat_out <= reg(sel) when stat_valid = '1' else (others => '0');
+
+	ipbus_out.ipb_rdata <= ctrl_out when ipbus_in.ipb_addr(ADDR_WIDTH) = '0' else
+		stat_out;	
 	ipbus_out.ipb_ack <= ack;
 	ipbus_out.ipb_err <= '0';
 
