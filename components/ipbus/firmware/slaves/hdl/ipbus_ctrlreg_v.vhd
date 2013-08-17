@@ -36,12 +36,11 @@ architecture rtl of ipbus_ctrlreg_v is
 
 	constant CTRL_WIDTH: integer := calc_width(N_CTRL);
 	constant STAT_WIDTH: integer := calc_width(N_STAT);
-	constant ADDR_WIDTH: integer := max(CTRL_WIDTH, STAT_WIDTH);
+	constant ADDR_WIDTH: integer := integer_max(CTRL_WIDTH, STAT_WIDTH);
 
+	signal sel: integer := 0;
 	signal reg: ipb_reg_v(CTRL_WIDTH - 1 downto 0);
 	signal ctrl_out, stat_out: std_logic_vector(31 downto 0);
-	signal ctrl_sel, stat_sel: integer;
-	signal addr_width_max: natural;
 	signal ack: std_logic;
 
 begin

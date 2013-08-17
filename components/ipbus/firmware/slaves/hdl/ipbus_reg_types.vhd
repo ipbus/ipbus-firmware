@@ -17,5 +17,12 @@ package ipbus_reg_types is
 		return(0);
 	end;
 
+	function max(LEFT, RIGHT: INTEGER) return INTEGER is
+  begin
+    if LEFT > RIGHT then return LEFT;
+    else return RIGHT;
+    end if;
+  end MAX;
+	
 end ipbus_reg_types;
 
