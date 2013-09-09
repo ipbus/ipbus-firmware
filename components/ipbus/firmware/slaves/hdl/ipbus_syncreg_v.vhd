@@ -41,11 +41,9 @@ architecture rtl of ipbus_syncreg_v is
 	constant ADDR_WIDTH: integer := integer_max(calc_width(N_CTRL), calc_width(N_STAT));
 
 	signal sel: integer := 0;
-	signal ctrl_out, stat_out: std_logic_vector(31 downto 0);
-	signal ctrl_valid, stat_valid: std_logic;
 	signal ctrl_cyc_w, ctrl_cyc_r, stat_cyc: std_logic;
-	signal cq: ipb_reg_v(N_CTRL - 1 downto 0);
-	signal sq: ipb_reg_v(N_STAT - 1 downto 0);
+	signal cq: ipb_reg_v(2 ** ADDR_WIDTH - 1 downto 0);
+	signal sq: ipb_reg_v(2 ** ADDR_WIDTH - 1 downto 0);
 	signal cwe, cbusy, cack: std_logic_vector(N_CTRL - 1 downto 0);
 	signal sre, sbusy, sack: std_logic_vector(N_STAT - 1 downto 0);
 	signal busy, ack, busy_d, pend: std_logic;
@@ -57,9 +55,6 @@ begin
 	ctrl_cyc_w <= ipb_in.ipb_strobe and ipb_in.ipb_write and not ipb_in.ipb_addr(ADDR_WIDTH);
 	ctrl_cyc_r <= ipb_in.ipb_strobe and not ipb_in.ipb_write and not ipb_in.ipb_addr(ADDR_WIDTH);
 	stat_cyc <= ipb_in.ipb_strobe and not ipb_in.ipb_write and ipb_in.ipb_addr(ADDR_WIDTH);
-
-	ctrl_valid <= '1' when sel < N_CTRL else '0';
-	stat_valid <= '1' when sel < N_STAT else '0';
 	
 	w_gen: for i in N_CTRL - 1 downto 0 generate
 	
@@ -81,6 +76,8 @@ begin
 
 	end generate;
 	
+	cq(2 ** ADDR_WIDTH - 1 downto N_CTRL) <= (others => (others => '0'));
+	
 	r_gen: for i in N_STAT - 1 downto 0 generate
 
 		sre(i) <= '1' when stat_cyc = '1' and sel = i and busy = '0' else '0';
@@ -98,9 +95,8 @@ begin
 			);
 	
 	end generate;
-
-	ctrl_out <= cq(sel) when ctrl_valid = '1' else (others => '0');
-	stat_out <= sq(sel) when stat_valid = '1' else (others => '0');
+	
+	sq(2 ** ADDR_WIDTH - 1 downto N_STAT) <= (others => (others => '0'));
 	
 	process(clk)
 	begin
@@ -113,9 +109,9 @@ begin
 	busy <= '1' when cbusy /= (cbusy'range => '0') or sbusy /= (sbusy'range => '0') else '0';
 	ack <= '1' when (cack /= (cack'range => '0') or sack /= (sack'range => '0')) and pend = '1' else '0';
 	
-	ipb_out.ipb_rdata <= ctrl_out when ctrl_cyc_r = '1' else stat_out;
-	ipb_out.ipb_ack <= ((ctrl_cyc_w or stat_cyc) and ack) or (ctrl_cyc_r and ctrl_valid);
-	ipb_out.ipb_err <= ((ctrl_cyc_w or ctrl_cyc_r) and not ctrl_valid) or (stat_cyc and not stat_valid);
+	ipb_out.ipb_rdata <= cq(sel) when ctrl_cyc_r = '1' else sq(sel);
+	ipb_out.ipb_ack <= ((ctrl_cyc_w or stat_cyc) and ack) or ctrl_cyc_r;
+	ipb_out.ipb_err <= '0';
 	
 end rtl;
 
