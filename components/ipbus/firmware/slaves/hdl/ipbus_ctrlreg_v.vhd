@@ -61,7 +61,7 @@ begin
 	ri(N_CTRL - 1 downto 0) <= reg;
 	ri(2 ** ADDR_WIDTH - 1 downto N_CTRL) <= (others => (others => '0'));
 	
-	ipbus_out.ipb_rdata <= ri(sel) when stat_cyc = '0' else di(sel);	
+	ipbus_out.ipb_rdata <= ri(sel) when stat_cyc = '0' else si(sel);	
 	ipbus_out.ipb_ack <= ipbus_in.ipb_strobe;
 	ipbus_out.ipb_err <= '0';
 
