@@ -54,16 +54,16 @@ begin
 
 	sel <= to_integer(unsigned(ipb_in.ipb_addr(ADDR_WIDTH - 1 downto 0))) when ADDR_WIDTH > 0 else 0;
 
-	ctrl_cyc_w <= ipb_in.ipb_strobe and ipb_in.ipb_write and not ipb_in.ipb_addr(ADDR_WIDTH) and not busy;
-	ctrl_cyc_r <= ipb_in.ipb_strobe and not ipb_in.ipb_write and not ipb_in.ipb_addr(ADDR_WIDTH) and not busy;
-	stat_cyc <= ipb_in.ipb_strobe and not ipb_in.ipb_write and ipb_in.ipb_addr(ADDR_WIDTH) and not busy;
+	ctrl_cyc_w <= ipb_in.ipb_strobe and ipb_in.ipb_write and not ipb_in.ipb_addr(ADDR_WIDTH);
+	ctrl_cyc_r <= ipb_in.ipb_strobe and not ipb_in.ipb_write and not ipb_in.ipb_addr(ADDR_WIDTH);
+	stat_cyc <= ipb_in.ipb_strobe and not ipb_in.ipb_write and ipb_in.ipb_addr(ADDR_WIDTH);
 
 	ctrl_valid <= '1' when sel < N_CTRL else '0';
 	stat_valid <= '1' when sel < N_STAT else '0';
 	
 	w_gen: for i in N_CTRL - 1 downto 0 generate
 	
-		cwe(i) <= '1' when ctrl_cyc_w = '1' and sel = i else '0';
+		cwe(i) <= '1' when ctrl_cyc_w = '1' and sel = i and busy = '0' else '0';
 		
 		wsync: entity work.syncreg_w
 			port map(
@@ -83,7 +83,7 @@ begin
 	
 	r_gen: for i in N_STAT - 1 downto 0 generate
 
-		sre(i) <= '1' when stat_cyc = '1' and sel = i else '0';
+		sre(i) <= '1' when stat_cyc = '1' and sel = i and busy = '0' else '0';
 	
 		rsync: entity work.syncreg_r
 			port map(
