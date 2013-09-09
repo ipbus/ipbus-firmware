@@ -7,7 +7,7 @@ package ipbus_reg_types is
 
 -- Useful functions - compile-time only
 
-	function calc_width(maxval: integer) return integer;
+	function calc_width(n: integer) return integer;
 	function integer_max(left, right: integer) return integer;
 
 end package ipbus_reg_types;

@@ -106,7 +106,7 @@ begin
 	begin
 		if rising_edge(clk) then
 			busy_d <= busy;
-			pend <= (pend or (busy and not busy_d)) and ipb_in.ipb_strobe;
+			pend <= (pend or (busy and not busy_d)) and ipb_in.ipb_strobe and not rst;
 		end if;
 	end process;
 	
