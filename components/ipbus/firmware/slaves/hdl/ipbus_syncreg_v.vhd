@@ -52,7 +52,7 @@ architecture rtl of ipbus_syncreg_v is
 
 begin
 
-	sel <= to_integer(unsigned(ipbus_in.ipb_addr(ADDR_WIDTH - 1 downto 0))) when ADDR_WIDTH > 0 else 0;
+	sel <= to_integer(unsigned(ipb_in.ipb_addr(ADDR_WIDTH - 1 downto 0))) when ADDR_WIDTH > 0 else 0;
 
 	ctrl_cyc_w <= ipb_in.ipb_strobe and ipb_in.ipb_write and not ipb_in.ipb_addr(ADDR_WIDTH) and not busy;
 	ctrl_cyc_r <= ipb_in.ipb_strobe and not ipb_in.ipb_write and not ipb_in.ipb_addr(ADDR_WIDTH) and not busy;
@@ -106,7 +106,7 @@ begin
 	begin
 		if rising_edge(clk) then
 			busy_d <= busy;
-			pend <= (pend or (busy and not busy_d)) and ipb_in.ipbus_strobe;
+			pend <= (pend or (busy and not busy_d)) and ipb_in.ipb_strobe;
 		end if;
 	end process;
 	
