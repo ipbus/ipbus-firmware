@@ -48,9 +48,9 @@ begin
 		end if;
 	end process;
 	
-	ipbus_out.ipb_rdata <= reg(sel) when valid else (others => '0');
-	ipbus_out.ipb_ack <= ipbus_strobe and valid;
-	ipbus_out.ipb_err <= ipbus_strobe and not valid;
+	ipbus_out.ipb_rdata <= reg(sel) when valid = '1' else (others => '0');
+	ipbus_out.ipb_ack <= ipbus_in.ipb_strobe and valid;
+	ipbus_out.ipb_err <= ipbus_in.ipb_strobe and not valid;
 
 	q <= reg;
 
