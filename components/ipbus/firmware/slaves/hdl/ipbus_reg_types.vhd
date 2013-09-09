@@ -14,10 +14,10 @@ end package ipbus_reg_types;
 
 package body ipbus_reg_types is
 
-	function calc_width(maxval: integer) return integer is
+	function calc_width(n: integer) return integer is
 	begin
-		for i in 1 to 32 loop
-			if(2 ** i > maxval) then
+		for i in 0 to 31 loop
+			if(2 ** i >= n) then
 				return(i);
 			end if;
 		end loop;

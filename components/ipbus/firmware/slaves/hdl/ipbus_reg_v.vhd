@@ -1,9 +1,6 @@
--- Generic ipbus slave config register for testing
+-- ipbus_reg_v
 --
--- generic addr_width defines number of significant address bits
---
--- We use one cycle of read / write latency to ease timing (probably not necessary)
--- The q outputs change immediately on write (no latency).
+-- Generic ipbus register bank
 --
 -- Dave Newbold, March 2011
 
@@ -14,44 +11,46 @@ use work.ipbus.all;
 use work.ipbus_reg_types.all;
 
 entity ipbus_reg_v is
-	generic(addr_width: natural := 0);
+	generic(
+		N_REG: positive := 1
+	);
 	port(
 		clk: in std_logic;
 		reset: in std_logic;
 		ipbus_in: in ipb_wbus;
 		ipbus_out: out ipb_rbus;
-		q: out ipb_reg_v(2 ** addr_width - 1 downto 0)
+		q: out ipb_reg_v(N_REG - 1 downto 0)
 	);
 	
 end ipbus_reg_v;
 
 architecture rtl of ipbus_reg_v is
 
-	signal reg: ipb_reg_v(2 ** addr_width - 1 downto 0);
+	constant ADDR_WIDTH: integer := calc_width(N_REG);
+
+	signal reg: ipb_reg_v(N_REG - 1 downto 0);
 	signal sel: integer;
-	signal ack: std_logic;
+	signal ack, valid: std_logic;
 
 begin
 
-	sel <= to_integer(unsigned(ipbus_in.ipb_addr(addr_width - 1 downto 0))) when addr_width > 0 else 0;
-
+	sel <= to_integer(unsigned(ipbus_in.ipb_addr(ADDR_WIDTH - 1 downto 0))) when ADDR_WIDTH > 0 else 0;
+	valid <= '1' when sel < N_REG else '0';
+	
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			if reset='1' then
-				reg <= (others=>(others=>'0'));
-			elsif ipbus_in.ipb_strobe='1' and ipbus_in.ipb_write='1' then
+			if reset = '1' then
+				reg <= (others => (others => '0'));
+			elsif ipbus_in.ipb_strobe = '1' and ipbus_in.ipb_write = '1' and valid = '1' then
 				reg(sel) <= ipbus_in.ipb_wdata;
 			end if;
-
-			ipbus_out.ipb_rdata <= reg(sel);
-			ack <= ipbus_in.ipb_strobe and not ack;
-
 		end if;
 	end process;
 	
-	ipbus_out.ipb_ack <= ack;
-	ipbus_out.ipb_err <= '0';
+	ipbus_out.ipb_rdata <= reg(sel) when valid else (others => '0');
+	ipbus_out.ipb_ack <= ipbus_strobe and valid;
+	ipbus_out.ipb_err <= ipbus_strobe and not valid;
 
 	q <= reg;
 

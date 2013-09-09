@@ -1,16 +1,14 @@
--- ipbus_syncreg
+-- ipbus_syncreg_v
 --
--- Generic control / status register block
+-- Generic control / status register bank
 --
--- Provides 2**n control registers (32b each), rw
--- Provides 2**m status registers (32b each), ro
+-- Provides N_CTRL control registers (32b each), rw
+-- Provides N_STAT status registers (32b each), ro
+--
 -- Bottom part of read address space is control, top is status
 --
 -- Both control and status are moved across clock domains with full handshaking
 -- This may be overkill for some applications
---
--- Useful for misc control of firmware block
--- Unused registers should be optimised away
 --
 -- Dave Newbold, June 2013
 
@@ -22,8 +20,8 @@ use work.ipbus_reg_types.all;
 
 entity ipbus_syncreg_v is
 	generic(
-		ctrl_addr_width : natural := 0;
-		stat_addr_width : natural := 0
+		N_CTRL: positive := 1;
+		N_STAT: positive := 1
 	);
 	port(
 		clk: in std_logic;
@@ -31,38 +29,41 @@ entity ipbus_syncreg_v is
 		ipb_in: in ipb_wbus;
 		ipb_out: out ipb_rbus;
 		slv_clk: in std_logic;
-		d: in ipb_reg_v(2 ** stat_addr_width - 1 downto 0);
-		q: out ipb_reg_v(2 ** ctrl_addr_width - 1 downto 0);
-		stb: out std_logic_vector(2 ** ctrl_addr_width - 1 downto 0)
+		d: in ipb_reg_v(N_STAT - 1 downto 0);
+		q: out ipb_reg_v(N_CTRL - 1 downto 0);
+		stb: out std_logic_vector(N_CTRL - 1 downto 0)
 	);
 	
 end ipbus_syncreg_v;
 
 architecture rtl of ipbus_syncreg_v is
 
-	signal ctrl_sel, stat_sel: integer := 0;
-	signal addr_width_max: natural;
+	constant ADDR_WIDTH: integer := integer_max(calc_width(N_CTRL), calc_width(N_STAT));
+
+	signal sel: integer := 0;
+	signal ctrl_out, stat_out: std_logic_vector(31 downto 0);
+	signal ctrl_valid, stat_valid: std_logic;
 	signal ctrl_cyc_w, ctrl_cyc_r, stat_cyc: std_logic;
-	signal cq: ipb_reg_v(2 ** ctrl_addr_width - 1 downto 0);
-	signal sq: ipb_reg_v(2 ** stat_addr_width - 1 downto 0);
-	signal cp: std_logic;
-	signal cwe, cbusy, cack: std_logic_vector(2 ** ctrl_addr_width - 1 downto 0);
-	signal sp: std_logic;
-	signal sre, sbusy, sack: std_logic_vector(2 ** stat_addr_width - 1 downto 0);
+	signal cq: ipb_reg_v(N_CTRL - 1 downto 0);
+	signal sq: ipb_reg_v(N_STAT - 1 downto 0);
+	signal cwe, cbusy, cack: std_logic_vector(N_CTRL - 1 downto 0);
+	signal sre, sbusy, sack: std_logic_vector(N_STAT - 1 downto 0);
+	signal busy, ack, busy_d, pend: std_logic;
 
 begin
 
-	addr_width_max <= ctrl_addr_width when ctrl_addr_width > stat_addr_width else stat_addr_width;
-	ctrl_sel <= to_integer(unsigned(ipb_in.ipb_addr(ctrl_addr_width - 1 downto 0))) when ctrl_addr_width > 0 else 0;
-	stat_sel <= to_integer(unsigned(ipb_in.ipb_addr(stat_addr_width - 1 downto 0))) when stat_addr_width > 0 else 0;
+	sel <= to_integer(unsigned(ipbus_in.ipb_addr(ADDR_WIDTH - 1 downto 0))) when ADDR_WIDTH > 0 else 0;
 
-	ctrl_cyc_w <= ipb_in.ipb_strobe and ipb_in.ipb_write and not ipb_in.ipb_addr(addr_width_max);
-	ctrl_cyc_r <= ipb_in.ipb_strobe and not ipb_in.ipb_write and not ipb_in.ipb_addr(addr_width_max);
-	stat_cyc <= ipb_in.ipb_strobe and not ipb_in.ipb_write and ipb_in.ipb_addr(addr_width_max);
-		
-	w_gen: for i in 2 ** ctrl_addr_width - 1 downto 0 generate
+	ctrl_cyc_w <= ipb_in.ipb_strobe and ipb_in.ipb_write and not ipb_in.ipb_addr(ADDR_WIDTH) and not busy;
+	ctrl_cyc_r <= ipb_in.ipb_strobe and not ipb_in.ipb_write and not ipb_in.ipb_addr(ADDR_WIDTH) and not busy;
+	stat_cyc <= ipb_in.ipb_strobe and not ipb_in.ipb_write and ipb_in.ipb_addr(ADDR_WIDTH) and not busy;
+
+	ctrl_valid <= '1' when sel < N_CTRL else '0';
+	stat_valid <= '1' when sel < N_STAT else '0';
 	
-		cwe(i) <= '1' when ctrl_cyc_w = '1' and ctrl_sel = i else '0';
+	w_gen: for i in N_CTRL - 1 downto 0 generate
+	
+		cwe(i) <= '1' when ctrl_cyc_w = '1' and sel = i else '0';
 		
 		wsync: entity work.syncreg_w
 			port map(
@@ -80,17 +81,9 @@ begin
 
 	end generate;
 	
-	process(clk)
-	begin
-		if rising_edge(clk) then
-			cp <= (cp or (ctrl_cyc_w and not cbusy(ctrl_sel))) and ctrl_cyc_w and not cack(ctrl_sel);
-			sp <= (sp or (stat_cyc and not sbusy(stat_sel))) and stat_cyc and not sack(stat_sel);
-		end if;
-	end process;
-	
-	r_gen: for i in 2 ** stat_addr_width - 1 downto 0 generate
+	r_gen: for i in N_STAT - 1 downto 0 generate
 
-		sre(i) <= '1' when stat_cyc = '1' and stat_sel = i else '0';
+		sre(i) <= '1' when stat_cyc = '1' and sel = i else '0';
 	
 		rsync: entity work.syncreg_r
 			port map(
@@ -105,11 +98,24 @@ begin
 			);
 	
 	end generate;
-			
-	ipb_out.ipb_rdata <= cq(ctrl_sel) when ctrl_cyc_r = '1' else sq(stat_sel);
+
+	ctrl_out <= cq(sel) when ctrl_valid = '1' else (others => '0');
+	stat_out <= sq(sel) when stat_valid = '1' else (others => '0');
 	
-	ipb_out.ipb_ack <= (ctrl_cyc_w and cack(ctrl_sel) and cp) or ctrl_cyc_r or (stat_cyc and sack(stat_sel) and sp);
-	ipb_out.ipb_err <= '0';
+	process(clk)
+	begin
+		if rising_edge(clk) then
+			busy_d <= busy;
+			pend <= (pend or (busy and not busy_d)) and ipb_in.ipbus_strobe;
+		end if;
+	end process;
+	
+	busy <= '1' when cbusy /= (cbusy'range => '0') or sbusy /= (sbusy'range => '0') else '0';
+	ack <= '1' when (cack /= (cack'range => '0') or sack /= (sack'range => '0')) and pend = '1' else '0';
+	
+	ipb_out.ipb_rdata <= ctrl_out when ctrl_cyc_r = '1' else stat_out;
+	ipb_out.ipb_ack <= ((ctrl_cyc_w or stat_cyc) and ack) or (ctrl_cyc_r and ctrl_valid);
+	ipb_out.ipb_err <= ((ctrl_cyc_w or ctrl_cyc_r) and not ctrl_valid) or (stat_cyc and not stat_valid);
 	
 end rtl;
 
