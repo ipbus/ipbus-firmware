@@ -41,7 +41,7 @@ begin
     end if;
   end process;
 
-  nuke_del <= nuke after 1ms;
+  nuke_del <= nuke after 50us;
   rsto <= reset_vec(0) or nuke_del;
 
 end behavioural;
