@@ -142,7 +142,6 @@ ARCHITECTURE flat OF UDP_if IS
    signal pkt_drop_ipbus, pkt_drop_reliable, pkt_byteswap: std_logic;
    signal next_pkt_id: std_logic_vector(15 downto 0); -- Next expected packet ID
 --
-   signal pkt_rdy_125: std_logic;
    signal we_125: std_logic;
    signal rst_ipb_125: std_logic;
 --
@@ -156,8 +155,8 @@ ARCHITECTURE flat OF UDP_if IS
    SIGNAL tx_write_buffer, tx_write_buffer_125, resend_buf: std_logic_vector(BUFWIDTH - 1 downto 0);
    SIGNAL rx_full_addra, tx_full_addrb: std_logic_vector(BUFWIDTH + ADDRWIDTH - 1 downto 0);
    SIGNAL rx_full_addrb, tx_full_addra: std_logic_vector(BUFWIDTH + ADDRWIDTH - 3 downto 0);
-   signal pkt_resend, pkt_rcvd, rx_ram_busy, rx_req_send, udpram_sent: std_logic;
-   signal busy_125, pkt_done_read_125, rx_ram_sent, tx_ram_written, rxreq_not_found: std_logic;
+   signal pkt_resend, pkt_rcvd, rx_ram_busy, rx_req_send_125, udpram_sent: std_logic;
+   signal busy_125, rx_ram_sent, tx_ram_written, rxreq_not_found: std_logic;
    signal resend_pkt_id: std_logic_vector(15 downto 0);
    signal clean_buf: std_logic_vector(2**BUFWIDTH - 1 downto 0);
    
@@ -503,7 +502,7 @@ rx_last_kludge: process(mac_clk)
 	resend_buf => (Others => '0'),
 	busy => rx_ram_busy,
 	write_buf => rx_write_buffer,
-	req_send => rx_req_send,
+	req_send => rx_req_send_125,
 	send_buf => rx_read_buffer_125,
 	clean_buf => open
       );
@@ -555,15 +554,11 @@ rx_last_kludge: process(mac_clk)
    rx_transactor: entity work.udp_rxtransactor_if
       PORT MAP (
          mac_clk => mac_clk,
-         rst_macclk => rst_macclk,
          rx_reset => rx_reset,
          payload_send => payload_send,
          payload_we => payload_we,
-	 pkt_done_read_125 => pkt_done_read_125,
 	 rx_ram_busy => rx_ram_busy,
-	 rx_req_send => rx_req_send,
 	 pkt_rcvd => pkt_rcvd,
-	 pkt_rdy_125 => pkt_rdy_125,
          rx_wea => rx_wea,
          rxpayload_dropped => rxpayload_dropped_sig
       );
@@ -619,15 +614,15 @@ rx_last_kludge: process(mac_clk)
       )
       PORT MAP (
          mac_clk => mac_clk,
-	 pkt_rdy_125 => pkt_rdy_125,
+         rst_macclk => rst_macclk,
          busy_125 => busy_125,
 	 rx_read_buffer_125 => rx_read_buffer_125,
+	 rx_req_send_125 => rx_req_send_125,
 	 tx_write_buffer_125 => tx_write_buffer_125,
-	 pkt_done_read_125 => pkt_done_read_125,
+	 rst_ipb_125 => rst_ipb_125,
 	 rx_ram_sent => rx_ram_sent,
 	 tx_ram_written => tx_ram_written,
 	 we_125 => we_125,
-	 rst_ipb_125 => rst_ipb_125,
 --
          ipb_clk => ipb_clk,
          rst_ipb => rst_ipb,

@@ -10,15 +10,11 @@ use ieee.numeric_std.all;
 entity udp_rxtransactor_if is
   port (
     mac_clk: in std_logic;
-    rst_macclk: in std_logic;
     rx_reset: in std_logic;
     payload_send: in std_logic;
     payload_we: in std_logic;
-    pkt_done_read_125: in std_logic;
     rx_ram_busy: in std_logic;
-    rx_req_send: in std_logic;
     pkt_rcvd: out std_logic;
-    pkt_rdy_125: out std_logic;
     rx_wea : out std_logic;
     rxpayload_dropped: out std_logic
   );
@@ -65,30 +61,6 @@ ram_status: process (mac_clk)
 -- pragma translate_on
       ;
       rxpayload_dropped <= rxpayload_dropped_i
--- pragma translate_off
-      after 4 ns
--- pragma translate_on
-      ;
-    end if;
-  end process;
-
-pkt_rdy_status: process (mac_clk)
--- delay change in pkt_rdy going high to allow rx_read_buffer to settle...
-  variable pkt_rdy_buf: std_logic_vector(15 downto 0);
-  begin
-    if rising_edge(mac_clk) then
-      if rst_macclk = '1' then
-        pkt_rdy_buf := (Others => '0');
-      else
-        if rx_req_send = '1' then
-          pkt_rdy_buf := pkt_rdy_buf(14 downto 0) & '1';
-        elsif pkt_done_read_125 = '1' then
-          pkt_rdy_buf := (Others => '0');
-        else
-          pkt_rdy_buf := pkt_rdy_buf(14 downto 0) & pkt_rdy_buf(0);
-        end if;
-      end if;
-      pkt_rdy_125 <= pkt_rdy_buf(15)
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
