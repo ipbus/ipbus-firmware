@@ -1,4 +1,4 @@
-project set "Keey Hierarchy" "Yes" -process "Synthesize - XST"
+project set "Keep Hierarchy" "Yes" -process "Synthesize - XST"
 project set "Enable Multi-Threading" "2" -process "Map"
 project set "Pack I/O Registers/Latches into IOBs" "For Inputs and Outputs" -process "Map"
 project set "Allow Logic Optimization Across Hierarchy" TRUE -process "Map"
