@@ -25,7 +25,7 @@ entity clocks_7s_serdes is
 		rsto_125: out std_logic; -- clk125 domain reset (held until ethernet locked)
 		rsto_ipb: out std_logic; -- ipbus domain reset
 		rsto_eth: out std_logic; -- ethernet startup reset (required!)
-		rsto: out std_logic; -- clk40 domain reset
+		rsto_fr: out std_logic; -- clk40 domain reset
 		onehz: out std_logic -- blinkenlights output
 	);
 
@@ -125,7 +125,7 @@ begin
 	
 	rsto_eth <= rst_eth;
 	
-	rsto <= rst;
+	rsto_fr <= rst;
 		
 end rtl;
 

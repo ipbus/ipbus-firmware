@@ -122,7 +122,7 @@ begin
 			pwrdwn => '0',
 			locked => mmcm_locked);
 	
-	bufr_125: BUFG
+	bufr_125: BUFH
 		port map(
 			i => clk125_ub,
 			o => clk125
