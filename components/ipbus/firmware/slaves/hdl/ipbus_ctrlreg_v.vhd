@@ -27,7 +27,7 @@ entity ipbus_ctrlreg_v is
 		ipbus_out: out ipb_rbus;
 		d: in ipb_reg_v(N_STAT - 1 downto 0);
 		q: out ipb_reg_v(N_CTRL - 1 downto 0);
-		stb: out std_logic(N_CTRL - 1 downto 0)
+		stb: out std_logic_vector(N_CTRL - 1 downto 0)
 	);
 	
 end ipbus_ctrlreg_v;
