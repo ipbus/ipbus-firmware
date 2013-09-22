@@ -44,8 +44,8 @@ begin
 	drp_out.data <= ipb_in.ipb_wdata(15 downto 0);
 	drp_out.we <= cyc and ipb_in.ipb_write;
 
-	ipb_out.ack <= drp_in.rdy and stb;
-	ipb_out.err <= '0';
+	ipb_out.ipb_ack <= drp_in.rdy and stb;
+	ipb_out.ipb_err <= '0';
 	ipb_out.ipb_rdata <= X"0000" & drp_in.data;
 
 end rtl;
