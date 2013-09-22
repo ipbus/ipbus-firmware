@@ -15,7 +15,6 @@ entity ipbus_fabric_sel is
   generic(
     NSLV: positive;
     STROBE_GAP: boolean := false;
-    SEL_WIDTH: positive
    );
   port(
   	sel: in std_logic_vector(calc_width(NSLV) - 1 downto 0);
