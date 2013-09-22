@@ -36,7 +36,6 @@ begin
 		port map(
 			m_clk => m_clk,
 			m_rst => m_rst,
-			
 
 	s_ipb_out.ipb_addr <= m_ipb_in.ipb_addr;
 	s_ipb_out.ipb_wdata <= m_ipb_in.ipb_wdata;
