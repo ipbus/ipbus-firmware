@@ -14,7 +14,7 @@ use work.ipbus_reg_types.all;
 entity ipbus_fabric_sel is
   generic(
     NSLV: positive;
-    STROBE_GAP: boolean := false;
+    STROBE_GAP: boolean := false
    );
   port(
   	sel: in std_logic_vector(calc_width(NSLV) - 1 downto 0);
