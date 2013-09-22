@@ -14,10 +14,11 @@ use work.ipbus_reg_types.all;
 entity ipbus_fabric_sel is
   generic(
     NSLV: positive;
-    STROBE_GAP: boolean := false
+    STROBE_GAP: boolean := false;
+    SEL_WIDTH: positive
    );
   port(
-  	sel: in std_logic_vector(calc_width(NSLV) - 1 downto 0);
+  	sel: in std_logic_vector(SEL_WIDTH - 1 downto 0);
     ipb_in: in ipb_wbus;
     ipb_out: out ipb_rbus;
     ipb_to_slaves: out ipb_wbus_array(NSLV - 1 downto 0);
