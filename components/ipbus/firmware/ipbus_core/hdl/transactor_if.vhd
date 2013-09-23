@@ -35,14 +35,14 @@ architecture rtl of transactor_if is
 	type state_type is (ST_IDLE, ST_FIRST, ST_HDR, ST_PREBODY, ST_BODY, ST_DONE);
 	signal state: state_type;
 	
-	signal dnext, dnext_d, dsel: std_logic;
+	signal dinit, dinit_d, dnext, dnext_d, dsel: std_logic;
 	signal raddr: unsigned(addr_width - 1 downto 0);
 	signal rxd, rxf: std_logic_vector(31 downto 0);
 --	signal raddr, waddr, haddr, waddrh: unsigned(addr_width - 1 downto 0);
 	signal waddr, haddr, waddrh: unsigned(addr_width - 1 downto 0);
 	signal hlen, blen, rctr, wctr: unsigned(15 downto 0);
 	signal idata, rdata: std_logic_vector(31 downto 0);
-	signal first, start: std_logic;
+	signal first, start, start_d: std_logic;
 
   
 begin
@@ -51,16 +51,17 @@ begin
 	begin
 		if rising_edge(clk) then
 
-			if state = ST_IDLE then
+			if dinit = '1' then
 				raddr <= (others => '0');
-			elsif dnext = '1' then
+			elsif dnext = '1' or dinit_d = '1' then
 				raddr <= raddr + 1;
 			end if;
 
+			dinit_d <= dinit;
 			dnext_d <= dnext;
 			dsel <= dnext and dnext_d;
 			
-			if state = ST_IDLE or dnext = '1' then
+			if dinit = '1' or dinit_d = '1' or dnext = '1' or dnext_d = '1' then
 				rxf <= trans_in.rdata;
 			end if;
 			
@@ -68,12 +69,10 @@ begin
 	end process;
 	
 	rxd <= rxf when dsel = '0' else trans_in.rdata;
-
+	
 	process(clk)
 	begin
 		if rising_edge(clk) then
-
-			start <= trans_in.pkt_rdy and not trans_in.busy;
 		
 			if rst = '1' then
 				state <= ST_IDLE;
@@ -81,7 +80,7 @@ begin
 				case state is
 
 				when ST_IDLE =>  -- Starting state
-					if start = '1' then
+					if start_d = '1' then
 						state <= ST_FIRST;
 					end if;
 				
@@ -138,11 +137,16 @@ begin
 --		end if;
 --	end process;
 
+	start <= trans_in.pkt_rdy and not trans_in.busy;
+
+	dinit <= not start;
 	dnext <= '1' when state = ST_FIRST or state = ST_HDR or (state = ST_BODY and rx_next = '1') else '0';
 	
 	process(clk)
 	begin
 		if rising_edge(clk) then
+		
+			start_d <= start;
 			
 			if state = ST_IDLE and start = '1' then
 --				hlen <= unsigned(trans_in.rdata(31 downto 16));
