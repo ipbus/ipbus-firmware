@@ -32,38 +32,70 @@ end transactor_if;
 
 architecture rtl of transactor_if is
 
-	type state_type is (ST_IDLE, ST_HDR, ST_PREBODY, ST_BODY, ST_DONE);
+	type state_type is (ST_IDLE, ST_FIRST, ST_HDR, ST_PREBODY, ST_BODY, ST_DONE);
 	signal state: state_type;
 	
-	signal raddr, waddr, haddr, waddrh: unsigned(addr_width - 1 downto 0);
+	signal dnext, dnext_d, dsel: std_logic;
+	signal raddr: unsigned(addr_width - 1 downto 0);
+	signal rxd, rxf: std_logic_vector(31 downto 0);
+--	signal raddr, waddr, haddr, waddrh: unsigned(addr_width - 1 downto 0);
+	signal waddr, haddr, waddrh: unsigned(addr_width - 1 downto 0);
 	signal hlen, blen, rctr, wctr: unsigned(15 downto 0);
 	signal idata, rdata: std_logic_vector(31 downto 0);
-	signal first, start, rx_next_d, dsel: std_logic;
+	signal first, start: std_logic;
+
   
 begin
-
-	start <= trans_in.pkt_rdy and not trans_in.busy;	
 
 	process(clk)
 	begin
 		if rising_edge(clk) then
 
+			if state = ST_IDLE then
+				raddr <= (others => '0');
+			elsif dnext = '1' then
+				raddr <= raddr + 1;
+			end if;
+
+			dnext_d <= dnext;
+			dsel <= dnext and dnext_d;
+			
+			if state = ST_IDLE or dnext = '1' then
+				rxf <= trans_in.rdata;
+			end if;
+			
+		end if;
+	end process;
+	
+	rxd <= rxf when dsel = '0' else trans_in.rdata;
+
+	process(clk)
+	begin
+		if rising_edge(clk) then
+
+			start <= trans_in.pkt_rdy and not trans_in.busy;
+		
 			if rst = '1' then
 				state <= ST_IDLE;
 			else
 				case state is
 
-				when ST_IDLE => -- Starting state
+				when ST_IDLE =>  -- Starting state
 					if start = '1' then
-						if trans_in.rdata(31 downto 16) = X"0000" then
-							if trans_in.rdata(15 downto 0) = X"0000" then
-								state <= ST_DONE;
-							else
-								state <= ST_PREBODY;
-							end if;
+						state <= ST_FIRST;
+					end if;
+				
+				when ST_FIRST => -- Get packet length
+--					if trans_in.rdata(31 downto 16) = X"0000" then
+--						if trans_in.rdata(15 downto 0) = X"0000" then
+					if rxd(31 downto 16) = X"0000" then
+						if rxd(15 downto 0) = X"0000" then
+							state <= ST_DONE;
 						else
-							state <= ST_HDR;
+							state <= ST_PREBODY;
 						end if;
+					else
+						state <= ST_HDR;
 					end if;
 
 				when ST_HDR => -- Transfer packet info
@@ -94,25 +126,29 @@ begin
 		end if;
 	end process;
 
-	process(clk)
-	begin
-		if rising_edge(clk) then
-			if raddr = (addr_width - 1 downto 0 => '0') or state = ST_HDR or
-				(state = ST_BODY and rx_next = '1') or (state = ST_IDLE and start = '1') then
-				raddr <= raddr + 1;
-			elsif state = ST_DONE or rst = '1' then
-				raddr <= (others => '0');
-			end if;
-		end if;
-	end process;
+--	process(clk)
+--	begin
+--		if rising_edge(clk) then
+--			if raddr = (addr_width - 1 downto 0 => '0') or state = ST_HDR or
+--				(state = ST_BODY and rx_next = '1') or (state = ST_IDLE and start = '1') then
+--				raddr <= raddr + 1;
+--			elsif state = ST_DONE or rst = '1' then
+--				raddr <= (others => '0');
+--			end if;
+--		end if;
+--	end process;
 
+	dnext <= '1' when state = ST_FIRST or state = ST_HDR or (state = ST_BODY and rx_next = '1') else '0';
+	
 	process(clk)
 	begin
 		if rising_edge(clk) then
 			
 			if state = ST_IDLE and start = '1' then
-				hlen <= unsigned(trans_in.rdata(31 downto 16));
-				blen <= unsigned(trans_in.rdata(15 downto 0));
+--				hlen <= unsigned(trans_in.rdata(31 downto 16));
+--				blen <= unsigned(trans_in.rdata(15 downto 0));
+				hlen <= unsigned(rxd(31 downto 16));
+				blen <= unsigned(rxd(15 downto 0));
 			end if;
 			
 			if state = ST_HDR or (state = ST_BODY and tx_we = '1') then
@@ -142,23 +178,17 @@ begin
 			elsif tx_we = '1' then
 				first <= '0';
 			end if;
-			
-			rx_next_d <= rx_next;
-			dsel <= rx_next and rx_next_d;
-			
-			if rx_next = '1' or raddr = (addr_width - 1 downto 0 => '0') then
-				rdata <= trans_in.rdata;
-			end if;
 						
 		end if;
 	end process;
 	
 	ipb_req <= '1' when state = ST_PREBODY or state = ST_BODY else '0';
-	
+
+	rx_data <= rxd;
 	rx_ready <= '1' when state = ST_BODY and not (rctr > blen) else '0';
 		
 	idata <= std_logic_vector(hlen) & std_logic_vector(wctr) when state = ST_DONE
-		else trans_in.rdata;
+		else rxd;
 		
 	waddrh <= (others => '0') when state = ST_DONE else waddr;
 	
@@ -171,6 +201,5 @@ begin
 	pkt_rx <= '1' when state = ST_IDLE and start = '1' else '0';
 	pkt_tx <= '1' when state = ST_DONE else '0';
 	
-	rx_data <= rdata when dsel = '0' else trans_in.rdata;
-	
 end rtl;
+

@@ -35,8 +35,8 @@ end transactor;
 
 architecture rtl of transactor is
 
-  signal rx_data, tx_data: std_logic_vector(31 downto 0);
-  signal rx_ready, rx_next, byte_order, tx_we, tx_hdr, tx_err: std_logic;
+	signal rx_data, tx_data: std_logic_vector(31 downto 0);
+  signal rx_ready, rx_next, tx_we, tx_hdr, tx_err: std_logic;
   signal cfg_we: std_logic;
   signal cfg_addr: std_logic_vector(1 downto 0);
   signal cfg_din, cfg_dout: std_logic_vector(31 downto 0);
