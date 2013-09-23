@@ -79,12 +79,16 @@ begin
 				when ST_HDR =>
 					if rx_ready = '0' or err /= X"0" or err_d /= X"0" then
 						state <= ST_IDLE;
-					elsif rx_data(15 downto 8) /= X"00" then
+					else
 						state <= ST_ADDR;
 					end if;
 -- Load address counter
 				when ST_ADDR =>
-					state <= ST_BUS_CYCLE;
+					if words_todo /= X"00" then
+						state <= ST_BUS_CYCLE;
+					else
+						state <= ST_HDR;
+					end if;
 -- The bus transaction
 				when ST_BUS_CYCLE =>
 					if err /= X"0" then
