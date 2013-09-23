@@ -35,7 +35,7 @@ end transactor;
 
 architecture rtl of transactor is
 
-  signal tx_data: std_logic_vector(31 downto 0);
+  signal rx_data, tx_data: std_logic_vector(31 downto 0);
   signal rx_ready, rx_next, byte_order, tx_we, tx_hdr, tx_err: std_logic;
   signal cfg_we: std_logic;
   signal cfg_addr: std_logic_vector(1 downto 0);
@@ -53,6 +53,7 @@ begin
 			ipb_grant => ipb_grant,
 			rx_ready => rx_ready,
 			rx_next => rx_next,
+			rx_data => rx_data,
 			tx_data => tx_data,
 			tx_we => tx_we,
 			tx_hdr => tx_hdr,
@@ -65,7 +66,7 @@ begin
     	port map(
 			clk => clk,
 			rst => rst,
-			rx_data => trans_in.rdata,
+			rx_data => rx_data,
 			rx_ready => rx_ready,
 			rx_next => rx_next,
 			tx_data => tx_data,

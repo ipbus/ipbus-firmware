@@ -19,12 +19,11 @@ entity transactor_if is
     ipb_grant: in std_logic; -- Bus grant
     rx_ready: out std_logic; -- New data is available
     rx_next: in std_logic; -- Request for new data from transactor
+    rx_data: out std_logic_vector(31 downto 0); -- Packet data to transactor
     tx_data: in std_logic_vector(31 downto 0); -- Packet data from transactor
     tx_we: in std_logic; -- Transactor data valid
     tx_hdr: in std_logic; -- Header word flag from transactor
     tx_err: in std_logic;
-    byte_order: out std_logic; -- Controls byte ordering of input and output packet data
-    next_pkt_id: out std_logic_vector(15 downto 0); -- Next expected packet ID
     pkt_rx: out std_logic;
     pkt_tx: out std_logic
    );
@@ -38,8 +37,8 @@ architecture rtl of transactor_if is
 	
 	signal raddr, waddr, haddr, waddrh: unsigned(addr_width - 1 downto 0);
 	signal hlen, blen, rctr, wctr: unsigned(15 downto 0);
-	signal idata: std_logic_vector(31 downto 0);
-	signal first, start: std_logic;
+	signal idata, rdata: std_logic_vector(31 downto 0);
+	signal first, start, rx_next_d, dsel: std_logic;
   
 begin
 
@@ -97,8 +96,9 @@ begin
 
 	process(clk)
 	begin
-		if falling_edge(clk) then
-			if state = ST_HDR or (state = ST_BODY and rx_next = '1') or (state = ST_IDLE and start = '1') then
+		if rising_edge(clk) then
+			if raddr = (addr_width - 1 downto 0 => '0') or state = ST_HDR or
+				(state = ST_BODY and rx_next = '1') or (state = ST_IDLE and start = '1') then
 				raddr <= raddr + 1;
 			elsif state = ST_DONE or rst = '1' then
 				raddr <= (others => '0');
@@ -143,6 +143,13 @@ begin
 				first <= '0';
 			end if;
 			
+			rx_next_d <= rx_next;
+			dsel <= rx_next and rx_next_d;
+			
+			if rx_next = '1' or raddr = (addr_width - 1 downto 0 => '0') then
+				rdata <= trans_in.rdata;
+			end if;
+						
 		end if;
 	end process;
 	
@@ -163,5 +170,7 @@ begin
 
 	pkt_rx <= '1' when state = ST_IDLE and start = '1' else '0';
 	pkt_tx <= '1' when state = ST_DONE else '0';
+	
+	rx_data <= rdata when dsel = '0' else trans_in.rdata;
 	
 end rtl;
