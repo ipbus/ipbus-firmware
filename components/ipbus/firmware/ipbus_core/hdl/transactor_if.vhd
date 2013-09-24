@@ -78,7 +78,7 @@ begin
 				case state is
 
 				when ST_IDLE =>  -- Starting state
-					if start_d = '1' then
+					if start = '1' and start_d = '1' then
 						state <= ST_FIRST;
 					end if;
 				
