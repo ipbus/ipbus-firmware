@@ -50,7 +50,7 @@ begin
 			elsif ipb_in.ipb_strobe = '1' then
 				if ipb_in.ipb_addr(0) = '0' then
 					if ipb_in.ipb_write = '1' then
-						ptr <= unsigned(ipbus_in.ipb_wdata(ADDR_WIDTH downto 0));
+						ptr <= unsigned(ipb_in.ipb_wdata(ADDR_WIDTH downto 0));
 					end if;
 				else
 					ptr <= ptr + 1;
@@ -73,9 +73,9 @@ begin
 				
 			if ipb_in.ipb_strobe = '1' and ipb_in.ipb_write = '1' then
 				if ptr(0) = '0' then
-					ram(sel)(17 downto 0) <= ipb_in.ipb_wdata(17 downto 0);
+					ram(sel)(17 downto 0) := ipb_in.ipb_wdata(17 downto 0);
 				else
-					ram(sel)(35 downto 18) <= ipb_in.ipb_wdata(17 downto 0);
+					ram(sel)(35 downto 18) := ipb_in.ipb_wdata(17 downto 0);
 				end if;
 			end if;
 		
