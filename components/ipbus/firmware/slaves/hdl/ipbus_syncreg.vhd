@@ -31,8 +31,6 @@ entity ipbus_syncreg is
 		ipb_in: in ipb_wbus;
 		ipb_out: out ipb_rbus;
 		slv_clk: in std_logic;
-		
-		
 		d: in std_logic_vector(2 ** stat_addr_width * 32 - 1 downto 0);
 		q: out std_logic_vector(2 ** ctrl_addr_width * 32 - 1 downto 0);
 		stb: out std_logic_vector(2 ** ctrl_addr_width - 1 downto 0)
