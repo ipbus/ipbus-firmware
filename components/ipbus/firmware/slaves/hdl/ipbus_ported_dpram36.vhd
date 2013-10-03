@@ -49,7 +49,7 @@ begin
 				ptr <= (others => '0');
 			elsif ipb_in.ipb_strobe = '1' then
 				if ipb_in.ipb_addr(0) = '0' then
-					if ipbus_in.ipb_write = '1' then
+					if ipb_in.ipb_write = '1' then
 						ptr <= unsigned(ipbus_in.ipb_wdata(ADDR_WIDTH downto 0));
 					end if;
 				else
@@ -73,19 +73,19 @@ begin
 				
 			if ipb_in.ipb_strobe = '1' and ipb_in.ipb_write = '1' then
 				if ptr(0) = '0' then
-					reg(sel)(17 downto 0) <= ipbus_in.ipb_wdata(17 downto 0);
+					ram(sel)(17 downto 0) <= ipb_in.ipb_wdata(17 downto 0);
 				else
-					reg(sel)(35 downto 18) <= ipbus_in.ipb_wdata(17 downto 0);
+					ram(sel)(35 downto 18) <= ipb_in.ipb_wdata(17 downto 0);
 				end if;
 			end if;
 		
 		end if;
 	end process;
 	
-	ipbus_out.ipb_ack <= ipbus_in.ipb_strobe;
-	ipbus_out.ipb_err <= '0';
-	ipbus_out.ipb_rdata <= std_logic_vector(to_unsigned(0, 32 - ADDR_WIDTH - 1)) & std_logic_vector(ptr)
-		when ipbus_in.ipb_addr(0)='0' else X"000" & "00" & data;
+	ipb_out.ipb_ack <= ipb_in.ipb_strobe;
+	ipb_out.ipb_err <= '0';
+	ipb_out.ipb_rdata <= std_logic_vector(to_unsigned(0, 32 - ADDR_WIDTH - 1)) & std_logic_vector(ptr)
+		when ipb_in.ipb_addr(0)='0' else X"000" & "00" & data;
 	
 	rsel <= to_integer(unsigned(addr));
 	
