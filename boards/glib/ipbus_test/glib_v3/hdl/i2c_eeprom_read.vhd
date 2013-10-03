@@ -45,7 +45,9 @@ type state_bm_type is
 	start_b,
 	start_c,
 	stop_a,
-	stop_b,stop_c,
+	stop_b,
+	stop_c,
+	stop_d,
 	wrbit_a,
 	wrbit_b,
 	wrbit_c,
@@ -120,7 +122,7 @@ if reset='1' then
 	state_bm		<= idle;
 	sda_wr			<= '1';
 	scl_wr 			<= '1';
-	sda_ien     <= '0';
+	sda_ien     <= '1';
 	
 elsif rising_edge(clk) then
 
@@ -135,9 +137,10 @@ elsif rising_edge(clk) then
 			when start_b => scl_wr <= '1'; sda_wr <= '1';                   state_bm <= start_c;
 			when start_c => scl_wr <= '1'; sda_wr <= '0';                   state_bm <= done; sclbit <= '0';
 			--
-			when stop_a  => scl_wr <= '0'; sda_wr <= '0';  sda_ien <= '0';  state_bm <= stop_b; 
+			when stop_a  => scl_wr <= '0'; sda_wr <= '0'; sda_ien <= '0';   state_bm <= stop_b; 
 			when stop_b  => scl_wr <= '1'; sda_wr <= '0';                   state_bm <= stop_c;
-			when stop_c  => scl_wr <= '1'; sda_wr <= '1';                   state_bm <= done; sclbit <= '1';
+			when stop_c  => scl_wr <= '1'; sda_wr <= '1';                   state_bm <= stop_d;
+			when stop_d  => scl_wr <= '1'; sda_wr <= '1'; sda_ien <= '1';   state_bm <= done; sclbit <= '1';
 			--
 			when wrbit_a => scl_wr <= '0'; sda_wr <= wrbit; sda_ien <= '0'; state_bm <= wrbit_b; 
 			when wrbit_b => scl_wr <= '1';                                  state_bm <= wrbit_c; 
