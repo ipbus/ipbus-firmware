@@ -81,7 +81,7 @@ begin
 				end if;
 			end if;
 			
-			wcyc_d <= wcyc;
+			wcyc_d <= wcyc and ipb_in.ipb_addr(0);
 		
 		end if;
 	end process;
