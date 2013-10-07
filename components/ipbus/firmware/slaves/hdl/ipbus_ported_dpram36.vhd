@@ -40,7 +40,7 @@ architecture rtl of ipbus_ported_dpram36 is
 	signal ptr: unsigned(ADDR_WIDTH downto 0);
 	signal data, data_i: std_logic_vector(35 downto 0);
 	signal data_o: std_logic_vector(31 downto 0);
-	signal wea_l, wea_h: std_logic;
+	signal wea: std_logic_vector(1 downto 0);
 
 begin
 
