@@ -38,7 +38,7 @@ architecture rtl of ipbus_ported_dpram36 is
 	signal sel, rsel: integer;
 	signal wcyc, wcyc_d: std_logic;
 	signal ptr: unsigned(ADDR_WIDTH downto 0);
-	signal data: std_logic_vector(35 downto 0);
+	signal data, data_i: std_logic_vector(35 downto 0);
 	signal data_o: std_logic_vector(31 downto 0);
 	signal wea_l, wea_h: std_logic;
 
@@ -64,8 +64,9 @@ begin
 	end process;
 	
 	sel <= to_integer(ptr(ADDR_WIDTH downto 1));
-	wea_l <= wcyc and not ptr(0);
-	wea_h <= wcyc and ptr(0);
+	wea(0) <= wcyc and not ptr(0);
+	wea(1) <= wcyc and ptr(0);
+	data_i <= ipb_in.ipb_wdata(17 downto 0) & ipb_in.ipb_wdata(17 downto 0);
 	
 	process(clk)
 	begin
@@ -73,12 +74,11 @@ begin
 
 			data <= ram(sel);
 				
-			if wea_l = '1' then 
-				ram(sel)(17 downto 0) := ipb_in.ipb_wdata(17 downto 0);
-			end if;
-			if wea_h = '1' then
-				ram(sel)(35 downto 18) := ipb_in.ipb_wdata(17 downto 0);
-			end if;
+			for i in 0 to 1 loop
+				if wea(i) = '1' then
+					ram(sel)((i + 1) * 18 - 1 downto i * 18) := data_i((i + 1) * 18 - 1 downto i * 18);
+				end if;
+			end loop;
 			
 			wcyc_d <= wcyc and ipb_in.ipb_addr(0);
 		
