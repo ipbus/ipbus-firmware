@@ -33,14 +33,14 @@ end ipbus_ported_dpram36;
 
 architecture rtl of ipbus_ported_dpram36 is
 
-	type ram_array is array(2 ** ADDR_WIDTH - 1 downto 0) of std_logic_vector(35 downto 0);
-	shared variable ram: ram_array;
+	type ram_array is array(2 ** ADDR_WIDTH - 1 downto 0) of std_logic_vector(18 downto 0);
+	shared variable ram_l, ram_h: ram_array;
 	signal sel, rsel: integer;
 	signal wcyc, wcyc_d: std_logic;
 	signal ptr: unsigned(ADDR_WIDTH downto 0);
-	signal data, data_i: std_logic_vector(35 downto 0);
+	signal data: std_logic_vector(35 downto 0);
 	signal data_o: std_logic_vector(31 downto 0);
-	signal wea: std_logic_vector(1 downto 0);
+	signal wea_l, wea_h: std_logic;
 
 begin
 
@@ -64,21 +64,21 @@ begin
 	end process;
 	
 	sel <= to_integer(ptr(ADDR_WIDTH downto 1));
-	wea(0) <= wcyc and not ptr(0);
-	wea(1) <= wcyc and ptr(0);
-	data_i <= ipb_in.ipb_wdata(17 downto 0) & ipb_in.ipb_wdata(17 downto 0);
+	wea_l <= wcyc and not ptr(0);
+	wea_h <= wcyc and ptr(0);
 	
 	process(clk)
 	begin
 		if rising_edge(clk) then
 
-			data <= ram(sel);
+			data <= ram_h(sel) & ram_l;
 				
-			for i in 0 to 1 loop
-				if wea(i) = '1' then
-					ram(sel)((i + 1) * 18 - 1 downto i * 18) := data_i((i + 1) * 18 - 1 downto i * 18);
-				end if;
-			end loop;
+			if wea_l = '1' then
+				ram_l <= ipb_in.ipb_wdata(17 downto 0);
+			end if;
+			if wea_h = '1' then
+				ram_h <= ipb_in.ipb_wdata(17 downto 0);
+			end if;
 			
 			wcyc_d <= wcyc and ipb_in.ipb_addr(0);
 		
@@ -98,9 +98,10 @@ begin
 	process(rclk)
 	begin
 		if rising_edge(rclk) then
-			q <= ram(rsel); -- Order of statements is important to infer read-first RAM!
+			q <= ram_h(rsel) & ram_l(rsel); -- Order of statements is important to infer read-first RAM!
 			if we = '1' then
-				ram(rsel) := d;
+				ram_l(rsel) := d(17 downto 0);
+				ram_h(rsel) := d(35 downto 18);
 			end if;
 		end if;
 	end process;
