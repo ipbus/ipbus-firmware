@@ -38,7 +38,9 @@ architecture rtl of ipbus_ported_dpram36 is
 	signal sel, rsel: integer;
 	signal wcyc, wcyc_d: std_logic;
 	signal ptr: unsigned(ADDR_WIDTH downto 0);
-	signal data: std_logic_vector(17 downto 0);
+	signal data: std_logic_vector(35 downto 0);
+	signal data_o: std_logic_vector(31 downto 0);
+	signal wea_l, wea_h: std_logic;
 
 begin
 
@@ -62,23 +64,20 @@ begin
 	end process;
 	
 	sel <= to_integer(ptr(ADDR_WIDTH downto 1));
+	wea_l <= wcyc and not ptr(0);
+	wea_h <= wcyc and ptr(0);
 	
 	process(clk)
 	begin
 		if rising_edge(clk) then
 
-			if ptr(0) = '0' then
-				data <= ram(sel)(17 downto 0);
-			else
-				data <= ram(sel)(35 downto 18);
-			end if;
+			data <= ram(sel);
 				
-			if wcyc = '1' then
-				if ptr(0) = '0' then
-					ram(sel)(17 downto 0) := ipb_in.ipb_wdata(17 downto 0);
-				else
-					ram(sel)(35 downto 18) := ipb_in.ipb_wdata(17 downto 0);
-				end if;
+			if wea_l = '1' then 
+				ram(sel)(17 downto 0) := ipb_in.ipb_wdata(17 downto 0);
+			end if;
+			if wea_h = '1' then
+				ram(sel)(35 downto 18) := ipb_in.ipb_wdata(17 downto 0);
 			end if;
 			
 			wcyc_d <= wcyc and ipb_in.ipb_addr(0);
@@ -86,10 +85,13 @@ begin
 		end if;
 	end process;
 	
+	data_o(17 downto 0) <= data(17 downto 0) when ptr(0) = '0' else data(35 downto 18);
+	data_o(31 downto 18) <= (others => '0');
+	
 	ipb_out.ipb_ack <= ipb_in.ipb_strobe;
 	ipb_out.ipb_err <= '0';
 	ipb_out.ipb_rdata <= std_logic_vector(to_unsigned(0, 32 - ADDR_WIDTH - 1)) & std_logic_vector(ptr)
-		when ipb_in.ipb_addr(0)='0' else X"000" & "00" & data;
+		when ipb_in.ipb_addr(0)='0' else data_o;
 	
 	rsel <= to_integer(unsigned(addr));
 	
