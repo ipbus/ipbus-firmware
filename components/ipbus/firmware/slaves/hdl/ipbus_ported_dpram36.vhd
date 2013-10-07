@@ -74,10 +74,10 @@ begin
 			data <= ram_h(sel) & ram_l(sel);
 				
 			if wea_l = '1' then
-				ram_l <= ipb_in.ipb_wdata(17 downto 0);
+				ram_l(sel) := ipb_in.ipb_wdata(17 downto 0);
 			end if;
 			if wea_h = '1' then
-				ram_h <= ipb_in.ipb_wdata(17 downto 0);
+				ram_h(sel) := ipb_in.ipb_wdata(17 downto 0);
 			end if;
 			
 			wcyc_d <= wcyc and ipb_in.ipb_addr(0);
