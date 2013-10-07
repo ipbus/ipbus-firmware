@@ -71,7 +71,7 @@ begin
 	begin
 		if rising_edge(clk) then
 
-			data <= ram_h(sel) & ram_l;
+			data <= ram_h(sel) & ram_l(sel);
 				
 			if wea_l = '1' then
 				ram_l <= ipb_in.ipb_wdata(17 downto 0);
