@@ -36,7 +36,7 @@ architecture rtl of ipbus_ported_dpram36 is
 	type ram_array is array(2 ** ADDR_WIDTH - 1 downto 0) of std_logic_vector(17 downto 0);
 	shared variable ram_l, ram_h: ram_array;
 	signal sel, rsel: integer;
-	signal wcyc, wcyc_d: std_logic;
+	signal wcyc, wcyc_d, dsel: std_logic;
 	signal ptr: unsigned(ADDR_WIDTH downto 0);
 	signal data: std_logic_vector(35 downto 0);
 	signal data_o: std_logic_vector(31 downto 0);
@@ -64,14 +64,15 @@ begin
 	end process;
 	
 	sel <= to_integer(ptr(ADDR_WIDTH downto 1));
-	wea_l <= wcyc and not ptr(0);
-	wea_h <= wcyc and ptr(0);
+	wea_l <= wcyc and ipb_in.ipb_addr(0) and not ptr(0);
+	wea_h <= wcyc and ipb_in.ipb_addr(0) and ptr(0);
 	
 	process(clk)
 	begin
 		if rising_edge(clk) then
 
 			data <= ram_h(sel) & ram_l(sel);
+			dsel <= ptr(0);
 				
 			if wea_l = '1' then
 				ram_l(sel) := ipb_in.ipb_wdata(17 downto 0);
@@ -85,7 +86,7 @@ begin
 		end if;
 	end process;
 	
-	data_o(17 downto 0) <= data(17 downto 0) when ptr(0) = '0' else data(35 downto 18);
+	data_o(17 downto 0) <= data(17 downto 0) when dsel = '0' else data(35 downto 18);
 	data_o(31 downto 18) <= (others => '0');
 	
 	ipb_out.ipb_ack <= ipb_in.ipb_strobe;
