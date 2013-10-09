@@ -25,7 +25,8 @@ package ipbus is
 	type ipb_rbus_array is array(natural range <>) of ipb_rbus;
 	
 	constant IPB_RBUS_NULL: ipb_rbus := ((others => '0'), '0', '0');
-	
+	constant IPB_WBUS_NULL: ipb_wbus := ((others => '0'), (others => '0'), '0', '0');
+
 -- For top-level generics
 	
 	type ipb_mac_cfg is (STATIC, CFG_SPACE);
