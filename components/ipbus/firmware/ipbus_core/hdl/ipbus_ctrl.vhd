@@ -138,7 +138,7 @@ begin
 	
 	trans: entity work.transactor port map(
 		clk => ipb_clk,
-		rst => rst_ipb,
+		rst => rst_ipb, -- This is probably not what we want...
 		ipb_out => ipb_out,
 		ipb_in => ipb_in,
 		ipb_req => ipb_req,
@@ -151,7 +151,7 @@ begin
 		pkt_tx => pkt_tx_i
 	);
 	
-	cfg_out <= my_ip_addr_udp & X"0000" & my_mac_addr & X"00000000";
+	cfg_out <= my_ip_addr_udp & X"0000" & my_mac_addr & cfg(31 downto 0);
 	
 	with MAC_CFG select my_mac_addr <=
 		mac_addr when STATIC,
