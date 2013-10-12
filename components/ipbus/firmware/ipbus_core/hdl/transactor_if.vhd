@@ -66,6 +66,7 @@ begin
 		end if;
 	end process;
 	
+	trans_out.raddr <= std_logic_vector(raddr) when dinit = '0' else (others => '0');
 	rxd <= rxf when dsel = '0' else trans_in.rdata;
 	
 	process(clk)
@@ -180,7 +181,6 @@ begin
 		
 	waddrh <= (others => '0') when state = ST_DONE else waddr;
 	
-	trans_out.raddr <= std_logic_vector(raddr);
 	trans_out.pkt_done <= '1' when state = ST_DONE else '0';
 	trans_out.we <= '1' when state = ST_HDR or (tx_we = '1' and first = '0') or state = ST_DONE else '0';
 	trans_out.waddr <= std_logic_vector(haddr) when (state = ST_BODY and tx_hdr = '1') else std_logic_vector(waddrh);
