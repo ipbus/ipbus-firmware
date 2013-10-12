@@ -31,7 +31,8 @@ entity ipbus_syncreg_v is
 		slv_clk: in std_logic;
 		d: in ipb_reg_v(N_STAT - 1 downto 0);
 		q: out ipb_reg_v(N_CTRL - 1 downto 0);
-		stb: out std_logic_vector(N_CTRL - 1 downto 0)
+		stb: out std_logic_vector(N_CTRL - 1 downto 0);
+		rstb: out std_logic_vector(N_STAT - 1 downto 0)
 	);
 	
 end ipbus_syncreg_v;
@@ -91,7 +92,8 @@ begin
 				m_ack => sack(i),
 				m_q => sq(i),
 				s_clk => slv_clk,
-				s_d => d(i)
+				s_d => d(i),
+				s_stb => rstb(i)
 			);
 	
 	end generate;

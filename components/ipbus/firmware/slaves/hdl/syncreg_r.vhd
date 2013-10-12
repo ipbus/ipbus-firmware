@@ -22,7 +22,8 @@ entity syncreg_r is
 		m_ack: out std_logic;
 		m_q: out std_logic_vector(size - 1 downto 0);
 		s_clk: in std_logic;
-		s_d: in std_logic_vector(size - 1 downto 0)
+		s_d: in std_logic_vector(size - 1 downto 0);
+		s_stb: out std_logic
 	);
 	
 end syncreg_r;
@@ -68,6 +69,7 @@ begin
 	end process;
 	
 	we <= s2 and not s3;
+	s_stb <= we;
 	
 	m_busy <= busy;
 	m_ack <= ack;

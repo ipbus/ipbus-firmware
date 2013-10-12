@@ -1,10 +1,5 @@
 <node description="Transactor interface test block" size="0x2" tags="slave">
-	<node id="data" address="0x0"/>
-	<node id="cmd" address="0x1">
-		<node id="write" mask="0x1"/>
-		<node id="read" mask="0x2"/>
-		<node id="req" mask="0x4"/>
-		<node id="done" mask="0x8"/>
-	</node>
+	<node id="w" address="0x0"/>
+	<node id="r" address="0x1"/>
 </node>
 
