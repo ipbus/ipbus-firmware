@@ -152,7 +152,7 @@ begin
 				rctr <= rctr + 1;
 			end if;
 
-			if state = ST_HDR then
+			if state = ST_PREBODY then
 				wctr <= X"0000";
 			elsif state = ST_BODY and tx_we = '1' and first = '0' then
 				wctr <= wctr + 1;
