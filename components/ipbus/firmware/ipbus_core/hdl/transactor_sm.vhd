@@ -221,7 +221,7 @@ begin
 	data_out <= ipb_in.ipb_rdata when cfg_cyc = '0' else cfg_din;
 
 	tx_data <= (hdr(31 downto 16) & std_logic_vector(words_done) & hdr(7 downto 4) & err_d) when state = ST_HDR else data_out;
-	tx_we <= '1' when state = ST_HDR or (ack and not write) = '1' else '0';
+	tx_we <= '1' when state = ST_HDR or (state = ST_BUS_CYCLE and (ack and not write) = '1') else '0';
 	tx_hdr <= '1' when state = ST_HDR else '0';
 	tx_err <= '1' when err_d /= X"0" else '0';
 
