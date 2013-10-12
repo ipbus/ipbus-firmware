@@ -154,8 +154,10 @@ begin
 
 			if state = ST_PREBODY then
 				wctr <= X"0000";
-			elsif state = ST_BODY and tx_we = '1' and first = '0'
-				and not ((rctr > blen and tx_hdr = '1') or tx_err = '1') then
+--			elsif state = ST_BODY and tx_we = '1' and first = '0'
+--				and not ((rctr > blen and tx_hdr = '1') or tx_err = '1') then
+--				wctr <= wctr + 1;
+			elsif state = ST_BODY and tx_we = '1' and first = '0' then
 				wctr <= wctr + 1;
 			end if;
 			
