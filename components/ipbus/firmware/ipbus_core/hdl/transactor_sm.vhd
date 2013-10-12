@@ -93,7 +93,7 @@ begin
 				when ST_BUS_CYCLE =>
 					if err /= X"0" then
 						state <= ST_HDR;
-					elsif (ack = '1' or cfg_cyc = '1') and last_wd = '1'  then
+					elsif ack = '1' and last_wd = '1'  then
 						if rmw_cyc = '1' and rmw_write = '0' then
 							state <= ST_RMW_1;
 						else
@@ -190,8 +190,7 @@ begin
 		or rmw_write = '1' else '0';
 	rx_next <= '1' when state = ST_HDR or state = ST_RMW_1 or state = ST_RMW_2 or
 		(state = ST_ADDR and write = '1') or
-		(state = ST_BUS_CYCLE and (strobe and ack and (write or last_wd) and not rmw_write) = '1') or
-		(state = ST_BUS_CYCLE and cfg_cyc = '1')
+		(state = ST_BUS_CYCLE and (ack and (strobe or cfg_cyc) and (write or last_wd) and not rmw_write) = '1')
 		else '0';
 	rmw_cyc <= '1' when trans_type = TRANS_RMWB or trans_type = TRANS_RMWS else '0';
 	cfg_cyc <= '1' when trans_type = TRANS_RD_CFG or trans_type = TRANS_WR_CFG else '0';
@@ -212,7 +211,7 @@ begin
 		end if;
 	end process;
 
-	ack <= ipb_in.ipb_ack or ipb_in.ipb_err;
+	ack <= ipb_in.ipb_ack or ipb_in.ipb_err or cfg_cyc;
 
 	ipb_out.ipb_addr <= std_logic_vector(addr);
 	ipb_out.ipb_write <= write;
@@ -227,7 +226,7 @@ begin
 	tx_err <= '1' when err_d /= X"0" else '0';
 
 	cfg_addr <= std_logic_vector(addr(1 downto 0));
-	cfg_we <= '1' when state = ST_BUS_CYCLE and cfg_cyc = '1' and trans_type = TRANS_WR_CFG else '0';
+	cfg_we <= '1' when state = ST_BUS_CYCLE and trans_type = TRANS_WR_CFG else '0';
 	cfg_dout <= rx_data;
 
 end rtl;
