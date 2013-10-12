@@ -191,7 +191,7 @@ begin
 	rx_next <= '1' when state = ST_HDR or state = ST_RMW_1 or state = ST_RMW_2 or
 		(state = ST_ADDR and write = '1') or
 		(state = ST_BUS_CYCLE and (strobe and ack and (write or last_wd) and not rmw_write) = '1') or
-		(state = ST_BUS_CYCLE and cfg_cyc);
+		(state = ST_BUS_CYCLE and cfg_cyc = '1');
 		else '0';
 	rmw_cyc <= '1' when trans_type = TRANS_RMWB or trans_type = TRANS_RMWS else '0';
 	cfg_cyc <= '1' when trans_type = TRANS_RD_CFG or trans_type = TRANS_WR_CFG else '0';
