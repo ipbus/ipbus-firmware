@@ -32,7 +32,7 @@ end transactor_if;
 
 architecture rtl of transactor_if is
 
-	type state_type is (ST_IDLE, ST_FIRST, ST_HDR, ST_PREBODY, ST_BODY, ST_DONE);
+	type state_type is (ST_IDLE, ST_FIRST, ST_HDR, ST_PREBODY, ST_BODY, ST_DONE, ST_GAP);
 	signal state: state_type;
 	
 	signal dinit, dinit_d, dnext, dnext_d, dsel: std_logic;
@@ -113,6 +113,9 @@ begin
 					end if;
 
 				when ST_DONE => -- Write buffer header
+					state <= ST_GAP;
+					
+				when ST_GAP =>
 					state <= ST_IDLE;
 
 				end case;
