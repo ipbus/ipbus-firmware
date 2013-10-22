@@ -93,7 +93,7 @@ void get_mac_data ( int del_return,
       return;
     }
 
-    tun_fd = tun_alloc ( TAP_DEV, IFF_TAP );
+    tun_fd = tun_alloc ( TAP_DEV, IFF_TAP | IFF_NO_PI );
 
     if ( tun_fd < 0 )
     {
