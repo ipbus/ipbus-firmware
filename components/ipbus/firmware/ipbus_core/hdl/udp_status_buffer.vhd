@@ -16,11 +16,13 @@ entity udp_status_buffer is
     rst_macclk: in std_logic;
     rst_ipb_125: in std_logic;
     rx_reset: in std_logic;
-    mac_rx_error: in std_logic;
-    mac_rx_last: in std_logic;
     ipbus_in_hdr: in std_logic_vector(31 downto 0);
     ipbus_out_hdr: in std_logic_vector(31 downto 0);
     ipbus_out_valid: in std_logic;
+    mac_rx_error: in std_logic;
+    mac_rx_last: in std_logic;
+    mac_tx_error: in std_logic;
+    mac_tx_last: in std_logic;
     pkt_broadcast: in std_logic;
     pkt_drop_arp: in std_logic;
     pkt_drop_ipbus: in std_logic;
@@ -32,9 +34,13 @@ entity udp_status_buffer is
     pkt_drop_status: in std_logic;
     pkt_rcvd: in std_logic;
     req_not_found: in std_logic;
+    rx_ram_sent: in std_logic;
+    rx_req_send_125: in std_logic;
     rxpayload_dropped: in std_logic;
     rxram_dropped: in std_logic;
     status_request: in std_logic;
+    tx_ram_written: in std_logic;
+    udpram_send: in std_logic;
     next_pkt_id: out std_logic_vector(15 downto 0);
     status_block: out std_logic_vector(127 downto 0)
   );
@@ -44,6 +50,8 @@ architecture rtl of udp_status_buffer is
 
   signal header, history, ipbus_in, ipbus_out: std_logic_vector(127 downto 0);
   signal tick: integer range 0 to 3;
+  signal ready, async_event: std_logic;
+  signal async_data: std_logic_vector(4 downto 0);
 
 begin
 
@@ -108,14 +116,17 @@ header_block:  process (mac_clk)
   end process;
 
 history_block:  process (mac_clk)
-  variable last_rst_ipb, new_event, event_pending: std_logic;
+  variable last_rst_ipb, new_event, event_pending, async_ready, 
+  async_pending: std_logic;
   variable event_data: std_logic_vector(7 downto 0);
   variable rarp_arp_ping_ipbus: std_logic_vector(3 downto 0);
+  variable async_payload: std_logic_vector(4 downto 0);
   variable payload_status_resend: std_logic_vector(2 downto 0);
   begin
     if rising_edge(mac_clk) then
       if rst_macclk = '1' then
 	event_pending := '0';
+	async_pending := '0';
         history <= (Others => '0')
 -- pragma translate_off
         after 4 ns
@@ -123,6 +134,7 @@ history_block:  process (mac_clk)
         ;
       end if;
       new_event := '0';
+      async_ready := '1';
       if rst_ipb_125 = '1' and not last_rst_ipb = '1' then
         new_event := '1';
 	event_data := x"01";
@@ -168,18 +180,106 @@ history_block:  process (mac_clk)
 	  new_event := '1';
 	end if;
       end if;
+      if async_event = '1' then
+        async_pending := '1';
+	async_payload := async_data;
+      end if;
       if new_event = '1' then
         event_pending := '0';
+        async_ready := '0';
         history <= history(119 downto 0) & event_data
 -- pragma translate_off
         after 4 ns
 -- pragma translate_on
         ;
+      elsif async_pending = '1' then
+        async_pending := '0';
+        history <= history(119 downto 0) & "000" & async_payload
+-- pragma translate_off
+        after 4 ns
+-- pragma translate_on
+        ;
       end if;
+      ready <= async_ready
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
       last_rst_ipb := rst_ipb_125;
     end if;
   end process;
 
+async_history_block: process(mac_clk)
+  variable send, sent, written, tx_event, tx_send, tx_sent, tx_error,
+  last_tx_last, got_event: std_logic;
+  variable event: std_logic_vector(4 downto 0);
+  begin
+    if rising_edge(mac_clk) then
+      if rst_macclk = '1' then
+	send := '0';
+	sent := '0';
+	written := '0';
+	tx_send := '0';
+	tx_sent := '0';
+	tx_error := '0';
+	last_tx_last := '0';
+	got_event := '0';
+	event := (Others => '0');
+      end if;
+-- latch all events
+      if rx_req_send_125 = '1' then
+	send := '1';
+      end if;
+      if rx_ram_sent = '1' then
+	sent := '1';
+      end if;
+      if tx_ram_written = '1' then
+	written := '1';
+      end if;
+      if udpram_send = '1' then
+	tx_send := '1';
+      end if;
+      if mac_tx_last = '1' and last_tx_last = '0' then
+	tx_sent := '1';
+	tx_error := mac_tx_error;
+      end if;
+      last_tx_last := mac_tx_last;
+-- peel off events if OK
+      event := (Others => '0');
+      got_event := '0';
+      if ready = '1' then
+        got_event := '1';
+	if sent = '1' or written = '1' then
+	  event := "010" & written & sent;
+	  sent := '0';
+	  written := '0';
+	elsif send = '1' then
+	  event := '0' & x"C";
+	  send := '0';
+	elsif tx_send = '1' then
+	  event := '0' & x"D";
+	  tx_send := '0';
+	elsif tx_sent = '1' then
+	  event := tx_error & x"E";
+	  tx_sent := '0';
+	  tx_error := '0';
+	else
+	  got_event := '0';
+	end if;
+      end if;
+      async_event <= got_event
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+      async_data <= event
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+    end if;
+  end process;
+      
 ipbus_in_block:  process (mac_clk)
   begin
     if rising_edge(mac_clk) then

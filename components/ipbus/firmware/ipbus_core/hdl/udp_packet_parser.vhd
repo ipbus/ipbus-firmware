@@ -13,6 +13,7 @@ entity udp_packet_parser is
   port (
     mac_clk: in std_logic;
     rx_reset: in std_logic;
+    enable_125: std_logic;
     mac_rx_data: in std_logic_vector(7 downto 0);
     mac_rx_valid: in std_logic;
     MAC_addr: in std_logic_vector(47 downto 0);
@@ -70,7 +71,7 @@ arp:  process (mac_clk)
         "00" & "00" & "00" & "00" & "111111" &
         "1111" & "111111" & "0000";
         pkt_data := x"0806" & x"0001" & x"0800" & x"0604" & x"0001" & My_IP_addr;
-        pkt_drop := '0';
+        pkt_drop := not enable_125;
       elsif mac_rx_valid = '1' then
         if pkt_mask(41) = '0' then
           if pkt_data(111 downto 104) /= mac_rx_data then
@@ -109,7 +110,7 @@ rarp:  process (mac_clk)
         "00" & "00" & "00" & "00" & "111111" &
         "1111" & "000000";
         pkt_data := x"8035" & x"0001" & x"0800" & x"0604" & x"0004" & MAC_addr;
-        pkt_drop := '0';
+        pkt_drop := not enable_125;
       elsif mac_rx_valid = '1' then
         if pkt_mask(37) = '0' then
           if pkt_data(127 downto 120) /= mac_rx_data then
@@ -152,7 +153,7 @@ ip_pkt:  process (mac_clk)
         msk_mask := "111111" & "11" & "10";
         pkt_data := MAC_addr & x"0800" & x"4500" & x"0000" & My_IP_addr;
 	msk_data := (Others => '1');
-        pkt_drop := '0';
+        pkt_drop := not enable_125;
       elsif mac_rx_valid = '1' then
         if pkt_mask(33) = '0' then
           if pkt_data(127 downto 120) /= (mac_rx_data and msk_data) then
@@ -200,7 +201,7 @@ ping:  process (mac_clk)
         "11" & "11" & "11" & "11" & "1" & "0" & "11" &
         "1111" & "1111" & "00";
         pkt_data := x"01" & x"0800";
-        pkt_drop := '0';
+        pkt_drop := not enable_125;
       elsif mac_rx_valid = '1' then
         if pkt_drop_ip_sig = '1' then
 	  pkt_drop := '1';
@@ -243,7 +244,7 @@ ipbus_pkt:  process (mac_clk)
         "11" & "11" & "11" & "11" & "1" & "0" & "11" &
         "1111" & "1111" & "11" & "00";
         pkt_data := x"11" & IPBUSPORT;
-        pkt_drop := '0';
+        pkt_drop := not enable_125;
       elsif mac_rx_valid = '1' then
         if pkt_drop_ip_sig = '1' then
 	  pkt_drop := '1';
@@ -307,8 +308,8 @@ bigendian:  process (mac_clk)
       if rx_reset = '1' then
         reliable_data := x"20" & next_pkt_id & x"F0";
         unreliable_data := x"200000F0";
-        pkt_drop_reliable_i := '0';
-        pkt_drop_unreliable := '0';
+        pkt_drop_reliable_i := not enable_125;
+        pkt_drop_unreliable := not enable_125;
       elsif mac_rx_valid = '1' then
         if pkt_drop_ipbus_sig = '1' then
 	  pkt_drop_reliable_i := '1';
@@ -350,8 +351,8 @@ littleendian:  process (mac_clk)
         reliable_data := x"F0" & next_pkt_id(7 downto 0) &
 	next_pkt_id(15 downto 8)  & x"20";
         unreliable_data := x"F0000020";
-        pkt_drop_reliable_i := '0';
-        pkt_drop_unreliable := '0';
+        pkt_drop_reliable_i := not enable_125;
+        pkt_drop_unreliable := not enable_125;
       elsif mac_rx_valid = '1' then
         if pkt_drop_ipbus_sig = '1' then
 	  pkt_drop_reliable_i := '1';
@@ -390,7 +391,7 @@ status_request:  process (mac_clk)
     if rising_edge(mac_clk) then
       if rx_reset = '1' then
         pkt_data := x"0048200000F1";
-        pkt_drop := '0';
+        pkt_drop := not enable_125;
       elsif mac_rx_valid = '1' then
         if pkt_drop_ipbus_sig = '1' then
 	  pkt_drop := '1';
@@ -420,7 +421,7 @@ resend:  process (mac_clk)
       if rx_reset = '1' then
         pkt_data := x"20F2";
 	pkt_mask := "0110";
-        pkt_drop := '0';
+        pkt_drop := not enable_125;
       elsif mac_rx_valid = '1' then
         if pkt_drop_ipbus_sig = '1' then
 	  pkt_drop := '1';

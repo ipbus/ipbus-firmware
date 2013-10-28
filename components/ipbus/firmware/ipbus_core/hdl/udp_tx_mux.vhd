@@ -57,6 +57,7 @@ architecture rtl of udp_tx_mux is
   signal udp_counter: unsigned(4 downto 0);
   signal udp_counting: std_logic;
   signal byteswap_sig, byteswapping: std_logic;
+  signal udp_short_sig: std_logic;
 
 begin
 
@@ -67,7 +68,7 @@ begin
   mac_tx_last <= mac_tx_last_sig;
   mac_tx_valid <= mac_tx_valid_sig;
   mac_tx_ready_sig <= mac_tx_ready and mac_tx_valid_sig;
-  mac_tx_error <= '0';
+  mac_tx_error <= udp_short_sig and mac_tx_last_sig;
 
   With byteswapping select udpaddrb <=
   addr_sig(12 downto 2) & not addr_sig(1 downto 0) when '1',
@@ -115,6 +116,33 @@ udp_event:  process(mac_clk)
       end if;
       last_udpram_active := udpram_active;
       udpram_busy_sig <= udpram_busy_int
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+    end if;
+  end process;
+
+udp_short_block: process(mac_clk)
+-- catch packet length too short...
+  variable short_int: std_logic;
+  begin
+    if rising_edge(mac_clk) then
+      if rst_macclk = '1' then
+	short_int := '0';
+      end if;
+      if udpram_active = '1' and low_addr = '1' then
+        case to_integer(unsigned(addr_sig(5 downto 0))) is
+	  when 2 =>
+	    short_int := '1';
+	  when 52 =>
+	    short_int := '0';
+	  when Others =>
+	end case;
+      else
+        short_int := '0';
+      end if;
+      udp_short_sig <= short_int
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
@@ -321,6 +349,7 @@ udp_build_data:  process(mac_clk)
 	case to_integer(udp_counter) is
 	  when 0 =>
 -- Finish IP cksum calculation, adding headers and ipbus payload length
+	    udpram_end_addr_int := (Others => '0');
 	    int_data_int := (Others => '0');
 	  when 1 =>
 -- IP, UDP, ipbus header length, 20 + 8 + 4 = 32
@@ -355,12 +384,15 @@ udp_build_data:  process(mac_clk)
 	    ip_len_int(15 downto 8) := outbyte;
 	    int_data_int := x"13";
 	  when 22 =>
-	    udpram_end_addr_int(7 downto 0) := outbyte;
 -- finally UDP length when bytes are reversed -39 (= 20 + 14 + 5)...
 	    int_data_int := (Others => '1');
 	  when 23 =>
+-- capture high byte of end address first, to avoid glitch at length 15...
 	    udpram_end_addr_int(12 downto 8) := outbyte(4 downto 0);
 	    int_data_int := x"D9";
+	  when 24 =>
+-- then low byte of end address...
+	    udpram_end_addr_int(7 downto 0) := outbyte;
 	  when 26 =>
 	    udp_len_int(7 downto 0) := outbyte;
 	  when 27 =>

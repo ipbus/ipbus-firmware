@@ -35,6 +35,8 @@ generic(
       rst_ipb: IN std_logic;
       IP_addr: IN std_logic_vector(31 DOWNTO 0);
       MAC_addr: IN std_logic_vector(47 DOWNTO 0);
+      enable: IN std_logic;
+      RARP: IN std_logic;
       mac_rx_data: IN std_logic_vector(7 DOWNTO 0);
       mac_rx_error: IN std_logic;
       mac_rx_last: IN std_logic;
@@ -136,6 +138,8 @@ ARCHITECTURE flat OF UDP_if IS
    signal last_rx_last: std_logic;
    signal my_rx_last: std_logic;
 --
+   signal mac_tx_last_sig, mac_tx_error_sig: std_logic;
+--
    signal ipbus_in_hdr, ipbus_out_hdr: std_logic_vector(31 downto 0);
    signal pkt_broadcast, ipbus_out_valid: std_logic;
    signal rxram_dropped_sig, rxpayload_dropped_sig: std_logic;
@@ -156,7 +160,8 @@ ARCHITECTURE flat OF UDP_if IS
    SIGNAL rx_full_addra, tx_full_addrb: std_logic_vector(BUFWIDTH + ADDRWIDTH - 1 downto 0);
    SIGNAL rx_full_addrb, tx_full_addra: std_logic_vector(BUFWIDTH + ADDRWIDTH - 3 downto 0);
    signal pkt_resend, pkt_rcvd, rx_ram_busy, rx_req_send_125, udpram_sent: std_logic;
-   signal busy_125, rx_ram_sent, tx_ram_written, rxreq_not_found: std_logic;
+   signal busy_125, enable_125, rarp_125, rx_ram_sent, tx_ram_written: std_logic;
+   signal rxreq_not_found: std_logic;
    signal resend_pkt_id: std_logic_vector(15 downto 0);
    signal clean_buf: std_logic_vector(2**BUFWIDTH - 1 downto 0);
    
@@ -165,6 +170,9 @@ BEGIN
    rxpacket_dropped <= rxram_dropped_sig or rxpayload_dropped_sig or rxreq_not_found;
    rxpacket_ignored <= my_rx_last and pkt_drop_arp and pkt_drop_ping and
    pkt_drop_payload and pkt_drop_rarp and pkt_drop_resend and pkt_drop_status;
+
+   mac_tx_last <= mac_tx_last_sig;
+   mac_tx_error <= '0';
 
    rx_do_sum <= do_sum_ping or do_sum_payload;
    rx_clr_sum <= clr_sum_ping or clr_sum_payload;
@@ -202,6 +210,8 @@ rx_last_kludge: process(mac_clk)
          mac_clk => mac_clk,
          rst_macclk => rst_macclk,
 	 rx_reset => rx_reset,
+	 enable_125 => enable_125,
+	 rarp_125 => rarp_125,
 	 IP_addr => IP_addr,
 	 mac_rx_data => mac_rx_data,
 	 mac_rx_error => mac_rx_error,
@@ -211,10 +221,11 @@ rx_last_kludge: process(mac_clk)
 	 My_IP_addr => My_IP_addr_sig,
          rarp_mode => rarp_mode
      );
-   RARP: entity work.udp_rarp_block
+   RARP_block: entity work.udp_rarp_block
       PORT MAP (
          mac_clk => mac_clk,
          rst_macclk => rst_macclk,
+	 enable_125 => enable_125,
          MAC_addr => MAC_addr,
          rarp_mode => rarp_mode,
          rarp_addr => rarp_addr,
@@ -321,11 +332,13 @@ rx_last_kludge: process(mac_clk)
 	 rst_macclk => rst_macclk,
 	 rst_ipb_125 => rst_ipb_125,
 	 rx_reset => rx_reset,
-	 mac_rx_error => mac_rx_error,
-	 mac_rx_last => my_rx_last,
 	 ipbus_in_hdr => ipbus_in_hdr,
 	 ipbus_out_hdr => ipbus_out_hdr,
 	 ipbus_out_valid => ipbus_out_valid,
+	 mac_rx_error => mac_rx_error,
+	 mac_rx_last => my_rx_last,
+	 mac_tx_error => mac_tx_error_sig,
+	 mac_tx_last => mac_tx_last_sig,
 	 pkt_broadcast => pkt_broadcast,
 	 pkt_drop_arp => pkt_drop_arp,
 	 pkt_drop_ipbus => pkt_drop_ipbus,
@@ -337,9 +350,13 @@ rx_last_kludge: process(mac_clk)
 	 pkt_drop_status => pkt_drop_status,
 	 pkt_rcvd => pkt_rcvd,
 	 req_not_found => rxreq_not_found,
+	 rx_ram_sent => rx_ram_sent,
+	 rx_req_send_125 => rx_req_send_125,
 	 rxpayload_dropped => rxpayload_dropped_sig,
 	 rxram_dropped => rxram_dropped_sig,
 	 status_request => status_request,
+	 tx_ram_written => tx_ram_written,
+	 udpram_send => udpram_send,
 	 next_pkt_id => next_pkt_id,
 	 status_block => status_block
       );
@@ -372,6 +389,7 @@ rx_last_kludge: process(mac_clk)
       PORT MAP (
          mac_clk => mac_clk,
 	 rx_reset => rx_reset,
+	 enable_125 => enable_125,
 	 mac_rx_data => mac_rx_data,
 	 mac_rx_valid => mac_rx_valid,
 	 MAC_addr => MAC_addr,
@@ -583,8 +601,8 @@ rx_last_kludge: process(mac_clk)
          outbyte => outbyte,
          mac_tx_data => mac_tx_data,
          mac_tx_valid => mac_tx_valid,
-         mac_tx_last => mac_tx_last,
-         mac_tx_error => mac_tx_error,
+         mac_tx_last => mac_tx_last_sig,
+         mac_tx_error => mac_tx_error_sig,
          mac_tx_ready => mac_tx_ready,
 	 ipbus_out_hdr => ipbus_out_hdr,
 	 ipbus_out_valid => ipbus_out_valid
@@ -619,6 +637,8 @@ rx_last_kludge: process(mac_clk)
 	 rx_read_buffer_125 => rx_read_buffer_125,
 	 rx_req_send_125 => rx_req_send_125,
 	 tx_write_buffer_125 => tx_write_buffer_125,
+	 enable_125 => enable_125,
+	 rarp_125 => rarp_125,
 	 rst_ipb_125 => rst_ipb_125,
 	 rx_ram_sent => rx_ram_sent,
 	 tx_ram_written => tx_ram_written,
@@ -626,8 +646,10 @@ rx_last_kludge: process(mac_clk)
 --
          ipb_clk => ipb_clk,
          rst_ipb => rst_ipb,
+	 enable => enable,
          pkt_done_read => pkt_done_read,
          pkt_done_write => pkt_done_write,
+	 RARP => RARP,
          we => we,
          busy => busy,
 	 pkt_rdy => pkt_rdy,

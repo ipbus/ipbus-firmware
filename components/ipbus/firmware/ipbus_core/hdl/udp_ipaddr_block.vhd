@@ -12,6 +12,8 @@ entity udp_ipaddr_block is
     mac_clk: in std_logic;
     rst_macclk: in std_logic;
     rx_reset: in std_logic;
+    enable_125: in std_logic;
+    rarp_125: in std_logic;
     IP_addr: in std_logic_vector(31 downto 0);
     mac_rx_data: in std_logic_vector(7 downto 0);
     mac_rx_error: in std_logic;
@@ -25,33 +27,10 @@ end udp_ipaddr_block;
 
 architecture rtl of udp_ipaddr_block is
 
-  signal IP_addr_rx_vld, IP_addr_vld: std_logic;
+  signal IP_addr_rx_vld: std_logic;
   signal IP_addr_rx: std_logic_vector(31 downto 0);
 
 begin
-
-IP_addr_vld_block:  process (mac_clk)
-  variable IP_addr_int, zeros: std_logic_vector(31 downto 0);
-  begin
--- Stable non-zero IP address on port?
-    if rising_edge(mac_clk) then
-      zeros := (Others => '0');
-      if (IP_addr = IP_addr_int) and not (IP_addr = zeros) then
-        IP_addr_vld <= '1'
--- pragma translate_off
-        after 4 ns
--- pragma translate_on
-        ;
-      else
-        IP_addr_vld <= '0'
--- pragma translate_off
-        after 4 ns
--- pragma translate_on
-        ;
-      end if;
-      IP_addr_int := IP_addr;
-    end if;
-  end process;
 
 IP_addr_rx_vld_block:  process (mac_clk)
   begin
@@ -112,14 +91,13 @@ My_IP_addr_block:  process (mac_clk)
         Got_IP_addr_rx := '1';
 	My_IP_addr_int := IP_addr_rx;
       end if;
--- Prefer IP address from port rather than RARP...
-      if IP_addr_vld = '1' then
+-- Predefined (Non-RARP) mode...
+      if rarp_125 = '0' then
         My_IP_addr <= IP_addr
 -- pragma translate_off
         after 4 ns
 -- pragma translate_on
         ;
--- But in the absence of IP address from port use RARP...
       else
         My_IP_addr <= My_IP_addr_int
 -- pragma translate_off
@@ -127,7 +105,7 @@ My_IP_addr_block:  process (mac_clk)
 -- pragma translate_on
         ;
       end if;
-      rarp_mode <= not (Got_IP_addr_rx or IP_addr_vld)
+      rarp_mode <= enable_125 and rarp_125 and not Got_IP_addr_rx
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on

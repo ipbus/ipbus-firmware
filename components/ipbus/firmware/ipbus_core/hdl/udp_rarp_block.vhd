@@ -10,6 +10,7 @@ entity udp_rarp_block is
   port (
     mac_clk: in std_logic;
     rst_macclk: in std_logic;
+    enable_125: in std_logic;
     MAC_addr: in std_logic_vector(47 downto 0);
     rarp_mode: in std_logic;
     rarp_addr: out std_logic_vector(12 downto 0);
@@ -127,7 +128,7 @@ tick_counter:  process(mac_clk)
   variable tick_int: std_logic;
   begin
     if rising_edge(mac_clk) then
-      if rst_macclk = '1' then
+      if (rst_macclk = '1') or (enable_125 = '0') then
         counter_int := (Others => '0');
 	tick_int := '0';
 -- tick goes at 8 Hz
@@ -177,10 +178,10 @@ rarp_req_block: process(mac_clk)
   variable rarp_req_int: std_logic;
   begin
     if rising_edge(mac_clk) then
-      if rst_macclk = '1' then
+      if (rst_macclk = '1') or (enable_125 = '0') then
         req_count := (Others => '0');
 -- initial delay from bottom of MAC address...
-	req_end := unsigned(MAC_addr(4 downto 0) & "1");
+	req_end := unsigned("000" & MAC_addr(1 downto 0) & "1");
 -- pragma translate_off
 -- kludge for simulation in finite number of ticks!
 	req_end := to_unsigned(1, 6);

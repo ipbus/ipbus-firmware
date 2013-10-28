@@ -14,8 +14,8 @@ use work.ipbus_trans_decl.all;
 
 entity ipbus_ctrl is 
 	generic(
-		MAC_CFG: ipb_mac_cfg := STATIC;
-		IP_CFG: ipb_ip_cfg := STATIC;
+		MAC_CFG: ipb_mac_cfg := EXTERNAL;
+		IP_CFG: ipb_ip_cfg := EXTERNAL;
 -- Number of address bits to select RX or TX buffer in UDP I/F
 -- Number of RX and TX buffers is 2**BUFWIDTH
 		BUFWIDTH: natural := 2;
@@ -51,6 +51,8 @@ entity ipbus_ctrl is
 		ipb_grant: in std_logic := '1';
 		mac_addr: in std_logic_vector(47 downto 0) := X"000000000000"; -- Static MAC and IP addresses
 		ip_addr: in std_logic_vector(31 downto 0) := X"00000000";
+		enable: in std_logic := '1';
+		RARP_select: in std_logic := '0';
 		pkt_rx: out std_logic;
 		pkt_tx: out std_logic;
 		pkt_rx_led: out std_logic;
@@ -69,7 +71,8 @@ architecture rtl of ipbus_ctrl is
   signal cfg, cfg_out: std_logic_vector(127 downto 0);
   signal my_mac_addr: std_logic_vector(47 downto 0);
   signal my_ip_addr, my_ip_addr_udp: std_logic_vector(31 downto 0);
-  signal pkt_rx_i, pkt_tx_i: std_logic;
+--  signal last_hdr: std_logic_vector(31 downto 0);
+  signal pkt_rx_i, pkt_tx_i, udp_en, rarp_en: std_logic;
   signal buf_in_a: ipbus_trans_in_array(N_OOB downto 0);
   signal buf_out_a: ipbus_trans_out_array(N_OOB downto 0);
   
@@ -89,6 +92,8 @@ begin
 		rst_ipb => rst_ipb,
 		IP_addr => my_ip_addr,
 		MAC_addr => my_mac_addr,
+		enable => udp_en,
+		RARP => rarp_en,
 		mac_rx_data => mac_rx_data,
 		mac_rx_error => mac_rx_error,
 		mac_rx_last => mac_rx_last,
@@ -138,7 +143,7 @@ begin
 	
 	trans: entity work.transactor port map(
 		clk => ipb_clk,
-		rst => rst_ipb, -- This is probably not what we want...
+		rst => rst_ipb, -- This is probably not what we want... 
 		ipb_out => ipb_out,
 		ipb_in => ipb_in,
 		ipb_req => ipb_req,
@@ -151,16 +156,20 @@ begin
 		pkt_tx => pkt_tx_i
 	);
 	
-	cfg_out <= my_ip_addr_udp & X"0000" & my_mac_addr & cfg(31 downto 0);
+	cfg_out <= my_ip_addr_udp & X"000" & "00" & rarp_en & udp_en & my_mac_addr & X"00000000";
+--	cfg_out <= my_ip_addr_udp & X"000" & "00" & rarp_en & udp_en & my_mac_addr & last_hdr;
 	
 	with MAC_CFG select my_mac_addr <=
-		mac_addr when STATIC,
+		mac_addr when EXTERNAL,
 		cfg(79 downto 32) when others;
 		
 	with IP_CFG select my_ip_addr <=
-		ip_addr when STATIC,
-		cfg(127 downto 96) when CFG_SPACE,
-		X"00000000" when others;
+		ip_addr when EXTERNAL,
+		cfg(127 downto 96) when others;
+		
+	udp_en <= cfg(80) or enable;
+
+	rarp_en <= cfg(81) or RARP_select;
 
 	stretch_rx: entity work.stretcher port map(
 		clk => mac_clk,
@@ -176,5 +185,16 @@ begin
 	
 	pkt_rx <= pkt_rx_i;
 	pkt_tx <= pkt_tx_i;
+
+-- latch_hdr:  process (ipb_clk)
+--   begin
+--     if rising_edge(ipb_clk) then
+--       if rst_ipb = '1' then
+--         last_hdr <= (Others => '1');
+--       elsif trans_out_udp.pkt_done = '1' then
+--         last_hdr <= "0" & trans_in_udp.pkt_rdy & trans_in_udp.busy & trans_out_udp.we & trans_out_udp.waddr & trans_out_udp.wdata(15 downto 0);
+--       end if;
+--     end if;
+--   end process;
 			
 end rtl;

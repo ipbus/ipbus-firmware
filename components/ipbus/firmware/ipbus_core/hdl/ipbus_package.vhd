@@ -29,8 +29,8 @@ package ipbus is
 
 -- For top-level generics
 	
-	type ipb_mac_cfg is (STATIC, CFG_SPACE);
-	type ipb_ip_cfg is (STATIC, CFG_SPACE, RARP);
+	type ipb_mac_cfg is (EXTERNAL, INTERNAL);
+	type ipb_ip_cfg is (EXTERNAL, INTERNAL);
 
 end ipbus;
 

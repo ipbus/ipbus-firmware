@@ -18,6 +18,8 @@ entity udp_clock_crossing_if is
     rx_read_buffer_125: in std_logic_vector(BUFWIDTH - 1 downto 0);
     rx_req_send_125: in std_logic;
     tx_write_buffer_125: in std_logic_vector(BUFWIDTH - 1 downto 0);
+    enable_125: out std_logic;
+    rarp_125: out std_logic;
     rst_ipb_125: out std_logic;
     rx_ram_sent: out std_logic;
     tx_ram_written: out std_logic;
@@ -26,8 +28,10 @@ entity udp_clock_crossing_if is
     ipb_clk: in std_logic; 
     rst_ipb: in std_logic;
 --
+    enable: in std_logic;
     pkt_done_read: in std_logic;
     pkt_done_write: in std_logic;
+    RARP: in std_logic;
     we: in std_logic;
     busy: out std_logic;
     pkt_rdy: out std_logic;
@@ -39,21 +43,23 @@ end udp_clock_crossing_if;
 architecture rtl of udp_clock_crossing_if is
 
   signal req_send_tff, busy_buf, busy_up_tff, busy_down_tff: std_logic;
-  signal we_buf, rst_ipb_buf: std_logic_vector(1 downto 0);
-  signal req_send_buf, pkt_done_read_buf, pkt_done_write_buf,
-  busy_up_buf, busy_down_buf: std_logic_vector(2 downto 0);
+  signal enable_buf, rarp_buf, we_buf, rst_ipb_buf: std_logic_vector(1 downto 0);
+  signal req_send_buf, pkt_done_read_buf, pkt_done_write_buf, busy_up_buf,
+  busy_down_buf, pkt_done_r_tff, pkt_done_w_tff: std_logic_vector(2 downto 0);
   signal rx_read_buf_buf, tx_write_buf_buf: std_logic_vector(BUFWIDTH - 1 downto 0);
 
   attribute KEEP: string;
-  attribute KEEP of we_buf: signal is "TRUE";
-  attribute KEEP of rst_ipb_buf: signal is "TRUE";
-  attribute KEEP of req_send_buf: signal is "TRUE";
+  attribute KEEP of busy_down_buf: signal is "TRUE";
+  attribute KEEP of busy_up_buf: signal is "TRUE";
+  attribute KEEP of enable_buf: signal is "TRUE";
   attribute KEEP of pkt_done_read_buf: signal is "TRUE";
   attribute KEEP of pkt_done_write_buf: signal is "TRUE";
-  attribute KEEP of busy_up_buf: signal is "TRUE";
-  attribute KEEP of busy_down_buf: signal is "TRUE";
+  attribute KEEP of rarp_buf: signal is "TRUE";
+  attribute KEEP of req_send_buf: signal is "TRUE";
+  attribute KEEP of rst_ipb_buf: signal is "TRUE";
   attribute KEEP of rx_read_buf_buf: signal is "TRUE";
   attribute KEEP of tx_write_buf_buf: signal is "TRUE";
+  attribute KEEP of we_buf: signal is "TRUE";
 
 begin
 
@@ -62,19 +68,36 @@ begin
 -- assumption is that ipbus clock is significantly slower than ethernet mac clock
 -- so that transitions in ipbus clock domain are always caught in mac clock domain
 -- whereas toggle flip flops are used to ensure the reciprocal
+-- but just to be safe do the same for pkt_done...
 
+  enable_125 <= enable_buf(1);
+  rarp_125 <= rarp_buf(1);
   we_125 <= we_buf(1);
   rst_ipb_125 <= rst_ipb_buf(1);
 
--- rx_ram_sent and tx_ram_written only high for 1 tick (at end...)
-  rx_ram_sent <= pkt_done_read_buf(2) and not pkt_done_read_buf(1);
-  tx_ram_written <= pkt_done_write_buf(2) and not pkt_done_write_buf(1);
+pkt_done_ipb_clk: process(ipb_clk)
+  begin
+    if rising_edge(ipb_clk) then
+      if rst_ipb = '1' then
+        pkt_done_r_tff <= "000";
+        pkt_done_w_tff <= "000";
+      else
+-- infer a (delayed) toggle flip flop in source domain
+        pkt_done_r_tff <= pkt_done_r_tff(1 downto 0) & (pkt_done_r_tff(0) xor pkt_done_read);
+        pkt_done_w_tff <= pkt_done_w_tff(1 downto 0) & (pkt_done_w_tff(0) xor pkt_done_write);
+      end if;
+    end if;
+  end process;      
 
 pkt_done_mac_clk: process(mac_clk)
   begin
     if rising_edge(mac_clk) then
-      pkt_done_read_buf <= pkt_done_read_buf(1 downto 0) & pkt_done_read;
-      pkt_done_write_buf <= pkt_done_write_buf(1 downto 0) & pkt_done_write;
+-- rx_ram_sent and tx_ram_written only high for 1 tick...
+      rx_ram_sent <= pkt_done_read_buf(2) xor pkt_done_read_buf(1);
+      tx_ram_written <= pkt_done_write_buf(2) xor pkt_done_write_buf(1);
+-- pick up delayed tff from ipbus domain
+      pkt_done_read_buf <= pkt_done_read_buf(1 downto 0) & pkt_done_r_tff(2);
+      pkt_done_write_buf <= pkt_done_write_buf(1 downto 0) & pkt_done_w_tff(2);
     end if;
   end process;      
 
@@ -113,6 +136,20 @@ pkt_rdy_ipb_clk: process(ipb_clk)
       pkt_rdy <= pkt_rdy_buf(2);
     end if;
   end process;
+
+enable_mac_clk: process(mac_clk)
+  begin
+    if rising_edge(mac_clk) then
+      enable_buf <= enable_buf(0) & enable;
+    end if;
+  end process;      
+
+rarp_mac_clk: process(mac_clk)
+  begin
+    if rising_edge(mac_clk) then
+      rarp_buf <= rarp_buf(0) & RARP;
+    end if;
+  end process;      
 
 we_mac_clk: process(mac_clk)
   begin
@@ -163,12 +200,12 @@ busy_ipb_clk: process(ipb_clk)
       elsif (busy_up_buf(2) xor busy_up_buf(1)) = '1' then
         busy_buf := (Others => '1');
       end if;
+      busy <= busy_buf(3);
       if (busy_down_buf(2) xor busy_down_buf(1)) = '1' then
         busy_buf := busy_buf(2 downto 0) & '0';
       else
         busy_buf := busy_buf(2 downto 0) & busy_buf(0);
       end if;
-      busy <= busy_buf(3);
     end if;
   end process;    
 
