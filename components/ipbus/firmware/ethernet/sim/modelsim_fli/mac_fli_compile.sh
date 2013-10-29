@@ -6,5 +6,5 @@
 #
 # $Id: mac_fli_compile.sh 327 2011-04-25 20:23:10Z phdmn $
 
-gcc -c -fPIC -I/software/CAD/Mentor/2010_2011/HDS2008.1b/questasim/include mac_fli.c
+gcc -c -fPIC -I${MODELSIM_ROOT}/include/ mac_fli.c
 gcc -shared -fPIC -Wl,-Bsymbolic,--allow-shlib-undefined,--export-dynamic -o mac_fli.so mac_fli.o

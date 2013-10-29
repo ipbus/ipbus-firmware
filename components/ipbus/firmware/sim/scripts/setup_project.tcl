@@ -7,11 +7,14 @@
 #
 # $Id$
 
+set xlib_vhdl $::env(ISE_VHDL_MTI)
+set xlib_vlog $::env(ISE_VLOG_MTI)
+
 project new ./ ipbus_sim_demo
-vmap unisim /opt/xilinx_lib/14.5_64b/unisim
-vmap unimacro /opt/xilinx_lib/14.5_64b/unimacro
-vmap secureip /opt/xilinx_lib/14.5_64b/secureip
-vmap xilinxcorelib /opt/xilinx_lib/14.5_64b/xilinxcorelib
+vmap unisim $xlib_vhdl/unisim
+vmap unimacro $xlib_vhdl/unimacro
+vmap secureip $xlib_vlog/secureip
+vmap xilinxcorelib $xlib_vhdl/xilinxcorelib
 
 source $::env(REPOS_FW_DIR)/ipbus/firmware/sim/scripts/addfiles_sim.tcl
 
