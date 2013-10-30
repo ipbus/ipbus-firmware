@@ -188,8 +188,7 @@ begin
 	strobe <= '1' when state = ST_BUS_CYCLE and cfg_cyc = '0' else '0';
 	write <= '1' when trans_type = TRANS_WR or trans_type = TRANS_WRN or trans_type = TRANS_WR_CFG
 		or rmw_write = '1' else '0';
-	rx_next <= '1' when state = ST_HDR or state = ST_RMW_1 or state = ST_RMW_2 or
-		(state = ST_ADDR and write = '1') or
+	rx_next <= '1' when state = ST_HDR or state = ST_RMW_1 or state = ST_RMW_2 or state = ST_ADDR or	
 		(state = ST_BUS_CYCLE and (ack and (strobe or cfg_cyc) and (write or last_wd) and not rmw_write) = '1')
 		else '0';
 	rmw_cyc <= '1' when trans_type = TRANS_RMWB or trans_type = TRANS_RMWS else '0';
