@@ -26,7 +26,9 @@ entity i2c_eeprom_read is
 		ip_addr           : out std_logic_vector(31 downto 0);
 		------------------------------
 		scl_wr				: out	std_logic;
-		sda					: inout std_logic
+		sda					: inout std_logic;
+		------------------------------
+		eeprom_done       : out std_logic
 	); 			
 
 end i2c_eeprom_read;
@@ -233,6 +235,7 @@ elsif rising_edge(clk) then
 			if eeprom_rd_done = '0' then
 				next_step:=next_step+1;
 			end if;	
+			eeprom_done <= eeprom_rd_done;
 		
 			--
 			when send_start  => 
