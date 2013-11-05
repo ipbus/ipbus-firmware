@@ -22,3 +22,8 @@ NET "v6_cpld[2]" LOC = AC27        ;       # IO_L15N_13
 NET "v6_cpld[3]" LOC = AG33        ;       # IO_L16P_13
 NET "v6_cpld[4]" LOC = AG32        ;       # IO_L16N_13
 NET "v6_cpld[5]" LOC = AA26        ;       # IO_L17P_13
+
+# interface between FPGA and I2C EEPROM
+
+NET sda LOC = AP21;
+NET scl LOC = AP20;
