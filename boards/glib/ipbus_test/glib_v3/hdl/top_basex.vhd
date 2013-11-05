@@ -134,7 +134,7 @@ begin
 			pkt_tx_led => pkt_tx_led_bus(0)
 		);
 
-	RARP_select <= '1' when (ip_addr(31 downto 0) = x"0") else '0';
+	RARP_select <= '1' when (ip_addr = x"00000000") else '0';
 
 -- ipbus slaves live in the entity below, and can expose top-level ports
 -- The ipbus fabric is instantiated within.
