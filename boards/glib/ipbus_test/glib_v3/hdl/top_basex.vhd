@@ -31,7 +31,7 @@ architecture rtl of top is
 	signal pkt_rx_bus, pkt_tx_bus, pkt_rx_led_bus, pkt_tx_led_bus: mac_arbiter_sl_array(1 downto 0);
 	signal mac_addr: std_logic_vector(47 downto 0);
 	signal ip_addr: std_logic_vector(31 downto 0);
-	signal RARP_select: std_logic;
+	signal RARP_select, eeprom_done: std_logic;
 	signal pkt_rx_led, pkt_tx_led, sys_rst: std_logic;	
 	signal amc_slot: std_logic_vector(3 downto 0);
 
@@ -126,7 +126,7 @@ begin
 			ipb_in => ipb_master_in_0,
 			mac_addr => mac_addr,
 			ip_addr => ip_addr,
-			enable => '1',
+			enable => eeprom_done,
 			RARP_select => RARP_select,
 			pkt_rx => pkt_rx_bus(0),
 			pkt_tx => pkt_tx_bus(0),
@@ -204,7 +204,8 @@ begin
 			mac_addr => mac_addr,
 			ip_addr => ip_addr,
 			scl_wr => scl,
-			sda => sda
+			sda => sda,
+			eeprom_done => eeprom_done
 		);
 
 end rtl;
