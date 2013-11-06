@@ -18,7 +18,7 @@ entity ipbus_ctrl is
 		IP_CFG: ipb_ip_cfg := EXTERNAL;
 -- Number of address bits to select RX or TX buffer in UDP I/F
 -- Number of RX and TX buffers is 2**BUFWIDTH
-		BUFWIDTH: natural := 2;
+		BUFWIDTH: natural := 4;
 -- Numer of address bits to select internal buffer in UDP I/F
 -- Number of internal buffers is 2**INTERNALWIDTH
 		INTERNALWIDTH: natural := 1;
