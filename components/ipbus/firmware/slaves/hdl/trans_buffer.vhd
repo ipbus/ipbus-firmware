@@ -58,8 +58,8 @@ architecture rtl of trans_buffer is
 
 	signal req_d, mode, done_m, done_m_s: std_logic;
 	signal mode_ipb, mode_ipb_s, mode_ipb_d, rdy, done_catch: std_logic;
-	signal addr: unsigned(9 downto 0);
-	signal addr_sl: std_logic_vector(9 downto 0);
+	signal addr: unsigned(9 downto 0) := (others=>'0');
+	signal addr_sl: std_logic_vector(9 downto 0) := (others=>'0');
 	signal we_in, we_out: std_logic_vector(0 downto 0); 
 	
 	attribute KEEP: string;
