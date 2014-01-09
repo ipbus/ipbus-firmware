@@ -1,0 +1,17 @@
+# connection to i2c eeprom with MAC and IP address
+hdl glib_infrastructure/firmware/hdl/i2c_eeprom_read.vhd
+
+# ipbus slaves for board specific functions
+hdl glib_infrastructure/firmware/hdl/glib_slaves.vhd
+
+# ICAP interface for selection of firmware image to boot from
+hdl glib_infrastructure/firmware/hdl/icap_package.vhd
+hdl glib_infrastructure/firmware/hdl/icap_interface_wrapper.vhd
+hdl glib_infrastructure/firmware/hdl/icap_interface_ioControl.vhd
+hdl glib_infrastructure/firmware/hdl/icap_interface.vhd
+hdl glib_infrastructure/firmware/hdl/icap_interface_fsm.vhd
+
+# flash prom interface for firmware upload
+hdl glib_infrastructure/firmware/hdl/flash_package.vhd
+hdl glib_infrastructure/firmware/hdl/flash_interface_wrapper.vhd
+hdl glib_infrastructure/firmware/hdl/flash_interface.vhd

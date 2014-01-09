@@ -28,7 +28,7 @@ use ieee.numeric_std.all;
 library unisim;
 use unisim.vcomponents.all;
 -- User libraries and packages:
-use work.system_flash_sram_package.all;
+use work.flash_package.all;
 --=================================================================================================--
 --======================================= Module Body =============================================-- 
 --=================================================================================================--

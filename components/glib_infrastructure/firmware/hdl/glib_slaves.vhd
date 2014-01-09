@@ -7,7 +7,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use work.ipbus.ALL;
-use work.system_flash_sram_package.ALL;
+use work.flash_package.ALL;
 
 entity glib_slaves is
 	port(
