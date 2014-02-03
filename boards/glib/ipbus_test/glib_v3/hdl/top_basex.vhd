@@ -178,6 +178,8 @@ begin
 			ipb_in => ipb_master_in_1,
 			mac_addr => mac_addr,
 			ip_addr => ip_addr,
+			-- enable => eeprom_done,        KHDEBUG: adding one of these seems to cause RARP requests
+			-- RARP_select => RARP_select,   every second or so despite positive response by server
 			pkt_rx => pkt_rx_bus(1),
 			pkt_tx => pkt_tx_bus(1),
 			pkt_rx_led => pkt_rx_led_bus(1),
@@ -207,6 +209,13 @@ begin
 			sda => sda,
 			eeprom_done => eeprom_done
 		);
+
+	-- the following MAC address is constructed for RAL GLIBs in B904, 
+	-- to give the proper assigned CERN MAC addresses to boards in slots 3,4,9,10            
+	--mac_addr <= X"080030f1003" & (not amc_slot(3) xor (amc_slot(0) xor amc_slot(1))) & amc_slot(2 downto 0); 
+	--ip_addr <= X"00000000"; -- 0.0.0.0 means use RARP 
+	--eeprom_done <= '1';
+	
 
 end rtl;
 
