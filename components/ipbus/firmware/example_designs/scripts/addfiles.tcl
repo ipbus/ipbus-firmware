@@ -21,6 +21,8 @@ proc dofile {f} {
 			set f_loc_s [exec basename $f_loc]
 			if {$cmd == "hdl"} {
 				addfile $f_loc $arg2
+			} elseif {$cmd == "ngc"} {
+				addfile $f_loc $arg2
 			} elseif {$cmd == "ghdl"} {
 				addfile $f_loc $arg2
 			} elseif {$cmd == "core"} {
