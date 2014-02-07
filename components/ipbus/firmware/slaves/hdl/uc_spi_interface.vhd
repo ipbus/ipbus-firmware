@@ -181,10 +181,13 @@ begin
 
  
       if cs_sreg(2 downto 1) = "10" then
-        buf_req <= '1';
-      else
-        buf_req <= '0';
+        if mode = WRITE_MODE then
+          buf_req <= '1';
+        else
+          buf_req <= '0';
+        end if;
       end if;
+
 
       buf_we <= '0';
       if mode = WRITE_MODE then

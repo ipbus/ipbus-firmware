@@ -5,6 +5,32 @@
 --
 -- Dave Newbold, February 2013
 --
+-- The design is edge-sensitive on the req flag. There are basically two modes the block can be in (the state signal is 'mode' in the design).
+--  
+-- - When mode = 0, the master (MMC, etc) has control of the buffers
+-- - When mode = 1, the transactor has control of the buffers
+--  
+-- The 'done' flag the master sees is just defined as done <= not mode;
+--  
+-- There are two dual-port buffers, the write buffer  (into which the master writes), and the read buffer (from which the master reads after the transactor is done). They share a common address pointer on the master port.
+--  
+-- - At reset, mode = 0 (so done is high) and the master-side address pointer is reset.
+-- - The master pushes data into the write-side buffer, it fills from location 0 upwards.
+-- - When master is done, it raises 'req' and holds it high.
+-- - The mode changes to mode = 1 (so done goes low), and the master-side address pointer is reset
+-- - When the transactor is free, it reads the contents of the write-side buffer and stores the output into the read-side buffer.
+-- - When the transactor signals that it's finished, the mode changes to mode = 0
+-- - The master sees 'done' go high, and can read the data from the read buffer, from location 0 onwards
+-- - When the master is done, it drops req, which resets everything ready for the next go.
+--  
+-- From the software point of view, it looks like:
+--  
+-- - Write data into the buffer
+-- - Assert req
+-- - Wait for done to go high
+-- - Read data from the buffer
+-- - Drop req
+
 -- $Id$
 
 library ieee;
