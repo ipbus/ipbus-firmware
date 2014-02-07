@@ -186,16 +186,16 @@ begin
 
 
 
-  ram_pipe_to_ipbus: sdpram_16x10_32x9
-    port map(
-      clka => clk125,
-      wea => we_pipe,
-      addra => w_addr_pipe,
-      dina => w_data_pipe,
-      clkb => clk,
-      addrb => std_logic_vector( r_addr_ipbus ),
-      doutb => r_data_ipbus
-    );
+--   ram_pipe_to_ipbus: sdpram_16x10_32x9
+--     port map(
+--       clka => clk200buf,
+--       wea => we_pipe,
+--       addra => w_addr_pipe,
+--       dina => w_data_pipe,
+--       clkb => clk,
+--       addrb => std_logic_vector( r_addr_ipbus ),
+--       doutb => r_data_ipbus
+--     );
 
 
    ram_ipbus_to_pipe: sdpram_32x9_16x10
