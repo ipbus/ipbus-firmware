@@ -1,0 +1,64 @@
+LIBRARY ieee;
+USE ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+ENTITY udp_DualPortRAM_rx IS
+generic(
+  BUFWIDTH: natural := 0;
+  ADDRWIDTH: natural := 0
+);
+port (
+  clk125 : in std_logic;
+  clk : in std_logic;
+  rx_wea : in std_logic;
+  rx_addra : in std_logic_vector(BUFWIDTH + ADDRWIDTH - 1 downto 0);
+  rx_addrb : in std_logic_vector(BUFWIDTH + ADDRWIDTH - 3 downto 0);
+  rx_dia : in std_logic_vector(7 downto 0);
+  rx_dob : out std_logic_vector(31 downto 0)
+  );
+END ENTITY udp_DualPortRAM_rx;
+
+--
+ARCHITECTURE striped OF udp_DualPortRAM_rx IS
+type ram_type is array (2**(BUFWIDTH + ADDRWIDTH - 2) - 1 downto 0) of std_logic_vector (7 downto 0);
+signal ram1,ram2, ram3, ram4 : ram_type;
+attribute block_ram : boolean;
+attribute block_ram of RAM1 : signal is TRUE;
+attribute block_ram of RAM2 : signal is TRUE;
+attribute block_ram of RAM3 : signal is TRUE;
+attribute block_ram of RAM4 : signal is TRUE;
+BEGIN
+
+write: process (clk125)
+begin
+  if (rising_edge(clk125)) then
+    if (rx_wea = '1') then
+      case rx_addra(1 downto 0) is
+        when "00" =>
+          ram4(to_integer(unsigned(rx_addra(BUFWIDTH + ADDRWIDTH - 1 downto 2)))) <= rx_dia;
+        when "01" =>
+          ram3(to_integer(unsigned(rx_addra(BUFWIDTH + ADDRWIDTH - 1 downto 2)))) <= rx_dia;
+        when "10" =>
+          ram2(to_integer(unsigned(rx_addra(BUFWIDTH + ADDRWIDTH - 1 downto 2)))) <= rx_dia;
+        when "11" =>
+          ram1(to_integer(unsigned(rx_addra(BUFWIDTH + ADDRWIDTH - 1 downto 2)))) <= rx_dia;
+        when Others =>
+      end case;
+    end if;
+  end if;
+end process write;
+
+read: process (clk)
+  variable byte1, byte2, byte3, byte4 : std_logic_vector (7 downto 0);
+begin
+  if (rising_edge(clk)) then
+    byte4 := ram4(to_integer(unsigned(rx_addrb)));
+    byte3 := ram3(to_integer(unsigned(rx_addrb)));
+    byte2 := ram2(to_integer(unsigned(rx_addrb)));
+    byte1 := ram1(to_integer(unsigned(rx_addrb)));
+    rx_dob <= byte4 & byte3 & byte2 & byte1;
+  end if;
+end process read;
+
+
+END ARCHITECTURE striped;

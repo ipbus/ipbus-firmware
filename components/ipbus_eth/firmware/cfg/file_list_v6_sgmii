@@ -1,0 +1,11 @@
+hdl ipbus/firmware/ethernet/hdl/eth_v6_sgmii.vhd
+core ipbus/firmware/ethernet/coregen/v6_emac_v2_3_sgmii.xco
+hdl ipbus/firmware/ethernet/gen_hdl/v6_emac_v2_3_sgmii/v6_emac_v2_3_sgmii_block.vhd
+ghdl v6_emac_v2_3_sgmii/example_design/common/reset_sync.vhd
+ghdl v6_emac_v2_3_sgmii/example_design/common/sync_block.vhd
+ghdl v6_emac_v2_3_sgmii/example_design/physical/v6_gtxwizard_top.vhd
+ghdl v6_emac_v2_3_sgmii/example_design/physical/v6_gtxwizard.vhd
+ghdl v6_emac_v2_3_sgmii/example_design/physical/v6_gtxwizard_gtx.vhd
+ghdl v6_emac_v2_3_sgmii/example_design/physical/double_reset.vhd
+
+

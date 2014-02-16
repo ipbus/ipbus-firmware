@@ -1,0 +1,5 @@
+<node description="Transactor interface test block" size="0x2" tags="slave">
+	<node id="w" address="0x0"/>
+	<node id="r" address="0x1"/>
+</node>
+

@@ -1,0 +1,9 @@
+hdl ipbus/firmware/example_designs/hdl/demo_atlys/top_atlys.vhd
+hdl ipbus/firmware/example_designs/ucf/atlys.ucf
+hdl ipbus/firmware/example_designs/hdl/clocks_s6_extphy_100MHz.vhd
+hdl ipbus/firmware/ethernet/hdl/eth_s6_gmii.vhd
+include ipbus/firmware/ipbus_core/cfg/file_list
+include ipbus/firmware/example_designs/cfg/file_list
+core ipbus/firmware/ethernet/coregen/tri_mode_eth_mac_v5_4.xco
+core ipbus/firmware/ethernet/coregen/mac_fifo_axi4.xco
+

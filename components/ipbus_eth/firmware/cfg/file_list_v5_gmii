@@ -1,0 +1,9 @@
+# Xilinx ISE setup fragment for v5_emac_v1_8
+
+# This is the ISE 14.3 version
+
+hdl ipbus/firmware/ethernet/hdl/eth_v5_gmii.vhd
+hdl ipbus/firmware/ethernet/hdl/emac_hostbus_decl.vhd
+hdl ipbus/firmware/ethernet/gen_hdl/v5_emac_v1_8/v5_emac_v1_8.vhd
+core ipbus/firmware/ethernet/coregen/mac_fifo.xco
+

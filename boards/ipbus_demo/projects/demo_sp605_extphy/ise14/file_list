@@ -1,0 +1,7 @@
+hdl ipbus/firmware/example_designs/hdl/demo_sp605_extphy/top_sp605_extphy.vhd
+hdl ipbus/firmware/example_designs/ucf/sp605_extphy.ucf
+hdl ipbus/firmware/example_designs/hdl/clocks_s6_extphy.vhd
+include ipbus/firmware/ethernet/cfg/file_list_s6_extphy
+include ipbus/firmware/ipbus_core/cfg/file_list
+include ipbus/firmware/example_designs/cfg/file_list
+

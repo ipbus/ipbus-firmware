@@ -1,0 +1,19 @@
+# Xilinx ISE setup fragment for gig_eth_pcs_pma_v11_4
+
+# This is the ISE 14.3 version modified for a v7 '490 production part
+
+core ipbus/firmware/ethernet/coregen/gig_eth_pcs_pma_v11_4.xco
+core ipbus/firmware/ethernet/coregen/tri_mode_eth_mac_v5_5.xco
+hdl ipbus/firmware/ethernet/hdl/emac_hostbus_decl.vhd
+hdl ipbus/firmware/ethernet/hdl/eth_7s_1000basex.vhd
+ghdl gig_eth_pcs_pma_v11_4/example_design/gig_eth_pcs_pma_v11_4_block.vhd
+hdl ipbus/firmware/ethernet/gen_hdl/gig_eth_pcs_pma_v11_4/gig_eth_pcs_pma_v11_4_transceiver.vhd
+ghdl gig_eth_pcs_pma_v11_4/example_design/gig_eth_pcs_pma_v11_4_reset_sync.vhd
+hdl ipbus/firmware/ethernet/gen_hdl/gtwizard_v2_3_gbe/gtwizard_v2_3_gbe_init.vhd
+hdl ipbus/firmware/ethernet/gen_hdl/gtwizard_v2_3_gbe/gtwizard_v2_3_gbe.vhd
+hdl ipbus/firmware/ethernet/gen_hdl/gtwizard_v2_3_gbe/gtwizard_v2_3_gbe_gt.vhd
+hdl ipbus/firmware/ethernet/gen_hdl/gtwizard_v2_3_gbe/gtwizard_v2_3_gbe_tx_startup_fsm.vhd
+hdl ipbus/firmware/ethernet/gen_hdl/gtwizard_v2_3_gbe/gtwizard_v2_3_gbe_rx_startup_fsm.vhd
+hdl ipbus/firmware/ethernet/gen_hdl/gtwizard_v2_3_gbe/gtwizard_v2_3_gbe_recclk_monitor.vhd
+ghdl gig_eth_pcs_pma_v11_4/example_design/gig_eth_pcs_pma_v11_4_sync_block.vhd
+

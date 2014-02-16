@@ -1,0 +1,7 @@
+hdl ipbus/firmware/example_designs/hdl/demo_sp605_basex/top_sp605_basex.vhd
+hdl ipbus/firmware/example_designs/ucf/sp605_basex.ucf
+hdl ipbus/firmware/example_designs/hdl/clocks_s6_basex.vhd
+include ipbus/firmware/ethernet/cfg/file_list_s6_basex
+include ipbus/firmware/ipbus_core/cfg/file_list
+include ipbus/firmware/example_designs/cfg/file_list
+

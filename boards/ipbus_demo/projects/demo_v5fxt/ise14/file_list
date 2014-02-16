@@ -1,0 +1,9 @@
+hdl ipbus/firmware/example_designs/hdl/demo_v5fxt/top_v5fxt.vhd
+hdl ipbus/firmware/example_designs/ucf/v5fxt.ucf
+hdl ipbus/firmware/example_designs/hdl/clocks_v5_extphy.vhd
+hdl ipbus/firmware/ethernet/hdl/mac_arbiter_decl.vhd
+hdl ipbus/firmware/ethernet/hdl/mac_arbiter.vhd
+include ipbus/firmware/ipbus_core/cfg/file_list
+include ipbus/firmware/example_designs/cfg/file_list
+include ipbus/firmware/ethernet/cfg/file_list_v5_gmii
+

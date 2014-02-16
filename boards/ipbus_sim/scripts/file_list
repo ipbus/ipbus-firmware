@@ -1,0 +1,7 @@
+hdl ipbus/firmware/sim/hdl/top_sim.vhd
+hdl ipbus/firmware/sim/hdl/clock_sim.vhd
+hdl ipbus/firmware/ethernet/sim/eth_mac_sim.vhd
+hdl ipbus/firmware/ethernet/hdl/emac_hostbus_decl.vhd
+include ipbus/firmware/ipbus_core/cfg/file_list
+include ipbus/firmware/example_designs/cfg/file_list
+

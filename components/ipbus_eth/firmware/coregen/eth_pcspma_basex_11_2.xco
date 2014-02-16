@@ -1,0 +1,56 @@
+##############################################################
+#
+# Xilinx Core Generator version 13.4
+# Date: Sat Aug  4 10:37:18 2012
+#
+##############################################################
+#
+#  This file contains the customisation parameters for a
+#  Xilinx CORE Generator IP GUI. It is strongly recommended
+#  that you do not manually alter this file as it may cause
+#  unexpected and unsupported behavior.
+#
+##############################################################
+#
+#  Generated from component: xilinx.com:ip:gig_eth_pcs_pma:11.2
+#
+##############################################################
+#
+# BEGIN Project Options
+SET addpads = false
+SET asysymbol = true
+SET busformat = BusFormatAngleBracketNotRipped
+SET createndf = false
+SET designentry = VHDL
+SET device = xc7vx485t
+SET devicefamily = virtex7
+SET flowvendor = Foundation_ISE
+SET formalverification = false
+SET foundationsym = false
+SET implementationfiletype = Ngc
+SET package = ffg1927
+SET removerpms = false
+SET simulationfiles = Structural
+SET speedgrade = -2
+SET verilogsim = true
+SET vhdlsim = true
+# END Project Options
+# BEGIN Select
+SELECT Ethernet_1000BASE-X_PCS/PMA_or_SGMII xilinx.com:ip:gig_eth_pcs_pma:11.2
+# END Select
+# BEGIN Parameters
+CSET auto_negotiation=false
+CSET component_name=eth_pcspma_basex_11_2
+CSET management_interface=false
+CSET physical_interface=Transceiver
+CSET sgmii_mode=10_100_1000
+CSET sgmii_phy_mode=false
+CSET standard=1000BASEX
+CSET timing_sim=false
+CSET transceiver_tile=A
+# END Parameters
+# BEGIN Extra information
+MISC pkg_timestamp=2011-03-30T08:06:39Z
+# END Extra information
+GENERATE
+# CRC: 4f9939d3

@@ -1,0 +1,19 @@
+NET eth/txoutclk TNM_NET=txoutclk;
+TIMESPEC TS_txoutclk = PERIOD txoutclk 16ns;
+
+NET clocks/rst TIG;
+NET clocks/nuke_i TIG;
+
+NET gt_clkp LOC=G8 | DIFF_TERM=TRUE | TNM_NET=gt_clk;
+NET gt_clkn LOC=G7 | DIFF_TERM=TRUE;
+
+TIMESPEC TS_gt_clk = PERIOD gt_clk 8ns;
+
+INST eth/phy/*/gtxe2_i LOC=GTXE2_CHANNEL_X0Y10;
+
+NET sfp_los LOC=P19 | IOSTANDARD=LVCMOS25;
+
+NET leds<0> LOC=AB8 | IOSTANDARD=LVCMOS15;
+NET leds<1> LOC=AA8 | IOSTANDARD=LVCMOS15;
+NET leds<2> LOC=AC9 | IOSTANDARD=LVCMOS15;
+NET leds<3> LOC=AB9 | IOSTANDARD=LVCMOS15;

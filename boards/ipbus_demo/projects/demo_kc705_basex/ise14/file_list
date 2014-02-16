@@ -1,0 +1,6 @@
+hdl ipbus/firmware/example_designs/hdl/demo_kc705_basex/top_kc705_basex.vhd
+hdl ipbus/firmware/example_designs/ucf/kc705_basex.ucf
+hdl ipbus/firmware/example_designs/hdl/clocks_7s_serdes.vhd
+include ipbus/firmware/ipbus_core/cfg/file_list
+include ipbus/firmware/example_designs/cfg/file_list
+include ipbus/firmware/ethernet/cfg/file_list_k7_basex

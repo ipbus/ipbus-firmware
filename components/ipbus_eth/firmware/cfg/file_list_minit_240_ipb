@@ -1,0 +1,11 @@
+# Ethernet setup for minit_240_ipb
+
+core ipbus/firmware/ethernet/coregen/v5_emac_v1_8_serdes.xco
+hdl ipbus/firmware/ethernet/hdl/eth_v5_1000basex.vhd
+hdl ipbus/firmware/ethernet/hdl/emac_hostbus_decl.vhd
+hdl ipbus/firmware/ethernet/gen_hdl/v5_emac_v1_8_serdes/v5_emac_v1_8_serdes_block.vhd
+hdl ipbus/firmware/ethernet/gen_hdl/v5_emac_v1_8_serdes/v5_emac_v1_8_serdes.vhd
+hdl ipbus/firmware/ethernet/gen_hdl/v5_emac_v1_8_serdes/gtx_dual_1000X_ch1.vhd
+hdl ipbus/firmware/ethernet/gen_hdl/v5_emac_v1_8_serdes/rocketio_wrapper_gtx.vhd
+hdl ipbus/firmware/ethernet/gen_hdl/v5_emac_v1_8_serdes/rocketio_wrapper_gtx_tile.vhd
+

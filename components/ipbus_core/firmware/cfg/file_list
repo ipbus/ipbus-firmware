@@ -1,0 +1,35 @@
+# Xilinx ISE setup fragment for ipbus core
+
+hdl ipbus/firmware/ipbus_core/hdl/ipbus_package.vhd
+hdl ipbus/firmware/ipbus_core/hdl/ipbus_trans_decl.vhd
+hdl ipbus/firmware/ipbus_core/hdl/ipbus_ctrl.vhd
+hdl ipbus/firmware/ipbus_core/hdl/udp_if_flat.vhd
+hdl ipbus/firmware/ipbus_core/hdl/udp_buffer_selector.vhd
+hdl ipbus/firmware/ipbus_core/hdl/udp_build_arp.vhd
+hdl ipbus/firmware/ipbus_core/hdl/udp_build_payload.vhd
+hdl ipbus/firmware/ipbus_core/hdl/udp_build_ping.vhd
+hdl ipbus/firmware/ipbus_core/hdl/udp_build_resend.vhd
+hdl ipbus/firmware/ipbus_core/hdl/udp_build_status.vhd
+hdl ipbus/firmware/ipbus_core/hdl/udp_byte_sum.vhd
+hdl ipbus/firmware/ipbus_core/hdl/udp_clock_crossing_if.vhd
+hdl ipbus/firmware/ipbus_core/hdl/udp_do_rx_reset.vhd
+hdl ipbus/firmware/ipbus_core/hdl/udp_dualportram.vhd
+hdl ipbus/firmware/ipbus_core/hdl/udp_dualportram_rx.vhd
+hdl ipbus/firmware/ipbus_core/hdl/udp_dualportram_tx.vhd
+hdl ipbus/firmware/ipbus_core/hdl/udp_ipaddr_block.vhd
+hdl ipbus/firmware/ipbus_core/hdl/udp_packet_parser.vhd
+hdl ipbus/firmware/ipbus_core/hdl/udp_rarp_block.vhd
+hdl ipbus/firmware/ipbus_core/hdl/udp_rxram_mux.vhd
+hdl ipbus/firmware/ipbus_core/hdl/udp_rxram_shim.vhd
+hdl ipbus/firmware/ipbus_core/hdl/udp_rxtransactor_if_simple.vhd
+hdl ipbus/firmware/ipbus_core/hdl/udp_status_buffer.vhd
+hdl ipbus/firmware/ipbus_core/hdl/udp_tx_mux.vhd
+hdl ipbus/firmware/ipbus_core/hdl/udp_txtransactor_if_simple.vhd
+hdl ipbus/firmware/ipbus_core/hdl/trans_arb.vhd
+hdl ipbus/firmware/ipbus_core/hdl/transactor.vhd
+hdl ipbus/firmware/ipbus_core/hdl/transactor_if.vhd
+hdl ipbus/firmware/ipbus_core/hdl/transactor_sm.vhd
+hdl ipbus/firmware/ipbus_core/hdl/transactor_cfg.vhd
+hdl ipbus/firmware/ipbus_core/hdl/stretcher.vhd
+hdl ipbus/firmware/example_designs/hdl/clock_div.vhd
+

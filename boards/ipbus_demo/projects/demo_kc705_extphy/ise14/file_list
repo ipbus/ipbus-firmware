@@ -1,0 +1,9 @@
+hdl ipbus/firmware/example_designs/hdl/demo_kc705_extphy/top_kc705_extphy.vhd
+hdl ipbus/firmware/example_designs/ucf/kc705_extphy.ucf
+hdl ipbus/firmware/example_designs/hdl/clocks_7s_extphy.vhd
+hdl ipbus/firmware/ethernet/hdl/eth_7s_gmii.vhd
+include ipbus/firmware/ipbus_core/cfg/file_list
+include ipbus/firmware/example_designs/cfg/file_list
+core ipbus/firmware/ethernet/coregen/tri_mode_eth_mac_v5_4.xco
+core ipbus/firmware/ethernet/coregen/mac_fifo_axi4.xco
+

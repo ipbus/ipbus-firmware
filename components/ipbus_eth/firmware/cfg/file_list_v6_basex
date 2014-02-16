@@ -1,0 +1,15 @@
+# Virtex-6 1000basex setup
+
+hdl ipbus/firmware/ethernet/hdl/eth_v6_basex.vhd
+core ipbus/firmware/ethernet/coregen/v6_emac_v2_3_basex.xco
+hdl ipbus/firmware/ethernet/hdl/emac_hostbus_decl.vhd
+#hdl ipbus/firmware/ethernet/gen_hdl/v6_emac_v2_3_basex/v6_emac_v2_3_basex_block.vhd
+ghdl v6_emac_v2_3_basex/example_design/v6_emac_v2_3_basex_block.vhd
+ghdl v6_emac_v2_3_basex/example_design/common/reset_sync.vhd
+ghdl v6_emac_v2_3_basex/example_design/common/sync_block.vhd
+ghdl v6_emac_v2_3_basex/example_design/physical/v6_gtxwizard_top.vhd
+ghdl v6_emac_v2_3_basex/example_design/physical/v6_gtxwizard.vhd
+ghdl v6_emac_v2_3_basex/example_design/physical/v6_gtxwizard_gtx.vhd
+ghdl v6_emac_v2_3_basex/example_design/physical/double_reset.vhd
+
+

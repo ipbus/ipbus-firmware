@@ -1,0 +1,34 @@
+NET sysclk_p LOC = K21 | IOSTANDARD = LVDS_25 | DIFF_TERM = TRUE |TNM_NET = sysclk;
+NET sysclk_n LOC = K22 | IOSTANDARD = LVDS_25 | DIFF_TERM = TRUE;
+
+TIMESPEC TS_sysclk = PERIOD sysclk 5ns;
+
+NET clk125 TNM_NET=clk125;
+TIMESPEC TS_clk125 = PERIOD clk125 8ns;
+
+NET clocks/rst TIG;
+NET clocks/nuke_i TIG;
+
+NET gtp_clkp LOC=A12 | DIFF_TERM=TRUE | TNM_NET=gtpclk;
+NET gtp_clkn LOC=B12 | DIFF_TERM=TRUE;
+
+TIMESPEC TS_gtpclk = PERIOD gtpclk 8ns;
+
+INST eth/phy/transceiver_inst/GTP_1000X/tile0_s6_gtpwizard_i/gtpa1_dual_i LOC=GTPA1_DUAL_X1Y0;
+
+NET gtp_txp LOC=B14;
+NET gtp_txn LOC=A14;
+NET gtp_rxp LOC=D13;
+NET gtp_rxn LOC=C13;
+
+NET sfp_los LOC=T17 | IOSTANDARD=LVCMOS25;
+
+NET leds<0> LOC=D17 | IOSTANDARD=LVCMOS25;
+NET leds<1> LOC=AB4 | IOSTANDARD=LVCMOS25;
+NET leds<2> LOC=D21 | IOSTANDARD=LVCMOS25;
+NET leds<3> LOC=W15 | IOSTANDARD=LVCMOS25;
+
+NET dip_switch<0> LOC=C18 | IOSTANDARD=LVCMOS25;
+NET dip_switch<1> LOC=Y6 | IOSTANDARD=LVCMOS25;
+NET dip_switch<2> LOC=W6 | IOSTANDARD=LVCMOS25;
+NET dip_switch<3> LOC=E4 | IOSTANDARD=LVCMOS15;

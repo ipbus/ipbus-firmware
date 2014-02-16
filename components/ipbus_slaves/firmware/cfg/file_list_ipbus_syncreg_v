@@ -1,0 +1,5 @@
+hdl ipbus/firmware/slaves/hdl/ipbus_reg_types.vhd
+hdl ipbus/firmware/slaves/hdl/ipbus_syncreg_v.vhd
+hdl ipbus/firmware/slaves/hdl/syncreg_w.vhd
+hdl ipbus/firmware/slaves/hdl/syncreg_r.vhd
+
