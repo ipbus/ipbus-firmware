@@ -24,7 +24,7 @@ architecture rtl of stretcher is
 	
 begin
 	
-	clkdiv: entity work.clock_div
+	clkdiv: entity work.ipbus_clock_div
 		port map(
 			clk => clk,
 			d25 => d25,

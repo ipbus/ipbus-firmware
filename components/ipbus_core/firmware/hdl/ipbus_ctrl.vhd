@@ -71,7 +71,6 @@ architecture rtl of ipbus_ctrl is
   signal cfg, cfg_out: std_logic_vector(127 downto 0);
   signal my_mac_addr: std_logic_vector(47 downto 0);
   signal my_ip_addr, my_ip_addr_udp: std_logic_vector(31 downto 0);
---  signal last_hdr: std_logic_vector(31 downto 0);
   signal pkt_rx_i, pkt_tx_i, udp_en, rarp_en: std_logic;
   signal buf_in_a: ipbus_trans_in_array(N_OOB downto 0);
   signal buf_out_a: ipbus_trans_out_array(N_OOB downto 0);
@@ -157,7 +156,6 @@ begin
 	);
 	
 	cfg_out <= my_ip_addr_udp & X"000" & "00" & rarp_en & udp_en & my_mac_addr & X"00000000";
---	cfg_out <= my_ip_addr_udp & X"000" & "00" & rarp_en & udp_en & my_mac_addr & last_hdr;
 	
 	with MAC_CFG select my_mac_addr <=
 		mac_addr when EXTERNAL,
@@ -171,13 +169,13 @@ begin
 
 	rarp_en <= cfg(81) or RARP_select;
 
-	stretch_rx: entity work.stretcher port map(
+	stretch_rx: entity work.ipbus_stretcher port map(
 		clk => mac_clk,
 		d => pkt_rx_i,
 		q => pkt_rx_led
 	);
 	
-	stretch_tx: entity work.stretcher port map(
+	stretch_tx: entity work.ipbus_stretcher port map(
 		clk => mac_clk,
 		d => pkt_tx_i,
 		q => pkt_tx_led
@@ -185,16 +183,5 @@ begin
 	
 	pkt_rx <= pkt_rx_i;
 	pkt_tx <= pkt_tx_i;
-
--- latch_hdr:  process (ipb_clk)
---   begin
---     if rising_edge(ipb_clk) then
---       if rst_ipb = '1' then
---         last_hdr <= (Others => '1');
---       elsif trans_out_udp.pkt_done = '1' then
---         last_hdr <= "0" & trans_in_udp.pkt_rdy & trans_in_udp.busy & trans_out_udp.we & trans_out_udp.waddr & trans_out_udp.wdata(15 downto 0);
---       end if;
---     end if;
---   end process;
 			
 end rtl;
