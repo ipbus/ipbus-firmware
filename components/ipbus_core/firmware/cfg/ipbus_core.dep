@@ -31,5 +31,5 @@ src transactor_if.vhd
 src transactor_sm.vhd
 src transactor_cfg.vhd
 src ipbus_stretcher.vhd
-src ipbus_clock_div.vhd
+src -c ipbus_util ipbus_clock_div.vhd
 
