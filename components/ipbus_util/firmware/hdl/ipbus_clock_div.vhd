@@ -6,13 +6,12 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
---use ieee.numeric_std.all;
 use ieee.std_logic_unsigned.all;
 
 library unisim;
 use unisim.VComponents.all;
 
-entity clock_div is
+entity ipbus_clock_div is
 	port(
 		clk: in std_logic;
 		d17: out std_logic;
@@ -20,9 +19,9 @@ entity clock_div is
 		d28: out std_logic
 	);
 
-end clock_div;
+end ipbus_clock_div;
 
-architecture rtl of clock_div is
+architecture rtl of ipbus_clock_div is
 
 	signal rst_b: std_logic;
 
