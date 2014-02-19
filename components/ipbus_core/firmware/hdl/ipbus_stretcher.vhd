@@ -9,16 +9,16 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-entity stretcher is
+entity ipbus_stretcher is
 	port(
 		clk: in std_logic; -- Assumed to be 125MHz ipbus clock
 		d: in std_logic; -- Input (edge detected)
 		q: out std_logic -- LED output, ~0.25s pulse
 	);
 
-end stretcher;
+end ipbus_stretcher;
 
-architecture rtl of stretcher is
+architecture rtl of ipbus_stretcher is
 
 	signal d_sync, d_sync_d, d_edge, d25, d25_d, q_i: std_logic;
 	
