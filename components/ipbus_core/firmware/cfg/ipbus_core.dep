@@ -1,7 +1,5 @@
 # Dependencies for ipbus_core
 
-src ipbus_package.vhd
-src ipbus_trans_decl.vhd
 src ipbus_ctrl.vhd
 src udp_if_flat.vhd
 src udp_buffer_selector.vhd
@@ -32,4 +30,5 @@ src transactor_sm.vhd
 src transactor_cfg.vhd
 src ipbus_stretcher.vhd
 src -c ipbus_util ipbus_clock_div.vhd
-
+src ipbus_package.vhd
+src ipbus_trans_decl.vhd
