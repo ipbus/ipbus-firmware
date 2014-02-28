@@ -24,11 +24,8 @@ architecture rtl of top is
 	signal clk125, clk125_fr, ipb_clk, eth_locked, clk_locked, rst_125, rst_ipb, rst_eth, onehz: std_logic;
 	signal mac_tx_data, mac_rx_data: std_logic_vector(7 downto 0);
 	signal mac_tx_valid, mac_tx_last, mac_tx_error, mac_tx_ready, mac_rx_valid, mac_rx_last, mac_rx_error: std_logic;
-	signal ipb_master_out_0, ipb_master_out_1 : ipb_wbus;
-	signal ipb_master_in_0, ipb_master_in_1 : ipb_rbus;
-	signal mac_tx_data_bus: mac_arbiter_slv_array(1 downto 0);
-	signal mac_tx_valid_bus, mac_tx_last_bus, mac_tx_error_bus, mac_tx_ready_bus: mac_arbiter_sl_array(1 downto 0);
-	signal pkt_rx_bus, pkt_tx_bus, pkt_rx_led_bus, pkt_tx_led_bus: mac_arbiter_sl_array(1 downto 0);
+	signal ipb_master_out : ipb_wbus; 
+	signal ipb_master_in : ipb_rbus; 
 	signal mac_addr: std_logic_vector(47 downto 0);
 	signal ip_addr: std_logic_vector(31 downto 0);
 	signal RARP_select, eeprom_done: std_logic;
@@ -54,8 +51,6 @@ begin
 		);
 		
 	leds <= eth_locked & clk_locked & onehz;
-	pkt_rx_led <= '0' when pkt_rx_led_bus = (pkt_rx_led_bus'range => '0') else '1';
-	pkt_tx_led <= '0' when pkt_tx_led_bus = (pkt_tx_led_bus'range => '0') else '1';
 	amc_slot(3) <= v6_cpld(3);
 	amc_slot(2) <= v6_cpld(2);
 	amc_slot(1) <= v6_cpld(1);
@@ -86,28 +81,10 @@ begin
 			rx_error => mac_rx_error
 		);
 	
-	arb: entity work.mac_arbiter
-		generic map(
-			NSRC => 2
-		)
-		port map(
-			clk => clk125,
-			rst => rst_125,
-			src_tx_data_bus => mac_tx_data_bus,
-			src_tx_valid_bus => mac_tx_valid_bus,
-			src_tx_last_bus => mac_tx_last_bus,
-			src_tx_error_bus => mac_tx_error_bus,
-			src_tx_ready_bus => mac_tx_ready_bus,
-			mac_tx_data => mac_tx_data,
-			mac_tx_valid => mac_tx_valid,
-			mac_tx_last => mac_tx_last,
-			mac_tx_error => mac_tx_error,
-			mac_tx_ready => mac_tx_ready
-		);
 
 -- ipbus control logic for example design slaves
 
-	ipbus_example: entity work.ipbus_ctrl
+	ipbus: entity work.ipbus_ctrl
 		port map(
 			mac_clk => clk125,
 			rst_macclk => rst_125,
@@ -117,87 +94,34 @@ begin
 			mac_rx_valid => mac_rx_valid,
 			mac_rx_last => mac_rx_last,
 			mac_rx_error => mac_rx_error,
-			mac_tx_data => mac_tx_data_bus(0),
-			mac_tx_valid => mac_tx_valid_bus(0),
-			mac_tx_last => mac_tx_last_bus(0),
-			mac_tx_error => mac_tx_error_bus(0),
-			mac_tx_ready => mac_tx_ready_bus(0),
-			ipb_out => ipb_master_out_0,
-			ipb_in => ipb_master_in_0,
+			mac_tx_data => mac_tx_data,
+			mac_tx_valid => mac_tx_valid,
+			mac_tx_last => mac_tx_last,
+			mac_tx_error => mac_tx_error,
+			mac_tx_ready => mac_tx_ready,
+			ipb_out => ipb_master_out,
+			ipb_in => ipb_master_in,
 			mac_addr => mac_addr,
 			ip_addr => ip_addr,
 			enable => eeprom_done,
 			RARP_select => RARP_select,
-			pkt_rx => pkt_rx_bus(0),
-			pkt_tx => pkt_tx_bus(0),
-			pkt_rx_led => pkt_rx_led_bus(0),
-			pkt_tx_led => pkt_tx_led_bus(0)
+			pkt_rx_led => pkt_rx_led, 
+			pkt_tx_led => pkt_tx_led			
 		);
 
 	RARP_select <= '1' when (ip_addr = x"00000000") else '0';
 
 -- ipbus slaves live in the entity below, and can expose top-level ports
 -- The ipbus fabric is instantiated within.
-
-	slaves_example: entity work.slaves port map(
+	
+	slaves: entity work.slaves port map(
 		ipb_clk => ipb_clk,
 		ipb_rst => rst_ipb,
-		ipb_in => ipb_master_out_0,
-		ipb_out => ipb_master_in_0,
-		rst_out => sys_rst,
-		pkt_rx => pkt_rx_bus(0),
-		pkt_tx => pkt_tx_bus(0)
-
+		ipb_in => ipb_master_out,
+		ipb_out => ipb_master_in,
+		rst_out => sys_rst
 	);
 
--- ipbus control logic for additional slaves for GLIB infastructure.
--- this is a secondary ipbus end point, i.e. uses the same MAC/IP address
--- as the main one above and is just running on a separate UDP port
--- (set to 50002 here)
-
-	ipbus_infrastructure: entity work.ipbus_ctrl
-		generic map(
-		  SECONDARYPORT => '1',
-		  IPBUSPORT => x"C352"
-		)
-		port map(
-			mac_clk => clk125,
-			rst_macclk => rst_125,
-			ipb_clk => ipb_clk,
-			rst_ipb => rst_ipb,
-			mac_rx_data => mac_rx_data,
-			mac_rx_valid => mac_rx_valid,
-			mac_rx_last => mac_rx_last,
-			mac_rx_error => mac_rx_error,
-			mac_tx_data => mac_tx_data_bus(1),
-			mac_tx_valid => mac_tx_valid_bus(1),
-			mac_tx_last => mac_tx_last_bus(1),
-			mac_tx_error => mac_tx_error_bus(1),
-			mac_tx_ready => mac_tx_ready_bus(1),
-			ipb_out => ipb_master_out_1,
-			ipb_in => ipb_master_in_1,
-			mac_addr => mac_addr,
-			ip_addr => ip_addr,
-			-- enable => eeprom_done,        KHDEBUG: adding one of these seems to cause RARP requests
-			-- RARP_select => RARP_select,   every second or so despite positive response by server
-			pkt_rx => pkt_rx_bus(1),
-			pkt_tx => pkt_tx_bus(1),
-			pkt_rx_led => pkt_rx_led_bus(1),
-			pkt_tx_led => pkt_tx_led_bus(1)
-		);
-
--- ipbus slaves live in the entity below, and can expose top-level ports
--- The ipbus fabric is instantiated within.
-
-	slaves_infrastructure: entity work.glib_slaves port map(
-		ipb_clk => ipb_clk,
-		ipb_rst => rst_ipb,
-		ipb_in => ipb_master_out_1,
-		ipb_out => ipb_master_in_1,
-		pkt_rx => pkt_rx_bus(1),
-		pkt_tx => pkt_tx_bus(1)
-
-	);
 
 	eeprom: entity work.i2c_eeprom_read
 		port map(
