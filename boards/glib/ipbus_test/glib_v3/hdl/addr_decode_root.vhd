@@ -10,24 +10,22 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use ieee.numeric_std.all;
-use work.ipbus.all;
 
 package addr_decode_root is
 
-    constant DECODE_SEL_WIDTH: positive := 5; -- Should be enough for now?
-    subtype decode_sel_t is std_logic_vector(DECODE_SEL_WIDTH - 1 downto 0);
-    function ipbus_addr_sel(signal addr : in std_logic_vector(31 downto 0)) return decode_sel_t;
+	constant DECODE_SEL_WIDTH: positive := 5; -- Should be enough for now?
+	subtype decode_sel_t is std_logic_vector(DECODE_SEL_WIDTH - 1 downto 0);
+	function ipbus_addr_sel(signal addr : in std_logic_vector(31 downto 0)) return decode_sel_t;
 
 -- START automatically  generated VHDL the Fri Feb 28 15:35:12 2014 
-	constant N_SLV_CTRL: decode_sel_t := decode_sel_t(to_unsigned(0, DECODE_SEL_WIDTH));
-	constant N_SLV_MGT_ALIGN: decode_sel_t := decode_sel_t(to_unsigned(1, DECODE_SEL_WIDTH));
-	constant N_SLV_TTC: decode_sel_t := decode_sel_t(to_unsigned(2, DECODE_SEL_WIDTH));
-	constant N_SLV_MGT: decode_sel_t := decode_sel_t(to_unsigned(3, DECODE_SEL_WIDTH));
-	constant N_SLV_MGT_DRP: decode_sel_t := decode_sel_t(to_unsigned(4, DECODE_SEL_WIDTH));
-	constant N_SLV_DEMUX: decode_sel_t := decode_sel_t(to_unsigned(5, DECODE_SEL_WIDTH));
-	constant N_SLV_PP_CTRL: decode_sel_t := decode_sel_t(to_unsigned(6, DECODE_SEL_WIDTH));
-	constant N_SLV_BUFFERS: decode_sel_t := decode_sel_t(to_unsigned(7, DECODE_SEL_WIDTH));
-	constant N_NULL: decode_sel_t := decode_sel_t(to_unsigned(8, DECODE_SEL_WIDTH));
+	constant N_SLV_CTRL: decode_sel_t := 0;
+	constant N_SLV_MGT_ALIGN: decode_sel_t := 1;
+	constant N_SLV_TTC: decode_sel_t := 2;
+	constant N_SLV_MGT: decode_sel_t := 3;
+	constant N_SLV_MGT_DRP: decode_sel_t := 4;
+	constant N_SLV_DEMUX: decode_sel_t := 5;
+	constant N_SLV_PP_CTRL: decode_sel_t := 6;
+	constant N_SLV_BUFFERS: decode_sel_t := 7;
 	constant N_SLAVES: positive := 8;
 -- END automatically generated VHDL
 
@@ -42,25 +40,25 @@ package body addr_decode_root is
 
 -- START automatically  generated VHDL the Fri Feb 28 15:35:12 2014 
 		if    std_match(addr, "---------------0-0--00--000-----") then
-			sel := N_SLV_CTRL; -- ctrl / base 0x00000000 / mask 0x00014ce0
+			sel := decode_sel_t(to_unsigned(N_SLV_CTRL, DECODE_SEL_WIDTH)); -- ctrl / base 0x00000000 / mask 0x00014ce0
 		elsif std_match(addr, "---------------0-0--00--001-----") then
-			sel := N_SLV_MGT_ALIGN; -- mgt_align / base 0x00000020 / mask 0x00014ce0
+			sel := decode_sel_t(to_unsigned(N_SLV_MGT_ALIGN, DECODE_SEL_WIDTH)); -- mgt_align / base 0x00000020 / mask 0x00014ce0
 		elsif std_match(addr, "---------------0-0--00--010-----") then
-			sel := N_SLV_TTC; -- ttc / base 0x00000040 / mask 0x00014ce0
+			sel := decode_sel_t(to_unsigned(N_SLV_TTC, DECODE_SEL_WIDTH)); -- ttc / base 0x00000040 / mask 0x00014ce0
 		elsif std_match(addr, "---------------0-0--00--10------") then
-			sel := N_SLV_MGT; -- mgt / base 0x00000080 / mask 0x00014ce0
+			sel := decode_sel_t(to_unsigned(N_SLV_MGT, DECODE_SEL_WIDTH)); -- mgt / base 0x00000080 / mask 0x00014ce0
 		elsif std_match(addr, "---------------0-0--01----------") then
-			sel := N_SLV_MGT_DRP; -- mgt_drp / base 0x00000400 / mask 0x00014ce0
+			sel := decode_sel_t(to_unsigned(N_SLV_MGT_DRP, DECODE_SEL_WIDTH)); -- mgt_drp / base 0x00000400 / mask 0x00014ce0
 		elsif std_match(addr, "---------------0-0--10--000-----") then
-			sel := N_SLV_DEMUX; -- demux / base 0x00000800 / mask 0x00014ce0
+			sel := decode_sel_t(to_unsigned(N_SLV_DEMUX, DECODE_SEL_WIDTH)); -- demux / base 0x00000800 / mask 0x00014ce0
 		elsif std_match(addr, "---------------0-1--00--000-----") then
-			sel := N_SLV_PP_CTRL; -- pp_ctrl / base 0x00004000 / mask 0x00014ce0
+			sel := decode_sel_t(to_unsigned(N_SLV_PP_CTRL, DECODE_SEL_WIDTH)); -- pp_ctrl / base 0x00004000 / mask 0x00014ce0
 		elsif std_match(addr, "---------------1-0--00--000-----") then
-			sel := N_SLV_BUFFERS; -- buffers / base 0x00010000 / mask 0x00014ce0
+			sel := decode_sel_t(to_unsigned(N_SLV_BUFFERS, DECODE_SEL_WIDTH)); -- buffers / base 0x00010000 / mask 0x00014ce0
 -- END automatically generated VHDL
 
     else
-        sel := N_NULL;
+        sel := decode_sel_t(to_unsigned(N_SLAVES, DECODE_SEL_WIDTH));
     end if;
 
     return sel;

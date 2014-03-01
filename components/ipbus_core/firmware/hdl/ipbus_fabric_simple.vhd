@@ -21,7 +21,7 @@ entity ipbus_fabric_simple is
     ipb_in: in ipb_wbus;
     ipb_out: out ipb_rbus;
     ipb_to_slaves: out ipb_wbus_array(NSLV - 1 downto 0);
-    ipb_from_slaves: in ipb_rbus_array(NSLV - 1 downto 0)
+    ipb_from_slaves: in ipb_rbus_array(NSLV - 1 downto 0) := (others => IPB_RBUS_NULL)
    );
 
 end ipbus_fabric_simple;

@@ -27,19 +27,17 @@ end slaves;
 
 architecture rtl of slaves is
 
-	signal ipbw: ipb_wbus_array(N_SLAVES-1 downto 0);
-	signal ipbr, ipbr_d: ipb_rbus_array(N_SLAVES-1 downto 0);
+	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
+	signal ipbr, ipbr_d: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl_reg: std_logic_vector(31 downto 0);
 	signal inj_ctrl, inj_stat: std_logic_vector(63 downto 0);
-	signal selector: integer range 99 downto 0;
-
+	
 begin
-
-
-
   
   fabric: entity work.ipbus_fabric_sel
-    generic map(NSLV => N_SLAVES,SEL_WIDTH => DECODE_SEL_WIDTH)
+    generic map(
+    	NSLV => N_SLAVES,
+    	SEL_WIDTH => DECODE_SEL_WIDTH)
     port map(
       ipb_in => ipb_in,
       ipb_out => ipb_out,
@@ -54,13 +52,13 @@ begin
 		port map(
 			clk => ipb_clk,
 			reset => ipb_rst,
-			ipbus_in => ipbw(to_integer(unsigned(N_SLV_BUFFERS))),
-			ipbus_out => ipbr(to_integer(unsigned(N_SLV_BUFFERS))),
+			ipbus_in => ipbw(N_SLV_BUFFERS),
+			ipbus_out => ipbr(N_SLV_BUFFERS),
 			d => X"abcdfedc",
 			q => ctrl_reg
 		);
 		
-		rst_out <= ctrl_reg(to_integer(unsigned(N_SLV_BUFFERS)));
+	rst_out <= ctrl_reg(0)
 
 -- Slave 1: register
 
@@ -69,8 +67,8 @@ begin
 		port map(
 			clk => ipb_clk,
 			reset => ipb_rst,
-			ipbus_in => ipbw(to_integer(unsigned(N_SLV_MGT))),
-			ipbus_out => ipbr(to_integer(unsigned(N_SLV_MGT))),
+			ipbus_in => ipbw(N_SLV_MGT),
+			ipbus_out => ipbr(N_SLV_MGT),
 			q => open
 		);
 
