@@ -11,13 +11,14 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use ieee.numeric_std.all;
 
-package addr_decode_root is
+package ipbus_decode_root is
 
-	constant DECODE_SEL_WIDTH: positive := 5; -- Should be enough for now?
-	subtype decode_sel_t is std_logic_vector(DECODE_SEL_WIDTH - 1 downto 0);
-	function ipbus_addr_sel(signal addr : in std_logic_vector(31 downto 0)) return decode_sel_t;
+	constant IPBUS_SEL_WIDTH: positive := 5; -- Should be enough for now?
+	subtype ipbus_sel_t is std_logic_vector(IPBUS_SEL_WIDTH - 1 downto 0);
 
 -- START automatically  generated VHDL the Fri Feb 28 15:35:12 2014 
+	function ipbus_sel_root(signal addr : in std_logic_vector(31 downto 0)) return ipbus_sel_t;
+
 	constant N_SLV_CTRL: decode_sel_t := 0;
 	constant N_SLV_MGT_ALIGN: decode_sel_t := 1;
 	constant N_SLV_TTC: decode_sel_t := 2;
@@ -28,41 +29,41 @@ package addr_decode_root is
 	constant N_SLV_BUFFERS: decode_sel_t := 7;
 	constant N_SLAVES: positive := 8;
 -- END automatically generated VHDL
-
     
-end addr_decode_root;
+end ipbus_decode_root;
 
-package body addr_decode_root is
-
-  function ipbus_addr_sel(signal addr : in std_logic_vector(31 downto 0)) return decode_sel_t is
-    variable sel: decode_sel_t;
-  begin
+package body ipbus_decode_root is
 
 -- START automatically  generated VHDL the Fri Feb 28 15:35:12 2014 
+
+	function ipbus_sel_root(signal addr : in std_logic_vector(31 downto 0)) return ipbus_sel_t is
+    variable sel: ipbus_sel_t;
+  begin
+
 		if    std_match(addr, "---------------0-0--00--000-----") then
-			sel := decode_sel_t(to_unsigned(N_SLV_CTRL, DECODE_SEL_WIDTH)); -- ctrl / base 0x00000000 / mask 0x00014ce0
+			sel := ipbus_sel_t(to_unsigned(N_SLV_CTRL, IPBUS_SEL_WIDTH)); -- ctrl / base 0x00000000 / mask 0x00014ce0
 		elsif std_match(addr, "---------------0-0--00--001-----") then
-			sel := decode_sel_t(to_unsigned(N_SLV_MGT_ALIGN, DECODE_SEL_WIDTH)); -- mgt_align / base 0x00000020 / mask 0x00014ce0
+			sel := ipbus_sel_t(to_unsigned(N_SLV_MGT_ALIGN, IPBUS_SEL_WIDTH)); -- mgt_align / base 0x00000020 / mask 0x00014ce0
 		elsif std_match(addr, "---------------0-0--00--010-----") then
-			sel := decode_sel_t(to_unsigned(N_SLV_TTC, DECODE_SEL_WIDTH)); -- ttc / base 0x00000040 / mask 0x00014ce0
+			sel := ipbus_sel_t(to_unsigned(N_SLV_TTC, IPBUS_SEL_WIDTH)); -- ttc / base 0x00000040 / mask 0x00014ce0
 		elsif std_match(addr, "---------------0-0--00--10------") then
-			sel := decode_sel_t(to_unsigned(N_SLV_MGT, DECODE_SEL_WIDTH)); -- mgt / base 0x00000080 / mask 0x00014ce0
+			sel := ipbus_sel_t(to_unsigned(N_SLV_MGT, IPBUS_SEL_WIDTH)); -- mgt / base 0x00000080 / mask 0x00014ce0
 		elsif std_match(addr, "---------------0-0--01----------") then
-			sel := decode_sel_t(to_unsigned(N_SLV_MGT_DRP, DECODE_SEL_WIDTH)); -- mgt_drp / base 0x00000400 / mask 0x00014ce0
+			sel := ipbus_sel_t(to_unsigned(N_SLV_MGT_DRP, IPBUS_SEL_WIDTH)); -- mgt_drp / base 0x00000400 / mask 0x00014ce0
 		elsif std_match(addr, "---------------0-0--10--000-----") then
-			sel := decode_sel_t(to_unsigned(N_SLV_DEMUX, DECODE_SEL_WIDTH)); -- demux / base 0x00000800 / mask 0x00014ce0
+			sel := ipbus_sel_t(to_unsigned(N_SLV_DEMUX, IPBUS_SEL_WIDTH)); -- demux / base 0x00000800 / mask 0x00014ce0
 		elsif std_match(addr, "---------------0-1--00--000-----") then
-			sel := decode_sel_t(to_unsigned(N_SLV_PP_CTRL, DECODE_SEL_WIDTH)); -- pp_ctrl / base 0x00004000 / mask 0x00014ce0
+			sel := ipbus_sel_t(to_unsigned(N_SLV_PP_CTRL, IPBUS_SEL_WIDTH)); -- pp_ctrl / base 0x00004000 / mask 0x00014ce0
 		elsif std_match(addr, "---------------1-0--00--000-----") then
-			sel := decode_sel_t(to_unsigned(N_SLV_BUFFERS, DECODE_SEL_WIDTH)); -- buffers / base 0x00010000 / mask 0x00014ce0
+			sel := ipbus_sel_t(to_unsigned(N_SLV_BUFFERS, IPBUS_SEL_WIDTH)); -- buffers / base 0x00010000 / mask 0x00014ce0
 -- END automatically generated VHDL
 
     else
-        sel := decode_sel_t(to_unsigned(N_SLAVES, DECODE_SEL_WIDTH));
+        sel := decode_sel_t(to_unsigned(N_SLAVES, IPBUS_SEL_WIDTH));
     end if;
 
     return sel;
 
-  end ipbus_addr_sel;
+  end ipbus_sel_root;
 
-end addr_decode_root;
+end ipbus_decode_root;

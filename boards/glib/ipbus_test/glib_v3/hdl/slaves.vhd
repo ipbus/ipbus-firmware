@@ -8,7 +8,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use work.ipbus.ALL;
 use ieee.numeric_std.all;
-use work.addr_decode_root.all;
+use work.ipbus_decode_root.all;
 
 entity slaves is
 	port(
@@ -37,11 +37,11 @@ begin
   fabric: entity work.ipbus_fabric_sel
     generic map(
     	NSLV => N_SLAVES,
-    	SEL_WIDTH => DECODE_SEL_WIDTH)
+    	SEL_WIDTH => IPBUS_SEL_WIDTH)
     port map(
       ipb_in => ipb_in,
       ipb_out => ipb_out,
-      sel => ipbus_addr_sel(ipb_in.ipb_addr),
+      sel => ipbus_sel_root(ipb_in.ipb_addr),
       ipb_to_slaves => ipbw,
       ipb_from_slaves => ipbr
     );
