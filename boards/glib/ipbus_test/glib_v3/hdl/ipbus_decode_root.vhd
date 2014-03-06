@@ -19,15 +19,15 @@ package ipbus_decode_root is
 -- START automatically  generated VHDL the Fri Feb 28 15:35:12 2014 
 	function ipbus_sel_root(signal addr : in std_logic_vector(31 downto 0)) return ipbus_sel_t;
 
-	constant N_SLV_CTRL: decode_sel_t := 0;
-	constant N_SLV_MGT_ALIGN: decode_sel_t := 1;
-	constant N_SLV_TTC: decode_sel_t := 2;
-	constant N_SLV_MGT: decode_sel_t := 3;
-	constant N_SLV_MGT_DRP: decode_sel_t := 4;
-	constant N_SLV_DEMUX: decode_sel_t := 5;
-	constant N_SLV_PP_CTRL: decode_sel_t := 6;
-	constant N_SLV_BUFFERS: decode_sel_t := 7;
-	constant N_SLAVES: positive := 8;
+	constant N_SLV_CTRL: integer := 0;
+	constant N_SLV_MGT_ALIGN: integer := 1;
+	constant N_SLV_TTC: integer := 2;
+	constant N_SLV_MGT: integer := 3;
+	constant N_SLV_MGT_DRP: integer := 4;
+	constant N_SLV_DEMUX: integer := 5;
+	constant N_SLV_PP_CTRL: integer := 6;
+	constant N_SLV_BUFFERS: integer := 7;
+	constant N_SLAVES: integer := 8;
 -- END automatically generated VHDL
     
 end ipbus_decode_root;
@@ -59,7 +59,7 @@ package body ipbus_decode_root is
 -- END automatically generated VHDL
 
     else
-        sel := decode_sel_t(to_unsigned(N_SLAVES, IPBUS_SEL_WIDTH));
+        sel := ipbus_sel_t(to_unsigned(N_SLAVES, IPBUS_SEL_WIDTH));
     end if;
 
     return sel;
