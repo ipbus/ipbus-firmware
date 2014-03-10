@@ -75,6 +75,8 @@ architecture rtl of ipbus_ctrl is
   signal buf_in_a: ipbus_trans_in_array(N_OOB downto 0);
   signal buf_out_a: ipbus_trans_out_array(N_OOB downto 0);
   
+  signal mac_src_flag, ip_src_flag : std_logic;
+  
 begin
 
 	udp_if: entity work.udp_if generic map(
@@ -155,7 +157,15 @@ begin
 		pkt_tx => pkt_tx_i
 	);
 	
-	cfg_out <= my_ip_addr_udp & X"000" & "00" & rarp_en & udp_en & my_mac_addr & X"00000000";
+  with MAC_CFG select mac_src_flag <=
+    '1' when EXTERNAL,
+    '0' when others;
+
+  with IP_CFG select ip_src_flag <=
+    '1' when EXTERNAL,
+    '0' when others;
+
+  cfg_out <= my_ip_addr_udp & X"000" & mac_src_flag & ip_src_flag & rarp_en & udp_en & my_mac_addr & X"00000000";
 	
 	with MAC_CFG select my_mac_addr <=
 		mac_addr when EXTERNAL,
