@@ -1,0 +1,8 @@
+<node description="Opencores / Lattice I2C master controller" fwinfo="endpoint;width=3">
+	<node id="ps_lo" address="0x0" description="Prescale low byte"/>
+	<node id="ps_hi" address="0x1" description="Prescale low byte"/>
+	<node id="ctrl" address="0x2" description="Control"/>
+	<node id="data" address="0x3" description="Data"/>
+	<node id="cmd_stat" address="0x4" description="Command / status"/>
+</node>
+
