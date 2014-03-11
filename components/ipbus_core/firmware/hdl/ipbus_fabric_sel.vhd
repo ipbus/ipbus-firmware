@@ -54,7 +54,7 @@ begin
 
 	end generate;
 
-  ipb_out.ipb_rdata <= ipb_from_slaves(sel_b).ipb_rdata when sel_i /= NSLV else (others => '0');
+  ipb_out.ipb_rdata <= ipb_from_slaves(sel_i).ipb_rdata when sel_i /= NSLV else (others => '0');
   ipb_out.ipb_ack <= ored_ack(0);
   ipb_out.ipb_err <= ored_err(0);
   
