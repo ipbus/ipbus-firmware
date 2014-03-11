@@ -9,12 +9,3 @@ src -d -s cgn gig_eth_pcs_pma_v11_5.xco
 src -d -s cgn -n gtwizard_v2_5_gbe_gtx.xco
 src -d -s cgn tri_mode_eth_mac_v5_5.xco
 
-#core ipbus/firmware/ethernet/coregen/gig_eth_pcs_pma_v11_4.xco
-#core ipbus/firmware/ethernet/coregen/tri_mode_eth_mac_v5_5.xco
-#hdl ipbus/firmware/ethernet/gen_hdl/gtwizard_v2_3_gbe/gtwizard_v2_3_gbe_init.vhd
-#hdl ipbus/firmware/ethernet/gen_hdl/gtwizard_v2_3_gbe/gtwizard_v2_3_gbe.vhd
-#hdl ipbus/firmware/ethernet/gen_hdl/gtwizard_v2_3_gbe/gtwizard_v2_3_gbe_gt.vhd
-#hdl ipbus/firmware/ethernet/gen_hdl/gtwizard_v2_3_gbe/gtwizard_v2_3_gbe_tx_startup_fsm.vhd
-#hdl ipbus/firmware/ethernet/gen_hdl/gtwizard_v2_3_gbe/gtwizard_v2_3_gbe_rx_startup_fsm.vhd
-#hdl ipbus/firmware/ethernet/gen_hdl/gtwizard_v2_3_gbe/gtwizard_v2_3_gbe_recclk_monitor.vhd
-
