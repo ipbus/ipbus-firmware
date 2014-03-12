@@ -186,15 +186,15 @@ begin
 	hostbus_out.hostrddata <= (others => '0');
 	hostbus_out.hostmiimrdy <= '0';
 
-	phy: entity work.gig_eth_pcs_pma_v11_4_block
+	phy: entity work.gig_eth_pcs_pma_v11_5_block
 		port map(
---			drpaddr_in => (others => '0'),
---			drpclk_in => clk125,
---			drpdi_in => (others => '0'),
---			drpdo_out => open,
---			drpen_in => '0',
---			drprdy_out => open,
---			drpwe_in => '0',
+			drpaddr_in => (others => '0'),
+			drpclk_in => clk125,
+			drpdi_in => (others => '0'),
+			drpdo_out => open,
+			drpen_in => '0',
+			drprdy_out => open,
+			drpwe_in => '0',
 			gtrefclk => clkin,
 			txp => gt_txp,
 			txn => gt_txn,
