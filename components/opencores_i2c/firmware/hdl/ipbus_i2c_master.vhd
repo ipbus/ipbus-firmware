@@ -38,7 +38,7 @@ begin
 		wb_dat_i => ipb_in.ipb_wdata(7 downto 0),
 		wb_dat_o => ipb_out.ipb_rdata(7 downto 0),
 		wb_we_i => ipb_in.ipb_write,
-		wb_stb_i => ipb_in.ipb_strobe,
+		wb_stb_i => stb,
 		wb_cyc_i => '1',
 		wb_ack_o => ack,
 		scl_pad_i => scl_i,

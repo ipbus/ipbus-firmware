@@ -60,12 +60,14 @@ architecture behave of spi_interface is
 
   signal sck_sreg, si_sreg, cs_sreg: std_logic_vector(2 downto 0);
 
-  signal SerialInError, SerialInActive, SerialInValid: std_logic;
+--  signal SerialInError, SerialInActive, SerialInValid: std_logic;
+  signal SerialInActive, SerialInValid: std_logic;
   signal SerialInRegister: std_logic_vector(width-1 downto 0);
   signal SerialInIndex: integer range 0 to width-1;
   signal SerialInTimeout: integer range 0 to 1073741823;
 
-  signal SerialOutError, SerialOutActive, SerialOutValid, SerialOutValidDelayed, SerialOutValidDelayed2: std_logic;
+--  signal SerialOutError, SerialOutActive, SerialOutValid, SerialOutValidDelayed, SerialOutValidDelayed2: std_logic;
+  signal SerialOutActive, SerialOutValid, SerialOutValidDelayed, SerialOutValidDelayed2: std_logic;
   signal SerialOutRegister: std_logic_vector(width-1 downto 0);
   signal SerialOutIndex: integer range 0 to width-1;
   signal SerialOutTimeout: integer range 0 to 1073741823;
@@ -76,7 +78,8 @@ architecture behave of spi_interface is
   signal status_reg: std_logic_vector(width-1 downto 0);
 
 
-  signal sck_rising_edge, sck_falling_edge: std_logic;
+--  signal sck_rising_edge, sck_falling_edge: std_logic;
+  signal sck_rising_edge: std_logic;
 
   attribute enum_encoding : string;
 
@@ -114,7 +117,7 @@ begin
     end if;
   end process;
   
-  sck_falling_edge <= '1' when sck_sreg(2 downto 1) = "10" else '0';
+--  sck_falling_edge <= '1' when sck_sreg(2 downto 1) = "10" else '0';
   sck_rising_edge <= '1' when sck_sreg(2 downto 1) = "01" else '0';
 
 
@@ -157,8 +160,6 @@ begin
           mode <= IDLE_MODE;
         end if;
 
-      when others =>
-        mode <= IDLE_MODE;
       end case; 
 
     end if;
@@ -170,7 +171,7 @@ begin
   SerialInProcess: process(clk, rst)
   begin
     if rst = '1' then
-      SerialInError <= '0';
+--      SerialInError <= '0';
       SerialInTimeout <= timeout_max;
       SerialInRegister <= x"0000";
       SerialInValid <= '0';
@@ -200,7 +201,7 @@ begin
       case rx_state is
       when RX_IDLE => 
         -- Clear any error
-        SerialInError <= '0';
+--        SerialInError <= '0';
         SerialInActive <= '0';
         SerialInRegister( width-1 downto 0 ) <= (others=>'0');
         SerialInIndex <= width-1;
@@ -218,16 +219,16 @@ begin
         if SerialInTimeout = 0 then
           rx_state <= RX_IDLE;
           SerialInActive <= '0';
-          SerialInError <= '1';
+--          SerialInError <= '1';
         elsif (cs_sreg(1) = '0') then
           -- Transaction ended prematurely
           rx_state <= RX_IDLE;
           SerialInActive <= '0';
-          if SerialInIndex = width-1 then
-            SerialInError <= '0';
-          else
-            SerialInError <= '1';
-          end if;
+--          if SerialInIndex = width-1 then
+--            SerialInError <= '0';
+--          else
+--            SerialInError <= '1';
+--          end if;
         else
 --          SerialInTimeout <= SerialInTimeout - 1;
           if sck_rising_edge = '1' then
@@ -246,8 +247,6 @@ begin
           end if;
         end if;    
 
-      when others =>
-        rx_state <= RX_IDLE;
       end case;
     end if;
   end process;
@@ -260,7 +259,7 @@ begin
   SerialOutProcess: process(clk, rst)
   begin
     if rst = '1' then
-      SerialOutError <= '0';
+--      SerialOutError <= '0';
       SerialOutTimeout <= timeout_max;
       SerialOutValid <= '0';
       SerialOutValidDelayed <= '0';
@@ -293,7 +292,7 @@ begin
       case tx_state is
       when TX_IDLE => 
         -- Clear any error
-        SerialOutError <= '0';
+--        SerialOutError <= '0';
         SerialOutActive <= '0';
         SerialOutValid <= '0';
         SerialOutValidDelayed <= '0';
@@ -314,16 +313,16 @@ begin
         if SerialOutTimeout = 0 then
           tx_state <= TX_IDLE;
           SerialOutActive <= '0';
-          SerialOutError <= '1';
+--          SerialOutError <= '1';
         elsif (cs_sreg(1) = '0') then
           -- Transaction ended prematurely
           tx_state <= TX_IDLE;
           SerialOutActive <= '0';
-          if SerialOutIndex = width-1 then
-            SerialOutError <= '0';
-          else
-            SerialOutError <= '1';
-          end if;
+--          if SerialOutIndex = width-1 then
+--            SerialOutError <= '0';
+--          else
+--            SerialOutError <= '1';
+--          end if;
         else
 --          SerialOutTimeout <= SerialOutTimeout - 1;
           if sck_rising_edge = '1' then
@@ -342,8 +341,6 @@ begin
           end if;
         end if;    
 
-      when others =>
-        tx_state <= TX_IDLE;
       end case;
     end if;
   end process;
