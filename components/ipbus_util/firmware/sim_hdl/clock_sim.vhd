@@ -28,7 +28,7 @@ begin
 
   clk125 <= not clk125 after 4 ns;
   clk25 <= not clk25 after 20 ns;
-  clk40 <= not clk40 after 12.5ns;
+  clk40 <= not clk40 after 12.5 ns;
   
   clko125 <= clk125;
   clko25 <= clk25;
@@ -41,7 +41,7 @@ begin
     end if;
   end process;
 
-  nuke_del <= nuke after 50us;
+  nuke_del <= nuke after 50 us;
   rsto <= reset_vec(0) or nuke_del;
 
 end behavioural;
