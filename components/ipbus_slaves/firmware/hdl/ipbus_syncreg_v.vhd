@@ -41,7 +41,7 @@ architecture rtl of ipbus_syncreg_v is
 
 	constant ADDR_WIDTH: integer := integer_max(calc_width(N_CTRL), calc_width(N_STAT));
 
-	signal sel: integer := 0;
+	signal sel: integer range 0 to 2 ** ADDR_WIDTH - 1 := 0;
 	signal ctrl_cyc_w, ctrl_cyc_r, stat_cyc: std_logic;
 	signal cq: ipb_reg_v(2 ** ADDR_WIDTH - 1 downto 0);
 	signal sq: ipb_reg_v(2 ** ADDR_WIDTH - 1 downto 0);

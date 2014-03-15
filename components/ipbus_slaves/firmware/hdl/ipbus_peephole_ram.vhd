@@ -26,10 +26,12 @@ use ieee.numeric_std.all;
 use work.ipbus.all;
 
 entity ipbus_peephole_ram is
-	generic(addr_width : positive);
+	generic(
+		ADDR_WIDTH: positive
+	);
 	port(
-		clk: in STD_LOGIC;
-		reset: in STD_LOGIC;
+		clk: in std_logic;
+		reset: in std_logic;
 		ipbus_in: in ipb_wbus;
 		ipbus_out: out ipb_rbus
 	);
@@ -38,10 +40,10 @@ end ipbus_peephole_ram;
 
 architecture rtl of ipbus_peephole_ram is
 
-	type reg_array is array(2**addr_width-1 downto 0) of std_logic_vector(31 downto 0);
+	type reg_array is array(2 ** ADDR_WIDTH - 1 downto 0) of std_logic_vector(31 downto 0);
 	signal reg: reg_array;
-	signal sel: integer;
-	signal ptr: unsigned(addr_width-1 downto 0);
+	signal sel: integer: range 0 to 2 ** ADDR_WIDTH - 1 := 0;
+	signal ptr: unsigned(ADDR_WIDTH - 1 downto 0);
 	signal data: std_logic_vector(31 downto 0);
 	
 begin
@@ -55,7 +57,7 @@ begin
 				ptr <= (others=>'0');
 			elsif ipbus_in.ipb_strobe='1' then
 				if ipbus_in.ipb_addr(0)='0' and ipbus_in.ipb_write='1' then
-					ptr <= unsigned(ipbus_in.ipb_wdata(addr_width-1 downto 0));
+					ptr <= unsigned(ipbus_in.ipb_wdata(ADDR_WIDTH - 1 downto 0));
 				elsif ipbus_in.ipb_addr(0)='1' then
 					if ipbus_in.ipb_write='1' then
 						reg(sel) <= ipbus_in.ipb_wdata;
@@ -71,7 +73,7 @@ begin
 	
 	ipbus_out.ipb_ack <= ipbus_in.ipb_strobe;
 	ipbus_out.ipb_err <= '0';
-	ipbus_out.ipb_rdata <= std_logic_vector(to_unsigned(0, 32 - addr_width)) & std_logic_vector(ptr)
+	ipbus_out.ipb_rdata <= std_logic_vector(to_unsigned(0, 32 - ADDR_WIDTH)) & std_logic_vector(ptr)
 		when ipbus_in.ipb_addr(0)='0' else data;
 
 end rtl;

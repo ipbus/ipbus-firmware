@@ -29,7 +29,7 @@ end ipbus_arb;
 architecture rtl of ipbus_arb is
 
  	signal src: unsigned(1 downto 0); -- Up to four ports...
-	signal sel: integer;
+	signal sel: integer range 0 to N_BUS - 1;
 	signal busy: std_logic;
 
 begin

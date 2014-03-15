@@ -36,12 +36,12 @@ architecture rtl of ipbus_dpram is
 
 	type ram_array is array(2 ** ADDR_WIDTH - 1 downto 0) of std_logic_vector(31 downto 0);
 	shared variable ram: ram_array;
-	signal sel, rsel: integer;
+	signal sel, rsel: integer range 0 to 2 ** ADDR_WIDTH - 1 := 0;
 	signal ack: std_logic;
 
 begin
 
-	sel <= to_integer(unsigned(ipb_in.ipb_addr(addr_width-1 downto 0)));
+	sel <= to_integer(unsigned(ipb_in.ipb_addr(ADDR_WIDTH - 1 downto 0)));
 
 	process(clk)
 	begin

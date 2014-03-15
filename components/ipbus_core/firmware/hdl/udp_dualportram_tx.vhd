@@ -22,8 +22,8 @@ END ENTITY udp_DualPortRAM_tx;
 ARCHITECTURE v3 OF udp_DualPortRAM_tx IS
 type ram_type is array (2**(BUFWIDTH + ADDRWIDTH - 2) - 1 downto 0) of std_logic_vector (31 downto 0);
 signal ram : ram_type;
-attribute block_ram : boolean;
-attribute block_ram of ram : signal is TRUE;
+--attribute block_ram : boolean;
+--attribute block_ram of ram : signal is TRUE;
 signal ram_out : std_logic_vector(31 downto 0);
 signal bytesel: std_logic_vector(1 downto 0);
 BEGIN

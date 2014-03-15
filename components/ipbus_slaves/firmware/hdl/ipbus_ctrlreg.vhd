@@ -1,5 +1,7 @@
 -- Generic control / status register block
 --
+-- THIS DESIGN IS OBSOLETE - USE IPBUS_CTRLREG_V INSTEAD
+--
 -- Provides 2**n control registers (32b each), rw
 -- Provides 2**m status registers (32b each), ro
 --
@@ -14,11 +16,12 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use ieee.numeric_std.all;
 use work.ipbus.all;
+use work.ipbus_reg_types.all;
 
 entity ipbus_ctrlreg is
 	generic(
-		ctrl_addr_width : natural := 0;
-		stat_addr_width : natural := 0
+		CTRL_ADDR_WIDTH: natural := 0;
+		STAT_ADDR_WIDTH: natural := 0
 	);
 	port(
 		clk: in std_logic;
@@ -33,17 +36,17 @@ end ipbus_ctrlreg;
 
 architecture rtl of ipbus_ctrlreg is
 
-	type reg_array is array(2 ** ctrl_addr_width - 1 downto 0) of std_logic_vector(31 downto 0);
+	constant ADDR_WIDTH: integer := integer_max(CTRL_ADDR_WIDTH, STAT_ADDR_WIDTH);
+
+	type reg_array is array(2 ** CTRL_ADDR_WIDTH - 1 downto 0) of std_logic_vector(31 downto 0);
 	signal reg: reg_array;
-	signal ctrl_sel, stat_sel: integer;
-	signal addr_width_max: natural;
+	signal ctrl_sel, stat_sel: integer range 0 to 2 ** ADDR_WIDTH - 1 := 0;
 	signal ack: std_logic;
 
 begin
 
-	addr_width_max <= ctrl_addr_width when ctrl_addr_width > stat_addr_width else stat_addr_width;
-	ctrl_sel <= to_integer(unsigned(ipbus_in.ipb_addr(ctrl_addr_width - 1 downto 0))) when ctrl_addr_width > 0 else 0;
-	stat_sel <= to_integer(unsigned(ipbus_in.ipb_addr(stat_addr_width - 1 downto 0))) when stat_addr_width > 0 else 0;
+	ctrl_sel <= to_integer(unsigned(ipbus_in.ipb_addr(CTRL_ADDR_WIDTH - 1 downto 0))) when CTRL_ADDR_WIDTH > 0 else 0;
+	stat_sel <= to_integer(unsigned(ipbus_in.ipb_addr(STAT_ADDR_WIDTH - 1 downto 0))) when STAT_ADDR_WIDTH > 0 else 0;
 
 	process(clk)
 	begin
@@ -54,7 +57,7 @@ begin
 				reg(ctrl_sel) <= ipbus_in.ipb_wdata;
 			end if;
 
-			if ipbus_in.ipb_addr(addr_width_max) = '0' then
+			if ipbus_in.ipb_addr(ADDR_WIDTH) = '0' then
 				ipbus_out.ipb_rdata <= reg(ctrl_sel);
 			else
 				ipbus_out.ipb_rdata <= d(32 * (stat_sel + 1) - 1 downto 32 * stat_sel); 

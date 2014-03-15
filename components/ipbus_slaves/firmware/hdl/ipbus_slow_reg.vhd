@@ -1,5 +1,7 @@
 -- Generic ipbus slave config register for testing
 --
+-- THIS DESIGN IS OBSOLETE - DO NOT USE
+--
 -- generic addr_width defines number of significant address bits
 --
 -- We use one cycle of read / write latency to ease timing (probably not necessary)

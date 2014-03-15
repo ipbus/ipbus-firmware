@@ -30,7 +30,7 @@ architecture rtl of ipbus_reg_v is
 
 	signal reg: ipb_reg_v(N_REG - 1 downto 0);
 	signal ri: ipb_reg_v(2 ** ADDR_WIDTH - 1 downto 0);
-	signal sel: integer := 0;
+	signal sel: integer range 0 to 2 ** ADDR_WIDTH - 1 := 0;
 
 begin
 

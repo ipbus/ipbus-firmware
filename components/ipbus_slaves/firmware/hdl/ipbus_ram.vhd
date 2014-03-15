@@ -25,10 +25,12 @@ use ieee.numeric_std.all;
 use work.ipbus.all;
 
 entity ipbus_ram is
-	generic(addr_width : positive);
+	generic(
+		ADDR_WIDTH: positive
+	);
 	port(
-		clk: in STD_LOGIC;
-		reset: in STD_LOGIC;
+		clk: in std_logic;
+		reset: in std_logic;
 		ipbus_in: in ipb_wbus;
 		ipbus_out: out ipb_rbus
 	);
@@ -37,14 +39,14 @@ end ipbus_ram;
 
 architecture rtl of ipbus_ram is
 
-	type reg_array is array(2**addr_width-1 downto 0) of std_logic_vector(31 downto 0);
+	type reg_array is array(2 ** ADDR_WIDTH - 1 downto 0) of std_logic_vector(31 downto 0);
 	signal reg: reg_array;
-	signal sel: integer;
+	signal sel: integer range 0 to 2 ** ADDR_WIDTH - 1 := 0;
 	signal ack: std_logic;
 
 begin
 
-	sel <= to_integer(unsigned(ipbus_in.ipb_addr(addr_width-1 downto 0)));
+	sel <= to_integer(unsigned(ipbus_in.ipb_addr(ADDR_WIDTH - 1 downto 0)));
 
 	process(clk)
 	begin

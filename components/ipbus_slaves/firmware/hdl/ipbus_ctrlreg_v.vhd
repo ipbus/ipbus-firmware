@@ -36,7 +36,7 @@ architecture rtl of ipbus_ctrlreg_v is
 
 	constant ADDR_WIDTH: integer := integer_max(calc_width(N_CTRL), calc_width(N_STAT));
 
-	signal sel: integer := 0;
+	signal sel: integer range 0 to 2 ** ADDR_WIDTH - 1 := 0;
 	signal reg: ipb_reg_v(N_CTRL - 1 downto 0);
 	signal si, ri: ipb_reg_v(2 ** ADDR_WIDTH - 1 downto 0);
 	signal stat_cyc, cw_cyc: std_logic;

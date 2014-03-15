@@ -28,7 +28,7 @@ end ipbus_fabric_sel;
 
 architecture rtl of ipbus_fabric_sel is
 
-	signal sel_i: integer := 0;
+	signal sel_i: integer range 0 to NSLV := 0;
 	signal ored_ack, ored_err: std_logic_vector(NSLV downto 0);
 	signal qstrobe: std_logic;
 

@@ -22,11 +22,11 @@ END ENTITY udp_DualPortRAM_rx;
 ARCHITECTURE striped OF udp_DualPortRAM_rx IS
 type ram_type is array (2**(BUFWIDTH + ADDRWIDTH - 2) - 1 downto 0) of std_logic_vector (7 downto 0);
 signal ram1,ram2, ram3, ram4 : ram_type;
-attribute block_ram : boolean;
-attribute block_ram of RAM1 : signal is TRUE;
-attribute block_ram of RAM2 : signal is TRUE;
-attribute block_ram of RAM3 : signal is TRUE;
-attribute block_ram of RAM4 : signal is TRUE;
+--attribute block_ram : boolean;
+--attribute block_ram of RAM1 : signal is TRUE;
+--attribute block_ram of RAM2 : signal is TRUE;
+--attribute block_ram of RAM3 : signal is TRUE;
+--attribute block_ram of RAM4 : signal is TRUE;
 BEGIN
 
 write: process (clk125)
@@ -42,7 +42,6 @@ begin
           ram2(to_integer(unsigned(rx_addra(BUFWIDTH + ADDRWIDTH - 1 downto 2)))) <= rx_dia;
         when "11" =>
           ram1(to_integer(unsigned(rx_addra(BUFWIDTH + ADDRWIDTH - 1 downto 2)))) <= rx_dia;
-        when Others =>
       end case;
     end if;
   end if;

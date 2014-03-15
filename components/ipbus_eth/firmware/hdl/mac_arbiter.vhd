@@ -35,7 +35,7 @@ end mac_arbiter;
 architecture rtl of mac_arbiter is
 
 	signal src: unsigned(3 downto 0); -- Up to sixteen ports...
-	signal sel: integer;
+	signal sel: integer range 1 to NSRC - 1 := 0;
 	signal busy: std_logic;
 
 begin

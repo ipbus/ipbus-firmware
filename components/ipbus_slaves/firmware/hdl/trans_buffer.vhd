@@ -92,7 +92,6 @@ architecture rtl of trans_buffer is
 	attribute KEEP of done_m_s: signal is "TRUE"; -- Synchroniser not to be optimised into shreg
 	attribute KEEP of mode_ipb_s: signal is "TRUE"; -- Synchroniser not to be optimised into shreg
 
-
 begin
 	
 	process(clk_m)

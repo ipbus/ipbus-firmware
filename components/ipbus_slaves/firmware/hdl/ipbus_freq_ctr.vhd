@@ -13,7 +13,9 @@ use ieee.numeric_std.all;
 use work.ipbus.all;
 
 entity ipbus_freq_ctr is
-	generic(addr_width: natural := 0);
+	generic(
+		ADDR_WIDTH: natural := 0
+	);
 	port(
 		clk: in std_logic;
 		rst: in std_logic;
@@ -26,14 +28,14 @@ end ipbus_freq_ctr;
 
 architecture rtl of ipbus_freq_ctr is
 
-	constant n_clk: natural := 2 ** addr_width;
+	constant n_clk: natural := 2 ** ADDR_WIDTH;
 	signal ctr_s: unsigned(15 downto 0) := X"0000";
 	type ctr_array is array(n_clk - 1 downto 0) of unsigned(23 downto 0);
 	signal ctr: ctr_array := (others => X"000000");
 	signal samp, samp_i: ctr_array;
 	signal go: std_logic;
 	signal go_s, go_s2, go_s3: std_logic_vector(n_clk - 1 downto 0);
-	signal sel: integer := 0;
+	signal sel: integer range 0 to 2 ** ADDR_WIDTH := 0;
 	
 	attribute KEEP: string;
 	attribute KEEP of go_s: signal is "TRUE"; -- Synchroniser not to be optimised into shreg
@@ -52,7 +54,7 @@ begin
 	
 	go <= '1' when ctr_s = X"0000" else '0';
 
-	sel <= to_integer(unsigned(ipb_in.ipb_addr(addr_width - 1 downto 0))) when addr_width > 0 else 0;	
+	sel <= to_integer(unsigned(ipb_in.ipb_addr(ADDR_WIDTH - 1 downto 0))) when ADDR_WIDTH > 0 else 0;	
 	ipb_out.ipb_rdata <= X"00" & std_logic_vector(samp_i(sel));
 	ipb_out.ipb_ack <= ipb_in.ipb_strobe and not ipb_in.ipb_write;
 	ipb_out.ipb_err <= '0';

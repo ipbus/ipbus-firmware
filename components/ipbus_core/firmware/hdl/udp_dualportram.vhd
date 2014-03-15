@@ -22,8 +22,8 @@ END ENTITY udp_DualPortRAM;
 ARCHITECTURE initial OF udp_DualPortRAM IS
 type ram_type is array (2**(BUFWIDTH + ADDRWIDTH) - 1 downto 0) of std_logic_vector (7 downto 0);
 signal ram : ram_type;
-attribute block_ram : boolean;
-attribute block_ram of RAM : signal is TRUE;
+--attribute block_ram : boolean;
+--attribute block_ram of RAM : signal is TRUE;
 BEGIN
 
 write: process (ClkA)
