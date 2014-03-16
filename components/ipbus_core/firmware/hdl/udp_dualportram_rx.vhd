@@ -43,7 +43,7 @@ begin
         when "11" =>
           ram1(to_integer(unsigned(rx_addra(BUFWIDTH + ADDRWIDTH - 1 downto 2)))) <= rx_dia;
         when others =>
-        	null
+        	null;
       end case;
     end if;
   end if;
