@@ -111,7 +111,7 @@ begin
         we_pipe <= "1";
       end if;
 
---     end if;
+     end if;
   end process;
 
   
