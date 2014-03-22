@@ -26,7 +26,8 @@ end del_array;
 
 architecture rtl of del_array is
 
-	type del_array is array(DELAY downto 0) of std_logic_vector(DWIDTH - 1 downto 0);
+	type del_array_t is array(DELAY downto 0) of std_logic_vector(DWIDTH - 1 downto 0);
+	signal del_array: del_array_t;
 
 begin
 
