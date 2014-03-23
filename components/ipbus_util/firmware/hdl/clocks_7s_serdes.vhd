@@ -8,6 +8,7 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 library unisim;
 use unisim.VComponents.all;
@@ -22,9 +23,11 @@ entity clocks_7s_serdes is
 		eth_locked: in std_logic; -- ethernet locked signal
 		locked: out std_logic; -- global locked signal
 		nuke: in std_logic; -- hard reset input
+		soft_rst: in std_logic;
 		rsto_125: out std_logic; -- clk125 domain reset (held until ethernet locked)
 		rsto_ipb: out std_logic; -- ipbus domain reset
 		rsto_eth: out std_logic; -- ethernet startup reset (required!)
+		rsto_ipb_ctrl: out std_logic; -- ipbus domain reset for controller
 		rsto_fr: out std_logic; -- clk40 domain reset
 		onehz: out std_logic -- blinkenlights output
 	);
@@ -37,8 +40,9 @@ architecture rtl of clocks_7s_serdes is
 	signal clk_p40_i, clk_p40_b: std_logic;
 	signal d17, d17_d: std_logic;
 	signal nuke_i, nuke_d, nuke_d2: std_logic := '0';
-	signal rst, rst_ipb, rst_125, rst_eth: std_logic := '1';
-
+	signal rst, srst, rst_ipb, rst_125, rst_eth, rst_ipb_ctrl: std_logic := '1';
+	signal rctr: unsigned(3 downto 0) := "0000";
+	
 begin
 	
 	sysclk <= clki_fr;
@@ -96,16 +100,29 @@ begin
 	end process;
 	
 	locked <= dcm_locked;
-
+	srst <= '1' when rctr /= "0000" else '0';
+	
 	process(clk_ipb_b)
 	begin
 		if rising_edge(clk_ipb_b) then
-			rst_ipb <= rst;
+			rst_ipb <= rst or srst;
 			nuke_i <= nuke;
+			if srst = '1' or soft_rst = '1' then
+				rctr <= rctr + 1;
+			end if;
 		end if;
 	end process;
 	
 	rsto_ipb <= rst_ipb;
+	
+	process(clk_ipb_b)
+	begin
+		if rising_edge(clk_ipb_b) then
+			rst_ipb_ctrl <= rst;
+		end if;
+	end process;
+	
+	rsto_ipb_ctrl <= rst_ipb_ctrl;
 	
 	process(clki_125)
 	begin
