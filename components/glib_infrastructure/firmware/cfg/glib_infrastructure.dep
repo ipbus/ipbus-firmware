@@ -1,0 +1,8 @@
+src glib_slaves.vhd
+src ipbus_decode_glib_infrastructure.vhd
+addrtab -t glib_infrastructure.xml
+src -c components/ipbus_util clocks_v6_serdes_noxtal.vhd ipbus_clock_div.vhd
+# NB: ethernet core included in top level dep file (it's board-dependent)
+include -c components/ipbus_core
+src -c components/ipbus_core ipbus_fabric_sel.vhd ipbus_trans_decl.vhd ipbus_package.vhd
+
