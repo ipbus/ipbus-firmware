@@ -1,0 +1,6 @@
+# Virtex-6 1000basex setup
+
+
+src eth_v6_basex.vhd emac_hostbus_decl.vhd
+src -d -s gen_hdl/v6_emac_v2_3_basex v6_emac_v2_3_basex_block.vhd reset_sync.vhd sync_block.vhd v6_gtxwizard_top.vhd v6_gtxwizard.vhd v6_gtxwizard_gtx.vhd double_reset.vhd
+src -d -s cgn v6_emac_v2_3_basex.xco
