@@ -78,7 +78,7 @@ begin
 			pwrdwn => '0'
 		);
 			
-	clkdiv: entity work.clock_div port map(
+	clkdiv: entity work.ipbus_clock_div port map(
 		clk => sysclk,
 		d17 => d17,
 		d28 => onehz
