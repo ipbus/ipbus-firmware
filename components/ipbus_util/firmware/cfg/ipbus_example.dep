@@ -2,4 +2,4 @@ src ipbus_example.vhd
 src -c components/ipbus_core ipbus_fabric_sel.vhd
 src ipbus_decode_ipbus_example.vhd
 addrtab -t ipbus_example.xml
-src -c components/ipbus_slaves ipbus_reg_types.vhd ipbus_reg.vhd ipbus_ctrlreg.vhd ipbus_pkt_ctr.vhd ipbus_ram.vhd ipbus_peephole_ram.vhd
+src -c components/ipbus_slaves ipbus_reg_types.vhd ipbus_reg_v.vhd ipbus_ctrlreg_v.vhd ipbus_pkt_ctr.vhd ipbus_ram.vhd ipbus_peephole_ram.vhd
