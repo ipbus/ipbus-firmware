@@ -1,0 +1,6 @@
+<!-- Default microHAL address table for	example	designs	-->
+
+<node id="TOP">
+	<node id="example" address="0x0" module="components/ipbus_util/addr_table/ipbus_example.xml"/>
+</node>
+
