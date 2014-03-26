@@ -1,0 +1,5 @@
+# Virtex-5 setup for IC mini-T5
+
+src eth_v5_1000basex.vhd emac_hostbus_decl.vhd
+src -d -s gen_hdl/v5_emac_v1_8_serdes v5_emac_v1_8_serdes_block.vhd v5_emac_v1_8_serdes.vhd gtx_dual_1000X_ch1.vhd rocketio_wrapper_gtx.vhd rocketio_wrapper_gtx_tile.vhd
+src -d -s cgn v5_emac_v1_8_serdes.xco
