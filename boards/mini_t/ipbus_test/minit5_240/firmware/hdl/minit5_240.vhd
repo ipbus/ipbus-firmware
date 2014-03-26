@@ -80,8 +80,8 @@ begin
 	ipbus: entity work.ipbus_ctrl
                 generic map(
                   -- MAC and IP address controlled via config space
-                  MAC_CFG => INTERNAL,
-                  IP_CFG => INTERNAL
+                  MAC_CFG => EXTERNAL,
+                  IP_CFG => EXTERNAL
                 )
 		port map(
 			mac_clk => clk125,
@@ -99,6 +99,9 @@ begin
 			mac_tx_ready => mac_tx_ready,
 			ipb_out => ipb_master_out,
 			ipb_in => ipb_master_in,
+			RARP_select => '1',
+			mac_addr => X"08002bf10031",
+			ip_addr => X"00000000",
 			pkt_rx_led => pkt_rx_led,
 			pkt_tx_led => pkt_tx_led
 		);
