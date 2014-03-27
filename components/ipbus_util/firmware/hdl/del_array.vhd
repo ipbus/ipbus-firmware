@@ -1,6 +1,6 @@
 -- del_array
 --
--- Generic delay element (should synthesis to SRL16/32 in Xilinx devices)
+-- Generic delay element (should synthesise to SRL16/32 in Xilinx devices)
 --
 -- Dave Newbold, March 2014.
 

@@ -17,8 +17,8 @@ use work.ipbus_reg_types.all;
 
 entity ipbus_ctrlreg_v is
 	generic(
-		N_CTRL: positive := 1;
-		N_STAT: positive := 1
+		N_CTRL: natural := 1;
+		N_STAT: natural := 1
 	);
 	port(
 		clk: in std_logic;
