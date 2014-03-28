@@ -5,6 +5,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use work.ipbus.all;
+use work.ipbus_trans_decl.all;
 use work.ipbus_decode_minit5_240.all;
 
 entity top is port(
@@ -13,7 +14,11 @@ entity top is port(
 		gt_txp, gt_txn: out std_logic;
 		gt_rxp, gt_rxn: in std_logic;
 		leds: out std_logic_vector(3 downto 0);
-		clk_cntrl: out std_logic_vector(23 downto 0)
+		clk_cntrl: out std_logic_vector(23 downto 0);
+                uc_spi_miso: out std_logic;
+                uc_spi_mosi: in std_logic;
+                uc_spi_sck: in std_logic;
+                uc_spi_cs_b: in std_logic
 	);
 end top;
 
@@ -27,7 +32,11 @@ architecture rtl of top is
 	signal ipb_master_in: ipb_rbus;
 	signal ipbw: ipb_wbus_array(N_SLAVES-1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES-1 downto 0);
+        signal oob_in: ipbus_trans_in;
+        signal oob_out: ipbus_trans_out;
 	signal pkt_rx_led, pkt_tx_led, sys_rst: std_logic;
+        signal mmc_wdata, mmc_rdata: std_logic_vector(15 downto 0);
+        signal mmc_we, mmc_re, mmc_req, mmc_done: std_logic;
 	
 begin
 
@@ -80,8 +89,9 @@ begin
 	ipbus: entity work.ipbus_ctrl
                 generic map(
                   -- MAC and IP address controlled via config space
-                  MAC_CFG => EXTERNAL,
-                  IP_CFG => EXTERNAL
+                  MAC_CFG => INTERNAL,
+                  IP_CFG => INTERNAL,
+                  N_OOB => 1
                 )
 		port map(
 			mac_clk => clk125,
@@ -99,11 +109,13 @@ begin
 			mac_tx_ready => mac_tx_ready,
 			ipb_out => ipb_master_out,
 			ipb_in => ipb_master_in,
-			RARP_select => '1',
-			mac_addr => X"08002bf10031",
-			ip_addr => X"00000000",
+			--RARP_select => '1',
+			--mac_addr => X"08002bf10039",
+			--ip_addr => X"00000000",
 			pkt_rx_led => pkt_rx_led,
-			pkt_tx_led => pkt_tx_led
+			pkt_tx_led => pkt_tx_led,
+                        oob_in(0) => oob_in,
+                        oob_out(0) => oob_out
 		);
 
 		ipbus_fabric_sel: entity work.ipbus_fabric_sel
@@ -131,5 +143,43 @@ begin
 		rst_out => sys_rst
 	);
 
+
+-- SPI interface to MMC
+	uc_trans: entity work.trans_buffer
+          port map(
+            clk_m => clk125,
+            rst_m => rst_125,
+            m_wdata => mmc_wdata,
+            m_we => mmc_we,
+            m_rdata => mmc_rdata,
+            m_re => mmc_re,
+            m_req => mmc_req,
+            m_done => mmc_done,
+            clk_ipb => ipb_clk,
+            t_out => oob_in,
+            t_in => oob_out
+            );
+
+
+        spi: entity work.spi_interface
+          generic map(
+            width => 16
+            )
+          port map(
+            clk => clk125,
+            rst => rst_125,
+            spi_miso => uc_spi_miso,
+            spi_mosi => uc_spi_mosi,
+            spi_sck => uc_spi_sck,
+            spi_cs_b => uc_spi_cs_b,
+            buf_wdata => mmc_wdata,
+            buf_we => mmc_we,
+            buf_rdata => mmc_rdata,
+            buf_re => mmc_re,
+            buf_req => mmc_req,
+            buf_done => mmc_done
+     );
+  
+        
 end rtl;
 
