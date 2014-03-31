@@ -15,9 +15,9 @@ entity top is port(
 		gt_rxp, gt_rxn: in std_logic;
 		leds: out std_logic_vector(3 downto 0);
 		clk_cntrl: out std_logic_vector(23 downto 0);
-                uc_spi_miso: out std_logic;
                 uc_spi_mosi: in std_logic;
                 uc_spi_sck: in std_logic;
+                uc_spi_miso: out std_logic;
                 uc_spi_cs_b: in std_logic
 	);
 end top;
@@ -179,6 +179,8 @@ begin
             buf_req => mmc_req,
             buf_done => mmc_done
      );
+
+     --uc_spi_cs_b <= '0'; 
   
         
 end rtl;
