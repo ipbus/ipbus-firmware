@@ -48,7 +48,7 @@ architecture rtl of ipbus_syncreg_v is
 	signal cq: ipb_reg_v(2 ** ADDR_WIDTH - 1 downto 0);
 	signal sq: ipb_reg_v(2 ** ADDR_WIDTH - 1 downto 0);
 	signal cbusy, cack: std_logic_vector(N_CTRL - 1 downto 0);
-	signal sre, sbusy, sack: std_logic_vector(N_STAT - 1 downto 0);
+	signal sbusy, sack: std_logic_vector(N_STAT - 1 downto 0);
 	signal busy, ack, busy_d, pend: std_logic;
 
 begin
@@ -89,7 +89,7 @@ begin
 	
 	r_gen: for i in N_STAT - 1 downto 0 generate
 	
-		signal srd: std_logic;
+		signal sre: std_logic;
 		signal stat_m: std_logic_vector(31 downto 0);
 
 	begin
