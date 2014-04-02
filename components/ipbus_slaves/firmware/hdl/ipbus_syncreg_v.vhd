@@ -22,7 +22,7 @@ entity ipbus_syncreg_v is
 	generic(
 		N_CTRL: natural := 1;
 		N_STAT: natural := 1;
-		CTRL_MASK: ipb_reg_v(N_CTRL - 1 downto 0) := (others => (others => '1'))
+		CTRL_MASK: ipb_reg_v(N_CTRL - 1 downto 0) := (others => (others => '1'));
 		STAT_MASK: ipb_reg_v(N_CTRL - 1 downto 0) := (others => (others => '1'))
 	);
 	port(
