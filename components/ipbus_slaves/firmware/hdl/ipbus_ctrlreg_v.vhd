@@ -18,8 +18,7 @@ use work.ipbus_reg_types.all;
 entity ipbus_ctrlreg_v is
 	generic(
 		N_CTRL: natural := 1;
-		N_STAT: natural := 1;
-		CTRL_MASK: ipb_reg_v(N_CTRL - 1 downto 0) := (others => (others => '1'))
+		N_STAT: natural := 1
 	);
 	port(
 		clk: in std_logic;
@@ -28,6 +27,7 @@ entity ipbus_ctrlreg_v is
 		ipbus_out: out ipb_rbus;
 		d: in ipb_reg_v(N_STAT - 1 downto 0);
 		q: out ipb_reg_v(N_CTRL - 1 downto 0);
+		qmask: in ipb_reg_v(N_STAT - 1 downto 0) := (others => (others => '1'));		
 		stb: out std_logic_vector(N_CTRL - 1 downto 0)
 	);
 	
@@ -54,7 +54,7 @@ begin
 			if reset = '1' then
 				reg <= (others => (others => '0'));
 			elsif cw_cyc = '1' and sel < N_CTRL then
-				reg(sel) <= ipbus_in.ipb_wdata and CTRL_MASK(sel);
+				reg(sel) <= ipbus_in.ipb_wdata and qmask(sel);
 			end if;
 		end if;
 	end process;
