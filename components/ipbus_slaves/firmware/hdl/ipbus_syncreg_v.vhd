@@ -21,7 +21,9 @@ use work.ipbus_reg_types.all;
 entity ipbus_syncreg_v is
 	generic(
 		N_CTRL: natural := 1;
-		N_STAT: natural := 1
+		N_STAT: natural := 1;
+		CTRL_MASK: ipb_reg_v(N_CTRL - 1 downto 0) := (others => (others => '1'))
+		STAT_MASK: ipb_reg_v(N_CTRL - 1 downto 0) := (others => (others => '1'))
 	);
 	port(
 		clk: in std_logic;
@@ -45,7 +47,7 @@ architecture rtl of ipbus_syncreg_v is
 	signal ctrl_cyc_w, ctrl_cyc_r, stat_cyc: std_logic;
 	signal cq: ipb_reg_v(2 ** ADDR_WIDTH - 1 downto 0);
 	signal sq: ipb_reg_v(2 ** ADDR_WIDTH - 1 downto 0);
-	signal cwe, cbusy, cack: std_logic_vector(N_CTRL - 1 downto 0);
+	signal cbusy, cack: std_logic_vector(N_CTRL - 1 downto 0);
 	signal sre, sbusy, sack: std_logic_vector(N_STAT - 1 downto 0);
 	signal busy, ack, busy_d, pend: std_logic;
 
@@ -59,16 +61,22 @@ begin
 	
 	w_gen: for i in N_CTRL - 1 downto 0 generate
 	
-		cwe(i) <= '1' when ctrl_cyc_w = '1' and sel = i and busy = '0' else '0';
+		signal cwe: std_logic;
+		signal ctrl_m: std_logic_vector(31 downto 0);
+		
+	begin
+	
+		cwe <= '1' when ctrl_cyc_w = '1' and sel = i and busy = '0' else '0';
+		ctrl_m <= ipb_in.ipb_wdata and CTRL_MASK(i);
 		
 		wsync: entity work.syncreg_w
 			port map(
 				m_clk => clk,
 				m_rst => rst,
-				m_we => cwe(i),
+				m_we => cwe,
 				m_busy => cbusy(i),
 				m_ack => cack(i),
-				m_d => ipb_in.ipb_wdata,
+				m_d => ctrl_m,
 				m_q => cq(i),
 				s_clk => slv_clk,
 				s_q => q(i),
@@ -80,19 +88,25 @@ begin
 	cq(2 ** ADDR_WIDTH - 1 downto N_CTRL) <= (others => (others => '0'));
 	
 	r_gen: for i in N_STAT - 1 downto 0 generate
+	
+		signal srd: std_logic;
+		signal stat_m: std_logic_vector(31 downto 0);
 
-		sre(i) <= '1' when stat_cyc = '1' and sel = i and busy = '0' else '0';
+	begin
+
+		sre <= '1' when stat_cyc = '1' and sel = i and busy = '0' else '0';
+		stat_m <= d(i) and STAT_MASK(i);
 	
 		rsync: entity work.syncreg_r
 			port map(
 				m_clk => clk,
 				m_rst => rst,
-				m_re => sre(i),
+				m_re => sre,
 				m_busy => sbusy(i),
 				m_ack => sack(i),
 				m_q => sq(i),
 				s_clk => slv_clk,
-				s_d => d(i),
+				s_d => stat_m,
 				s_stb => rstb(i)
 			);
 	
