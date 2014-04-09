@@ -18,3 +18,6 @@ include -c components/ipbus_eth v5_serdes.dep
 
 # microcontroller interface
 include -c components/ipbus_slaves uc_spi_interface.dep
+
+# flash prom interface for firmware upload
+src pflash_interface_ipbus.vhd

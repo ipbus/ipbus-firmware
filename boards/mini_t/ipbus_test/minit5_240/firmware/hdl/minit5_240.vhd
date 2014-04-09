@@ -15,10 +15,16 @@ entity top is port(
 		gt_rxp, gt_rxn: in std_logic;
 		leds: out std_logic_vector(3 downto 0);
 		clk_cntrl: out std_logic_vector(23 downto 0);
-                uc_spi_mosi: in std_logic;
-                uc_spi_sck: in std_logic;
-                uc_spi_miso: out std_logic;
-                uc_spi_cs_b: in std_logic
+		uc_spi_mosi: in std_logic;
+		uc_spi_sck: in std_logic;
+		uc_spi_miso: out std_logic;
+		uc_spi_cs_b: in std_logic;
+		pflash_a: out std_logic_vector(23 downto 0);
+		pflash_d: inout std_logic_vector(15 downto 0);
+		pflash_fcs_b: out std_logic;
+		pflash_fle_b: out std_logic;
+		pflash_foe_b: out std_logic;
+		pflash_fwe_b: out std_logic
 	);
 end top;
 
@@ -110,8 +116,8 @@ begin
 			ipb_out => ipb_master_out,
 			ipb_in => ipb_master_in,
 			--RARP_select => '1',
-			--mac_addr => X"08002bf10039",
-			--ip_addr => X"00000000",
+			mac_addr => X"08002bf10031",
+			ip_addr => X"00000000",
 			pkt_rx_led => pkt_rx_led,
 			pkt_tx_led => pkt_tx_led,
                         oob_in(0) => oob_in,
@@ -179,9 +185,21 @@ begin
             buf_req => mmc_req,
             buf_done => mmc_done
      );
-
-     --uc_spi_cs_b <= '0'; 
   
         
+-- flash prom interface for firmware upload
+	flash: entity work.pflash_interface port map(
+		clk => ipb_clk,
+		rst => rst_ipb,
+		ipbus_in => ipbw(N_SLV_FLASH),
+		ipbus_out => ipbr(N_SLV_FLASH),
+		pflash_a => pflash_a,
+		pflash_d => pflash_d,
+		pflash_fcs_b => pflash_fcs_b,
+		pflash_fle_b => pflash_fle_b,
+		pflash_foe_b => pflash_foe_b,
+		pflash_fwe_b => pflash_fwe_b
+	);	
+
 end rtl;
 

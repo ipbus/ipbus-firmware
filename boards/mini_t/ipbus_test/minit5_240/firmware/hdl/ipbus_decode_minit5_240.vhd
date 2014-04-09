@@ -19,7 +19,8 @@ package ipbus_decode_minit5_240 is
 
 -- START automatically  generated VHDL the Wed Mar 12 17:56:54 2014 
   constant N_SLV_EXAMPLE: integer := 0;
-  constant N_SLAVES: integer := 1;
+  constant N_SLV_FLASH: integer := 1;
+  constant N_SLAVES: integer := 2;
 -- END automatically generated VHDL
 
     
@@ -32,8 +33,10 @@ package body ipbus_decode_minit5_240 is
   begin
 
 -- START automatically  generated VHDL the Wed Mar 12 17:56:54 2014 
-    if    std_match(addr, "--------------------------------") then
+    if    std_match(addr, "0-------------------------------") then
       sel := ipbus_sel_t(to_unsigned(N_SLV_EXAMPLE, IPBUS_SEL_WIDTH));
+    elsif std_match(addr, "1-------------------------------") then
+      sel := ipbus_sel_t(to_unsigned(N_SLV_FLASH, IPBUS_SEL_WIDTH));
 -- END automatically generated VHDL
 
     else
