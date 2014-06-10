@@ -41,8 +41,10 @@ SIGNAL samp_nrd : std_logic_vector(1 DOWNTO 0) := (OTHERS => '1');
       signal r_addr_pipe : unsigned(9 downto 0) := (others=>'0');
       signal r_data_pipe : std_logic_vector(15 downto 0);
 
---       signal pipe_to_ipbus_reset , ipbus_to_pipe_reset : std_logic;
-
+      signal pipe_to_ipbus_reset , ipbus_to_pipe_reset : std_logic;
+		
+		signal we_pipe_clked : std_logic_vector(0 downto 0);
+		signal uc_pipe_clked : std_logic_vector(15 downto 0);
 
   COMPONENT sdpram_16x10_32x9
     PORT (
@@ -82,7 +84,7 @@ begin
 --   uc_pipe <= r_data_pipe when uc_pipe_nwe = '1' else (OTHERS => 'Z');
 
 
-  process( clk200buf , ipbus_to_pipe_reset , pipe_to_ipbus_reset )
+  process( clk200buf ) --, ipbus_to_pipe_reset , pipe_to_ipbus_reset )
   begin
 --     if( ipbus_to_pipe_reset = '1' ) then
 --       r_addr_pipe <= (others=>'0');
@@ -96,25 +98,40 @@ begin
 
       we_pipe <= "0";
 
-      if( uc_pipe_nwe = '1' ) then
-        uc_pipe <= r_data_pipe;
-      else
-        uc_pipe <= (OTHERS => 'Z');
-      end if;
+		if( ipbus_to_pipe_reset = '1') then
+			r_addr_pipe <= (others => '0');
+		elsif( samp_nrd = "10" ) then
+			r_addr_pipe <= r_addr_pipe + 1;
+		end if;
+	 
+		if( pipe_to_ipbus_reset = '1') then
+			w_addr_pipe <= (others => '1');
+		elsif( samp_nwe = "10" ) then
+			w_addr_pipe <= w_addr_pipe + 1;
+			we_pipe <= "1";
+		end if;
 
-      if( samp_nrd = "10" ) then
-        r_addr_pipe <= r_addr_pipe + 1;
-      end if;
-
-      if( samp_nwe = "10" ) then
-        w_addr_pipe <= w_addr_pipe + 1;
-        we_pipe <= "1";
-      end if;
-
+--      if( uc_pipe_nwe = '1' ) then
+--        uc_pipe <= r_data_pipe;
+--      else
+--        uc_pipe <= (OTHERS => 'Z');
+--      end if;
+--
+--      if( samp_nrd = "10" ) then
+--        r_addr_pipe <= r_addr_pipe + 1;
+--      end if;
+--
+--      if( samp_nwe = "10" ) then
+--        w_addr_pipe <= w_addr_pipe + 1;
+--        we_pipe <= "1";
+--      end if;
+			we_pipe_clked <= we_pipe;
+			uc_pipe_clked <= uc_pipe;
      end if;
   end process;
 
-  
+
+	uc_pipe <= r_data_pipe when uc_pipe_nwe = '1' else (others => 'Z');	
 
 
   ipbus_out.ipb_err <= '0'; 
@@ -143,6 +160,15 @@ begin
             elsif ipbus_in.ipb_addr(1 downto 0)="01" then
               ipbus_out.ipb_rdata <= "0000000" & std_logic_vector( r_addr_ipbus ) & "000000" & std_logic_vector( w_addr_pipe );
             end if;
+			 else
+           -- reset fifo pointers
+				if ipbus_in.ipb_addr(1 downto 0)="00" then
+					ipbus_to_pipe_reset <= ipbus_in.ipb_wdata(0);
+               w_addr_ipbus <= (others => '1');
+            elsif ipbus_in.ipb_addr(1 downto 0)="01" then
+               pipe_to_ipbus_reset <= ipbus_in.ipb_wdata(0);
+               r_addr_ipbus <= (others => '0');
+            end if;   
 --           else
 --             if ipbus_in.ipb_addr(1 downto 0)="00" then
 --               ipbus_to_pipe_reset <= '1';          
@@ -179,9 +205,9 @@ begin
   ram_pipe_to_ipbus: sdpram_16x10_32x9
     port map(
       clka => clk200buf,
-      wea => we_pipe,
+      wea => we_pipe_clked,
       addra => std_logic_vector( w_addr_pipe ),
-      dina => uc_pipe, --w_data_pipe,
+      dina => uc_pipe_clked, --w_data_pipe,
       clkb => clk,
       addrb => std_logic_vector( r_addr_ipbus ),
       doutb => r_data_ipbus
