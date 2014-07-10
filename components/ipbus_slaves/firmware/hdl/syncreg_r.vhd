@@ -32,9 +32,9 @@ architecture rtl of syncreg_r is
 		
 	signal we, busy, ack, s1, s2, s3, m1, m2, m3: std_logic;
 	
-	attribute KEEP: string;
-	attribute KEEP of s1: signal is "TRUE"; -- Synchroniser not to be optimised into shreg
-	attribute KEEP of m1: signal is "TRUE"; -- Synchroniser not to be optimised into shreg
+	attribute SHREG_EXTRACT: string;
+	attribute SHREG_EXTRACT of s1: signal is "no"; -- Synchroniser not to be optimised into shreg
+	attribute SHREG_EXTRACT of m1: signal is "no"; -- Synchroniser not to be optimised into shreg
 	
 begin
 

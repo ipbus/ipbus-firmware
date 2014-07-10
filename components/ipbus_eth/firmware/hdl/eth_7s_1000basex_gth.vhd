@@ -101,7 +101,7 @@ begin
 	
 	clk125_fr <= clk_fr;
 	
-	bufg_tx: BUFH port map(
+	bufh_tx: BUFH port map(
 		i => txoutclk_ub,
 		o => txoutclk
 	);
