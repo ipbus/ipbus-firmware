@@ -45,7 +45,7 @@ package ipbus is
 		
 	type ipbdc_bus_array is array(natural range <>) of ipbdc_bus;
  
-	constant IPBDC_BUS_NULL: ipbdc_bus := ((others => '0'), '0', '0');
+	constant IPBDC_BUS_NULL: ipbdc_bus := ("00", (others => '0'), '0');
 
 -- For top-level generics
 	
