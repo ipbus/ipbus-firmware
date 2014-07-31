@@ -39,6 +39,7 @@ begin
 					sel <= '1';
 				else
 					sel <= '0';
+				end if;
 			elsif ipbdc_in.phase = "01" then
 				ipb_out.ipb_addr <= ipbdc_in.ad;
 				ipb_out.ipb_write <= ipbdc_in.flag;
@@ -52,7 +53,7 @@ begin
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			if ipbdc_in.phase = "00" and ipdbc_in.flag = '0' and (ipb_in.ipb_ack or ipb_in.ipb_err) = '1' and sel = '1' then
+			if ipbdc_in.phase = "00" and ipbdc_in.flag = '0' and (ipb_in.ipb_ack or ipb_in.ipb_err) = '1' and sel = '1' then
 				ipbdc_out.phase <= "11";
 				ipbdc_out.ad <= ipb_in.ipb_rdata;
 				ipbdc_out.flag <= ipb_in.ipb_ack;
