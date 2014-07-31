@@ -47,7 +47,7 @@ begin
 				case state is
 -- Starting state
 				when ST_IDLE =>
-					if ipb_in.stb = '1' then
+					if ipb_in.ipb_strobe = '1' then
 						state <= ST_SEL;
 					end if;				
 -- Send slave select word			
