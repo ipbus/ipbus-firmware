@@ -27,7 +27,7 @@ end ipbus_dc_node;
 
 architecture rtl of ipbus_dc_node is
 
-	signal cyc, resp, sel, pend: std_logic;
+	signal resp, sel: std_logic;
 	
 begin
 
@@ -52,13 +52,11 @@ begin
 	ipb_out.ipb_wdata <= ipbdc_in.ad;
 	ipb_out.ipb_strobe <= '1' when ipbdc_in.phase = "10" and sel = '1' else '0';
 	resp <= ipb_in.ipb_ack or ipb_in.ipb_err;
-	cyc <= '1' when ipbdc_in.phase = "10" else '0';
 
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			pend <= ((pend and not resp) or cyc) and not rst and sel;
-			if pend = '1' and resp = '1' then
+			if resp = '1' and sel = '1' then
 				ipbdc_out.phase <= "11";
 				ipbdc_out.ad <= ipb_in.ipb_rdata;
 				ipbdc_out.flag <= ipb_in.ipb_ack;
