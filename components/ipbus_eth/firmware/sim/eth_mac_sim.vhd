@@ -80,11 +80,15 @@ architecture behavioural of eth_mac_sim is
 begin
 
   rx_error <= '0';
-  
+  last <= '1' when ifg_ctr = 3 else '0';
+
   packet_rx: process(clk)    
-    variable del, data, datav: integer;
+
+  	variable del, data, datav: integer;
+
   begin
-    if MULTI_PACKET then
+
+  	if MULTI_PACKET then
       del := 0;
     else
       del := 1;
@@ -126,13 +130,12 @@ begin
       	rx_data <= rx_data_d;
       end if;
       
-      last <= '1' when ifg_ctr = 3 else '0';
       rx_valid <= (rx_valid_d and rx_valid_i) or last;
       rx_last <= last;
     
     end if;
   end process;
-
+  
   packet_tx: process(clk)
     variable data: integer;
   begin
