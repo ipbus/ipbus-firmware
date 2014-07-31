@@ -52,7 +52,7 @@ begin
 	ipb_out.ipb_wdata <= ipbdc_in.ad;
 	ipb_out.ipb_strobe <= '1' when ipbdc_in.phase = "10" and sel = '1' else '0';
 	resp <= ipb_in.ipb_ack or ipb_in.ipb_err;
-	cyc <= '1' when ipbdc_in_phase = "10" else '0';
+	cyc <= '1' when ipbdc_in.phase = "10" else '0';
 
 	process(clk)
 	begin
