@@ -38,9 +38,9 @@ package ipbus is
 	
 	type ipbdc_bus is
 		record
-			ipb_phase: std_logic_vector(1 downto 0);
-			ipb_ad: std_logic_vector(31 downto 0);
-			ipb_flag: std_logic;
+			phase: std_logic_vector(1 downto 0);
+			ad: std_logic_vector(31 downto 0);
+			flag: std_logic;
 		end record;
 		
 	type ipbdc_bus_array is array(natural range <>) of ipbdc_bus;

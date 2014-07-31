@@ -91,9 +91,9 @@ begin
 
 	ret <= '1' when ipbdc_in.phase = "11" else '0';
 
-	ipb_out.rdata <= ipbdc_in.ad;
-	ipb_out.ack <= ret and ipbdc_in.flag;
-	ipb_out.err <= ret and not ipbdc_in.flag;	
+	ipb_out.ipb_rdata <= ipbdc_in.ad;
+	ipb_out.ipb_ack <= ret and ipbdc_in.flag;
+	ipb_out.ipb_err <= ret and not ipbdc_in.flag;	
   
 end rtl;
 
