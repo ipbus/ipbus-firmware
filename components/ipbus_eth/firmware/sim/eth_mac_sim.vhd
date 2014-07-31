@@ -95,7 +95,7 @@ begin
         rxen <= '1';
         timer <= 0;
         last_del <= (others => '0');
-      elsif rxen = '1' or MULTI_PACKET then
+      elsif rxen = '1' then
         get_mac_data(del_return => del,
         	mac_data_out => data,
         	mac_data_valid => datav);
@@ -109,7 +109,7 @@ begin
           end if;          
         end if;
       else
-        if tx_last = '1' or timer = timeout then
+        if tx_last = '1' or timer = timeout or (last_del(3) = '1' and MULTI_PACKET) then
           rxen <= '1';
           timer <= 0;
         else
