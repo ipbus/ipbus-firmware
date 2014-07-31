@@ -12,6 +12,7 @@ use work.ipbus.ALL;
 entity ipbus_dc_node is
   generic(
   	I_SLV: integer;
+  	SEL_WIDTH: integer := 5
    );
   port(
   	clk: in std_logic;
@@ -26,10 +27,42 @@ end ipbus_dc_node;
 
 architecture rtl of ipbus_dc_node is
 
+	signal sel: std_logic;
+	
 begin
 
-	ipb_out <= IPB_WBUS_NULL;
-	ipbdc_out <= IPBDC_BUS_NULL;
+	process(clk)
+	begin
+		if rising_edge(clk) then
+			if ipbdc_in.phase = "00" and ipbdc_in.flag = '1' then
+				if ipbdc_in.ad(SEL_WIDTH - 1 downto 0) = std_logic_vector(to_unsigned(I_SLV, SEL_WIDTH)) then
+					sel <= '1';
+				else
+					sel <= '0';
+			elsif ipbdc_in.phase = "01" then
+				ipb_out.ipb_addr <= ipbdc_in.ad;
+				ipb_out.ipb_write <= ipbdc_in.flag;
+			end if;
+		end if;
+	end process;
+
+	ipb_out.ipb_wdata <= ipbdc_in.ad;
+	ipb_out.ipb_strobe <= '1' when ipbdc_in.phase = "10" and sel = '1' else '0';
+
+	process(clk)
+	begin
+		if rising_edge(clk) then
+			if ipbdc_in.phase = "00" and ipdbc_in.flag = '0' and (ipb_in.ipb_ack or ipb_in.ipb_err) = '1' and sel = '1' then
+				ipbdc_out.phase <= "11";
+				ipbdc_out.ad <= ipb_in.ipb_rdata;
+				ipbdc_out.flag <= ipb_in.ipb_ack;
+			else
+				ipbdc_out.phase <= ipbdc_in.phase;
+				ipbdc_out.ad <= ipbdc_in.ad;
+				ipbdc_out.flag <= ipbdc_in.flag;
+			end if;
+		end if;
+	end process;
   
 end rtl;
 
