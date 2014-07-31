@@ -19,6 +19,8 @@ package drp_decl is
     	end record;
 
 	type drp_wbus_array is array(natural range <>) of drp_wbus;
+	
+	constant DRP_WBUS_NULL: drp_wbus := ((others => '0'), (others => '0'), '0', '0');
 	 
 -- The signals going from slaves to master	 
 	type drp_rbus is

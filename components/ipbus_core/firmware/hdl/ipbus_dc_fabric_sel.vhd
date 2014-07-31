@@ -50,10 +50,10 @@ begin
 					if ipb_in.stb = '1' then
 						state <= ST_SEL;
 					end if;				
--- Decode header word			
+-- Send slave select word			
 				when ST_SEL =>
 					state <= ST_ADDR;
--- Load address counter
+-- Send address word
 				when ST_ADDR =>
 					state <= ST_WDATA;
 -- Send data
