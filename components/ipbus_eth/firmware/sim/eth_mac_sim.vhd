@@ -71,7 +71,7 @@ architecture behavioural of eth_mac_sim is
   attribute FOREIGN of put_packet : procedure is "put_packet mac_fli.so";
 
   constant TIMEOUT: integer := 32768;
-  constant IFG_LENGTH: integer := 96; -- ethernet interframe gap
+  constant IFG_LENGTH: integer := 12; -- ethernet interframe gap in words
 
   signal rxen, rx_valid_d, rx_valid_i, last: std_logic;
   signal rx_data_i, rx_data_d: std_logic_vector(7 downto 0);
