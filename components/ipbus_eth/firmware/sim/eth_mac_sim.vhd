@@ -70,12 +70,12 @@ architecture behavioural of eth_mac_sim is
   
   attribute FOREIGN of put_packet : procedure is "put_packet mac_fli.so";
 
-  constant timeout: integer := 32768;
+  constant TIMEOUT: integer := 32768;
+  constant IFG_LENGTH: integer := 96; -- ethernet interframe gap
 
-  signal rxen, rx_valid_d, rx_valid_i: std_logic;
+  signal rxen, rx_valid_d, rx_valid_i, last: std_logic;
   signal rx_data_i, rx_data_d: std_logic_vector(7 downto 0);
-  signal timer: integer;
-  signal last_del: std_logic_vector(3 downto 0);
+  signal timer, ifg_ctr: integer;
   
 begin
 
@@ -94,8 +94,9 @@ begin
       if rst = '1' then
         rxen <= '1';
         timer <= 0;
+        ifg_ctr <= 0;
         last_del <= (others => '0');
-      elsif rxen = '1' then
+      elsif rxen = '1' and ifg_ctr > IFG_LENGTH then
         get_mac_data(del_return => del,
         	mac_data_out => data,
         	mac_data_valid => datav);
@@ -106,10 +107,12 @@ begin
           rx_valid_i <= '0';
           if rx_valid_d='1' then
             rxen <= '0';
+            ifg_ctr <= 0;
           end if;          
         end if;
       else
-        if tx_last = '1' or timer = timeout or (last_del(3) = '1' and MULTI_PACKET) then
+      	ifg_ctr <= ifg_ctr + 1;
+        if tx_last = '1' or timer = TIMEOUT or MULTI_PACKET then
           rxen <= '1';
           timer <= 0;
         else
@@ -119,15 +122,14 @@ begin
     
       rx_valid_d <= rx_valid_i;
       rx_data_d <= rx_data_i; -- Delay to allow generation of rx_last flag
-
-      last_del <= last_del(2 downto 0) & (rx_valid_d and not rx_valid_i);
       
       if rx_valid_d = '1' then
       	rx_data <= rx_data_d;
       end if;
       
-      rx_valid <= (rx_valid_d and rx_valid_i) or last_del(3);
-      rx_last <= last_del(3);
+      last <= '1' when ifg_ctr = 3 else '0';
+      rx_valid <= (rx_valid_d and rx_valid_i) or last;
+      rx_last <= last;
     
     end if;
   end process;
