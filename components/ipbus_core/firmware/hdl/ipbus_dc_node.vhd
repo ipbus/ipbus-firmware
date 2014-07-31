@@ -57,7 +57,7 @@ begin
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			pend <= (pend or cyc) and not (resp or rst) and sel;
+			pend <= ((pend and not resp) or cyc) and not rst and sel;
 			if pend = '1' and resp = '1' then
 				ipbdc_out.phase <= "11";
 				ipbdc_out.ad <= ipb_in.ipb_rdata;
