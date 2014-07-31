@@ -95,7 +95,6 @@ begin
         rxen <= '1';
         timer <= 0;
         ifg_ctr <= 0;
-        last_del <= (others => '0');
       elsif rxen = '1' and ifg_ctr > IFG_LENGTH then
         get_mac_data(del_return => del,
         	mac_data_out => data,
