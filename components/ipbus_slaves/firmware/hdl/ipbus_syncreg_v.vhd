@@ -31,7 +31,7 @@ entity ipbus_syncreg_v is
 		slv_clk: in std_logic;
 		d: in ipb_reg_v(N_STAT - 1 downto 0);
 		q: out ipb_reg_v(N_CTRL - 1 downto 0);
-		qmask: in ipb_reg_v(N_STAT - 1 downto 0) := (others => (others => '1'));
+		qmask: in ipb_reg_v(N_CTRL - 1 downto 0) := (others => (others => '1'));
 		stb: out std_logic_vector(N_CTRL - 1 downto 0);
 		rstb: out std_logic_vector(N_STAT - 1 downto 0)
 	);
