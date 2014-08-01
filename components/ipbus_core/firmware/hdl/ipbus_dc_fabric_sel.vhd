@@ -61,7 +61,7 @@ begin
 					state <= ST_RDATA;
 -- Receive data
 				when ST_RDATA =>
-					if ret = '1' then
+					if ret = '1' or ipb_in.ipb_strobe = '0' then
 						state <= ST_IDLE;
 					end if;
 
