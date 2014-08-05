@@ -53,10 +53,7 @@ entity ipbus_ctrl is
 		ip_addr: in std_logic_vector(31 downto 0) := X"00000000";
 		enable: in std_logic := '1';
 		RARP_select: in std_logic := '0';
-		pkt_rx: out std_logic;
-		pkt_tx: out std_logic;
-		pkt_rx_led: out std_logic;
-		pkt_tx_led: out std_logic;
+		pkt: out std_logic;
 		oob_in: in ipbus_trans_in_array(N_OOB - 1 downto 0) := (others => ('0', X"00000000", '0'));
 		oob_out: out ipbus_trans_out_array(N_OOB - 1 downto 0)
 	);
@@ -71,7 +68,7 @@ architecture rtl of ipbus_ctrl is
   signal cfg, cfg_out: std_logic_vector(127 downto 0);
   signal my_mac_addr: std_logic_vector(47 downto 0);
   signal my_ip_addr, my_ip_addr_udp: std_logic_vector(31 downto 0);
-  signal pkt_rx_i, pkt_tx_i, udp_en, rarp_en: std_logic;
+  signal udp_en, rarp_en: std_logic;
   signal buf_in_a: ipbus_trans_in_array(N_OOB downto 0);
   signal buf_out_a: ipbus_trans_out_array(N_OOB downto 0);
   
@@ -153,8 +150,8 @@ begin
 		trans_out => trans_out,
 		cfg_vector_in => cfg_out,
 		cfg_vector_out => cfg,
-		pkt_rx => pkt_rx_i,
-		pkt_tx => pkt_tx_i
+		pkt_rx => open,
+		pkt_tx => pkt
 	);
 	
   with MAC_CFG select mac_src_flag <=
@@ -178,20 +175,5 @@ begin
 	udp_en <= cfg(80) or enable;
 
 	rarp_en <= cfg(81) or RARP_select;
-
-	stretch_rx: entity work.ipbus_stretcher port map(
-		clk => mac_clk,
-		d => pkt_rx_i,
-		q => pkt_rx_led
-	);
-	
-	stretch_tx: entity work.ipbus_stretcher port map(
-		clk => mac_clk,
-		d => pkt_tx_i,
-		q => pkt_tx_led
-	);
-	
-	pkt_rx <= pkt_rx_i;
-	pkt_tx <= pkt_tx_i;
 			
 end rtl;
