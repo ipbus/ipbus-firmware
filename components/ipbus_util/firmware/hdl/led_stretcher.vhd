@@ -54,9 +54,11 @@ begin
 				s <= d(i); -- Possible clock domain crossing from slower clock (sync not important)
 				sd <= s;
 				e <= (e or (s and not sd)) and not e_d;
-				e_d <= sl;
 				if d17 = '1' and d17_d = '0' then
-					if sl = '0' or e = '1' then
+					e_d <= sl;
+					if e = '1' then
+						scnt <= "0000001";
+					elsif sl = '0' then
 						scnt <= scnt + 1;
 					end if;					
 				end if;
