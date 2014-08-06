@@ -72,7 +72,7 @@ architecture rtl of ipbus_ctrl is
   signal udp_en, rarp_en: std_logic;
   signal buf_in_a: ipbus_trans_in_array(N_OOB downto 0);
   signal buf_out_a: ipbus_trans_out_array(N_OOB downto 0);
-  signal pkts: std_logic_vector(N_OOB + 1 downto 0);
+  signal pkts: std_logic_vector(N_OOB downto 0);
   signal mac_src_flag, ip_src_flag : std_logic;
   
 begin
@@ -136,7 +136,7 @@ begin
 			);
 			
 		pkt <= pkts(0);
-		pkt_oob <= '1' when pkts(N_OOB + 1 downto 1) /= (N_OOB downto 0 => '0') else '0';
+		pkt_oob <= '1' when pkts(N_OOB downto 1) /= (N_OOB - 1 downto 0 => '0') else '0';
 
 	end generate;
 	
