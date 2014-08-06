@@ -144,7 +144,7 @@ begin
 
 		trans_in <= trans_in_udp;
 		trans_out_udp <= trans_out;
-		pkt <= trans_in_udp.pkt_done;
+		pkt <= trans_out_udp.pkt_done;
 		pkt_oob <= '0';
 
 	end generate;
