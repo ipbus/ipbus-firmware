@@ -8,6 +8,7 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 entity led_stretcher is
 	generic(
@@ -23,27 +24,27 @@ end led_stretcher;
 
 architecture rtl of led_stretcher is
 
-	signal d25, d25_d: std_logic;
+	signal d17, d17_d: std_logic;
 	
 begin
 	
 	clkdiv: entity work.ipbus_clock_div
 		port map(
 			clk => clk,
-			d25 => d25,
-			d28 => open
+			d17 => d17
 		);
 
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			d25_d <= d25;
+			d17_d <= d17;
 		end if;
 	end process;
 	
 	lgen: for i in WIDTH - 1 downto 0 generate
 	
-		signal s, sd, e, q_i, q_i_d: std_logic;
+		signal s, sd, e, e_d, sl: std_logic;
+		signal scnt: unsigned(6 downto 0);
 	
 	begin
 	
@@ -52,15 +53,19 @@ begin
 			if rising_edge(clk) then
 				s <= d(i); -- Possible clock domain crossing from slower clock (sync not important)
 				sd <= s;
-				e <= (e or (s and not sd)) and not (q_i and not q_i_d);
-				q_i_d <= q_i;
-				if d25 = '1' and d25_d = '0' then
-					q_i <= e;
+				e <= (e or (s and not sd)) and not e_d;
+				e_d <= sl;
+				if d17 = '1' and d17_d = '0' then
+					if sl = '0' or e = '1' then
+						scnt <= scnt + 1;
+					end if;					
 				end if;
 			end if;
 		end process;
 
-		q(i) <= q_i;
+		sl <= '1' when scnt = "0000000" else '0';
+		
+		q(i) <= not sl;
 		
 	end generate;
 	
