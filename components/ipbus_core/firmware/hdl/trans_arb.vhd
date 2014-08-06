@@ -69,7 +69,7 @@ begin
 			buf_out(i).waddr <= trans_in.waddr;
 			buf_out(i).raddr <= trans_in.raddr;
 			buf_out(i).we <= trans_in.we when sel = i else '0';
-			pkt(i) <= trans_in.pkt_done when sel = 1 else '0';
+			pkt(i) <= trans_in.pkt_done when sel = i else '0';
 		end generate;
   
 end rtl;
