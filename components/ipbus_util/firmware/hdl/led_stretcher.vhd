@@ -55,7 +55,7 @@ begin
 				sd <= s;
 				e <= (e or (s and not sd)) and not e_d;
 				if d17 = '1' and d17_d = '0' then
-					e_d <= sl;
+					e_d <= e;
 					if e = '1' then
 						scnt <= "0000001";
 					elsif sl = '0' then
