@@ -21,7 +21,7 @@ entity trans_arb is
     buf_out: out ipbus_trans_out_array(NSRC - 1 downto 0);
     trans_out: out ipbus_trans_in;
     trans_in: in ipbus_trans_out;
-    pkt: out std_logic_vector(NSRC - 1 downto 0);
+    pkt: out std_logic_vector(NSRC - 1 downto 0)
   );
 
 end trans_arb;
