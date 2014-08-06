@@ -23,9 +23,7 @@ entity transactor_if is
     tx_data: in std_logic_vector(31 downto 0); -- Packet data from transactor
     tx_we: in std_logic; -- Transactor data valid
     tx_hdr: in std_logic; -- Header word flag from transactor
-    tx_err: in std_logic;
-    pkt_rx: out std_logic;
-    pkt_tx: out std_logic
+    tx_err: in std_logic
    );
  
 end transactor_if;
@@ -185,9 +183,6 @@ begin
 	trans_out.we <= '1' when state = ST_HDR or (tx_we = '1' and first = '0') or state = ST_DONE else '0';
 	trans_out.waddr <= std_logic_vector(haddr) when (state = ST_BODY and tx_hdr = '1') else std_logic_vector(waddrh);
 	trans_out.wdata <= tx_data when state = ST_BODY else idata;
-
-	pkt_rx <= '1' when state = ST_IDLE and start_d = '1' else '0';
-	pkt_tx <= '1' when state = ST_DONE else '0';
 	
 end rtl;
 

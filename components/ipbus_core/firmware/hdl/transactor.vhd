@@ -26,9 +26,7 @@ entity transactor is
 		trans_in: in ipbus_trans_in; -- Interface to packet buffers
 		trans_out: out ipbus_trans_out;
 		cfg_vector_in: in std_logic_vector(127 downto 0);
-		cfg_vector_out: out std_logic_vector(127 downto 0);
-		pkt_rx: out std_logic; -- 'Activity LED' lines (need stretching externally)
-		pkt_tx: out std_logic
+		cfg_vector_out: out std_logic_vector(127 downto 0)
 	);
 		
 end transactor;
@@ -57,9 +55,7 @@ begin
 			tx_data => tx_data,
 			tx_we => tx_we,
 			tx_hdr => tx_hdr,
-			tx_err => tx_err,
-			pkt_rx => pkt_rx,
-			pkt_tx => pkt_tx
+			tx_err => tx_err
 		);
     
 	sm: entity work.transactor_sm

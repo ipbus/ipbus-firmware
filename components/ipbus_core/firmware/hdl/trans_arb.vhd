@@ -17,10 +17,11 @@ entity trans_arb is
   port(
     clk: in std_logic; 
     rst: in std_logic;
-    buf_in: in ipbus_trans_in_array(NSRC-1 downto 0);
-    buf_out: out ipbus_trans_out_array(NSRC-1 downto 0);
+    buf_in: in ipbus_trans_in_array(NSRC - 1 downto 0);
+    buf_out: out ipbus_trans_out_array(NSRC - 1 downto 0);
     trans_out: out ipbus_trans_in;
-    trans_in: in ipbus_trans_out
+    trans_in: in ipbus_trans_out;
+    pkt: out std_logic_vector(NSRC - 1 downto 0);
   );
 
 end trans_arb;
@@ -60,14 +61,16 @@ begin
 	trans_out.pkt_rdy <= buf_in(sel).pkt_rdy;
 	trans_out.rdata <= buf_in(sel).rdata;
 	trans_out.busy <= buf_in(sel).busy;
-
+	
   busgen: for i in NSRC - 1 downto 0 generate
-  begin
-    buf_out(i).pkt_done <= trans_in.pkt_done when sel = i else '0';
-    buf_out(i).wdata <= trans_in.wdata;
-    buf_out(i).waddr <= trans_in.waddr;
-    buf_out(i).raddr <= trans_in.raddr;
-    buf_out(i).we <= trans_in.we when sel = i else '0';      
-  end generate;
+		begin
+			buf_out(i).pkt_done <= trans_in.pkt_done when sel = i else '0';
+			buf_out(i).wdata <= trans_in.wdata;
+			buf_out(i).waddr <= trans_in.waddr;
+			buf_out(i).raddr <= trans_in.raddr;
+			buf_out(i).we <= trans_in.we when sel = i else '0';
+			pkt(i) <= trans_in.pkt_done when sel = 1 else '0';
+		end generate;
   
 end rtl;
+

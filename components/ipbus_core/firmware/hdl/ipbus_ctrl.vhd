@@ -54,6 +54,7 @@ entity ipbus_ctrl is
 		enable: in std_logic := '1';
 		RARP_select: in std_logic := '0';
 		pkt: out std_logic;
+		pkt_oob: out std_logic;
 		oob_in: in ipbus_trans_in_array(N_OOB - 1 downto 0) := (others => ('0', X"00000000", '0'));
 		oob_out: out ipbus_trans_out_array(N_OOB - 1 downto 0)
 	);
@@ -71,49 +72,50 @@ architecture rtl of ipbus_ctrl is
   signal udp_en, rarp_en: std_logic;
   signal buf_in_a: ipbus_trans_in_array(N_OOB downto 0);
   signal buf_out_a: ipbus_trans_out_array(N_OOB downto 0);
-  
+  signal pkts: std_logic_vector(N_OOB + 1 downto 0);
   signal mac_src_flag, ip_src_flag : std_logic;
   
 begin
 
-	udp_if: entity work.udp_if generic map(
-		BUFWIDTH => BUFWIDTH,
-		INTERNALWIDTH => INTERNALWIDTH,
-		ADDRWIDTH => ADDRWIDTH,
-		IPBUSPORT => IPBUSPORT,
-		SECONDARYPORT => SECONDARYPORT
-	)
-	port map(
-		mac_clk => mac_clk,
-		rst_macclk => rst_macclk,
-		ipb_clk => ipb_clk,
-		rst_ipb => rst_ipb,
-		IP_addr => my_ip_addr,
-		MAC_addr => my_mac_addr,
-		enable => udp_en,
-		RARP => rarp_en,
-		mac_rx_data => mac_rx_data,
-		mac_rx_error => mac_rx_error,
-		mac_rx_last => mac_rx_last,
-		mac_rx_valid => mac_rx_valid,
-		mac_tx_ready => mac_tx_ready,
-		pkt_done_read => trans_out_udp.pkt_done,
-		pkt_done_write => trans_out_udp.pkt_done,
-		raddr => trans_out_udp.raddr,
-		waddr => trans_out_udp.waddr,
-		wdata => trans_out_udp.wdata,
-		we => trans_out_udp.we,
-		busy => trans_in_udp.busy,
-		mac_tx_data => mac_tx_data,
-		mac_tx_error => mac_tx_error,
-		mac_tx_last => mac_tx_last,
-		mac_tx_valid => mac_tx_valid,
-		My_IP_addr => my_ip_addr_udp,
-		pkt_rdy => trans_in_udp.pkt_rdy,
-		rdata => trans_in_udp.rdata,
-		rxpacket_ignored => udp_rxpacket_ignored,
-		rxpacket_dropped => udp_rxpacket_dropped
-	);
+	udp_if: entity work.udp_if
+		generic map(
+			BUFWIDTH => BUFWIDTH,
+			INTERNALWIDTH => INTERNALWIDTH,
+			ADDRWIDTH => ADDRWIDTH,
+			IPBUSPORT => IPBUSPORT,
+			SECONDARYPORT => SECONDARYPORT
+		)
+		port map(
+			mac_clk => mac_clk,
+			rst_macclk => rst_macclk,
+			ipb_clk => ipb_clk,
+			rst_ipb => rst_ipb,
+			IP_addr => my_ip_addr,
+			MAC_addr => my_mac_addr,
+			enable => udp_en,
+			RARP => rarp_en,
+			mac_rx_data => mac_rx_data,
+			mac_rx_error => mac_rx_error,
+			mac_rx_last => mac_rx_last,
+			mac_rx_valid => mac_rx_valid,
+			mac_tx_ready => mac_tx_ready,
+			pkt_done_read => trans_out_udp.pkt_done,
+			pkt_done_write => trans_out_udp.pkt_done,
+			raddr => trans_out_udp.raddr,
+			waddr => trans_out_udp.waddr,
+			wdata => trans_out_udp.wdata,
+			we => trans_out_udp.we,
+			busy => trans_in_udp.busy,
+			mac_tx_data => mac_tx_data,
+			mac_tx_error => mac_tx_error,
+			mac_tx_last => mac_tx_last,
+			mac_tx_valid => mac_tx_valid,
+			My_IP_addr => my_ip_addr_udp,
+			pkt_rdy => trans_in_udp.pkt_rdy,
+			rdata => trans_in_udp.rdata,
+			rxpacket_ignored => udp_rxpacket_ignored,
+			rxpacket_dropped => udp_rxpacket_dropped
+		);
 	
 	arb_gen: if N_OOB > 0 generate
 
@@ -129,30 +131,37 @@ begin
 				buf_in => buf_in_a,
 				buf_out => buf_out_a,
 				trans_out => trans_in,
-				trans_in => trans_out
+				trans_in => trans_out,
+				pkt => pkts
 			);
+			
+		pkt <= pkts(0);
+		pkt_oob <= '1' when pkts(N_OOB + 1 downto 1) /= (N_OOB downto 0 => '0') else '0';
 
 	end generate;
 	
 	n_arb_gen: if N_OOB = 0 generate
+
 		trans_in <= trans_in_udp;
 		trans_out_udp <= trans_out;
+		pkt <= trans_in_udp.pkt_done;
+		pkt_oob <= '0';
+
 	end generate;
 	
-	trans: entity work.transactor port map(
-		clk => ipb_clk,
-		rst => rst_ipb, -- This is probably not what we want... 
-		ipb_out => ipb_out,
-		ipb_in => ipb_in,
-		ipb_req => ipb_req,
-		ipb_grant => ipb_grant,
-		trans_in => trans_in,
-		trans_out => trans_out,
-		cfg_vector_in => cfg_out,
-		cfg_vector_out => cfg,
-		pkt_rx => open,
-		pkt_tx => pkt
-	);
+	trans: entity work.transactor
+		port map(
+			clk => ipb_clk,
+			rst => rst_ipb, -- This is probably not what we want... 
+			ipb_out => ipb_out,
+			ipb_in => ipb_in,
+			ipb_req => ipb_req,
+			ipb_grant => ipb_grant,
+			trans_in => trans_in,
+			trans_out => trans_out,
+			cfg_vector_in => cfg_out,
+			cfg_vector_out => cfg
+		);
 	
   with MAC_CFG select mac_src_flag <=
     '1' when EXTERNAL,
@@ -177,3 +186,4 @@ begin
 	rarp_en <= cfg(81) or RARP_select;
 			
 end rtl;
+
