@@ -20,6 +20,7 @@ entity eth_7s_1000basex is
 		gt_rxp, gt_rxn: in std_logic;
 		clk125_out: out std_logic;
 		clk125_fr: out std_logic;
+		refclk_out: out std_logic;
 		rsti: in std_logic;
 		locked: out std_logic;
 		tx_data: in std_logic_vector(7 downto 0);
@@ -99,6 +100,7 @@ begin
 		o => clk_fr
 	);
 	
+	refclk_out <= clkin;
 	clk125_fr <= clk_fr;
 	
 	bufh_tx: BUFH port map(
