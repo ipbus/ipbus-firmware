@@ -24,7 +24,7 @@ entity big_fifo_72 is
 		half_full: out std_logic;
 		ren: in std_logic;
 		q: out std_logic_vector(71 downto 0);
-		valid: out std_logic_vector
+		valid: out std_logic
 	);
 
 end big_fifo_72;
@@ -73,7 +73,7 @@ begin
 		
 	end generate;
 	
-	en(N_FIFO - 1 downto 1) <= (not ifull(N_FIFO - 1 downto 1)) and (not empty(N_FIFO - 2 downto 0));
+	en(N_FIFO - 1 downto 1) <= not ifull(N_FIFO - 1 downto 1) and not empty(N_FIFO - 2 downto 0);
 	
 	q <= fifo_d(N_FIFO - 1);
 	valid <= not empty(N_FIFO - 1);
