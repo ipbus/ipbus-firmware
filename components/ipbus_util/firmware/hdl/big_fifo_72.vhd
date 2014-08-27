@@ -31,7 +31,7 @@ end big_fifo_72;
 
 architecture rtl of big_fifo_72 is
 
-	signal full, afull, empty, en: std_logic_vector(N_FIFO downto 0);
+	signal ifull, hfull, empty, en: std_logic_vector(N_FIFO downto 0);
 	type fifo_d_t is array(N_FIFO downto 0) of std_logic_vector(71 downto 0);
 	signal fifo_d: fifo_d_t;
 
@@ -47,19 +47,19 @@ begin
 	
 		fifo: FIFO36E1
 			generic map(
-				ALMOST_FULL_OFFSET => 13'h0fff,
+				ALMOST_FULL_OFFSET => X"fff",
 				DATA_WIDTH => 72,
 				FIFO_MODE => "FIFO36_72",
 				FIRST_WORD_FALL_THROUGH => true
 			)
 			port map(
-				almostfull => afull(i),
+				almostfull => hfull(i),
 				di => fifo_d(i)(63 downto 0),
 				dip => fifo_d(i)(71 downto 64),
 				do => fifo_d(i + 1)(63 downto 0),
 				dop => fifo_d(i + 1)(71 downto 64),
 				empty => empty(i),
-				full => full(i),
+				full => ifull(i),
 				rdclk => clk,
 				rden => en(i + 1),
 				regce => '1',
@@ -71,12 +71,12 @@ begin
 		
 	end generate;
 	
-	en(N_FIFO - 1 downto 1) <= not full(N_FIFO - 1 downto 1) and not empty(N_FIFO - 2 downto 0);
+	en(N_FIFO - 1 downto 1) <= not ifull(N_FIFO - 1 downto 1) and not empty(N_FIFO - 2 downto 0);
 	
 	q <= fifo_d(N_FIFO - 1);
 	valid <= not empty(N_FIFO - 1);
-	full <= full(0);
-	half_full <= full(N_FIFO / 2 - 1) when N_FIFO mod 2 = 0 else afull((N_FIFO - 1) / 2);
+	full <= ifull(0);
+	half_full <= ifull(N_FIFO / 2 - 1) when N_FIFO mod 2 = 0 else hfull((N_FIFO - 1) / 2);
 	
 end rtl;
 
