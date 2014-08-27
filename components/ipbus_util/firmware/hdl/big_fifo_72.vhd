@@ -60,6 +60,8 @@ begin
 				dop => fifo_d(i + 1)(71 downto 64),
 				empty => empty(i),
 				full => ifull(i),
+				injectdbiterr => '0',
+				injectsbiterr => '0',
 				rdclk => clk,
 				rden => en(i + 1),
 				regce => '1',
@@ -71,7 +73,7 @@ begin
 		
 	end generate;
 	
-	en(N_FIFO - 1 downto 1) <= not ifull(N_FIFO - 1 downto 1) and not empty(N_FIFO - 2 downto 0);
+	en(N_FIFO - 1 downto 1) <= (not ifull(N_FIFO - 1 downto 1)) and (not empty(N_FIFO - 2 downto 0));
 	
 	q <= fifo_d(N_FIFO - 1);
 	valid <= not empty(N_FIFO - 1);
