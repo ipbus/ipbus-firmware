@@ -1,4 +1,4 @@
--- ipbus_dpram
+-- ipbus_ported_dpram
 --
 -- Generic 36b wide dual-port memory with ported ipbus access on one side
 -- Only the bottom 18b of the data port are meaningful
@@ -15,7 +15,7 @@ use work.ipbus.all;
 
 entity ipbus_ported_dpram36 is
 	generic(
-		ADDR_WIDTH: positive
+		ADDR_WIDTH: positive := 10
 	);
 	port(
 		clk: in std_logic;

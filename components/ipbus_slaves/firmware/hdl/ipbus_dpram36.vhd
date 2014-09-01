@@ -18,7 +18,7 @@ use work.ipbus.all;
 
 entity ipbus_dpram36 is
 	generic(
-		ADDR_WIDTH: positive
+		ADDR_WIDTH: positive := 10
 	);
 	port(
 		clk: in std_logic;
