@@ -29,7 +29,7 @@ entity ipbus_ported_sdpram72 is
 		ipb_out: out ipb_rbus;
 		wclk: in std_logic;
 		we: in std_logic := '0';
-		d: in std_logic_vector(35 downto 0);
+		d: in std_logic_vector(71 downto 0);
 		addr: in std_logic_vector(ADDR_WIDTH - 1 downto 0)
 	);
 	
@@ -43,6 +43,7 @@ architecture rtl of ipbus_ported_sdpram72 is
 	signal rsel: integer range 0 to 2 ** ADDR_WIDTH - 1 := 0;
 	signal ptr: unsigned(ADDR_WIDTH + 1 downto 0);
 	signal data_o: std_logic_vector(31 downto 0);
+	signal rdata: std_logic_vector(17 downto 0);
 	signal v: std_logic;
 
 begin
@@ -89,9 +90,9 @@ begin
 	
 	rsel <= to_integer(unsigned(addr));
 	
-	process(rclk)
+	process(wclk)
 	begin
-		if rising_edge(rclk) then
+		if rising_edge(wclk) then
 			if we = '1' then
 				ram(rsel) := d;
 			end if;
