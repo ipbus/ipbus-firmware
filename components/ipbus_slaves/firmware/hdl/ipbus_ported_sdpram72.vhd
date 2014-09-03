@@ -85,7 +85,7 @@ begin
 	ipb_out.ipb_ack <= ipb_in.ipb_strobe and v;
 	ipb_out.ipb_err <= ipb_in.ipb_strobe and not v;
 	
-	ipb_out.ipb_rdata <= std_logic_vector(to_unsigned(0, 32 - ADDR_WIDTH)) & std_logic_vector(ptr)
+	ipb_out.ipb_rdata <= std_logic_vector(to_unsigned(0, 32 - ADDR_WIDTH - 2)) & std_logic_vector(ptr)
 		when ipb_in.ipb_addr(0) = '0' else data_o;
 	
 	rsel <= to_integer(unsigned(addr));
