@@ -31,14 +31,29 @@ end big_fifo_72;
 architecture rtl of big_fifo_72 is
 
 	signal ifull, empty, en: std_logic_vector(N_FIFO downto 0);
+	signal rsti: std_logic;
 	type fifo_d_t is array(N_FIFO downto 0) of std_logic_vector(71 downto 0);
 	signal fifo_d: fifo_d_t;
+	signal rst_ctr: unsigned(2 downto 0);
 
 begin
 
+	process(clk_p)
+	begin
+		if rising_edge(clk_p) then
+			if rst_p = '1' or resync = '1' then
+				rst_ctr <= "000";
+			elsif rsti = '1' then
+				rst_ctr <= rst_ctr + 1;
+			end if;
+		end if;
+	end process;
+	
+	rsti <= '0' when rst_ctr = "111" else '1';
+
 	fifo_d(0) <= d;
-	en(0) <= wen;
-	en(N_FIFO) <= ren;
+	en(0) <= wen and not rsti;
+	en(N_FIFO) <= ren and not rsti;
 
 	fifo_gen: for i in N_FIFO - 1 downto 0 generate
 	
@@ -62,7 +77,7 @@ begin
 				rdclk => clk,
 				rden => en(i + 1),
 				regce => '1',
-				rst => rst,
+				rst => rsti,
 				rstreg => '0',
 				wrclk => clk,
 				wren => en(i)
@@ -70,7 +85,7 @@ begin
 		
 	end generate;
 	
-	en(N_FIFO - 1 downto 1) <= not ifull(N_FIFO - 1 downto 1) and not empty(N_FIFO - 2 downto 0);
+	en(N_FIFO - 1 downto 1) <= not ifull(N_FIFO - 1 downto 1) and not empty(N_FIFO - 2 downto 0) and not rsti;
 	
 	q <= fifo_d(N_FIFO - 1);
 	valid <= not empty(N_FIFO - 1);
