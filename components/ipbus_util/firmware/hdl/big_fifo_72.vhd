@@ -63,7 +63,7 @@ begin
 				rden => en(i + 1),
 				regce => '1',
 				rst => rst,
-				rstreg => rst,
+				rstreg => '0',
 				wrclk => clk,
 				wren => en(i)
 			);
