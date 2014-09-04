@@ -21,7 +21,6 @@ entity big_fifo_72 is
 		d: in std_logic_vector(71 downto 0);
 		wen: in std_logic;
 		full: out std_logic;
-		half_full: out std_logic;
 		ren: in std_logic;
 		q: out std_logic_vector(71 downto 0);
 		valid: out std_logic
@@ -31,7 +30,7 @@ end big_fifo_72;
 
 architecture rtl of big_fifo_72 is
 
-	signal ifull, hfull, empty, en: std_logic_vector(N_FIFO downto 0);
+	signal ifull, empty, en: std_logic_vector(N_FIFO downto 0);
 	type fifo_d_t is array(N_FIFO downto 0) of std_logic_vector(71 downto 0);
 	signal fifo_d: fifo_d_t;
 
@@ -47,13 +46,11 @@ begin
 	
 		fifo: FIFO36E1
 			generic map(
-				ALMOST_FULL_OFFSET => X"fff",
 				DATA_WIDTH => 72,
 				FIFO_MODE => "FIFO36_72",
 				FIRST_WORD_FALL_THROUGH => true
 			)
 			port map(
-				almostfull => hfull(i),
 				di => fifo_d(i)(63 downto 0),
 				dip => fifo_d(i)(71 downto 64),
 				do => fifo_d(i + 1)(63 downto 0),
@@ -78,7 +75,6 @@ begin
 	q <= fifo_d(N_FIFO - 1);
 	valid <= not empty(N_FIFO - 1);
 	full <= ifull(0);
-	half_full <= ifull(N_FIFO / 2 - 1) when N_FIFO mod 2 = 0 else hfull((N_FIFO - 1) / 2);
 	
 end rtl;
 
