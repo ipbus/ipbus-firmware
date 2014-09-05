@@ -8,12 +8,15 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+use work.ipbus_reg_types.all;
+
 library unisim;
 use unisim.VComponents.all;
 
 entity big_fifo_72 is
 	generic(
 		N_FIFO: positive
+		WARN_THRESHOLD: integer
 	);
 	port(
 		clk: in std_logic;
@@ -36,6 +39,7 @@ architecture rtl of big_fifo_72 is
 	type fifo_d_t is array(N_FIFO downto 0) of std_logic_vector(71 downto 0);
 	signal fifo_d: fifo_d_t;
 	signal rst_ctr: unsigned(2 downto 0);
+	signal ctr: unsigned(calc_width(N_FIFO) + 8 downto 0);
 
 begin
 
@@ -91,7 +95,21 @@ begin
 	q <= fifo_d(N_FIFO - 1);
 	valid <= not empty(N_FIFO - 1);
 	full <= ifull(0);
-	warn <= '0';
+
+	process(clk)
+	begin
+		if rising_edge(clk) then
+			if rsti = '1' then
+				ctr <= (others => '0');
+			elsif en(0) = '1' and en(N_FIFO) = '0' then
+				ctr <= ctr + 1;
+			elsif en(0) = '0' and en(N_FIFO) = '1' then
+				ctr <= ctr - 1;
+			end if;
+		end if;
+	end process;
+	
+	warn <= '1' when ctr => to_unsigned(WARN_THRESHOLD, ctr'width) else '0';
 	
 end rtl;
 
