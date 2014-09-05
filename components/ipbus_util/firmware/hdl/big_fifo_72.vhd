@@ -42,7 +42,7 @@ begin
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			if rst = '1' or resync = '1' then
+			if rst = '1' then
 				rst_ctr <= "000";
 			elsif rsti = '1' then
 				rst_ctr <= rst_ctr + 1;
