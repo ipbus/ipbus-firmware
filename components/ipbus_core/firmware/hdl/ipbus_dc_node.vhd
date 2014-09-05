@@ -12,7 +12,8 @@ use work.ipbus.ALL;
 entity ipbus_dc_node is
   generic(
   	I_SLV: integer;
-  	SEL_WIDTH: integer := 5
+  	SEL_WIDTH: integer := 5;
+  	PIPELINE: boolean := true
    );
   port(
   	clk: in std_logic;
@@ -28,6 +29,7 @@ end ipbus_dc_node;
 architecture rtl of ipbus_dc_node is
 
 	signal resp, sel, cyc, stb: std_logic;
+	signal ipbout, ipbout_d: ipbdc_bus;
 	
 begin
 
@@ -63,20 +65,18 @@ begin
 	
 	ipb_out.ipb_strobe <= stb;
 
+	ipbout.phase <= "11" when resp = '1' and sel = '1' else ipbdc_in.phase;
+	ipbout.ad <= ipb_in.ipb_rdata when resp = '1' and sel = '1' else ipbdc_in.ad;
+	ipbout.flag <= ipb_in.ipb_ack when resp = '1' and sel = '1' else ipbdc_in.flag;
+		
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			if resp = '1' and sel = '1' then
-				ipbdc_out.phase <= "11";
-				ipbdc_out.ad <= ipb_in.ipb_rdata;
-				ipbdc_out.flag <= ipb_in.ipb_ack;
-			else
-				ipbdc_out.phase <= ipbdc_in.phase;
-				ipbdc_out.ad <= ipbdc_in.ad;
-				ipbdc_out.flag <= ipbdc_in.flag;
-			end if;
+			ipbout_d <= ipbout;
 		end if;
 	end process;
+
+	ipbdc_out <= ipbout_d when PIPELINE else ipbout;
   
 end rtl;
 
