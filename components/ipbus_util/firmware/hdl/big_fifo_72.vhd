@@ -21,6 +21,7 @@ entity big_fifo_72 is
 		d: in std_logic_vector(71 downto 0);
 		wen: in std_logic;
 		full: out std_logic;
+		warn: out std_logic;
 		ren: in std_logic;
 		q: out std_logic_vector(71 downto 0);
 		valid: out std_logic
@@ -90,6 +91,7 @@ begin
 	q <= fifo_d(N_FIFO - 1);
 	valid <= not empty(N_FIFO - 1);
 	full <= ifull(0);
+	warn <= '0';
 	
 end rtl;
 
