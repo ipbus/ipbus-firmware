@@ -39,10 +39,10 @@ architecture rtl of big_fifo_72 is
 
 begin
 
-	process(clk_p)
+	process(clk)
 	begin
-		if rising_edge(clk_p) then
-			if rst_p = '1' or resync = '1' then
+		if rising_edge(clk) then
+			if rst = '1' or resync = '1' then
 				rst_ctr <= "000";
 			elsif rsti = '1' then
 				rst_ctr <= rst_ctr + 1;
@@ -86,7 +86,7 @@ begin
 		
 	end generate;
 	
-	en(N_FIFO - 1 downto 1) <= not ifull(N_FIFO - 1 downto 1) and not empty(N_FIFO - 2 downto 0) and not rsti;
+	en(N_FIFO - 1 downto 1) <= not ifull(N_FIFO - 1 downto 1) and not empty(N_FIFO - 2 downto 0) and not (N_FIFO - 2 downto 0 => rsti);
 	
 	q <= fifo_d(N_FIFO - 1);
 	valid <= not empty(N_FIFO - 1);
