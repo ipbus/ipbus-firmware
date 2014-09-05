@@ -15,7 +15,7 @@ use unisim.VComponents.all;
 
 entity big_fifo_72 is
 	generic(
-		N_FIFO: positive
+		N_FIFO: positive;
 		WARN_THRESHOLD: integer
 	);
 	port(
