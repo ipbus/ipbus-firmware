@@ -109,7 +109,7 @@ begin
 		end if;
 	end process;
 	
-	warn <= '1' when ctr => to_unsigned(WARN_THRESHOLD, ctr'width) else '0';
+	warn <= '1' when ctr >= to_unsigned(WARN_THRESHOLD, ctr'width) else '0';
 	
 end rtl;
 
