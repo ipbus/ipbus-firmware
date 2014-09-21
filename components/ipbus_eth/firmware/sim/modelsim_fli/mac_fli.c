@@ -186,10 +186,17 @@ void put_packet()
   /* Send a packet */
   int txlen;
   txlen=write ( tun_fd, txbuffer, txidx );
-
+  
+  if ( txlen < 0 )
+  {
+  	  perror ( "Writing to interface" );
+  	  mti_FatalError();
+  	  return;
+  }
+  
   if ( txlen!=txidx )
   {
-    mti_PrintFormatted ( "fli: put_mac_data partial packet write error\n" );
+    mti_PrintFormatted ( "fli: put_mac_data partial packet write error, length %d\n", txlen);
     mti_FatalError();
     return;
   }
