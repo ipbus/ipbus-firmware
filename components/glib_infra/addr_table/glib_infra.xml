@@ -1,0 +1,10 @@
+<node id="TOP">
+    <node id="ctrl" module="file://mp7_ctrl.xml" address="0x0"/>
+    <node id="ttc" module="file://mp7_ttc.xml" address="0x40"/>
+    <node id="formatter" module="file://mp7_formatter.xml" address="0x50"/>
+    <node id="readout" module="file://mp7_readout.xml" address="0x58"/>
+    <node id="datapath" module="file://mp7_datapath.xml" address="0x1000"/>
+    <node id="uc" module="file://mp7_infra_uc.xml" address="0x70000000"/>
+    <node id="payload" address="0x80000000" fwinfo="endpoint;width=31"/>
+</node>
+
