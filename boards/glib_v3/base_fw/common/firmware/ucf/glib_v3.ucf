@@ -2,7 +2,7 @@ NET infra/eth/clk125_out TNM_NET = clk125;
 TIMESPEC TS_clk125 = PERIOD clk125 8ns;
 
 NET infra/clocks/rst TIG;
-NET infra/clocks/nuke_i TIG;
+#NET infra/clocks/nuke_i TIG;
 
 NET eth_clkp LOC = M6 | DIFF_TERM = TRUE | TNM_NET=eth_clk;
 NET eth_clkn LOC = M5 | DIFF_TERM = TRUE;
