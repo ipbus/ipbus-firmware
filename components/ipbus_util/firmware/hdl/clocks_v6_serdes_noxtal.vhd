@@ -55,7 +55,7 @@ begin
 	
 	sysclk <= clki_125_fr;
 	
-	bufg: BUFG port map(
+	bufg625: BUFG port map(
 		i => clk_62_5_i,
 		o => clk_62_5_b
 	);
