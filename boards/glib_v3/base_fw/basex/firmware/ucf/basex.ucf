@@ -1,4 +1,4 @@
 # Ethernet MGT - select here between backplane ethernet and SGMII
 
-INST eth/*/gtxe1_i LOC=GTXE1_X0Y9; # Backplane
+INST infra/eth/*/gtxe1_i LOC=GTXE1_X0Y9; # Backplane
 
