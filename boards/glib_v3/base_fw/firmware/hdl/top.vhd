@@ -5,7 +5,8 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
-use work.ipbus.ALL;
+use work.ipbus.all;
+use work.top_decl.all;
 
 entity top is
 	port(
@@ -13,8 +14,9 @@ entity top is
 		eth_clkp: in std_logic;
 		eth_clkn: in std_logic;
 		phy_rstb: out std_logic;
-		sda: inout std_logic;
-		scl: inout std_logic
+		fpga_sda: inout std_logic;
+		fpga_scl: inout std_logic;
+		v6_cpld : in std_logic_vector(0 to 5)
 	);
 
 end top;
@@ -29,11 +31,11 @@ begin
 
 	infra: entity work.glib_infra
 		generic map(
-			ETH_BP => false,
-			MAC_FROM_PROM => false,
-			IP_FROM_PROM => false,
-			STATIC_MAC_ADDR => X"020ddba1159a",
-			STATIC_IP_ADDR => X"c0a80010"
+			ETH_BP => ETH_BP,
+			MAC_FROM_PROM => MAC_FROM_PROM,
+			IP_FROM_PROM => IP_FROM_PROM,
+			STATIC_MAC_ADDR => MAC_ADDR,
+			STATIC_IP_ADDR => IP_ADDR
 		)
 		port map(
 			gt_clkp => eth_clkp,
@@ -46,8 +48,8 @@ begin
 			nuke => '0',
 			soft_rst => '0',
 			userled => '0',
-			scl => scl,
-			sda => sda,
+			scl => fpga_scl,
+			sda => fpga_sda,
 			ipb_in_ctrl => ipb_out_ctrl,
 			ipb_out_ctrl => ipb_in_ctrl,
 			ipb_in_payload => ipb_out_payload,

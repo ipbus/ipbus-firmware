@@ -1,7 +1,7 @@
 setup
 setup -ddd -s common/firmware/cfg settings_v6.tcl
 setup -z coregen.cgp
-src top.vhd
+src -ddd -s common/firmware/hdl top.vhd
 src -d -s ucf glib_v3_sgmii.ucf
 src -ddd -s common/firmware/ucf glib_v3.ucf
 include -c components/glib_infra
