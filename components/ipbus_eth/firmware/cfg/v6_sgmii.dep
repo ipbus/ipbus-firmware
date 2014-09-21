@@ -2,7 +2,8 @@
 
 src eth_v6_sgmii.vhd emac_hostbus_decl.vhd
 src -d -s gen_hdl/v6_emac_v2_3_sgmii v6_emac_v2_3_sgmii_block.vhd
-src -g -s v6_emac_v2_3_sgmii/example_design/physical v6_gtxwizard_top.vhd v6_gtxwizard.vhd v6_gtxwizard_gtx.vhd double_reset.vhd
-src -g -s v6_emac_v2_3_sgmii/example_design/common reset_sync.vhd sync_block.vhd
+src -g -s v6_emac_v2_3_sgmii/example_design/physical v6_gtxwizard_top.vhd v6_gtxwizard.vhd v6_gtxwizard_gtx.vhd 
+# src -g -s v6_emac_v2_3_sgmii/example_design/physical double_reset.vhd # Already included by basex part
+# src -g -s v6_emac_v2_3_sgmii/example_design/common reset_sync.vhd sync_block.vhd # Already included by basex part
 src -d -s cgn -n v6_emac_v2_3_sgmii.xco
 
