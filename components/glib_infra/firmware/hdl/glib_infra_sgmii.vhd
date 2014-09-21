@@ -45,7 +45,7 @@ end glib_infra;
 
 architecture rtl of glib_infra is
 
-	signal clk125_fr, clk125, clk200, ipb_clk, clk_locked, locked, eth_locked: std_logic;
+	signal clk125_fr, clk125, ipb_clk, clk_locked, locked, eth_locked: std_logic;
 	signal rsti_125, rsti_ipb, rsti_eth, rsti_ipb_ctrl, onehz, rsti_fr: std_logic;
 	signal mac_tx_data, mac_rx_data: std_logic_vector(7 downto 0);
 	signal mac_tx_valid, mac_tx_last, mac_tx_error, mac_tx_ready, mac_rx_valid, mac_rx_last, mac_rx_error: std_logic;
@@ -76,11 +76,11 @@ begin
 			locked => clk_locked,
 			nuke => nuke,
 			soft_rst => soft_rst,
-			rsto_125 => rst_125,
-			rsto_ipb => rst_ipb,
+			rsto_125 => rsti_125,
+			rsto_ipb => rsti_ipb,
 			rsto_ipb_ctrl => rsti_ipb_ctrl,
-			rsto_eth => rst_eth,
-			rsto_fr => rst_fr,
+			rsto_eth => rsti_eth,
+			rsto_fr => rsti_fr,
 			onehz => onehz
 		);
 		
@@ -125,7 +125,7 @@ begin
 			sgmii_rxn => '1',		
 			clk125_o => clk125,
 			clk125_fr => clk125_fr,
-			rst => rst_eth,
+			rst => rsti_eth,
 			locked => eth_locked,
 			tx_data => mac_tx_data,
 			tx_valid => mac_tx_valid,
@@ -143,7 +143,7 @@ begin
 	prom: entity work.i2c_eeprom_read
 		port map(
 			clk => ipb_clk,
-			rst => rsti_ipb_ctrl,
+			reset => rsti_ipb_ctrl,
 			mac_addr => mac_addr_prom,
 			ip_addr => ip_addr_prom,
 			scl_wr => scl,
@@ -193,7 +193,7 @@ begin
     port map(
       ipb_in => ipb_out_m,
       ipb_out => ipb_in_m,
-      sel => ipbus_sel_mp7_infra(ipb_out_m.ipb_addr),
+      sel => ipbus_sel_glib_infra(ipb_out_m.ipb_addr),
       ipb_to_slaves => ipbw,
       ipb_from_slaves => ipbr
     );
