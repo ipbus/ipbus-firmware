@@ -1,0 +1,9 @@
+setup
+setup -ddd -s common/firmware/cfg settings_v6.tcl
+setup -z coregen.cgp
+src top.vhd
+src -d -s ucf glib_v3_basex.ucf
+src -ddd -s common/firmware/ucf glib_v3.ucf
+include -c components/glib_infra
+src -c components/ipbus_core ipbus_package.vhd
+

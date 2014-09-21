@@ -1,118 +1,61 @@
 -- Top-level design for ipbus demo
 --
--- You must edit this file to set the IP and MAC addresses
---
 -- Dave Newbold, 16/7/12
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+
 use work.ipbus.ALL;
 
-entity top is port(
-	leds: out std_logic_vector(2 downto 0);
-	sgmii_clkp, sgmii_clkn: in std_logic;
-	sgmii_txp, sgmii_txn: out std_logic;
-	sgmii_rxp, sgmii_rxn: in std_logic;
-	phy_rstb: out std_logic
+entity top is
+	port(
+		leds: out std_logic_vector(2 downto 0);
+		eth_clkp: in std_logic;
+		eth_clkn: in std_logic;
+		phy_rstb: out std_logic;
+		sda: inout std_logic;
+		scl: inout std_logic
 	);
+
 end top;
 
 architecture rtl of top is
 
-	signal clk125, clk125_fr, ipb_clk, eth_locked, clk_locked, rst_125, rst_ipb, rst_eth, onehz: std_logic;
-	signal mac_tx_data, mac_rx_data: std_logic_vector(7 downto 0);
-	signal mac_tx_valid, mac_tx_last, mac_tx_error, mac_tx_ready, mac_rx_valid, mac_rx_last, mac_rx_error: std_logic;
-	signal ipb_master_out : ipb_wbus;
-	signal ipb_master_in : ipb_rbus;
-	signal mac_addr: std_logic_vector(47 downto 0);
-	signal ip_addr: std_logic_vector(31 downto 0);
-	signal pkt_rx_led, pkt_tx_led, sys_rst: std_logic;	
+	signal clk_ipb, rst_ipb, clkp, rstp, clk200: std_logic;
+	signal ipb_in_ctrl, ipb_in_payload: ipb_wbus;
+	signal ipb_out_ctrl, ipb_out_payload: ipb_rbus;
 
 begin
 
---	DCM clock generation for internal bus, ethernet
-
-	clocks: entity work.clocks_v6_serdes_noxtal
+	infra: entity work.glib_infra
+		generic map(
+			ETH_BP => false,
+			MAC_FROM_PROM => false,
+			IP_FROM_PROM => false,
+			STATIC_MAC_ADDR => X"020ddba1159a",
+			STATIC_IP_ADDR => X"c0a80010"
+		)
 		port map(
-			clki_125_fr => clk125_fr,
-			clki_125 => clk125,
-			clko_ipb => ipb_clk,
-			eth_locked => eth_locked,
-			locked => clk_locked,
-			nuke => sys_rst,
-			rsto_125 => rst_125,
-			rsto_ipb => rst_ipb,
-			rsto_eth => rst_eth,
-			onehz => onehz
-		);
-		
-	leds <= eth_locked & clk_locked & onehz;
-	
---	Ethernet MAC core and PHY interface
-	
-	eth: entity work.eth_v6_sgmii
-		port map(
-			sgmii_clkp => sgmii_clkp,
-			sgmii_clkn => sgmii_clkn,
-			sgmii_txp => sgmii_txp,
-			sgmii_txn => sgmii_txn,
-			sgmii_rxp => sgmii_rxp,
-			sgmii_rxn => sgmii_rxn,		
-			clk125_o => clk125,
-			clk125_fr => clk125_fr,
-			rst => rst_eth,
-			locked => eth_locked,
-			tx_data => mac_tx_data,
-			tx_valid => mac_tx_valid,
-			tx_last => mac_tx_last,
-			tx_error => mac_tx_error,
-			tx_ready => mac_tx_ready,
-			rx_data => mac_rx_data,
-			rx_valid => mac_rx_valid,
-			rx_last => mac_rx_last,
-			rx_error => mac_rx_error
-		);
-	
-	phy_rstb <= not rst_ipb;
-	
--- ipbus control logic
-
-	ipbus: entity work.ipbus_ctrl
-		port map(
-			mac_clk => clk125,
-			rst_macclk => rst_125,
-			ipb_clk => ipb_clk,
+			gt_clkp => eth_clkp,
+			gt_clkn => eth_clkn,
+			leds => leds,
+			clk_ipb => clk_ipb,
 			rst_ipb => rst_ipb,
-			mac_rx_data => mac_rx_data,
-			mac_rx_valid => mac_rx_valid,
-			mac_rx_last => mac_rx_last,
-			mac_rx_error => mac_rx_error,
-			mac_tx_data => mac_tx_data,
-			mac_tx_valid => mac_tx_valid,
-			mac_tx_last => mac_tx_last,
-			mac_tx_error => mac_tx_error,
-			mac_tx_ready => mac_tx_ready,
-			ipb_out => ipb_master_out,
-			ipb_in => ipb_master_in,
-			mac_addr => mac_addr,
-			ip_addr => ip_addr,
-			pkt_rx_led => pkt_rx_led,
-			pkt_tx_led => pkt_tx_led
+			clk_payload => clkp,
+			clk200 => clk200,
+			nuke => '0',
+			soft_rst => '0',
+			userled => '0',
+			scl => scl,
+			sda => sda,
+			ipb_in_ctrl => ipb_out_ctrl,
+			ipb_out_ctrl => ipb_in_ctrl,
+			ipb_in_payload => ipb_out_payload,
+			ipb_out_payload => ipb_in_payload
 		);
-		
-	mac_addr <= X"020ddba1159a"; -- Careful here, arbitrary addresses do not always work
-	ip_addr <= X"c0a80010"; -- 192.168.0.16
-
--- ipbus slaves live in the entity below, and can expose top-level ports
--- The ipbus fabric is instantiated within.
-
-	slaves: entity work.slaves port map(
-		ipb_clk => ipb_clk,
-		ipb_rst => rst_ipb,
-		ipb_in => ipb_master_out,
-		ipb_out => ipb_master_in,
-		rst_out => sys_rst
-	);
+	
+	ipb_out_ctrl <= IPB_RBUS_NULL;
+	ipb_out_payload <= IPB_RBUS_NULL;
 
 end rtl;
 

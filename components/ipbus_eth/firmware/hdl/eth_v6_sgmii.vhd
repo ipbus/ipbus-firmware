@@ -13,7 +13,6 @@ library unisim;
 use unisim.VComponents.all;
 use work.emac_hostbus_decl.all;
 
-
 entity eth_v6_sgmii is
 	port(
 		sgmii_clkp, sgmii_clkn: in std_logic;

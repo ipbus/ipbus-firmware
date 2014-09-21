@@ -18,15 +18,17 @@ entity clocks_v6_serdes_noxtal is
 		clki_125_fr: in std_logic;
 		clki_125: in std_logic;
 		clko_ipb: out std_logic;
-		clko_p40: out std_logic;
+		clko_62_5: out std_logic;
 		clko_200: out std_logic; -- 200MHz clock for idelayctrl
 		eth_locked: in std_logic;
 		locked: out std_logic;
 		nuke: in std_logic;
-		rsto_ipb: out std_logic;
+		soft_rst: in std_logic;
 		rsto_125: out std_logic;
+		rsto_ipb: out std_logic;
+		rsto_ipb_ctrl: out std_logic;
 		rsto_eth: out std_logic;
-		rsto: out std_logic;
+		rsto_fr: out std_logic;
 		onehz: out std_logic
 	);
 
@@ -35,10 +37,11 @@ end clocks_v6_serdes_noxtal;
 architecture rtl of clocks_v6_serdes_noxtal is
 	
 	signal dcm_locked, sysclk, sysclk_ub, clk_ipb_i, clk_ipb_b, clkfb: std_logic;
-	signal clk_p40_i, clk_p40_b: std_logic;
+	signal clk_62_5_i, clk_62_5_b: std_logic;
 	signal d17, d17_d: std_logic;
 	signal dcm_rst, nuke_i, nuke_d, nuke_d2: std_logic := '0';
-	signal rst, rst_ipb, rst_125, rst_eth: std_logic := '1';
+	signal rst, srst, rst_ipb, rst_125, rst_eth, rst_ipb_ctrl: std_logic := '1';
+	signal rctr: unsigned(3 downto 0) := "0000";
 
 begin
 
@@ -51,19 +54,19 @@ begin
 	
 	sysclk <= clki_125_fr;
 	
-	bufgp40: BUFG port map(
-		i => clk_p40_i,
-		o => clk_p40_b
+	bufg: BUFG port map(
+		i => clk_62_5_i,
+		o => clk_62_5_b
 	);
 	
-	clko_p40 <= clk_p40_b;
+	clko_62_5 <= clk_62_5_b;
 	
 	mmcm: MMCM_BASE
 		generic map(
 			clkin1_period => 8.0,
 			clkfbout_mult_f => 8.0, -- VCO freq 1000MHz
 			clkout1_divide => 32,
-			clkout2_divide => 25,
+			clkout2_divide => 16,
 			clkout3_divide => 5
 		)
 		port map(
@@ -71,7 +74,7 @@ begin
 			clkfbin => clkfb,
 			clkfbout => clkfb,
 			clkout1 => clk_ipb_i,
-			clkout2 => clk_p40_i,
+			clkout2 => clk_62_5_i,
 			clkout3 => clko_200, -- No BUFG needed here, goes to idelayctrl on local routing
 			locked => dcm_locked,
 			rst => dcm_rst,
@@ -98,16 +101,29 @@ begin
 	end process;
 	
 	locked <= dcm_locked;
+	srst <= '1' when rctr /= "0000" else '0';
 
 	process(clk_ipb_b)
 	begin
 		if rising_edge(clk_ipb_b) then
-			rst_ipb <= rst;
+			rst_ipb <= rst or srst;
 			nuke_i <= nuke;
+			if srst = '1' or soft_rst = '1' then
+				rctr <= rctr + 1;
+			end if;
 		end if;
 	end process;
 	
 	rsto_ipb <= rst_ipb;
+	
+	process(clk_ipb_b)
+	begin
+		if rising_edge(clk_ipb_b) then
+			rst_ipb_ctrl <= rst;
+		end if;
+	end process;
+	
+	rsto_ipb_ctrl <= rst_ipb_ctrl;
 	
 	process(clki_125)
 	begin
@@ -127,7 +143,7 @@ begin
 	
 	rsto_eth <= rst_eth;
 	
-	rsto <= rst;
+	rsto_fr <= rst;
 		
 end rtl;
 

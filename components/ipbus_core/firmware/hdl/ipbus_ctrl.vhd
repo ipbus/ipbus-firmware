@@ -152,7 +152,7 @@ begin
 	trans: entity work.transactor
 		port map(
 			clk => ipb_clk,
-			rst => rst_ipb, -- This is probably not what we want... 
+			rst => rst_ipb,
 			ipb_out => ipb_out,
 			ipb_in => ipb_in,
 			ipb_req => ipb_req,

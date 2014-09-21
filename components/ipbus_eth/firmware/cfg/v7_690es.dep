@@ -8,3 +8,4 @@ src -g gtwizard_v2_5_gbe_gth.vhd gtwizard_v2_5_gbe_gth_gt.vhd
 src -d -s cgn gig_eth_pcs_pma_v11_5.xco
 src -d -s cgn -n gtwizard_v2_5_gbe_gth.xco
 src -d -s cgn tri_mode_eth_mac_v5_5.xco
+
