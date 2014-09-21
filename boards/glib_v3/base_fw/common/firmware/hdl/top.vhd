@@ -31,7 +31,6 @@ begin
 
 	infra: entity work.glib_infra
 		generic map(
-			ETH_BP => ETH_BP,
 			MAC_FROM_PROM => MAC_FROM_PROM,
 			IP_FROM_PROM => IP_FROM_PROM,
 			STATIC_MAC_ADDR => MAC_ADDR,

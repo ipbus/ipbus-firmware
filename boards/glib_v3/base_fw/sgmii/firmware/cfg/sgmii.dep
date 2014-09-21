@@ -1,0 +1,4 @@
+include -ddd -s common/firmware/cfg glib_v3.dep
+src -d -s ucf sgmii.ucf
+include -c components/glib_infra glib_infra_sgmii.dep
+
