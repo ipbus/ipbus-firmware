@@ -56,7 +56,7 @@ architecture rtl of glib_infra is
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal mac_addr, mac_addr_prom: std_logic_vector(47 downto 0);
 	signal ip_addr, ip_addr_prom: std_logic_vector(31 downto 0);
-	signal rarp_select: std_logic;
+	signal rarp_select, prom_done: std_logic;
 	
 	attribute KEEP: string;	
 	attribute KEEP of clk125_fr: signal is "TRUE";	
@@ -104,7 +104,7 @@ begin
 			q(1) => leds(2)
 		);
 
-	leds(0) <= locked and onehz;
+	leds(0) <= locked and onehz and prom_done;
 	
 -- Clocks for rest of logic
 
@@ -180,6 +180,7 @@ begin
 			ipb_in => ipb_in_m,
 			mac_addr => mac_addr,
 			ip_addr => ip_addr,
+			enable => prom_done,
 			rarp_select => rarp_select,
 			pkt => pkt
 		);
