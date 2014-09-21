@@ -1,3 +1,3 @@
 src glib_infra_sgmii.vhd
 include -c components/ipbus_eth v6_sgmii.dep
-
+include glib_infra_common.dep
