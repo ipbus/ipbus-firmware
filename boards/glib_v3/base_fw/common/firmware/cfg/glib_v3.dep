@@ -1,4 +1,4 @@
-setup
+setup glib_v3.tcl
 setup settings_v6.tcl
 setup -z coregen.cgp
 src top.vhd

@@ -1,4 +1,4 @@
-include -ddd -s common/firmware/cfg glib_v3.dep
+include -c boards/glib_v3/base_fw/common glib_v3.dep
 src -d -s ucf basex.ucf
 include -c components/glib_infra glib_infra_basex.dep
 
