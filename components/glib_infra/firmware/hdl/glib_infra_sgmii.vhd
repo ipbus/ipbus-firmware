@@ -36,8 +36,6 @@ entity glib_infra is
 		userled: in std_logic;
 		scl: inout std_logic;
 		sda: inout std_logic;
-		ipb_in_ctrl: in ipb_rbus; -- ipbus signals to top-level slaves
-		ipb_out_ctrl: out ipb_wbus;
 		ipb_in_payload: in ipb_rbus;
 		ipb_out_payload: out ipb_wbus
 	);
@@ -201,8 +199,6 @@ begin
       ipb_from_slaves => ipbr
     );
 
-	ipb_out_ctrl <= ipbw(N_SLV_CTRL);
-	ipbr(N_SLV_CTRL) <= ipb_in_ctrl;
 	ipb_out_payload <= ipbw(N_SLV_PAYLOAD);
 	ipbr(N_SLV_PAYLOAD) <= ipb_in_payload;
 

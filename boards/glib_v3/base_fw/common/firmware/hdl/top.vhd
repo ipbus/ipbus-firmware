@@ -16,7 +16,7 @@ entity top is
 		phy_rstb: out std_logic;
 		fpga_sda: inout std_logic;
 		fpga_scl: inout std_logic;
-		v6_cpld : in std_logic_vector(0 to 5)
+		v6_cpld: in std_logic_vector(5 downto 0)
 	);
 
 end top;
@@ -24,8 +24,9 @@ end top;
 architecture rtl of top is
 
 	signal clk_ipb, rst_ipb, clkp, rstp, clk200: std_logic;
-	signal ipb_in_ctrl, ipb_in_payload: ipb_wbus;
-	signal ipb_out_ctrl, ipb_out_payload: ipb_rbus;
+	signal ipb_in_payload: ipb_wbus;
+	signal ipb_out_payload: ipb_rbus;
+	signal nuke, soft_rst, userled: std_logic;
 
 begin
 
@@ -45,19 +46,26 @@ begin
 			clk_payload => clkp,
 			clk200 => clk200,
 			phy_rstb => phy_rstb,
-			nuke => '0',
-			soft_rst => '0',
-			userled => '0',
+			nuke => nuke,
+			soft_rst => soft_rst,
+			userled => userled,
 			scl => fpga_scl,
 			sda => fpga_sda,
-			ipb_in_ctrl => ipb_out_ctrl,
-			ipb_out_ctrl => ipb_in_ctrl,
 			ipb_in_payload => ipb_out_payload,
 			ipb_out_payload => ipb_in_payload
 		);
-		
-	ipb_out_ctrl <= IPB_RBUS_NULL;
-	ipb_out_payload <= IPB_RBUS_NULL;
+
+	payload: entity work.sc_daq
+		port map(
+			clk => clk_ipb,
+			rst => rst_ipb,
+			ipb_in => ipb_in_payload,
+			ipb_out => ipb_out_payload,
+			nuke => nuke,
+			soft_rst => soft_rst,
+			led => userled,
+			slot => v6_cpld(3 downto 0)
+		)
 
 end rtl;
 
