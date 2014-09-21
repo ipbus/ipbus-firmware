@@ -44,6 +44,7 @@ begin
 			rst_ipb => rst_ipb,
 			clk_payload => clkp,
 			clk200 => clk200,
+			phy_rstb => phy_rstb,
 			nuke => '0',
 			soft_rst => '0',
 			userled => '0',
@@ -54,7 +55,7 @@ begin
 			ipb_in_payload => ipb_out_payload,
 			ipb_out_payload => ipb_in_payload
 		);
-	
+		
 	ipb_out_ctrl <= IPB_RBUS_NULL;
 	ipb_out_payload <= IPB_RBUS_NULL;
 

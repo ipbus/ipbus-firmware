@@ -31,6 +31,7 @@ entity glib_infra is
 		clk_fr: out std_logic; -- 125MHz free-running clock & reset (for reset state machines)
 		rst_fr: out std_logic;
 		clk200: out std_logic;
+		phy_rstb: out std_logic;
 		nuke: in std_logic; -- The signal of doom
 		soft_rst: in std_logic; -- The signal of lesser doom
 		userled: in std_logic;
@@ -113,6 +114,7 @@ begin
 	rst_ipb <= rsti_ipb;
 	clk_fr <= clk125_fr;
 	rst_fr <= rsti_fr;
+	phy_rstb <= not rsti_eth;
 
 -- Ethernet MAC core and PHY interface
 
