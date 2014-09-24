@@ -15,7 +15,8 @@ entity top is
 		eth_clkn: in std_logic;
 		phy_rstb: out std_logic;
 		fpga_sda: inout std_logic;
-		fpga_scl: inout std_logic
+		fpga_scl: inout std_logic;
+		v6_cpld: in std_logic_vector(5 downto 0)
 	);
 
 end top;
