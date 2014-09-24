@@ -65,7 +65,7 @@ begin
 			soft_rst => soft_rst,
 			led => userled,
 			slot => v6_cpld(3 downto 0)
-		)
+		);
 
 end rtl;
 
