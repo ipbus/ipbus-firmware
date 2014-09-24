@@ -2,7 +2,7 @@ NET infra/eth/clk125_out TNM_NET = clk125;
 TIMESPEC TS_clk125 = PERIOD clk125 8ns;
 
 NET infra/clocks/rst TIG;
-#NET infra/clocks/nuke_i TIG;
+NET infra/clocks/nuke_i TIG;
 
 NET eth_clkp LOC = M6 | DIFF_TERM = TRUE | TNM_NET=eth_clk;
 NET eth_clkn LOC = M5 | DIFF_TERM = TRUE;
@@ -13,15 +13,6 @@ NET phy_rstb LOC=AK16 | IOSTANDARD=LVCMOS25;
 NET leds<0> LOC=AF31 | IOSTANDARD=LVCMOS25;
 NET leds<1> LOC=AB25 | IOSTANDARD=LVCMOS25;
 NET leds<2> LOC=AC25 | IOSTANDARD=LVCMOS25;
-
-# Interface between FPGA and CPLD
-
-NET v6_cpld<0> LOC = AE32 | IOSTANDARD=LVCMOS25;
-NET v6_cpld<1> LOC = AB27 | IOSTANDARD=LVCMOS25;
-NET v6_cpld<2> LOC = AC27 | IOSTANDARD=LVCMOS25;
-NET v6_cpld<3> LOC = AG33 | IOSTANDARD=LVCMOS25;
-NET v6_cpld<4> LOC = AG32 | IOSTANDARD=LVCMOS25;
-NET v6_cpld<5> LOC = AA26 | IOSTANDARD=LVCMOS25;
 
 # I2C to PROM
 

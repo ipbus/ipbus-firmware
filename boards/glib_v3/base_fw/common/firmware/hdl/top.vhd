@@ -15,8 +15,7 @@ entity top is
 		eth_clkn: in std_logic;
 		phy_rstb: out std_logic;
 		fpga_sda: inout std_logic;
-		fpga_scl: inout std_logic;
-		v6_cpld: in std_logic_vector(5 downto 0)
+		fpga_scl: inout std_logic
 	);
 
 end top;
@@ -55,7 +54,7 @@ begin
 			ipb_out_payload => ipb_in_payload
 		);
 
-	payload: entity work.sc_daq
+	payload: entity work.payload
 		port map(
 			clk => clk_ipb,
 			rst => rst_ipb,
@@ -64,7 +63,9 @@ begin
 			nuke => nuke,
 			soft_rst => soft_rst,
 			led => userled,
-			slot => v6_cpld(3 downto 0)
+			slot => v6_cpld(3 downto 0),
+			clkp => clkp,
+			clk200 => clk200
 		);
 
 end rtl;
