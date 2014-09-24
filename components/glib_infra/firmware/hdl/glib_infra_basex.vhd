@@ -11,7 +11,6 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 use work.ipbus.all;
 use work.ipbus_trans_decl.all;
-use work.ipbus_decode_glib_infra.all;
 
 entity glib_infra is
 	generic(
@@ -36,10 +35,8 @@ entity glib_infra is
 		userled: in std_logic;
 		scl: inout std_logic;
 		sda: inout std_logic;
-		ipb_in_ctrl: in ipb_rbus; -- ipbus signals to top-level slaves
-		ipb_out_ctrl: out ipb_wbus;
-		ipb_in_payload: in ipb_rbus;
-		ipb_out_payload: out ipb_wbus
+		ipb_in: in ipb_rbus;
+		ipb_out: out ipb_wbus
 	);
 
 end glib_infra;
@@ -51,10 +48,6 @@ architecture rtl of glib_infra is
 	signal mac_tx_data, mac_rx_data: std_logic_vector(7 downto 0);
 	signal mac_tx_valid, mac_tx_last, mac_tx_error, mac_tx_ready, mac_rx_valid, mac_rx_last, mac_rx_error: std_logic;
 	signal pkt: std_logic;
-	signal ipb_out_m: ipb_wbus;
-	signal ipb_in_m: ipb_rbus;
-	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
-	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal mac_addr, mac_addr_prom: std_logic_vector(47 downto 0);
 	signal ip_addr, ip_addr_prom: std_logic_vector(31 downto 0);
 	signal rarp_select, prom_done: std_logic;
@@ -178,33 +171,14 @@ begin
 			mac_tx_last => mac_tx_last,
 			mac_tx_error => mac_tx_error,
 			mac_tx_ready => mac_tx_ready,
-			ipb_out => ipb_out_m,
-			ipb_in => ipb_in_m,
+			ipb_out => ipb_out,
+			ipb_in => ipb_in,
 			mac_addr => mac_addr,
 			ip_addr => ip_addr,
 			enable => prom_done,
 			rarp_select => rarp_select,
 			pkt => pkt
 		);
-
--- ipbus address decode
-		
-	fabric: entity work.ipbus_fabric_sel
-    generic map(
-    	NSLV => N_SLAVES,
-    	SEL_WIDTH => IPBUS_SEL_WIDTH)
-    port map(
-      ipb_in => ipb_out_m,
-      ipb_out => ipb_in_m,
-      sel => ipbus_sel_glib_infra(ipb_out_m.ipb_addr),
-      ipb_to_slaves => ipbw,
-      ipb_from_slaves => ipbr
-    );
-
-	ipb_out_ctrl <= ipbw(N_SLV_CTRL);
-	ipbr(N_SLV_CTRL) <= ipb_in_ctrl;
-	ipb_out_payload <= ipbw(N_SLV_PAYLOAD);
-	ipbr(N_SLV_PAYLOAD) <= ipb_in_payload;
 
 end rtl;
 
