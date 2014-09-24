@@ -63,7 +63,7 @@ begin
 			ipb_out => ipb_out_payload,
 			nuke => nuke,
 			soft_rst => soft_rst,
-			led => userled,
+			userled => userled,
 			slot => v6_cpld(3 downto 0),
 			clkp => clkp,
 			clk200 => clk200
