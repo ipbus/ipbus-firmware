@@ -171,7 +171,7 @@ begin
     '1' when EXTERNAL,
     '0' when others;
 
-  cfg_out <= my_ip_addr_udp & X"000" & mac_src_flag & ip_src_flag & rarp_en & udp_en & my_mac_addr & X"00000000";
+  cfg_out <= my_ip_addr_udp & X"00" & "000" & not rst_macclk & mac_src_flag & ip_src_flag & rarp_en & udp_en & my_mac_addr & X"00000000";
 	
 	with MAC_CFG select my_mac_addr <=
 		mac_addr when EXTERNAL,

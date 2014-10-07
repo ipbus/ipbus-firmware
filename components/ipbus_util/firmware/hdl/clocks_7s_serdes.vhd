@@ -39,8 +39,8 @@ architecture rtl of clocks_7s_serdes is
 	signal dcm_locked, sysclk, sysclk_ub, clk_ipb_i, clk_ipb_b, clkfb: std_logic;
 	signal clk_p40_i, clk_p40_b: std_logic;
 	signal d17, d17_d: std_logic;
-	signal nuke_i, nuke_d, nuke_d2: std_logic := '0';
-	signal rst, srst, rst_ipb, rst_125, rst_eth, rst_ipb_ctrl: std_logic := '1';
+	signal nuke_i, nuke_d, nuke_d2, eth_done: std_logic := '0';
+	signal rst, srst, rst_ipb, rst_125, rst_ipb_ctrl: std_logic := '1';
 	signal rctr: unsigned(3 downto 0) := "0000";
 	
 begin
@@ -95,6 +95,8 @@ begin
 				rst <= nuke_d2 or not dcm_locked;
 				nuke_d <= nuke_i; -- ~1ms time bomb (allows return packet to be sent)
 				nuke_d2 <= nuke_d;
+				eth_done <= (eth_done or eth_locked) and not rst;
+				rsto_eth <= rst; -- delayed reset for ethernet block to avoid startup issues
 			end if;
 		end if;
 	end process;
@@ -127,20 +129,11 @@ begin
 	process(clki_125)
 	begin
 		if rising_edge(clki_125) then
-			rst_125 <= rst or not eth_locked;
+			rst_125 <= rst or not eth_done;
 		end if;
 	end process;
 	
 	rsto_125 <= rst_125;
-	
-	process(sysclk)
-	begin
-		if rising_edge(sysclk) then
-			rst_eth <= rst;
-		end if;
-	end process;
-	
-	rsto_eth <= rst_eth;
 	
 	rsto_fr <= rst;
 		
