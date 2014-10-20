@@ -85,6 +85,7 @@ architecture rtl of eth_7s_1000basex is
 	signal clk62_5_ub, clk62_5, clkfb: std_logic;
 	signal rstn, phy_done, mmcm_locked, locked_int: std_logic;
 	signal status: std_logic_vector(15 downto 0);
+	signal decoupled_clk: std_logic := '0';
 
 begin
 	
@@ -108,7 +109,7 @@ begin
 		o => txoutclk
 	);
 	
-	mcmm: MMCME2_BASE
+	mmcm: MMCME2_BASE
 		generic map(
 			CLKIN1_PERIOD => 16.0,
 			CLKFBOUT_MULT_F => 16.0,
@@ -188,6 +189,20 @@ begin
 	hostbus_out.hostrddata <= (others => '0');
 	hostbus_out.hostmiimrdy <= '0';
 
+    -- Vivado generates a CRC error if you drive the CPLLLOCKDET circuitry with
+    -- the same clock used to drive the transceiver PLL.  While this makes sense
+    -- if the clk is derved from the CPLL (e.g. TXOUTCLK) it is less clear is 
+    -- essential if you use the clock raw from the input pins.  The short story
+    -- is that it has always worked in the past with ISE, but Vivado generates 
+    -- DRC error.  Can be bypassed by decoupling the clock from the perpective 
+    -- of the tools by just toggling a flip flop, which is what is done below.
+    process(clk_fr)
+    begin
+        if rising_edge(clk_fr) then
+            decoupled_clk <= not decoupled_clk;
+        end if;
+    end process;
+
 	phy: entity work.gig_eth_pcs_pma_v11_5_block
 		port map(
 			drpaddr_in => (others => '0'),
@@ -207,7 +222,7 @@ begin
 			mmcm_locked => mmcm_locked,
 			userclk => clk62_5,
 			userclk2 => clk125,
-			independent_clock_bufg => clk_fr,
+			independent_clock_bufg => decoupled_clk, --clk_fr,
 			pma_reset => rsti,
 			gmii_txd => gmii_txd,
 			gmii_tx_en => gmii_tx_en,
