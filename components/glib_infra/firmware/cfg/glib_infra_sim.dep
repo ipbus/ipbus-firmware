@@ -1,0 +1,6 @@
+src -d -s sim_hdl glib_infra_sim.vhd
+src -c components/ipbus_util -d -s sim_hdl clock_sim.vhd
+src -c components/ipbus_eth -d -s sim eth_mac_sim.vhd
+include -c components/ipbus_core
+src -c components/ipbus_core ipbus_package.vhd
+

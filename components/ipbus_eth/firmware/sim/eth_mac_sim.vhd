@@ -98,7 +98,7 @@ begin
       if rst = '1' then
         rxen <= '1';
         timer <= 0;
-        ifg_ctr <= 0;
+        ifg_ctr <= 4;
       elsif rxen = '1' and ifg_ctr > IFG_LENGTH then
         get_mac_data(del_return => del,
         	mac_data_out => data,

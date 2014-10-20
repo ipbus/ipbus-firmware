@@ -38,10 +38,10 @@ end clocks_v6_serdes_noxtal;
 architecture rtl of clocks_v6_serdes_noxtal is
 	
 	signal dcm_locked, sysclk, sysclk_ub, clk_ipb_i, clk_ipb_b, clkfb: std_logic;
-	signal clk_62_5_i, clk_62_5_b: std_logic;
+	signal clk_62_5_i, clk_62_5_u: std_logic;
 	signal d17, d17_d: std_logic;
-	signal dcm_rst, nuke_i, nuke_d, nuke_d2: std_logic := '0';
-	signal rst, srst, rst_ipb, rst_125, rst_eth, rst_ipb_ctrl: std_logic := '1';
+	signal dcm_rst, nuke_i, nuke_d, nuke_d2, eth_done: std_logic := '0';
+	signal rst, srst, rst_ipb, rst_125, rst_ipb_ctrl: std_logic := '1';
 	signal rctr: unsigned(3 downto 0) := "0000";
 
 begin
@@ -55,12 +55,12 @@ begin
 	
 	sysclk <= clki_125_fr;
 	
-	bufg625: BUFG port map(
-		i => clk_62_5_i,
-		o => clk_62_5_b
+	bufg_62_5: BUFG port map(
+		i => clk_62_5_u,
+		o => clk_62_5_i
 	);
 	
-	clko_62_5 <= clk_62_5_b;
+	clko_62_5 <= clk_62_5_i;
 	
 	mmcm: MMCM_BASE
 		generic map(
@@ -75,7 +75,7 @@ begin
 			clkfbin => clkfb,
 			clkfbout => clkfb,
 			clkout1 => clk_ipb_i,
-			clkout2 => clk_62_5_i,
+			clkout2 => clk_62_5_u, -- No BUFG needed here, goes to an adjacent MMCM
 			clkout3 => clko_200, -- No BUFG needed here, goes to idelayctrl on local routing
 			locked => dcm_locked,
 			rst => dcm_rst,
@@ -97,6 +97,8 @@ begin
 				rst <= nuke_d2 or not dcm_locked;
 				nuke_d <= nuke_i; -- Time bomb (allows return packet to be sent)
 				nuke_d2 <= nuke_d;
+				eth_done <= (eth_done or eth_locked) and not rst;
+				rsto_eth <= rst; -- delayed reset for ethernet block to avoid startup issues				
 			end if;
 		end if;
 	end process;
@@ -129,20 +131,11 @@ begin
 	process(clki_125)
 	begin
 		if rising_edge(clki_125) then
-			rst_125 <= rst or not eth_locked;
+			rst_125 <= rst or not eth_done;
 		end if;
 	end process;
 	
 	rsto_125 <= rst_125;
-	
-	process(sysclk)
-	begin
-		if rising_edge(sysclk) then
-			rst_eth <= rst;
-		end if;
-	end process;
-	
-	rsto_eth <= rst_eth;
 	
 	rsto_fr <= rst;
 		

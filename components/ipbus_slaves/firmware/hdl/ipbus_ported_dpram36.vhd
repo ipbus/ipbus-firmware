@@ -99,11 +99,11 @@ begin
 	process(rclk)
 	begin
 		if rising_edge(rclk) then
-			q <= ram_h(rsel) & ram_l(rsel); -- Order of statements is important to infer read-first RAM!
 			if we = '1' then
 				ram_l(rsel) := d(17 downto 0);
 				ram_h(rsel) := d(35 downto 18);
 			end if;
+			q <= ram_h(rsel) & ram_l(rsel); -- Order of statements is important for RAM mode!
 		end if;
 	end process;
 

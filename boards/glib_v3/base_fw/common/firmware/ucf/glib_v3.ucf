@@ -8,23 +8,54 @@ NET eth_clkp LOC = M6 | DIFF_TERM = TRUE | TNM_NET=eth_clk;
 NET eth_clkn LOC = M5 | DIFF_TERM = TRUE;
 TIMESPEC TS_eth_clk = PERIOD eth_clk 8ns;
 
+NET clk_ipb TNM = clk_ipb;
+NET clkp TNM = clkp;
+
+TIMESPEC TS_clkp = FROM clk_ipb TO clkp TIG;
+TIMESPEC TS_clkp_r = FROM clkp TO clk_ipb TIG;
+
+# Keep ipbus stuff under control
+
+AREA_GROUP infra RANGE = CLOCKREGION_X1Y2;
+INST infra/* AREA_GROUP = infra;
+
+# SGMII PHY
+
 NET phy_rstb LOC=AK16 | IOSTANDARD=LVCMOS25;
 
-NET leds<0> LOC=AF31 | IOSTANDARD=LVCMOS25;
-NET leds<1> LOC=AB25 | IOSTANDARD=LVCMOS25;
-NET leds<2> LOC=AC25 | IOSTANDARD=LVCMOS25;
+# LEDs
+
+NET leds<*> IOSTANDARD = LVCMOS25;
+NET leds<0> LOC=AF31;
+NET leds<1> LOC=AB25;
+NET leds<2> LOC=AC25;
 
 # Interface between FPGA and CPLD
 
-NET v6_cpld<0> LOC = AE32 | IOSTANDARD=LVCMOS25;
-NET v6_cpld<1> LOC = AB27 | IOSTANDARD=LVCMOS25;
-NET v6_cpld<2> LOC = AC27 | IOSTANDARD=LVCMOS25;
-NET v6_cpld<3> LOC = AG33 | IOSTANDARD=LVCMOS25;
-NET v6_cpld<4> LOC = AG32 | IOSTANDARD=LVCMOS25;
-NET v6_cpld<5> LOC = AA26 | IOSTANDARD=LVCMOS25;
+NET v6_cpld<*> IOSTANDARD = LVCMOS25;
+NET v6_cpld<0> LOC = AE32;
+NET v6_cpld<1> LOC = AB27;
+NET v6_cpld<2> LOC = AC27;
+NET v6_cpld<3> LOC = AG33;
+NET v6_cpld<4> LOC = AG32;
+NET v6_cpld<5> LOC = AA26;
 
 # I2C to PROM
 
 NET fpga_scl LOC = AP20 | IOSTANDARD=LVCMOS25;
 NET fpga_sda LOC = AP21 | IOSTANDARD=LVCMOS25;
+
+# Clock buffer control
+
+NET xpoint_ctrl<*> IOSTANDARD = LVCMOS25;
+NET xpoint_ctrl<0> LOC = AK21; # xpoint1_s40
+NET xpoint_ctrl<1> LOC = AG22; # xpoint1_s30
+NET xpoint_ctrl<2> LOC = AJ22; # xpoint1_s20
+NET xpoint_ctrl<3> LOC = AN19; # xpoint1_s10
+NET xpoint_ctrl<4> LOC = AJ21; # xpoint1_s41
+NET xpoint_ctrl<5> LOC = AL20; # xpoint1_s31
+NET xpoint_ctrl<6> LOC = AH22; # xpoint1_s32
+NET xpoint_ctrl<7> LOC = AM18; # xpoint1_s11
+NET xpoint_ctrl<8> LOC = AN18; # xpoint2_s0
+NET xpoint_ctrl<9> LOC = AP19; # xpoint2_s1
 

@@ -1,0 +1,5 @@
+setup lib_mappings.tcl
+src top.vhd
+src -c components/ipbus_core ipbus_package.vhd
+include -c components/glib_infra glib_infra_sim.dep
+

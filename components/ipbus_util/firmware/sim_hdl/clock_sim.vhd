@@ -14,6 +14,7 @@ entity clock_sim is
 		clko125: out std_logic;
 		clko25: out std_logic;
 		clko40: out std_logic;
+		clko62_5: out std_logic;
 		nuke: in std_logic;
 		soft_rst: in std_logic;
 		rsto: out std_logic;
@@ -24,7 +25,7 @@ end clock_sim;
 
 architecture behavioural of clock_sim is
 
-	signal clk125, clk25, clk40, nuke_del, srst: std_logic := '0';
+	signal clk125, clk25, clk40, clk62_5, nuke_del, srst: std_logic := '0';
 	signal reset_vec: std_logic_vector(3 downto 0) := X"f";
 	signal rctr: unsigned(3 downto 0) := "0000";
 
@@ -33,10 +34,12 @@ begin
 	clk125 <= not clk125 after 4 ns;
 	clk25 <= not clk25 after 20 ns;
 	clk40 <= not clk40 after 12.5 ns;
+	clk62_5 <= not clk62_5 after 8 ns;
 	
 	clko125 <= clk125;
 	clko25 <= clk25;
 	clko40 <= clk40;
+	clko62_5 <= clk62_5;
 	
 	srst <= '1' when rctr /= "0000" else '0';
 	

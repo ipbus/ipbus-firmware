@@ -12,6 +12,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use ieee.numeric_std.all;
+
 use work.ipbus.all;
 
 entity ipbus_dpram is
@@ -46,10 +47,10 @@ begin
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			ipb_out.ipb_rdata <= ram(sel); -- Order of statements is important to infer read-first RAM!
 			if ipb_in.ipb_strobe='1' and ipb_in.ipb_write='1' then
 				ram(sel) := ipb_in.ipb_wdata;
 			end if;
+			ipb_out.ipb_rdata <= ram(sel); -- Order of statements is important for RAM mode!
 			ack <= ipb_in.ipb_strobe and not ack;
 		end if;
 	end process;
@@ -62,10 +63,10 @@ begin
 	process(rclk)
 	begin
 		if rising_edge(rclk) then
-			q <= ram(rsel); -- Order of statements is important to infer read-first RAM!
 			if we = '1' then
 				ram(rsel) := d;
 			end if;
+			q <= ram(rsel); -- Order of statements is important for RAM mode!
 		end if;
 	end process;
 
