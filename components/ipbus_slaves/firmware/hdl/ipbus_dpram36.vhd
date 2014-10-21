@@ -18,7 +18,7 @@ use work.ipbus.all;
 
 entity ipbus_dpram36 is
 	generic(
-		ADDR_WIDTH: positive := 10
+		ADDR_WIDTH: positive
 	);
 	port(
 		clk: in std_logic;
@@ -47,7 +47,12 @@ begin
 
 	process(clk)
 	begin
-		if rising_edge(clk) then	
+		if rising_edge(clk) then
+			if ipb_in.ipb_addr(ADDR_WIDTH) = '0' then
+				ipb_out.ipb_rdata <= X"000" & "00" & ram_bh(sel); -- Order of statements is important to infer read-first RAM!
+			else
+				ipb_out.ipb_rdata <= X"000" & "00" & ram_th(sel); -- Order of statements is important to infer read-first RAM!
+			end if;				
 			if ipb_in.ipb_strobe='1' and ipb_in.ipb_write='1' then
 				if ipb_in.ipb_addr(ADDR_WIDTH) = '0' then
 					ram_bh(sel) := ipb_in.ipb_wdata(17 downto 0);
@@ -55,11 +60,6 @@ begin
 					ram_th(sel) := ipb_in.ipb_wdata(17 downto 0);
 				end if;
 			end if;
-			if ipb_in.ipb_addr(ADDR_WIDTH) = '0' then
-				ipb_out.ipb_rdata <= X"000" & "00" & ram_bh(sel); -- Order of statements is important for RAM mode!
-			else
-				ipb_out.ipb_rdata <= X"000" & "00" & ram_th(sel); -- Order of statements is important for RAM mode!
-			end if;						
 			ack <= ipb_in.ipb_strobe and not ack;
 		end if;
 	end process;
@@ -72,11 +72,11 @@ begin
 	process(rclk)
 	begin
 		if rising_edge(rclk) then
+			q <= ram_th(rsel) & ram_bh(rsel); -- Order of statements is important to infer read-first RAM!
 			if we = '1' then
 				ram_bh(rsel) := d(17 downto 0);
 				ram_th(rsel) := d(35 downto 18);
 			end if;
-			q <= ram_th(rsel) & ram_bh(rsel); -- Order of statements is important for RAM mode!
 		end if;
 	end process;
 
