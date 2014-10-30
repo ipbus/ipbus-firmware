@@ -26,16 +26,50 @@
 #define TAP_MTU 1500
 #define WAIT_USECS 50000 /* 50ms */
 
-static int init=0;
 static unsigned char* rxbuffer, *txbuffer;
 static int tun_fd;
 static int rxidx=0, txidx=0, rxlen=0;
 
-__attribute__((constructor)) static void init()
+__attribute__((constructor)) static void cinit()
 {
-	mti_PrintFormatted ( "fli: in my constructor\n" );
+    /* First time called, set up the interfaces */
+    mti_PrintFormatted ( "fli: initialising\n" );
+
+    if ( NULL== ( rxbuffer= ( unsigned char* ) malloc ( TAP_MTU ) ) )
+    {
+      perror ( "malloc for rxbuffer" );
+      mti_FatalError();
+      return;
+    }
+
+    if ( NULL== ( txbuffer= ( unsigned char* ) malloc ( TAP_MTU ) ) )
+    {
+      perror ( "malloc for txbuffer" );
+      mti_FatalError();
+      return;
+    }
+
+    tun_fd = tun_alloc ( TAP_DEV, IFF_TAP | IFF_NO_PI );
+
+    if ( tun_fd < 0 )
+    {
+      perror ( "Allocating interface" );
+      mti_FatalError();
+      return;
+    }
+
+    mti_PrintFormatted ( "fli: initalised\n" );
 }
 
+__attribute__((destructor)) static void cdestruct()
+{
+  free(rxbuffer);
+  free(txbuffer);
+  close(tun_fd);
+  mti_PrintFormatted ( "fli: shutting down\n" );
+}
+
+	
 int tun_alloc ( char* dev, int flags )
 {
   struct ifreq ifr;
@@ -78,41 +112,6 @@ void get_mac_data ( int del_return,
   fd_set fds;
   static struct timeval tv;
   int s;
-
-  if ( init==0 )
-  {
-    /* First time called, set up the interfaces */
-    mti_PrintFormatted ( "fli: get_mac_data initialising\n" );
-
-    if ( NULL== ( rxbuffer= ( unsigned char* ) malloc ( TAP_MTU ) ) )
-    {
-      perror ( "malloc for rxbuffer" );
-      mti_FatalError();
-      return;
-    }
-
-    if ( NULL== ( txbuffer= ( unsigned char* ) malloc ( TAP_MTU ) ) )
-    {
-      perror ( "malloc for txbuffer" );
-      mti_FatalError();
-      return;
-    }
-
-    tun_fd = tun_alloc ( TAP_DEV, IFF_TAP | IFF_NO_PI );
-
-    if ( tun_fd < 0 )
-    {
-      perror ( "Allocating interface" );
-      mti_FatalError();
-      return;
-    }
-
-    mti_AddRestartCB(cleanup, NULL);
-    
-    mti_PrintFormatted ( "fli: get_mac_data initalised\n" );
-    *mac_data_valid=0;
-    init=1;
-  }
 
   if ( rxlen==0 )
   {
@@ -214,14 +213,3 @@ void put_packet()
   }
 }
 
-void cleanup(void * param)
-{
-	destruct();
-}
-
-__attribute__((destructor)) static void destruct()
-{
-	mti_PrintFormatted ( "fli: in my destructor\n" );
-}
-
-	
