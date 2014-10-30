@@ -31,6 +31,11 @@ static unsigned char* rxbuffer, *txbuffer;
 static int tun_fd;
 static int rxidx=0, txidx=0, rxlen=0;
 
+__attribute__((constructor)) static void init()
+{
+	mti_PrintFormatted ( "fli: in my constructor\n" );
+}
+
 int tun_alloc ( char* dev, int flags )
 {
   struct ifreq ifr;
@@ -102,6 +107,8 @@ void get_mac_data ( int del_return,
       return;
     }
 
+    mti_AddRestartCB(cleanup, NULL);
+    
     mti_PrintFormatted ( "fli: get_mac_data initalised\n" );
     *mac_data_valid=0;
     init=1;
@@ -206,3 +213,15 @@ void put_packet()
     txidx=0;
   }
 }
+
+void cleanup(void * param)
+{
+	destruct();
+}
+
+__attribute__((destructor)) static void destruct()
+{
+	mti_PrintFormatted ( "fli: in my destructor\n" );
+}
+
+	
