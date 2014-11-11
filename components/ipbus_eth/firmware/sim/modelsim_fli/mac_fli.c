@@ -28,7 +28,7 @@
 
 static unsigned char* rxbuffer, *txbuffer;
 static int tun_fd;
-static int rxidx=0, txidx=0, rxlen=0;
+static int rxidx, txidx, rxlen;
 
 __attribute__((constructor)) static void cinit()
 {
@@ -58,6 +58,9 @@ __attribute__((constructor)) static void cinit()
       return;
     }
 
+    txidx = 0;
+    rxlen = 0;
+    
     mti_PrintFormatted ( "fli: initalised\n" );
 }
 
@@ -149,7 +152,6 @@ void get_mac_data ( int del_return,
       }
 
       rxidx=0;
-      txidx=0;
       mti_PrintFormatted ( "fli: get_mac_data received packet, length %d\n", rxlen );
     }
   }
