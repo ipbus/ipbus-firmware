@@ -10,4 +10,3 @@ project set "Enable Multi-Threading" "2" -process "Place & Route"
 project set "Generate Clock Region Report" TRUE -process "Place & Route"
 project set "Enable BitStream Compression" TRUE -process "Generate Programming File"
 project set "Power Down Device if Over Safe Temperature" TRUE -process "Generate Programming File"
-

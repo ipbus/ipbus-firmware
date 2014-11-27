@@ -1,4 +1,4 @@
-	-- ipbus_drp_bridge
+-- ipbus_drp_bridge
 --
 -- Interfaces ipbus master to Xilinx DRP slave (for access to MGT, MAC, etc)
 --

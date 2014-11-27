@@ -59,9 +59,16 @@ begin
 		end if;
 	end process;
 	
-	stb_gen: for i in N_CTRL - 1 downto 0 generate
-		stb(i) <= '1' when cw_cyc = '1' and sel = i else '0';
-	end generate;
+	process(clk)
+	begin
+		if rising_edge(clk) then
+			for i in N_CTRL - 1 downto 0 loop
+				if sel = i then
+					stb(i) <= cw_cyc;
+				end if;
+			end loop;
+		end if;
+	end process;
 	
 	si(N_STAT - 1 downto 0) <= d;
 	si(2 ** ADDR_WIDTH - 1 downto N_STAT) <= (others => (others => '0'));

@@ -8,12 +8,6 @@ NET eth_clkp LOC = M6 | DIFF_TERM = TRUE | TNM_NET=eth_clk;
 NET eth_clkn LOC = M5 | DIFF_TERM = TRUE;
 TIMESPEC TS_eth_clk = PERIOD eth_clk 8ns;
 
-NET clk_ipb TNM = clk_ipb;
-NET clkp TNM = clkp;
-
-TIMESPEC TS_clkp = FROM clk_ipb TO clkp TIG;
-TIMESPEC TS_clkp_r = FROM clkp TO clk_ipb TIG;
-
 # Keep ipbus stuff under control
 
 AREA_GROUP infra RANGE = CLOCKREGION_X1Y2;

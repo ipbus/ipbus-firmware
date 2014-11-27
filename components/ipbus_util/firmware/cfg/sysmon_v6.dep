@@ -1,0 +1,3 @@
+src sysmon_v6.vhd
+src -c components/ipbus_slaves ipbus_drp_bridge.vhd drp_decl.vhd
+src -c components/ipbus_core ipbus_package.vhd

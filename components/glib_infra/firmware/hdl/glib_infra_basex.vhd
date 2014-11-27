@@ -32,6 +32,7 @@ entity glib_infra is
 		phy_rstb: out std_logic;
 		nuke: in std_logic; -- The signal of doom
 		soft_rst: in std_logic; -- The signal of lesser doom
+		reconf: in std_logic; -- The signal of ultimate doom
 		userled: in std_logic;
 		scl: inout std_logic;
 		sda: inout std_logic;
@@ -43,7 +44,7 @@ end glib_infra;
 
 architecture rtl of glib_infra is
 
-	signal clk125_fr, clk125, ipb_clk, clk_locked, locked, eth_locked: std_logic;
+	signal clk125_fr, clk125, ipb_clk, clk_locked, locked, eth_locked, ipb_clk_n: std_logic;
 	signal rsti_125, rsti_ipb, rsti_eth, rsti_ipb_ctrl, onehz, rsti_fr: std_logic;
 	signal mac_tx_data, mac_rx_data: std_logic_vector(7 downto 0);
 	signal mac_tx_valid, mac_tx_last, mac_tx_error, mac_tx_ready, mac_rx_valid, mac_rx_last, mac_rx_error: std_logic;
@@ -149,6 +150,21 @@ begin
 	mac_addr <= mac_addr_prom when MAC_FROM_PROM else STATIC_MAC_ADDR;
 	ip_addr <= ip_addr_prom when IP_FROM_PROM else STATIC_IP_ADDR;
 	rarp_select <= '1' when (ip_addr = X"00000000") else '0';
+
+-- ICAP interface
+
+	ipb_clk_n <= not ipb_clk;
+
+	icap: entity work.icap_interface_wrapper
+		port map(
+			reset_i => rsti_ipb,
+			conf_trigg_i => reconf,
+			fsm_conf_page_i => "00",
+			ipbus_clk_i => ipb_clk,
+			ipbus_inv_clk_i => ipb_clk_n,
+			ipbus_i => IPB_WBUS_NULL, -- no ipbus connection for now
+			ipbus_o => open
+		);
 
 -- ipbus control logic
 

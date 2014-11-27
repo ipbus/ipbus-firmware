@@ -16,7 +16,7 @@ entity top is
 		phy_rstb: out std_logic;
 		fpga_sda: inout std_logic;
 		fpga_scl: inout std_logic;
-		v6_cpld: in std_logic_vector(5 downto 0);
+		v6_cpld: inout std_logic_vector(5 downto 0);
 		clk_in_p: in std_logic;
 		clk_in_n: in std_logic;
 		xpoint_ctrl: out std_logic_vector(9 downto 0);
@@ -33,7 +33,7 @@ architecture rtl of top is
 	signal clk_ipb, rst_ipb, clkp, rstp, clk200: std_logic;
 	signal ipb_in: ipb_wbus;
 	signal ipb_out: ipb_rbus;
-	signal nuke, soft_rst, userled: std_logic;
+	signal prog, nuke, soft_rst, userled, reconf: std_logic;
 
 begin
 
@@ -55,6 +55,7 @@ begin
 			phy_rstb => phy_rstb,
 			nuke => nuke,
 			soft_rst => soft_rst,
+			reconf => reconf,
 			userled => userled,
 			scl => fpga_scl,
 			sda => fpga_sda,
@@ -70,6 +71,7 @@ begin
 			ipb_out => ipb_out,
 			nuke => nuke,
 			soft_rst => soft_rst,
+			reconf => reconf,
 			userled => userled,
 			slot => v6_cpld(3 downto 0),
 			clkp => clkp,
@@ -83,6 +85,7 @@ begin
 		);
 
 	xpoint_ctrl <= "0000000000";
+	v6_cpld <= "1ZZZZZ";
 		
 end rtl;
 
