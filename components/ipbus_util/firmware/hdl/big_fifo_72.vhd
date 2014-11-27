@@ -92,7 +92,7 @@ begin
 	
 	en(N_FIFO - 1 downto 1) <= not ifull(N_FIFO - 1 downto 1) and not empty(N_FIFO - 2 downto 0) and not (N_FIFO - 2 downto 0 => rsti);
 	
-	q <= fifo_d(N_FIFO - 1);
+	q <= fifo_d(N_FIFO);
 	valid <= not empty(N_FIFO - 1);
 	full <= ifull(0);
 
