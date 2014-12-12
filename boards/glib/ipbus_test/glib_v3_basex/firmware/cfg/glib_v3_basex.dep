@@ -1,8 +1,8 @@
 setup
-setup -ddd -s common/firmware/cfg settings_v6.tcl
+setup ../../../common/firmware/cfg/settings_v6.tcl
 setup -z coregen.cgp
 src glib_v3_basex.vhd ipbus_decode_glib_v3_basex.vhd
-src -d -s ucf glib_v3.ucf
+src ../ucf/glib_v3.ucf
 include -c components/ipbus_core
 #include -c components/glib_infrastructure
 src -c components/glib_infrastructure i2c_eeprom_read.vhd

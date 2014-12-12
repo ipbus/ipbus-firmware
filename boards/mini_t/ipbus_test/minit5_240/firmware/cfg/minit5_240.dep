@@ -1,10 +1,10 @@
 setup
-setup -ddd -s common/firmware/cfg settings_v5.tcl
+setup ../../../common/firmware/cfg/settings_v5.tcl
 setup -z coregen.cgp
 
 # top level files
 src minit5_240.vhd ipbus_decode_minit5_240.vhd
-src -d -s ucf minit5_240.ucf
+src ../ucf/minit5_240.ucf
 
 # IPbus
 include -c components/ipbus_core

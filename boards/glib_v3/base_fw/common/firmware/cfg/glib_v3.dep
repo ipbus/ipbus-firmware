@@ -2,6 +2,6 @@ setup glib_v3.tcl
 setup settings_v6.tcl
 setup -z coregen.cgp
 src top.vhd
-src -d -s ucf glib_v3.ucf
+src ../ucf/glib_v3.ucf
 src -c components/ipbus_core ipbus_package.vhd
 

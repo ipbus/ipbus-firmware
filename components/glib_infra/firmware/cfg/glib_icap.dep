@@ -1,2 +1,2 @@
-src -s icap_interface *.vhd
+src --cd icap_interface *.vhd
 

@@ -1,0 +1,12 @@
+# XST synthesis script for GPCS_PMA core.
+set -tmpdir .
+set -xsthdpdir ./xst
+run
+-ifmt mixed
+-top gig_eth_pcs_pma_v11_5_example_design
+-ofn gig_eth_pcs_pma_v11_5_example_design
+-p virtex7
+-uc example_design_xst.xcf
+-ifn xst.prj
+-iobuf YES
+
