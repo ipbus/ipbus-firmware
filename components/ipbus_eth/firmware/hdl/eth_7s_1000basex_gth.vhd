@@ -85,7 +85,7 @@ architecture rtl of eth_7s_1000basex is
 	signal clk62_5_ub, clk62_5, clkfb: std_logic;
 	signal rstn, phy_done, mmcm_locked, locked_int: std_logic;
 	signal status: std_logic_vector(15 downto 0);
-	signal decoupled_clk: std_logic := '0';
+	signal decoupled_clk, decoupled_clk_src: std_logic := '0';
 
 begin
 	
@@ -199,9 +199,15 @@ begin
     process(clk_fr)
     begin
         if rising_edge(clk_fr) then
-            decoupled_clk <= not decoupled_clk;
+            decoupled_clk_src <= not decoupled_clk_src;
         end if;
     end process;
+    
+	buf_decoupled_clk: BUFH
+        port map(
+            i => decoupled_clk_src,
+            o => decoupled_clk
+        );
 
 	phy: entity work.gig_eth_pcs_pma_v11_5_block
 		port map(
