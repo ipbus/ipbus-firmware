@@ -32,8 +32,7 @@ entity ipbus_syncreg_v is
 		d: in ipb_reg_v(N_STAT - 1 downto 0);
 		q: out ipb_reg_v(N_CTRL - 1 downto 0);
 		qmask: in ipb_reg_v(N_CTRL - 1 downto 0) := (others => (others => '1'));
-		stb: out std_logic_vector(N_CTRL - 1 downto 0);
-		rstb: out std_logic_vector(N_STAT - 1 downto 0)
+		stb: out std_logic_vector(N_CTRL - 1 downto 0)
 	);
 	
 end ipbus_syncreg_v;
@@ -45,9 +44,9 @@ architecture rtl of ipbus_syncreg_v is
 	signal sel: integer range 0 to 2 ** ADDR_WIDTH - 1 := 0;
 	signal ctrl_cyc_w, ctrl_cyc_r, stat_cyc: std_logic;
 	signal cq: ipb_reg_v(2 ** ADDR_WIDTH - 1 downto 0);
-	signal sq: ipb_reg_v(2 ** ADDR_WIDTH - 1 downto 0);
+	signal sq, ds: std_logic_vector(31 downto 0);
 	signal cbusy, cack: std_logic_vector(N_CTRL - 1 downto 0);
-	signal sbusy, sack: std_logic_vector(N_STAT - 1 downto 0);
+	signal sbusy, sack: std_logic;
 	signal busy, ack, busy_d, pend: std_logic;
 
 begin
@@ -85,34 +84,22 @@ begin
 	end generate;
 	
 	cq(2 ** ADDR_WIDTH - 1 downto N_CTRL) <= (others => (others => '0'));
-	
-	r_gen: for i in N_STAT - 1 downto 0 generate
-	
-		signal sre: std_logic;
-		signal stat_m: std_logic_vector(31 downto 0);
 
-	begin
+	ds <= d(sel) when sel < N_STAT else (others => '0');
+	sre <= '1' when stat_cyc = '1' and busy = '0' else '0';
+	
+	rsync: entity work.syncreg_r
+		port map(
+			m_clk => clk,
+			m_rst => rst,
+			m_re => sre,
+			m_busy => sbusy,
+			m_ack => sack,
+			m_q => sq,
+			s_clk => slv_clk,
+			s_d => ds
+		);
 
-		sre <= '1' when stat_cyc = '1' and sel = i and busy = '0' else '0';
-		stat_m <= d(i);
-	
-		rsync: entity work.syncreg_r
-			port map(
-				m_clk => clk,
-				m_rst => rst,
-				m_re => sre,
-				m_busy => sbusy(i),
-				m_ack => sack(i),
-				m_q => sq(i),
-				s_clk => slv_clk,
-				s_d => stat_m,
-				s_stb => rstb(i)
-			);
-	
-	end generate;
-	
-	sq(2 ** ADDR_WIDTH - 1 downto N_STAT) <= (others => (others => '0'));
-	
 	process(clk)
 	begin
 		if rising_edge(clk) then
@@ -121,10 +108,10 @@ begin
 		end if;
 	end process;
 	
-	busy <= '1' when cbusy /= (cbusy'range => '0') or sbusy /= (sbusy'range => '0') else '0';
-	ack <= '1' when (cack /= (cack'range => '0') or sack /= (sack'range => '0')) and pend = '1' else '0';
+	busy <= '1' when cbusy /= (cbusy'range => '0') or sbusy = '1' else '0';
+	ack <= '1' when (cack /= (cack'range => '0') or sack = '1') and pend = '1' else '0';
 	
-	ipb_out.ipb_rdata <= cq(sel) when ctrl_cyc_r = '1' else sq(sel);
+	ipb_out.ipb_rdata <= cq(sel) when ctrl_cyc_r = '1' else sq;
 	ipb_out.ipb_ack <= ((ctrl_cyc_w or stat_cyc) and ack) or ctrl_cyc_r;
 	ipb_out.ipb_err <= '0';
 	
