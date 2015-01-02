@@ -19,7 +19,8 @@ entity ipbus_reg_v is
 		reset: in std_logic;
 		ipbus_in: in ipb_wbus;
 		ipbus_out: out ipb_rbus;
-		q: out ipb_reg_v(N_REG - 1 downto 0)
+		q: out ipb_reg_v(N_REG - 1 downto 0);
+		qmask: in ipb_reg_v(N_REG - 1 downto 0) := (others => (others => '1'))
 	);
 	
 end ipbus_reg_v;
@@ -42,7 +43,7 @@ begin
 			if reset = '1' then
 				reg <= (others => (others => '0'));
 			elsif ipbus_in.ipb_strobe = '1' and ipbus_in.ipb_write = '1' and sel < N_REG then
-				reg(sel) <= ipbus_in.ipb_wdata;
+				reg(sel) <= ipbus_in.ipb_wdata and qmask(sel);
 			end if;
 		end if;
 	end process;

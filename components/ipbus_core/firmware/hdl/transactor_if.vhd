@@ -183,6 +183,6 @@ begin
 	trans_out.we <= '1' when state = ST_HDR or (tx_we = '1' and first = '0') or state = ST_DONE else '0';
 	trans_out.waddr <= std_logic_vector(haddr) when (state = ST_BODY and tx_hdr = '1') else std_logic_vector(waddrh);
 	trans_out.wdata <= tx_data when state = ST_BODY else idata;
-	
+			
 end rtl;
 
