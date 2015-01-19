@@ -96,4 +96,3 @@ begin
 	ipb_out.ipb_err <= ret and not ipbdc_in.flag;	
   
 end rtl;
-

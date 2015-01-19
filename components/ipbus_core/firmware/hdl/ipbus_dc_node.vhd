@@ -79,4 +79,3 @@ begin
 	ipbdc_out <= ipbout_d when PIPELINE else ipbout;
   
 end rtl;
-
