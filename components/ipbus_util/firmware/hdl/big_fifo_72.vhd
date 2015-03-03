@@ -16,7 +16,8 @@ use unisim.VComponents.all;
 entity big_fifo_72 is
 	generic(
 		N_FIFO: positive;
-		WARN_THRESHOLD: integer
+		WARN_HWM: integer := N_FIFO * 384; -- assert warning at high watermark
+		WARN_LWM: integer := N_FIFO * 256 -- deassert warning at low watermark
 	);
 	port(
 		clk: in std_logic;
@@ -35,7 +36,7 @@ end big_fifo_72;
 architecture rtl of big_fifo_72 is
 
 	signal ifull, empty, en: std_logic_vector(N_FIFO downto 0);
-	signal rsti: std_logic;
+	signal rsti, warn_i std_logic;
 	type fifo_d_t is array(N_FIFO downto 0) of std_logic_vector(71 downto 0);
 	signal fifo_d: fifo_d_t;
 	signal rst_ctr: unsigned(2 downto 0);
@@ -108,8 +109,20 @@ begin
 			end if;
 		end if;
 	end process;
+
+	process(clk)
+	begin
+		if rising_edge(clk) then
+			if rsti = '1' then
+				warn_i <= '0';
+			elsif warn_i = '0' and ctr > to_unsigned(WARN_HWM, ctr'length) then
+				warn_i <= '1';
+			elsif warn_i = '1' and ctr < to_unsigned(WARN_LWM, ctr'length) then
+				warn_i <= '0';
+			end if;
+		end if;
+	end process;
 	
-	warn <= '1' when ctr >= to_unsigned(WARN_THRESHOLD, ctr'length) else '0';
+	warn <= warn_i;
 	
 end rtl;
-
