@@ -16,8 +16,8 @@ use unisim.VComponents.all;
 entity big_fifo_72 is
 	generic(
 		N_FIFO: positive;
-		WARN_HWM: integer := N_FIFO * 384; -- assert warning at high watermark
-		WARN_LWM: integer := N_FIFO * 256 -- deassert warning at low watermark
+		WARN_HWM: integer; -- assert warning at high watermark
+		WARN_LWM: integer -- deassert warning at low watermark
 	);
 	port(
 		clk: in std_logic;
