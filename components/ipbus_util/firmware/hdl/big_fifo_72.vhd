@@ -36,7 +36,7 @@ end big_fifo_72;
 architecture rtl of big_fifo_72 is
 
 	signal ifull, empty, en: std_logic_vector(N_FIFO downto 0);
-	signal rsti, warn_i std_logic;
+	signal rsti, warn_i: std_logic;
 	type fifo_d_t is array(N_FIFO downto 0) of std_logic_vector(71 downto 0);
 	signal fifo_d: fifo_d_t;
 	signal rst_ctr: unsigned(2 downto 0);
