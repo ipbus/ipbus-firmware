@@ -25,6 +25,7 @@ entity big_fifo_72 is
 		d: in std_logic_vector(71 downto 0);
 		wen: in std_logic;
 		full: out std_logic;
+		empty: out std_logic;
 		warn: out std_logic;
 		ren: in std_logic;
 		q: out std_logic_vector(71 downto 0);
@@ -35,7 +36,8 @@ end big_fifo_72;
 
 architecture rtl of big_fifo_72 is
 
-	signal ifull, empty, en: std_logic_vector(N_FIFO downto 0);
+	signal en: std_logic_vector(N_FIFO  downto 0);
+	signal ifull, iempty: std_logic_vector(N_FIFO- 1  downto 0);
 	signal rsti, warn_i: std_logic;
 	type fifo_d_t is array(N_FIFO downto 0) of std_logic_vector(71 downto 0);
 	signal fifo_d: fifo_d_t;
@@ -76,7 +78,7 @@ begin
 				dip => fifo_d(i)(71 downto 64),
 				do => fifo_d(i + 1)(63 downto 0),
 				dop => fifo_d(i + 1)(71 downto 64),
-				empty => empty(i),
+				empty => iempty(i),
 				full => ifull(i),
 				injectdbiterr => '0',
 				injectsbiterr => '0',
@@ -91,11 +93,12 @@ begin
 		
 	end generate;
 	
-	en(N_FIFO - 1 downto 1) <= not ifull(N_FIFO - 1 downto 1) and not empty(N_FIFO - 2 downto 0) and not (N_FIFO - 2 downto 0 => rsti);
+	en(N_FIFO - 1 downto 1) <= not ifull(N_FIFO - 1 downto 1) and not iempty(N_FIFO - 2 downto 0) and not (N_FIFO - 2 downto 0 => rsti);
 	
 	q <= fifo_d(N_FIFO);
-	valid <= not empty(N_FIFO - 1);
+	valid <= not iempty(N_FIFO - 1);
 	full <= ifull(0);
+	empty <= iempty(N_FIFO - 1);
 
 	process(clk)
 	begin
