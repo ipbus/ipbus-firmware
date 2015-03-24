@@ -138,4 +138,3 @@ begin
 	rsto_fr <= rst;
 		
 end rtl;
-
