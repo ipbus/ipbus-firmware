@@ -39,7 +39,7 @@ package body ipbus_addr_decode is
 		-- END automatic generated VHDL
 
                 else
-                        sel := 99;
+                        sel := 6;
                 end if;
                 return sel;
   end ipbus_addr_sel;
