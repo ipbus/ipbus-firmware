@@ -1,0 +1,16 @@
+src -c boards/ipbus_sim ../../hdl/ipbus_tb.vhd
+src -c boards/ipbus_sim ../../hdl/package_ipbus_simulation.vhd
+
+src -c components/ipbus_slaves ipbus_ram.vhd
+src -c components/ipbus_slaves ipbus_ctrlreg_v.vhd
+src -c components/ipbus_slaves ipbus_reg_v.vhd
+src -c components/ipbus_slaves ipbus_reg_types.vhd
+
+src -c components/ipbus_core ipbus_shim.vhd
+src -c components/ipbus_core ipbus_fabric.vhd
+
+src -c components/ipbus_util ipbus_addr_decode.vhd
+
+include -c components/ipbus_core
+
+
