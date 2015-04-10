@@ -7,9 +7,9 @@ src -c components/ipbus_slaves ipbus_reg_v.vhd
 src -c components/ipbus_slaves ipbus_reg_types.vhd
 
 src -c components/ipbus_core ipbus_shim.vhd
-src -c components/ipbus_core ipbus_fabric.vhd
+src -c components/ipbus_core ipbus_fabric_sel.vhd
 
-src -c components/ipbus_util ipbus_addr_decode.vhd
+src -c components/ipbus_util ipbus_decode_ipbus_example.vhd
 
 include -c components/ipbus_core
 
