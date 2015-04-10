@@ -23,6 +23,8 @@ use work.ipbus_trans_decl.all;
 use work.ipbus_simulation.all;
 use work.ipbus_reg_types.all;
 
+use work.ipbus_decode_ipbus_example.all;
+
 entity ipbus_tb is
 end ipbus_tb;
 
@@ -31,9 +33,8 @@ architecture behave of ipbus_tb is
   -- The number of Out-Of-Band interfaces to the ipbus master (i.e. not from the Ethernet MAC)   
   constant N_OOB: natural := 1;
   -- The number of ipbus slaves used in this example. 
-  constant NSLV: positive := 99;
 
-  -- Base addreses of ipbus slaves.  THis is defined in package "ipbus_addr_decode"
+  -- Base addreses of ipbus slaves.  THis is defined in package "ipbus_decode_ipbus_example"
   constant BASE_ADD_CTRL_REG: std_logic_vector(31 downto 0) := x"00000000";
   constant BASE_ADD_REG: std_logic_vector(31 downto 0) := x"00000002";
   constant BASE_ADD_RAM: std_logic_vector(31 downto 0) := x"00001000";
@@ -52,8 +53,8 @@ architecture behave of ipbus_tb is
 	signal oob_out: ipbus_trans_out := (X"000", '0', '0', X"000", X"00000000");
 
   -- Array of ipbus records for communication to the ipbus slaves. 
-	signal ipbw: ipb_wbus_array(NSLV - 1 downto 0);
-	signal ipbr: ipb_rbus_array(NSLV - 1 downto 0) := (others => IPB_RBUS_NULL);
+	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
+	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0) := (others => IPB_RBUS_NULL);
 
   -- RW & R registers
   signal ctrl_v, stat_v: ipb_reg_v(0 downto 0);
@@ -212,26 +213,30 @@ begin
   -- on the master bus: "ipb_out_m" and "ipb_out_m".  
   -----------------------------------------------------------------------
    
-   
-	fabric: entity work.ipbus_fabric
-    generic map(NSLV => NSLV)
+
+	fabric: entity work.ipbus_fabric_sel
+    generic map(
+    	NSLV => N_SLAVES,
+    	SEL_WIDTH => IPBUS_SEL_WIDTH)
     port map(
       ipb_in => ipbus_shim_out,
       ipb_out => ipbus_shim_in,
+      sel => ipbus_sel_ipbus_example(ipbus_shim_out.ipb_addr),
       ipb_to_slaves => ipbw,
       ipb_from_slaves => ipbr
     );
+
 
   -- Generic control / status register block
   -- Provides 2**n control registers (32b each), rw
   -- Provides 2**m status registers (32b each), ro
   -- Bottom part of read address space is control, top is status
-	slave0: entity work.ipbus_ctrlreg_v
+	ctrl_reg: entity work.ipbus_ctrlreg_v
 		port map(
 			clk => clk,
 			reset => rst,
-			ipbus_in => ipbw(0),
-			ipbus_out => ipbr(0),
+			ipbus_in => ipbw(N_SLV_CTRL_REG),
+			ipbus_out => ipbr(N_SLV_CTRL_REG),
 			d => stat_v,
 			q => ctrl_v
 		);
@@ -243,13 +248,13 @@ begin
   -- generic addr_width defines number of significant address bits
   -- We use one cycle of read / write latency to ease timing (probably not necessary)
   -- The q outputs change immediately on write (no latency).
-	slave1: entity work.ipbus_reg_v
+	reg: entity work.ipbus_reg_v
 		generic map(N_REG => 1)
 		port map(
 			clk => clk,
 			reset => rst,
-			ipbus_in => ipbw(1),
-			ipbus_out => ipbr(1),
+			ipbus_in => ipbw(N_SLV_REG),
+			ipbus_out => ipbr(N_SLV_REG),
 			q => open
 		);
     
@@ -258,13 +263,13 @@ begin
   -- In order to allow Xilinx block RAM to be inferred:
   -- Reset does not clear the RAM contents (not implementable in Xilinx)
   -- There is one cycle of latency on the read / write
-	slave2: entity work.ipbus_ram
+	ram: entity work.ipbus_ram
 		generic map(addr_width => 4)
 		port map(
 			clk => clk,
 			reset => rst,
-			ipbus_in => ipbw(4),
-			ipbus_out => ipbr(4)
+			ipbus_in => ipbw(N_SLV_RAM),
+			ipbus_out => ipbr(N_SLV_RAM)
 		);
 
 
