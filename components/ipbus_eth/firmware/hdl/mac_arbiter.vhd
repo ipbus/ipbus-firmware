@@ -16,8 +16,8 @@ use work.mac_arbiter_decl.all;
 entity mac_arbiter is
 	generic(NSRC: positive);
 	port(
-		clk: in std_logic;
-		rst: in std_logic;
+		mac_clk: in std_logic;
+		rst_macclk: in std_logic;
 		src_tx_data_bus: in mac_arbiter_slv_array(NSRC-1 downto 0);
 		src_tx_valid_bus: in mac_arbiter_sl_array(NSRC-1 downto 0);
 		src_tx_last_bus: in mac_arbiter_sl_array(NSRC-1 downto 0);
@@ -35,17 +35,17 @@ end mac_arbiter;
 architecture rtl of mac_arbiter is
 
 	signal src: unsigned(3 downto 0); -- Up to sixteen ports...
-	signal sel: integer range 1 to NSRC - 1 := 0;
+	signal sel: integer range 0 to NSRC-1;
 	signal busy: std_logic;
 
 begin
 
 	sel <= to_integer(src);
 
-	process(clk)
+	process(mac_clk)
 	begin
-		if rising_edge(clk) then
-			if rst = '1' then
+		if rising_edge(mac_clk) then
+			if rst_macclk = '1' then
 				busy <= '0';
 				src <= "0000";
 			elsif busy = '0' then
