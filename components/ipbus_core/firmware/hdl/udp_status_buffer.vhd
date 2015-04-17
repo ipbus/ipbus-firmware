@@ -13,14 +13,14 @@ entity udp_status_buffer is
   );
   port (
     mac_clk: in std_logic;
-    rst_macclk: in std_logic;
+    rst_macclk_reg: in std_logic;
     rst_ipb_125: in std_logic;
     rx_reset: in std_logic;
     ipbus_in_hdr: in std_logic_vector(31 downto 0);
     ipbus_out_hdr: in std_logic_vector(31 downto 0);
     ipbus_out_valid: in std_logic;
-    mac_rx_error: in std_logic;
-    mac_rx_last: in std_logic;
+    my_rx_error: in std_logic;
+    my_rx_last: in std_logic;
     mac_tx_error: in std_logic;
     mac_tx_last: in std_logic;
     pkt_broadcast: in std_logic;
@@ -29,10 +29,10 @@ entity udp_status_buffer is
     pkt_drop_payload: in std_logic;
     pkt_drop_ping: in std_logic;
     pkt_drop_rarp: in std_logic;
-    pkt_drop_reliable: in std_logic;
     pkt_drop_resend: in std_logic;
     pkt_drop_status: in std_logic;
     pkt_rcvd: in std_logic;
+    reliable_packet: in std_logic;
     req_not_found: in std_logic;
     rx_ram_sent: in std_logic;
     rx_req_send_125: in std_logic;
@@ -52,6 +52,7 @@ architecture rtl of udp_status_buffer is
   signal tick: integer range 0 to 3;
   signal ready, async_event: std_logic;
   signal async_data: std_logic_vector(4 downto 0);
+  signal rst_macclk_sig: std_logic;
 
 begin
 
@@ -60,6 +61,18 @@ With tick select status_block <=
   ipbus_in when 2,
   ipbus_out when 3,
   header when Others;
+
+-- register reset...
+	rst_macclk_block: process(mac_clk)
+	begin
+		if rising_edge(mac_clk) then
+			rst_macclk_sig <= rst_macclk_reg
+-- pragma translate_off
+			after 4 ns
+-- pragma translate_on
+			;
+		end if;
+	end process;
 
 select_block:  process (mac_clk)
   begin
@@ -84,7 +97,7 @@ header_block:  process (mac_clk)
   variable next_pkt_id_int, bufsize, nbuf: unsigned(15 downto 0);
   begin
     if rising_edge(mac_clk) then
-      if rst_macclk = '1' then
+      if rst_macclk_sig = '1' then
         bufsize := to_unsigned((2**ADDRWIDTH) - 8, 16);
         nbuf := to_unsigned(2**BUFWIDTH, 16);
         next_pkt_id_int := to_unsigned(1, 16);
@@ -95,7 +108,7 @@ header_block:  process (mac_clk)
         after 4 ns
 -- pragma translate_on
         ;
-      elsif pkt_rcvd = '1' and pkt_drop_reliable = '0' then
+      elsif pkt_rcvd = '1' and reliable_packet = '1' then
         if next_pkt_id_int = x"FFFF" then
 	  next_pkt_id_int := to_unsigned(1, 16);
 	else
@@ -124,7 +137,7 @@ history_block:  process (mac_clk)
   variable payload_status_resend: std_logic_vector(2 downto 0);
   begin
     if rising_edge(mac_clk) then
-      if rst_macclk = '1' then
+      if rst_macclk_sig = '1' then
 	event_pending := '0';
 	async_pending := '0';
         history <= (Others => '0')
@@ -139,7 +152,7 @@ history_block:  process (mac_clk)
         new_event := '1';
 	event_data := x"01";
       end if;
-      if mac_rx_last = '1' then
+      if my_rx_last = '1' then
         rarp_arp_ping_ipbus := pkt_drop_rarp & pkt_drop_arp & 
 	pkt_drop_ping & pkt_drop_ipbus;
 	payload_status_resend := pkt_drop_payload & pkt_drop_status & 
@@ -167,7 +180,7 @@ history_block:  process (mac_clk)
 	      event_data := x"0F";
 	    end if;
         end case;
-        if mac_rx_error = '1' then
+        if my_rx_error = '1' then
 	  event_data(7 downto 4) := x"8";
 	end if;
 	event_pending := '1';
@@ -215,7 +228,7 @@ async_history_block: process(mac_clk)
   variable event: std_logic_vector(4 downto 0);
   begin
     if rising_edge(mac_clk) then
-      if rst_macclk = '1' then
+      if rst_macclk_sig = '1' then
 	send := '0';
 	sent := '0';
 	written := '0';
@@ -283,7 +296,7 @@ async_history_block: process(mac_clk)
 ipbus_in_block:  process (mac_clk)
   begin
     if rising_edge(mac_clk) then
-      if rst_macclk = '1' then
+      if rst_macclk_sig = '1' then
         ipbus_in <= (Others => '0')
 -- pragma translate_off
         after 4 ns
@@ -303,7 +316,7 @@ ipbus_in_block:  process (mac_clk)
 ipbus_out_block:  process (mac_clk)
   begin
     if rising_edge(mac_clk) then
-      if rst_macclk = '1' then
+      if rst_macclk_sig = '1' then
         ipbus_out <= (Others => '0')
 -- pragma translate_off
         after 4 ns

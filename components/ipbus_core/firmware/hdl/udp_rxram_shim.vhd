@@ -10,7 +10,7 @@ ENTITY udp_rxram_shim IS
   );
   port (
     mac_clk: in std_logic;
-    rst_macclk: in std_logic;
+    rst_macclk_reg: in std_logic;
 --
     rxram_end_addr: in std_logic_vector(12 downto 0);
     rxram_send: in std_logic;
@@ -38,7 +38,7 @@ begin
 input_block: process (mac_clk)
   begin
     if rising_edge(mac_clk) then
-      if rst_macclk = '1' then
+      if rst_macclk_reg = '1' then
 	end_address_buf <= (Others => (Others => '0'));
       elsif rxram_send = '1' then
 	end_address_buf(to_integer(unsigned(rxram_write_buf))) <= rxram_end_addr;

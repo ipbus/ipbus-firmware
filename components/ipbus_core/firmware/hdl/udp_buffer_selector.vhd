@@ -10,7 +10,7 @@ ENTITY udp_buffer_selector IS
   );
   port (
     mac_clk: in std_logic;
-    rst_macclk: in std_logic;
+    rst_macclk_reg: in std_logic;
 --
     written: in std_logic;
     we: in std_logic;
@@ -34,6 +34,7 @@ architecture simple of udp_buffer_selector is
   signal free, clean, send_pending: std_logic_vector(2**BUFWIDTH - 1 downto 0);
   signal send_sig, write_sig: unsigned(BUFWIDTH - 1 downto 0);
   signal sending, busy_sig: std_logic;
+  signal rst_macclk_sig: std_logic;
 
 begin
 
@@ -42,11 +43,23 @@ begin
   busy <= busy_sig;
   clean_buf <= clean;
 
+-- register reset...
+	rst_macclk_block: process(mac_clk)
+	begin
+		if rising_edge(mac_clk) then
+			rst_macclk_sig <= rst_macclk_reg
+-- pragma translate_off
+			after 4 ns
+-- pragma translate_on
+			;
+		end if;
+	end process;
+
 free_block: process (mac_clk)
   variable free_i: std_logic_vector(2**BUFWIDTH - 1 downto 0);
   begin
     if rising_edge(mac_clk) then
-      if rst_macclk = '1' then
+      if rst_macclk_sig = '1' then
 	free_i := (Others => '1');
       else
 	if written = '1' then
@@ -71,7 +84,7 @@ clean_block: process (mac_clk)
   variable clean_i: std_logic_vector(2**BUFWIDTH - 1 downto 0);
   begin
     if rising_edge(mac_clk) then
-      if rst_macclk = '1' then
+      if rst_macclk_sig = '1' then
 	clean_i := (Others => '0');
       else
         if written = '1' then
@@ -92,7 +105,7 @@ send_pending_block: process (mac_clk)
   variable send_pending_i: std_logic_vector(2**BUFWIDTH - 1 downto 0);
   begin
     if rising_edge(mac_clk) then
-      if rst_macclk = '1' then
+      if rst_macclk_sig = '1' then
 	send_pending_i := (Others => '0');
       else
         if written = '1' then
@@ -117,7 +130,7 @@ busy_block: process (mac_clk)
   variable busy_i: std_logic;
   begin
     if rising_edge(mac_clk) then
-      if rst_macclk = '1' then
+      if rst_macclk_sig = '1' then
 	busy_i := '1';
       else
 	if busy_i = '1' and free(to_integer(write_sig)) = '1' then
@@ -139,7 +152,7 @@ req_send_block: process (mac_clk)
   begin
     if rising_edge(mac_clk) then
       req_send_i := '0';
-      if rst_macclk = '1' then
+      if rst_macclk_sig = '1' then
 	sending_i := '0';
       else
 	if sending = '0' and send_pending(to_integer(send_sig)) = '1' then
@@ -166,7 +179,7 @@ write_block: process (mac_clk)
   variable write_i: unsigned(BUFWIDTH - 1 downto 0);
   begin
     if rising_edge(mac_clk) then
-      if rst_macclk = '1' then
+      if rst_macclk_sig = '1' then
 	write_i := (Others => '0');
       else
 	if busy_sig = '1' and free(to_integer(write_sig)) = '0' then
@@ -189,7 +202,7 @@ send_block: process (mac_clk)
   variable send_i: unsigned(BUFWIDTH - 1 downto 0);
   begin
     if rising_edge(mac_clk) then
-      if rst_macclk = '1' then
+      if rst_macclk_sig = '1' then
 	send_i := (Others => '0');
       else
 	if sending = '0' and send_pending(to_integer(send_sig)) = '0' then

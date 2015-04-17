@@ -10,10 +10,10 @@ entity udp_build_payload is
   port (
     mac_clk: in std_logic;
     rx_reset: in std_logic;
-    mac_rx_data: in std_logic_vector(7 downto 0);
-    mac_rx_valid: in std_logic;
-    mac_rx_last: in std_logic;
-    mac_rx_error: in std_logic;
+    my_rx_data: in std_logic_vector(7 downto 0);
+    my_rx_valid: in std_logic;
+    my_rx_last: in std_logic;
+    my_rx_error: in std_logic;
     pkt_drop_payload: in std_logic;
     pkt_byteswap: in std_logic;
     outbyte: in std_logic_vector(7 downto 0);
@@ -32,7 +32,7 @@ end udp_build_payload;
 
 architecture rtl of udp_build_payload is
 
-  signal payload_we_sig, set_addr, send_pending: std_logic;
+  signal payload_we_sig, set_addr, send_pending, good_packet: std_logic;
   signal send_buf, load_buf, low_addr, next_low, byteswap: std_logic;
   signal buf_to_load: std_logic_vector(15 downto 0);
   signal address, addr_to_set, next_addr: unsigned(12 downto 0);
@@ -42,6 +42,8 @@ begin
 
   payload_we <= payload_we_sig;
   payload_data <= payload_data_sig;
+
+  good_packet <= send_pending or not pkt_drop_payload;
 
   With byteswap select payload_addr <=
   std_logic_vector(address(12 downto 2) & not address(1 downto 0)) when '1',
@@ -59,8 +61,8 @@ send_packet:  process (mac_clk)
       case state is
         when 0 =>
 	  send_i := '0';
-	  if mac_rx_last = '1' and pkt_drop_payload = '0' and 
-	  mac_rx_error = '0' then
+	  if my_rx_last = '1' and good_packet = '1' and 
+	  my_rx_error = '0' then
 	    send_pending_i := '1';
 	    next_state := 1;
 	  else
@@ -113,12 +115,12 @@ set_address_block:  process(mac_clk)
 	set_addr_int := '1';
 	addr_to_set_int := to_unsigned(12, 6);
 	cksum_pending := '0';
-      elsif pkt_drop_payload = '0' then
-        if mac_rx_last = '1' then
+      elsif good_packet = '1' then
+        if my_rx_last = '1' then
 	  set_addr_int := '1';
 	  addr_to_set_int := to_unsigned(4, 6);
 	  cksum_pending := '1';
-	elsif mac_rx_valid = '1' and low_addr = '1' then
+	elsif my_rx_valid = '1' and low_addr = '1' then
 -- Because address is buffered this logic needs to switch a byte early...
 -- But don't forget we're offset by 4 + 2 bytes for payload word alignment!
           case to_integer(address(5 downto 0)) is
@@ -195,13 +197,13 @@ build_packet:  process(mac_clk)
 	cksum_pending := '0';
 	payload_len := (Others => '0');
 	buf_to_load_int := (Others => '0');
-      elsif pkt_drop_payload = '0' then
-        payload_we_i := mac_rx_valid or cksum_pending;
-	if mac_rx_last = '1' then
+      elsif good_packet = '1' then
+        payload_we_i := my_rx_valid or cksum_pending;
+	if my_rx_last = '1' then
 	  load_buf_int := '1';
 	  send_buf_int := '1';
 	  cksum_pending := '1';
-	elsif mac_rx_valid = '1' and low_addr = '1' then
+	elsif my_rx_valid = '1' and low_addr = '1' then
 -- Because address is buffered this logic needs to switch a byte early...
 -- But don't forget we're offset by 4 + 2 bytes for payload word alignment!
           case to_integer(address(5 downto 0)) is
@@ -294,7 +296,7 @@ do_cksum:  process(mac_clk)
 	cksum_int := '1';
 	int_data_int := (Others => '0');
 	payload_len := (Others => '0');
-      elsif mac_rx_valid = '1' and pkt_drop_payload = '0' and low_addr = '1' then
+      elsif my_rx_valid = '1' and good_packet = '1' and low_addr = '1' then
 -- Because address is buffered this logic needs to switch a byte early...
 -- But don't forget we're offset by 4 + 2 bytes for payload word alignment!
         case to_integer(address(5 downto 0)) is
@@ -308,10 +310,10 @@ do_cksum:  process(mac_clk)
 	    do_sum_int := '0';
 -- RX IP length => ignore for cksum, write zeros, capture packet length
           when 21 =>
-	    payload_len(15 downto 6) := "00" & mac_rx_data;
+	    payload_len(15 downto 6) := "00" & my_rx_data;
 -- RX IP length => ignore for cksum, write zeros, capture packet length
           when 22 =>
-	    payload_len(5 downto 0) := mac_rx_data(7 downto 2);
+	    payload_len(5 downto 0) := my_rx_data(7 downto 2);
 	    do_sum_int := '1';
           when 28 =>
 	    do_sum_int := '0';
@@ -394,11 +396,11 @@ next_addr_block:  process(mac_clk)
         addr_to_set_buf := addr_to_set;
 	set_addr_buf := '1';
       end if;
-      if rx_reset = '1' or mac_rx_valid = '1' or send_pending = '1' then
+      if rx_reset = '1' or my_rx_valid = '1' or send_pending = '1' then
         if set_addr_buf = '1' then
           addr_int := addr_to_set_buf;
 	  set_addr_buf := '0';
-	elsif pkt_drop_payload = '0' then
+	elsif good_packet = '1' then
           addr_int := next_addr_int;
 	end if;
       end if;
@@ -430,12 +432,12 @@ address_block:  process(mac_clk)
         addr_to_set_buf := addr_to_set;
 	set_addr_buf := '1';
       end if;
-      if rx_reset = '1' or mac_rx_valid = '1' or send_pending = '1' then
+      if rx_reset = '1' or my_rx_valid = '1' or send_pending = '1' then
         if set_addr_buf = '1' then
           addr_int := addr_to_set_buf;
 	  low_addr_i := '1';
 	  set_addr_buf := '0';
-	elsif pkt_drop_payload = '0' then
+	elsif good_packet = '1' then
           addr_int := next_addr;
 	  low_addr_i := next_low;
 	end if;
@@ -460,7 +462,7 @@ byteswap_block:  process(mac_clk)
       if set_addr = '1' then
  	set_addr_buf := '1';
       end if;
-      if rx_reset = '1' or mac_rx_valid = '1' or send_pending = '1' then
+      if rx_reset = '1' or my_rx_valid = '1' or send_pending = '1' then
         if set_addr_buf = '1' then
 	  byteswap_int := '0';
 	  set_addr_buf := '0';
@@ -485,11 +487,11 @@ write_data:  process(mac_clk)
       if load_buf = '1' then
         shift_buf := buf_to_load;
       end if;
-      if (mac_rx_valid = '1' or send_pending = '1') and pkt_drop_payload = '0' then
+      if (my_rx_valid = '1' or send_pending = '1') and good_packet = '1' then
 	if send_buf = '1' then
 	  data_to_send := shift_buf(15 downto 8);
 	else
-	  data_to_send := mac_rx_data;
+	  data_to_send := my_rx_data;
 	end if;
 	shift_buf := shift_buf(7 downto 0) & x"00";
       end if;

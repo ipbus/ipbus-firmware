@@ -14,8 +14,9 @@ entity udp_packet_parser is
     mac_clk: in std_logic;
     rx_reset: in std_logic;
     enable_125: std_logic;
-    mac_rx_data: in std_logic_vector(7 downto 0);
-    mac_rx_valid: in std_logic;
+    my_rx_data: in std_logic_vector(7 downto 0);
+    my_rx_last: in std_logic;
+    my_rx_valid: in std_logic;
     MAC_addr: in std_logic_vector(47 downto 0);
     My_IP_addr: in std_logic_vector(31 downto 0);
     next_pkt_id: in std_logic_vector(15 downto 0);
@@ -26,9 +27,10 @@ entity udp_packet_parser is
     pkt_drop_payload: out std_logic;
     pkt_drop_ping: out std_logic;
     pkt_drop_rarp: out std_logic;
-    pkt_drop_reliable: out std_logic;
     pkt_drop_resend: out std_logic;
-    pkt_drop_status: out std_logic
+    pkt_drop_status: out std_logic;
+    pkt_runt: out std_logic;
+    reliable_packet: out std_logic
   );
 end udp_packet_parser;
 
@@ -42,13 +44,20 @@ architecture v3 of udp_packet_parser is
 
 begin
 
-  pkt_drop_arp <= pkt_drop_arp_sig or SECONDARYPORT;
-  pkt_drop_rarp <= pkt_drop_rarp_sig or SECONDARYPORT;
-  pkt_drop_ping <= pkt_drop_ping_sig or SECONDARYPORT;
+  pkt_drop_rarp <= pkt_drop_rarp_sig;
   pkt_drop_ipbus <= pkt_drop_ipbus_sig;
   pkt_drop_payload <= pkt_drop_payload_sig and pkt_payload_drop_sig;
-  pkt_drop_reliable <= pkt_drop_reliable_sig and pkt_reliable_drop_sig;
   pkt_byteswap <= pkt_drop_payload_sig;
+
+secondary_mode: if SECONDARYPORT = '1' generate
+-- Don't respond to arp or ping (but do capture rarp...)
+  pkt_drop_arp <= '1';
+  pkt_drop_ping <= '1';
+end generate secondary_mode;
+
+primary_mode: if SECONDARYPORT = '0' generate
+  pkt_drop_arp <= pkt_drop_arp_sig;
+  pkt_drop_ping <= pkt_drop_ping_sig;
 
 -- ARP:
 -- Ethernet DST_MAC(6), SRC_MAC(6), Ether_Type = x"0806"
@@ -72,9 +81,11 @@ arp:  process (mac_clk)
         "1111" & "111111" & "0000";
         pkt_data := x"0806" & x"0001" & x"0800" & x"0604" & x"0001" & My_IP_addr;
         pkt_drop := not enable_125;
-      elsif mac_rx_valid = '1' then
+      elsif my_rx_last = '1' then
+        pkt_drop := '1';
+      elsif my_rx_valid = '1' then
         if pkt_mask(41) = '0' then
-          if pkt_data(111 downto 104) /= mac_rx_data then
+          if pkt_data(111 downto 104) /= my_rx_data then
             pkt_drop := '1';
           end if;
           pkt_data := pkt_data(103 downto 0) & x"00";
@@ -88,6 +99,54 @@ arp:  process (mac_clk)
       ;
     end if;
   end process;
+
+-- Ping:
+-- Ethernet
+-- IP VERS, HL, TOS
+-- IP LEN
+-- IP ID
+-- IP FLAG-FRAG
+-- IP TTL, PROTO = x"01"
+-- IP CKSUM
+-- IP SPA(4)
+-- IP DPA(4)
+-- ICMP TYPE = "08", CODE = "00"
+-- ICMP CKSUM
+-- ICMP data...
+ping:  process (mac_clk)
+  variable pkt_data: std_logic_vector(23 downto 0);
+  variable pkt_mask: std_logic_vector(35 downto 0);
+  variable pkt_drop: std_logic;
+  begin
+    if rising_edge(mac_clk) then
+      if rx_reset = '1' then
+        pkt_mask := "111111" & "111111" & "11" &
+        "11" & "11" & "11" & "11" & "1" & "0" & "11" &
+        "1111" & "1111" & "00";
+        pkt_data := x"01" & x"0800";
+        pkt_drop := not enable_125;
+      elsif my_rx_last = '1' then
+        pkt_drop := '1';
+      elsif my_rx_valid = '1' then
+        if pkt_drop_ip_sig = '1' then
+	  pkt_drop := '1';
+        elsif pkt_mask(35) = '0' then
+          if pkt_data(23 downto 16) /= my_rx_data then
+            pkt_drop := '1';
+          end if;
+          pkt_data := pkt_data(15 downto 0) & x"00";
+        end if;
+        pkt_mask := pkt_mask(34 downto 0) & '1';
+      end if;
+      pkt_drop_ping_sig <= pkt_drop
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+    end if;
+  end process;
+
+end generate primary_mode;
 
 -- RARP:
 -- Ethernet DST_MAC(6), SRC_MAC(6), Ether_Type = x"8035"
@@ -111,9 +170,11 @@ rarp:  process (mac_clk)
         "1111" & "000000";
         pkt_data := x"8035" & x"0001" & x"0800" & x"0604" & x"0004" & MAC_addr;
         pkt_drop := not enable_125;
-      elsif mac_rx_valid = '1' then
+      elsif my_rx_last = '1' then
+        pkt_drop := '1';
+      elsif my_rx_valid = '1' then
         if pkt_mask(37) = '0' then
-          if pkt_data(127 downto 120) /= mac_rx_data then
+          if pkt_data(127 downto 120) /= my_rx_data then
             pkt_drop := '1';
           end if;
           pkt_data := pkt_data(119 downto 0) & x"00";
@@ -154,9 +215,11 @@ ip_pkt:  process (mac_clk)
         pkt_data := MAC_addr & x"0800" & x"4500" & x"0000" & My_IP_addr;
 	msk_data := (Others => '1');
         pkt_drop := not enable_125;
-      elsif mac_rx_valid = '1' then
+      elsif my_rx_last = '1' then
+        pkt_drop := '1';
+      elsif my_rx_valid = '1' then
         if pkt_mask(33) = '0' then
-          if pkt_data(127 downto 120) /= (mac_rx_data and msk_data) then
+          if pkt_data(127 downto 120) /= (my_rx_data and msk_data) then
             pkt_drop := '1';
           end if;
           pkt_data := pkt_data(119 downto 0) & x"00";
@@ -170,50 +233,6 @@ ip_pkt:  process (mac_clk)
         pkt_mask := pkt_mask(32 downto 0) & '1';
       end if;
       pkt_drop_ip_sig <= pkt_drop
--- pragma translate_off
-      after 4 ns
--- pragma translate_on
-      ;
-    end if;
-  end process;
-
--- Ping:
--- Ethernet
--- IP VERS, HL, TOS
--- IP LEN
--- IP ID
--- IP FLAG-FRAG
--- IP TTL, PROTO = x"01"
--- IP CKSUM
--- IP SPA(4)
--- IP DPA(4)
--- ICMP TYPE = "08", CODE = "00"
--- ICMP CKSUM
--- ICMP data...
-ping:  process (mac_clk)
-  variable pkt_data: std_logic_vector(23 downto 0);
-  variable pkt_mask: std_logic_vector(35 downto 0);
-  variable pkt_drop: std_logic;
-  begin
-    if rising_edge(mac_clk) then
-      if rx_reset = '1' then
-        pkt_mask := "111111" & "111111" & "11" &
-        "11" & "11" & "11" & "11" & "1" & "0" & "11" &
-        "1111" & "1111" & "00";
-        pkt_data := x"01" & x"0800";
-        pkt_drop := not enable_125;
-      elsif mac_rx_valid = '1' then
-        if pkt_drop_ip_sig = '1' then
-	  pkt_drop := '1';
-        elsif pkt_mask(35) = '0' then
-          if pkt_data(23 downto 16) /= mac_rx_data then
-            pkt_drop := '1';
-          end if;
-          pkt_data := pkt_data(15 downto 0) & x"00";
-        end if;
-        pkt_mask := pkt_mask(34 downto 0) & '1';
-      end if;
-      pkt_drop_ping_sig <= pkt_drop
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
@@ -245,11 +264,13 @@ ipbus_pkt:  process (mac_clk)
         "1111" & "1111" & "11" & "00";
         pkt_data := x"11" & IPBUSPORT;
         pkt_drop := not enable_125;
-      elsif mac_rx_valid = '1' then
+      elsif my_rx_last = '1' then
+        pkt_drop := '1';
+      elsif my_rx_valid = '1' then
         if pkt_drop_ip_sig = '1' then
 	  pkt_drop := '1';
         elsif pkt_mask(37) = '0' then
-          if pkt_data(23 downto 16) /= mac_rx_data then
+          if pkt_data(23 downto 16) /= my_rx_data then
             pkt_drop := '1';
           end if;
           pkt_data := pkt_data(15 downto 0) & x"00";
@@ -265,6 +286,7 @@ ipbus_pkt:  process (mac_clk)
   end process;
 
 -- IPbus header parsers (switch 1 tick earlier...)
+-- Also kludge a runt packet signal
 ipbus_mask: process(mac_clk)
   variable pkt_mask: std_logic_vector(44 downto 0);
   variable last_mask, header_sel: std_logic;
@@ -276,7 +298,7 @@ ipbus_mask: process(mac_clk)
         "1111" & "1111" & "11" & "1" & "00" & "11" & "0000";
         last_mask := '1';
 	header_sel := '1';
-      elsif mac_rx_valid = '1' then
+      elsif my_rx_valid = '1' then
         if pkt_mask(44) = '1' and last_mask = '0' then
           header_sel := '0';
         end if;
@@ -289,6 +311,11 @@ ipbus_mask: process(mac_clk)
 -- pragma translate_on
       ;
       ipbus_hdr_mask <= last_mask or header_sel
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+      pkt_runt <= header_sel
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
@@ -310,15 +337,18 @@ bigendian:  process (mac_clk)
         unreliable_data := x"200000F0";
         pkt_drop_reliable_i := not enable_125;
         pkt_drop_unreliable := not enable_125;
-      elsif mac_rx_valid = '1' then
+      elsif my_rx_last = '1' then
+	pkt_drop_reliable_i := '1';
+	pkt_drop_unreliable := '1';
+      elsif my_rx_valid = '1' then
         if pkt_drop_ipbus_sig = '1' then
 	  pkt_drop_reliable_i := '1';
 	  pkt_drop_unreliable := '1';
         elsif ipbus_hdr_mask = '0' then
-          if reliable_data(31 downto 24) /= mac_rx_data then
+          if reliable_data(31 downto 24) /= my_rx_data then
             pkt_drop_reliable_i := '1';
           end if;
-          if unreliable_data(31 downto 24) /= mac_rx_data then
+          if unreliable_data(31 downto 24) /= my_rx_data then
             pkt_drop_unreliable := '1';
           end if;
           reliable_data := reliable_data(23 downto 0) & x"00";
@@ -353,15 +383,18 @@ littleendian:  process (mac_clk)
         unreliable_data := x"F0000020";
         pkt_drop_reliable_i := not enable_125;
         pkt_drop_unreliable := not enable_125;
-      elsif mac_rx_valid = '1' then
+      elsif my_rx_last = '1' then
+	pkt_drop_reliable_i := '1';
+	pkt_drop_unreliable := '1';
+      elsif my_rx_valid = '1' then
         if pkt_drop_ipbus_sig = '1' then
 	  pkt_drop_reliable_i := '1';
 	  pkt_drop_unreliable := '1';
         elsif ipbus_hdr_mask = '0' then
-          if reliable_data(31 downto 24) /= mac_rx_data then
+          if reliable_data(31 downto 24) /= my_rx_data then
             pkt_drop_reliable_i := '1';
           end if;
-          if unreliable_data(31 downto 24) /= mac_rx_data then
+          if unreliable_data(31 downto 24) /= my_rx_data then
             pkt_drop_unreliable := '1';
           end if;
           reliable_data := reliable_data(23 downto 0) & x"00";
@@ -381,6 +414,24 @@ littleendian:  process (mac_clk)
     end if;
   end process;
 
+-- Reliable payload signal
+reliable_payload: process(mac_clk)
+  variable IsReliable: std_logic;
+  Begin
+    if rising_edge(mac_clk) then
+      If rx_reset = '1' then
+        IsReliable := '0';
+      ElsIf my_rx_last = '1' then
+        IsReliable := not (pkt_drop_reliable_sig and pkt_reliable_drop_sig);
+      End If;
+      reliable_packet <= IsReliable
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+    end if;
+  end process reliable_payload;
+
 -- UDP status request:
 -- UDP LEN (72 = x"48")
 -- IPBus packet header x"200000F1"
@@ -392,11 +443,13 @@ status_request:  process (mac_clk)
       if rx_reset = '1' then
         pkt_data := x"0048200000F1";
         pkt_drop := not enable_125;
-      elsif mac_rx_valid = '1' then
+      elsif my_rx_last = '1' then
+        pkt_drop := '1';
+      elsif my_rx_valid = '1' then
         if pkt_drop_ipbus_sig = '1' then
 	  pkt_drop := '1';
         elsif ipbus_status_mask = '0' then
-          if pkt_data(47 downto 40) /= mac_rx_data then
+          if pkt_data(47 downto 40) /= my_rx_data then
             pkt_drop := '1';
           end if;
           pkt_data := pkt_data(39 downto 0) & x"00";
@@ -422,12 +475,14 @@ resend:  process (mac_clk)
         pkt_data := x"20F2";
 	pkt_mask := "0110";
         pkt_drop := not enable_125;
-      elsif mac_rx_valid = '1' then
+      elsif my_rx_last = '1' then
+        pkt_drop := '1';
+      elsif my_rx_valid = '1' then
         if pkt_drop_ipbus_sig = '1' then
 	  pkt_drop := '1';
         elsif ipbus_hdr_mask = '0' then
 	  if pkt_mask(3) = '0' then
-	    if pkt_data(15 downto 8) /= mac_rx_data then
+	    if pkt_data(15 downto 8) /= my_rx_data then
               pkt_drop := '1';
             end if;
             pkt_data := pkt_data(7 downto 0) & x"00";
@@ -451,8 +506,8 @@ broadcast:  process (mac_clk)
       if rx_reset = '1' then
 	pkt_mask := (Others => '0');
         broadcast_int := '1';
-      elsif mac_rx_valid = '1' and pkt_mask(5) = '0' then
-        if mac_rx_data /= x"FF" then
+      elsif my_rx_valid = '1' and pkt_mask(5) = '0' then
+        if my_rx_data /= x"FF" then
           broadcast_int := '0';
         end if;
         pkt_mask := pkt_mask(4 downto 0) & '1';

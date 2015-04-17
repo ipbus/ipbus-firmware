@@ -10,10 +10,10 @@ entity udp_build_ping is
   port (
     mac_clk: in std_logic;
     rx_reset: in std_logic;
-    mac_rx_data: in std_logic_vector(7 downto 0);
-    mac_rx_valid: in std_logic;
-    mac_rx_last: in std_logic;
-    mac_rx_error: in std_logic;
+    my_rx_data: in std_logic_vector(7 downto 0);
+    my_rx_valid: in std_logic;
+    my_rx_last: in std_logic;
+    my_rx_error: in std_logic;
     pkt_drop_ping: in std_logic;
     outbyte: in std_logic_vector(7 downto 0);
     ping_data: out std_logic_vector(7 downto 0);
@@ -30,7 +30,7 @@ end udp_build_ping;
 
 architecture rtl of udp_build_ping is
 
-  signal ping_we_sig, set_addr, send_pending: std_logic;
+  signal ping_we_sig, set_addr, send_pending, good_packet: std_logic;
   signal send_buf, load_buf, low_addr: std_logic;
   signal buf_to_load: std_logic_vector(15 downto 0);
   signal address, addr_to_set: unsigned(12 downto 0);
@@ -39,6 +39,8 @@ begin
 
   ping_we <= ping_we_sig;
   ping_addr <= std_logic_vector(address);
+
+  good_packet <= send_pending or not pkt_drop_ping;
 
 send_packet:  process (mac_clk)
   variable send_pending_i, send_i, last_we: std_logic;
@@ -54,8 +56,8 @@ send_packet:  process (mac_clk)
         when 0 =>
 	  send_i := '0';
 	  end_addr_i := (Others => '0');
-	  if mac_rx_last = '1' and pkt_drop_ping = '0' and 
-	  mac_rx_error = '0' then
+	  if my_rx_last = '1' and good_packet = '1' and 
+	  my_rx_error = '0' then
 	    send_pending_i := '1';
 	    next_state := 1;
 	  else
@@ -111,12 +113,12 @@ address_block:  process (mac_clk)
       if (rx_reset = '1') then
 	set_addr_int := '1';
 	addr_to_set_int := to_unsigned(6, 6);
-      elsif pkt_drop_ping = '0' then
-	if mac_rx_last = '1' then
+      elsif good_packet = '1' then
+	if my_rx_last = '1' then
 -- ICMP cksum...
 	  set_addr_int := '1';
 	  addr_to_set_int := to_unsigned(36, 6);
-	elsif mac_rx_valid = '1' and low_addr = '1' then
+	elsif my_rx_valid = '1' and low_addr = '1' then
 -- Because address is buffered this logic needs to switch a byte early...
           case to_integer(address(5 downto 0)) is
 -- RX Ethernet Dest MAC bytes 0 to 5 => TX copy to Source MAC bytes 6 to 11...
@@ -177,14 +179,14 @@ build_packet:  process (mac_clk)
 	ping_we_i := '0';
 	buf_to_load_int := (Others => '0');
 	cksum_pending := '0';
-      elsif pkt_drop_ping = '0' then
-        ping_we_i := mac_rx_valid or cksum_pending;
-	if mac_rx_last = '1' then
+      elsif good_packet = '1' then
+        ping_we_i := my_rx_valid or cksum_pending;
+	if my_rx_last = '1' then
 -- End of packet, prepare to send cksum
 	  load_buf_int := '1';
 	  send_buf_int := '1';
 	  cksum_pending := '1';
-	elsif mac_rx_valid = '1' and low_addr = '1' then
+	elsif my_rx_valid = '1' and low_addr = '1' then
 -- Because address is buffered this logic needs to switch a byte early...
           case to_integer(address(5 downto 0)) is
 -- RX ICMP type code bytes 34 to 35 => TX write reply bytes 34 to 35...
@@ -249,7 +251,7 @@ do_cksum:  process (mac_clk)
 	clr_sum_int := '1';
 	int_valid_int := '0';
 	int_data_int := (Others => '0');
-      elsif mac_rx_valid = '1' and pkt_drop_ping = '0' and low_addr = '1' then
+      elsif my_rx_valid = '1' and good_packet = '1' and low_addr = '1' then
 -- Because address is buffered this logic needs to switch a byte early...
         case to_integer(address(5 downto 0)) is
 -- RX ICMP type code bytes 34 to 35 => TX write reply bytes 34 to 35...
@@ -312,12 +314,12 @@ next_addr:  process(mac_clk)
         addr_to_set_buf := addr_to_set;
 	set_addr_buf := '1';
       end if;
-      if rx_reset = '1' or mac_rx_valid = '1' or send_pending = '1' then
+      if rx_reset = '1' or my_rx_valid = '1' or send_pending = '1' then
         if set_addr_buf = '1' then
           addr_int := addr_to_set_buf;
 	  low_addr_i := '1';
 	  set_addr_buf := '0';
-	elsif pkt_drop_ping = '0' then
+	elsif good_packet = '1' then
           addr_int := next_addr;
 	  low_addr_i := next_low;
 	end if;
@@ -350,11 +352,11 @@ write_data:  process(mac_clk)
       if load_buf = '1' then
         shift_buf := buf_to_load;
       end if;
-      if (mac_rx_valid = '1' or send_pending = '1') and pkt_drop_ping = '0' then
+      if (my_rx_valid = '1' or send_pending = '1') and good_packet = '1' then
 	if send_buf = '1' then
 	  data_to_send := shift_buf(15 downto 8);
 	else
-	  data_to_send := mac_rx_data;
+	  data_to_send := my_rx_data;
 	end if;
 	shift_buf := shift_buf(7 downto 0) & x"00";
       end if;

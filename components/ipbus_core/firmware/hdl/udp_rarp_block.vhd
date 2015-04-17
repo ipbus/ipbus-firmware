@@ -7,9 +7,13 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity udp_rarp_block is
+generic(
+-- Flag whether this instance ignores everything except IPBus traffic
+  SECONDARYPORT: std_logic := '0'
+);
   port (
     mac_clk: in std_logic;
-    rst_macclk: in std_logic;
+    rst_macclk_reg: in std_logic;
     enable_125: in std_logic;
     MAC_addr: in std_logic_vector(47 downto 0);
     rarp_mode: in std_logic;
@@ -27,11 +31,24 @@ architecture rtl of udp_rarp_block is
   signal address: unsigned(5 downto 0);
   signal rarp_req, tick: std_logic;
   signal rndm: std_logic_vector(4 downto 0);
+  signal rst_macclk_sig: std_logic;
 
 begin
 
   rarp_we <= rarp_we_sig;
   rarp_addr <= std_logic_vector("0000000" & address);
+
+-- register reset...
+	rst_macclk_block: process(mac_clk)
+	begin
+		if rising_edge(mac_clk) then
+			rst_macclk_sig <= rst_macclk_reg
+-- pragma translate_off
+			after 4 ns
+-- pragma translate_on
+			;
+		end if;
+	end process;
 
 send_packet:  process (mac_clk)
   variable last_we, send_i: std_logic;
@@ -70,39 +87,57 @@ send_packet:  process (mac_clk)
 -- THA(6)
 -- TPA(4)
 data_block:  process(mac_clk)
-  variable data_buffer: std_logic_vector(335 downto 0);
-  variable we_buffer: std_logic_vector(41 downto 0);
+  variable pkt_data: std_logic_vector(7 downto 0);
+  variable data_buffer: std_logic_vector(55 downto 0);
+  variable pkt_mask: std_logic_vector(41 downto 0);
+  variable filler: std_logic;
+  variable we: std_logic;
   begin
-    if rising_edge(mac_clk) then
-      if (rst_macclk = '1') then
-	we_buffer := (Others => '0');
-      elsif rarp_req = '1' then
-        data_buffer := x"FFFFFFFFFFFF" & MAC_addr & x"8035" & x"0001" &
-	x"0800" & x"06" & x"04" & x"0003" & MAC_addr & x"00000000" &
-	MAC_addr & x"00000000";
-	we_buffer := (Others => '1');
-      end if;
-      rarp_data <= data_buffer(335 downto 328)
+    If rising_edge(mac_clk) then
+      If rst_macclk_sig = '1' then
+	we := '0';
+      ElsIf rarp_req = '1' then
+        we := '1';
+	pkt_mask := "0000001111111101101101" &
+	"11111100001111110000";
+	filler := '1';
+      End If;
+      Case to_integer(address) is
+	When 5 | 21 | 31 =>
+	  data_buffer := MAC_addr & x"00";
+	  filler := '0';
+	When 11 =>
+	  data_buffer := x"80350108060403";
+	When 41 =>
+	  we := '0';
+	When Others =>
+      End Case;
+      If pkt_mask(41) = '1' then
+        pkt_data := data_buffer(55 downto 48);
+	data_buffer := data_buffer(47 downto 0) & x"00";
+      Else
+        pkt_data := (Others => filler);
+      End If;
+      pkt_mask := pkt_mask(40 downto 0) & '0';
+      rarp_data <= pkt_data
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
       ;
-      rarp_we_sig <= we_buffer(41)
+      rarp_we_sig <= we
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
       ;
-      data_buffer := data_buffer(327 downto 0) & x"00";
-      we_buffer := we_buffer(40 downto 0) & '0';
     end if;
-  end process;
+  end process data_block;
 
 addr_block:  process(mac_clk)
   variable addr_int, next_addr: unsigned(5 downto 0);
   variable counting: std_logic;
   begin
     if rising_edge(mac_clk) then
-      if rst_macclk = '1' then
+      if rst_macclk_sig = '1' then
 	next_addr := (Others => '0');
 	counting := '0';
       elsif rarp_req = '1' then
@@ -128,7 +163,7 @@ tick_counter:  process(mac_clk)
   variable tick_int: std_logic;
   begin
     if rising_edge(mac_clk) then
-      if (rst_macclk = '1') or (enable_125 = '0') then
+      if (rst_macclk_sig = '1') or (enable_125 = '0') then
         counter_int := (Others => '0');
 	tick_int := '0';
 -- tick goes at 8 Hz
@@ -157,7 +192,7 @@ random: process(mac_clk)
   variable x, y, t : std_logic_vector(15 downto 0);
   begin
     if rising_edge(mac_clk) then
-      if rst_macclk = '1' then
+      if rst_macclk_sig = '1' then
         x := MAC_addr(31 downto 16);
         y := MAC_addr(15 downto 0);
       elsif tick = '1' then
@@ -178,7 +213,7 @@ rarp_req_block: process(mac_clk)
   variable rarp_req_int: std_logic;
   begin
     if rising_edge(mac_clk) then
-      if (rst_macclk = '1') or (enable_125 = '0') then
+      if (rst_macclk_sig = '1') or (enable_125 = '0') then
         req_count := (Others => '0');
 -- initial delay from bottom of MAC address...
 	req_end := unsigned("000" & MAC_addr(1 downto 0) & "1");
@@ -190,7 +225,7 @@ rarp_req_block: process(mac_clk)
       elsif req_count = req_end then
         req_count := (Others => '0');
 	req_end := unsigned(rndm & "1");
-	rarp_req_int := RARP_mode;
+	rarp_req_int := RARP_mode and not SECONDARYPORT;
       elsif tick = '1' then
         req_count := req_count + 1;
 	rarp_req_int := '0';

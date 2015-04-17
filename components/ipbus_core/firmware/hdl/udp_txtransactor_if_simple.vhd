@@ -13,7 +13,7 @@ entity udp_txtransactor_if is
   );
   port (
     mac_clk: in std_logic;
-    rst_macclk: in std_logic;
+    rst_macclk_reg: in std_logic;
 --
     pkt_resend: in std_logic;
     resend_pkt_id: in std_logic_vector(15 downto 0);
@@ -42,7 +42,7 @@ begin
 pkt_id_block: process (mac_clk)
   begin
     if rising_edge(mac_clk) then
-      if rst_macclk = '1' then
+      if rst_macclk_reg = '1' then
 	pkt_id_buf <= (Others => (Others => '0'));
       elsif ipbus_out_valid = '1' then
 -- Take byte ordering into account and make packet ID big endian...

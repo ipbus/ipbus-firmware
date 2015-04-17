@@ -39,8 +39,10 @@ entity udp_rxram_mux is
     status_end_addr: in std_logic_vector(12 downto 0);
     status_send: in std_logic;
 --
-    mac_rx_valid: in std_logic;
+    my_rx_valid: in std_logic;
+    my_rx_last: in std_logic;
     rxram_busy: in std_logic;
+    pkt_runt: in std_logic;
 --
     dia: out std_logic_vector(7 downto 0);
     addra: out std_logic_vector(12 downto 0);
@@ -65,7 +67,7 @@ do_ram_ready:  process(mac_clk)
     if rising_edge(mac_clk) then
       if rx_reset = '1' or rarp_mode = '1' then
         ram_ready_int := '1';
-      elsif mac_rx_valid = '1' and rxram_busy = '1' then 
+      elsif my_rx_valid = '1' and rxram_busy = '1' then 
         ram_ready_int := '0';
       end if;
       if rxram_send_sig = '1' and ram_ready_int = '0' then
@@ -112,7 +114,7 @@ send_packet:  process(mac_clk)
       after 4 ns
 -- pragma translate_on
       ;
-      rxram_send_sig <= rxram_send_int
+      rxram_send_sig <= rxram_send_int and (rarp_mode or not pkt_runt)
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
@@ -123,31 +125,52 @@ send_packet:  process(mac_clk)
 build_packet:  process(mac_clk)
   variable dia_int: std_logic_vector(7 downto 0);
   variable addra_int: std_logic_vector(12 downto 0);
-  variable wea_int: std_logic;
+  variable wea_int, incoming: std_logic;
+  variable pkt_type: integer range 0 to 4;
   begin
     if rising_edge(mac_clk) then
-      if ram_ready = '1' then
-        if rarp_mode = '1' then
-          dia_int := rarp_data;
-	  addra_int := rarp_addr;
-	  wea_int := rarp_we;
-        elsif pkt_drop_arp = '0' then
-          dia_int := arp_data;
-	  addra_int := arp_addr;
-	  wea_int := arp_we;
+-- Remember packet type after rx_last...
+      if rx_reset = '1' then
+        incoming := '1';
+      elsif my_rx_last = '1' then
+        incoming := '0';
+      end if;
+      if rarp_mode = '1' then
+        pkt_type := 1;
+      elsif incoming = '1' then
+        if pkt_drop_arp = '0' then
+	  pkt_type := 2;
         elsif pkt_drop_ping = '0' then
-          dia_int := ping_data;
-	  addra_int := ping_addr;
-	  wea_int := ping_we;
+	  pkt_type := 3;
         elsif pkt_drop_status = '0' then
-          dia_int := status_data;
-	  addra_int := status_addr;
-	  wea_int := status_we;
+	  pkt_type := 4;
         else
+	  pkt_type := 0;
+        end if;
+      end if;
+      if ram_ready = '1' then
+        case pkt_type is
+          when 1 =>
+            dia_int := rarp_data;
+	    addra_int := rarp_addr;
+	    wea_int := rarp_we;
+          when 2 =>
+            dia_int := arp_data;
+	    addra_int := arp_addr;
+	    wea_int := arp_we;
+          when 3 =>
+            dia_int := ping_data;
+	    addra_int := ping_addr;
+	    wea_int := ping_we;
+          when 4 =>
+            dia_int := status_data;
+	    addra_int := status_addr;
+	    wea_int := status_we;
+        when Others =>
           dia_int := (Others => '0');
 	  addra_int := (Others => '0');
 	  wea_int := '0';
-        end if;
+        end case;
       else
         dia_int := (Others => '0');
 	addra_int := (Others => '0');

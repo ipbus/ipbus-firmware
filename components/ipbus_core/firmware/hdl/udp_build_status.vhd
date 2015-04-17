@@ -10,10 +10,10 @@ entity udp_build_status is
   port (
     mac_clk: in std_logic;
     rx_reset: in std_logic;
-    mac_rx_data: in std_logic_vector(7 downto 0);
-    mac_rx_valid: in std_logic;
-    mac_rx_last: in std_logic;
-    mac_rx_error: in std_logic;
+    my_rx_data: in std_logic_vector(7 downto 0);
+    my_rx_valid: in std_logic;
+    my_rx_last: in std_logic;
+    my_rx_error: in std_logic;
     pkt_drop_status: in std_logic;
     status_block: in std_logic_vector(127 downto 0);
     status_request: out std_logic;
@@ -54,7 +54,7 @@ send_packet:  process (mac_clk)
       after 4 ns
 -- pragma translate_on
       ;
-      send_pending <= mac_rx_last and not (pkt_drop_status or mac_rx_error)
+      send_pending <= my_rx_last and not (pkt_drop_status or my_rx_error)
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
@@ -65,7 +65,7 @@ send_packet:  process (mac_clk)
 good_packet_block:  process (mac_clk)
   begin
     if rising_edge(mac_clk) then
-      status_we <= mac_rx_valid and not pkt_drop_status
+      status_we <= my_rx_valid and not pkt_drop_status
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
@@ -96,7 +96,7 @@ address_block:  process (mac_clk)
       if (rx_reset = '1') then
 	set_addr_int := '1';
 	addr_to_set_int := to_unsigned(6, 7);
-      elsif (mac_rx_valid = '1') and (pkt_drop_status = '0') then
+      elsif (my_rx_valid = '1') and (pkt_drop_status = '0') then
 -- Because address is buffered this logic needs to switch a byte early...
         case to_integer(address) is
 -- RX Ethernet Dest MAC bytes 0 to 5 => TX copy to Source MAC bytes 6 to 11...
@@ -158,7 +158,7 @@ next_addr:  process(mac_clk)
         addr_to_set_buf := addr_to_set;
 	set_addr_buf := '1';
       end if;
-      if rx_reset = '1' or mac_rx_valid = '1' then
+      if rx_reset = '1' or my_rx_valid = '1' then
         if set_addr_buf = '1' then
           addr_int := addr_to_set_buf;
 	  set_addr_buf := '0';
@@ -183,7 +183,7 @@ load_data:  process (mac_clk)
         request_int := '0';
 	send_buf_int := '0';
 	next_load := '0';
-      elsif (mac_rx_valid = '1') and (pkt_drop_status = '0') then
+      elsif (my_rx_valid = '1') and (pkt_drop_status = '0') then
         load_buf_int := next_load;
 -- Because address is buffered this logic needs to switch a byte early...
         case to_integer(address) is
@@ -242,11 +242,11 @@ write_data:  process(mac_clk)
       if load_buf = '1' then
         shift_buf := status_block;
       end if;
-      if mac_rx_valid = '1' and pkt_drop_status = '0' then
+      if my_rx_valid = '1' and pkt_drop_status = '0' then
 	if send_buf = '1' then
 	  data_to_send := shift_buf(127 downto 120);
 	else
-	  data_to_send := mac_rx_data;
+	  data_to_send := my_rx_data;
 	end if;
 	shift_buf := shift_buf(119 downto 0) & x"00";
       else
