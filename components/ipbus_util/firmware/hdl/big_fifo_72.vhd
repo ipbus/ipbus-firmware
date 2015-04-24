@@ -27,10 +27,17 @@ entity big_fifo_72 is
 		full: out std_logic;
 		empty: out std_logic;
 		warn: out std_logic;
+		ctr: out std_logic_vector(7 downto 0);
 		ren: in std_logic;
 		q: out std_logic_vector(71 downto 0);
 		valid: out std_logic
 	);
+	
+begin
+
+	assert NFIFO <= 256
+		report "big_fifo_72 is too large for internal counters"
+		severity failure;
 
 end big_fifo_72;
 
@@ -42,7 +49,7 @@ architecture rtl of big_fifo_72 is
 	type fifo_d_t is array(N_FIFO downto 0) of std_logic_vector(71 downto 0);
 	signal fifo_d: fifo_d_t;
 	signal rst_ctr: unsigned(2 downto 0);
-	signal ctr: unsigned(calc_width(N_FIFO) + 8 downto 0);
+	signal ctri: unsigned(16 downto 0);
 
 begin
 
@@ -104,11 +111,11 @@ begin
 	begin
 		if rising_edge(clk) then
 			if rsti = '1' then
-				ctr <= (others => '0');
+				ctri <= (others => '0');
 			elsif en(0) = '1' and en(N_FIFO) = '0' then
-				ctr <= ctr + 1;
+				ctri <= ctri + 1;
 			elsif en(0) = '0' and en(N_FIFO) = '1' then
-				ctr <= ctr - 1;
+				ctri <= ctri - 1;
 			end if;
 		end if;
 	end process;
@@ -118,14 +125,15 @@ begin
 		if rising_edge(clk) then
 			if rsti = '1' then
 				warn_i <= '0';
-			elsif warn_i = '0' and ctr > to_unsigned(WARN_HWM, ctr'length) then
+			elsif warn_i = '0' and ctri > to_unsigned(WARN_HWM, 17) then
 				warn_i <= '1';
-			elsif warn_i = '1' and ctr < to_unsigned(WARN_LWM, ctr'length) then
+			elsif warn_i = '1' and ctri < to_unsigned(WARN_LWM, 17) then
 				warn_i <= '0';
 			end if;
 		end if;
 	end process;
 	
 	warn <= warn_i;
+	ctr <= std_logic_vector(ctri(16 downto 9));
 	
 end rtl;
