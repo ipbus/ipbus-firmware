@@ -125,9 +125,9 @@ begin
 		if rising_edge(clk) then
 			if rsti = '1' then
 				warn_i <= '0';
-			elsif warn_i = '0' and ctri > to_unsigned(WARN_HWM, 17) then
+			elsif warn_i = '0' and ctri > to_unsigned(WARN_HWM * 512, 17) then
 				warn_i <= '1';
-			elsif warn_i = '1' and ctri < to_unsigned(WARN_LWM, 17) then
+			elsif warn_i = '1' and ctri < to_unsigned(WARN_LWM * 512, 17) then
 				warn_i <= '0';
 			end if;
 		end if;
