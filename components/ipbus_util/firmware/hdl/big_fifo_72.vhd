@@ -35,7 +35,7 @@ entity big_fifo_72 is
 	
 begin
 
-	assert NFIFO <= 256
+	assert N_FIFO <= 256
 		report "big_fifo_72 is too large for internal counters"
 		severity failure;
 
