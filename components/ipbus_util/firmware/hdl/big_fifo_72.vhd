@@ -1,6 +1,6 @@
 -- big_fifo_72
 --
--- Parametrised depth single-clock FIFO based on 7-series FIFO36E1 in 72bit mode
+-- Parametrised depth single-clock FWFT FIFO based on 7-series FIFO36E1 in 72bit mode
 --
 -- Dave Newbold, August 2014
 
@@ -16,26 +16,26 @@ use unisim.VComponents.all;
 entity big_fifo_72 is
 	generic(
 		N_FIFO: positive;
-		WARN_HWM: integer; -- assert warning at high watermark
-		WARN_LWM: integer -- deassert warning at low watermark
+		WARN_HWM: integer; -- assert warning at high watermark, measured in 512-word units
+		WARN_LWM: integer -- deassert warning at low watermark, measured in 512-word units
 	);
 	port(
 		clk: in std_logic;
 		rst: in std_logic;
-		d: in std_logic_vector(71 downto 0);
-		wen: in std_logic;
-		full: out std_logic;
-		empty: out std_logic;
-		warn: out std_logic;
-		ctr: out std_logic_vector(7 downto 0);
-		ren: in std_logic;
-		q: out std_logic_vector(71 downto 0);
-		valid: out std_logic
+		d: in std_logic_vector(71 downto 0); -- data in
+		wen: in std_logic; -- write enable
+		full: out std_logic; -- full flag
+		empty: out std_logic; -- empty flag
+		warn: out std_logic; -- warning flag
+		ctr: out std_logic_vector(7 downto 0); -- data count, measured in 512-word units
+		ren: in std_logic; -- read enable
+		q: out std_logic_vector(71 downto 0); -- data out
+		valid: out std_logic -- data valid flag
 	);
 	
 begin
 
-	assert N_FIFO <= 256
+	assert N_FIFO <= 512
 		report "big_fifo_72 is too large for internal counters"
 		severity failure;
 
@@ -49,7 +49,7 @@ architecture rtl of big_fifo_72 is
 	type fifo_d_t is array(N_FIFO downto 0) of std_logic_vector(71 downto 0);
 	signal fifo_d: fifo_d_t;
 	signal rst_ctr: unsigned(2 downto 0);
-	signal ctri: unsigned(16 downto 0);
+	signal ctri: unsigned(17 downto 0);
 
 begin
 
@@ -68,7 +68,7 @@ begin
 
 	fifo_d(0) <= d;
 	en(0) <= wen and not (rsti or ifull(0));
-	en(N_FIFO) <= ren and not (rsti or iempty(N_FIFO));
+	en(N_FIFO) <= ren and not (rsti or iempty(N_FIFO - 1));
 
 	fifo_gen: for i in N_FIFO - 1 downto 0 generate
 	
@@ -125,15 +125,15 @@ begin
 		if rising_edge(clk) then
 			if rsti = '1' then
 				warn_i <= '0';
-			elsif warn_i = '0' and ctri > to_unsigned(WARN_HWM * 512, 17) then
+			elsif warn_i = '0' and ctri > to_unsigned(WARN_HWM * 512, 18) then
 				warn_i <= '1';
-			elsif warn_i = '1' and ctri < to_unsigned(WARN_LWM * 512, 17) then
+			elsif warn_i = '1' and ctri < to_unsigned(WARN_LWM * 512, 18) then
 				warn_i <= '0';
 			end if;
 		end if;
 	end process;
 	
 	warn <= warn_i;
-	ctr <= std_logic_vector(ctri(16 downto 9));
+	ctr <= std_logic_vector(ctri(17 downto 10));
 	
 end rtl;
