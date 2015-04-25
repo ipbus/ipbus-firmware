@@ -27,7 +27,7 @@ entity big_fifo_72 is
 		full: out std_logic; -- full flag
 		empty: out std_logic; -- empty flag
 		warn: out std_logic; -- warning flag
-		ctr: out std_logic_vector(7 downto 0); -- data count, measured in 512-word units
+		ctr: out std_logic_vector(17 downto 0); -- data count
 		ren: in std_logic; -- read enable
 		q: out std_logic_vector(71 downto 0); -- data out
 		valid: out std_logic -- data valid flag
@@ -134,6 +134,6 @@ begin
 	end process;
 	
 	warn <= warn_i;
-	ctr <= std_logic_vector(ctri(17 downto 10));
+	ctr <= std_logic_vector(ctri);
 	
 end rtl;
