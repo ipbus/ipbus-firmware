@@ -44,7 +44,7 @@ end big_fifo_72;
 architecture rtl of big_fifo_72 is
 
 	signal en: std_logic_vector(N_FIFO  downto 0);
-	signal ifull, iempty: std_logic_vector(N_FIFO- 1  downto 0);
+	signal ifull, iempty: std_logic_vector(N_FIFO - 1  downto 0);
 	signal rsti, warn_i: std_logic;
 	type fifo_d_t is array(N_FIFO downto 0) of std_logic_vector(71 downto 0);
 	signal fifo_d: fifo_d_t;
@@ -67,8 +67,8 @@ begin
 	rsti <= '0' when rst_ctr = "111" else '1';
 
 	fifo_d(0) <= d;
-	en(0) <= wen and not rsti;
-	en(N_FIFO) <= ren and not rsti;
+	en(0) <= wen and not (rsti or ifull(0));
+	en(N_FIFO) <= ren and not (rsti or iempty(N_FIFO));
 
 	fifo_gen: for i in N_FIFO - 1 downto 0 generate
 	
