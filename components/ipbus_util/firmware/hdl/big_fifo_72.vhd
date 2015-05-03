@@ -15,9 +15,7 @@ use unisim.VComponents.all;
 
 entity big_fifo_72 is
 	generic(
-		N_FIFO: positive;
-		WARN_HWM: integer; -- assert warning at high watermark, measured in 512-word units
-		WARN_LWM: integer -- deassert warning at low watermark, measured in 512-word units
+		N_FIFO: positive
 	);
 	port(
 		clk: in std_logic;
@@ -26,7 +24,6 @@ entity big_fifo_72 is
 		wen: in std_logic; -- write enable
 		full: out std_logic; -- full flag
 		empty: out std_logic; -- empty flag
-		warn: out std_logic; -- warning flag
 		ctr: out std_logic_vector(17 downto 0); -- data count
 		ren: in std_logic; -- read enable
 		q: out std_logic_vector(71 downto 0); -- data out
@@ -120,20 +117,6 @@ begin
 		end if;
 	end process;
 
-	process(clk)
-	begin
-		if rising_edge(clk) then
-			if rsti = '1' then
-				warn_i <= '0';
-			elsif warn_i = '0' and ctri > to_unsigned(WARN_HWM * 512, 18) then
-				warn_i <= '1';
-			elsif warn_i = '1' and ctri < to_unsigned(WARN_LWM * 512, 18) then
-				warn_i <= '0';
-			end if;
-		end if;
-	end process;
-	
-	warn <= warn_i;
 	ctr <= std_logic_vector(ctri);
 	
 end rtl;
