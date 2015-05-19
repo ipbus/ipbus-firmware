@@ -42,7 +42,7 @@ architecture rtl of big_fifo_72 is
 
 	signal en: std_logic_vector(N_FIFO  downto 0);
 	signal ifull, iempty: std_logic_vector(N_FIFO - 1  downto 0);
-	signal rsti, warn_i, disable: std_logic;
+	signal rsti, warn_i, fifo_rst: std_logic;
 	type fifo_d_t is array(N_FIFO downto 0) of std_logic_vector(71 downto 0);
 	signal fifo_d: fifo_d_t;
 	signal rst_ctr: unsigned(3 downto 0);
@@ -61,12 +61,12 @@ begin
 		end if;
 	end process;
 	
-	rsti <= '0' when rst_ctr = "1111" else rst_ctr(3);
-	disable <= '0' when rst_ctr = "1111" else '0';
-
+	rsti <= '0' when rst_ctr = "1111" else '1';
+	fifo_rst <= rsti and rst_ctr(3);
+	
 	fifo_d(0) <= d;
-	en(0) <= wen and not (disable or ifull(0));
-	en(N_FIFO) <= ren and not (disable or iempty(N_FIFO - 1));
+	en(0) <= wen and not (rsti or ifull(0));
+	en(N_FIFO) <= ren and not (rsti or iempty(N_FIFO - 1));
 
 	fifo_gen: for i in N_FIFO - 1 downto 0 generate
 	
@@ -90,7 +90,7 @@ begin
 				rdclk => clk,
 				rden => en(i + 1),
 				regce => '1',
-				rst => rsti,
+				rst => fifo_rst,
 				rstreg => '0',
 				wrclk => clk,
 				wren => en(i)
@@ -98,7 +98,7 @@ begin
 		
 	end generate;
 	
-	en(N_FIFO - 1 downto 1) <= not ifull(N_FIFO - 1 downto 1) and not iempty(N_FIFO - 2 downto 0) and not (N_FIFO - 2 downto 0 => disable);
+	en(N_FIFO - 1 downto 1) <= not ifull(N_FIFO - 1 downto 1) and not iempty(N_FIFO - 2 downto 0) and not (N_FIFO - 2 downto 0 => rsti);
 	
 	q <= fifo_d(N_FIFO);
 	valid <= not iempty(N_FIFO - 1);
