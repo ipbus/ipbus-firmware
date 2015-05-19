@@ -61,8 +61,8 @@ begin
 		end if;
 	end process;
 	
-	rsti <= '0' when rst_ctr = "111" else rst_ctr(3);
-	disable <= '0' when rst_ctr = "111" else '0';
+	rsti <= '0' when rst_ctr = "1111" else rst_ctr(3);
+	disable <= '0' when rst_ctr = "1111" else '0';
 
 	fifo_d(0) <= d;
 	en(0) <= wen and not (disable or ifull(0));
