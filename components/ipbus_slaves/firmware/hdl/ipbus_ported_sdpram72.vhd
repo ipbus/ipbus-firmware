@@ -36,7 +36,7 @@ architecture rtl of ipbus_ported_sdpram72 is
 
 	type ram_array is array(2 ** ADDR_WIDTH - 1 downto 0) of std_logic_vector(71 downto 0);
 	shared variable ram: ram_array;
-	signal sel: integer range 0 to 2 ** ADDR_WIDTH - 3 := 0;
+	signal sel: integer range 0 to 2 ** ADDR_WIDTH - 1 := 0;
 	signal rsel: integer range 0 to 2 ** ADDR_WIDTH - 1 := 0;
 	signal ptr: unsigned(ADDR_WIDTH + 1 downto 0);
 	signal data_o: std_logic_vector(31 downto 0);
