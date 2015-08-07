@@ -37,7 +37,7 @@ architecture rtl of transactor_if is
 	signal rxd, rxf: std_logic_vector(31 downto 0);
 	signal raddr, waddr, haddr, waddrh: unsigned(addr_width - 1 downto 0);
 	signal hlen, blen, rctr, wctr: unsigned(15 downto 0);
-	signal idata, rdata: std_logic_vector(31 downto 0);
+	signal idata: std_logic_vector(31 downto 0);
 	signal first, start, start_d: std_logic;
 
   
