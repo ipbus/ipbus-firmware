@@ -1,7 +1,7 @@
--- Handles source of IP address...
--- Parses incoming RARP response
+-- Handles source of MAC and IP address...
+-- Parses incoming RARP response to capture real MAC and IP address
 --
--- Dave Sankey, July 2012
+-- Dave Sankey, July 2012 and September 2015
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -14,12 +14,14 @@ entity udp_ipaddr_block is
     rx_reset: in std_logic;
     enable_125: in std_logic;
     rarp_125: in std_logic;
+    MAC_addr: in std_logic_vector(47 DOWNTO 0);
     IP_addr: in std_logic_vector(31 downto 0);
     my_rx_data: in std_logic_vector(7 downto 0);
     my_rx_error: in std_logic;
     my_rx_last: in std_logic;
     my_rx_valid: in std_logic;
     pkt_drop_rarp: in std_logic;
+    My_MAC_addr: out std_logic_vector(47 downto 0);
     My_IP_addr: out std_logic_vector(31 downto 0);
     rarp_mode: out std_logic
   );
@@ -27,24 +29,24 @@ end udp_ipaddr_block;
 
 architecture rtl of udp_ipaddr_block is
 
-  signal IP_addr_rx_vld: std_logic;
-  signal IP_addr_rx: std_logic_vector(31 downto 0);
+  signal MAC_IP_addr_rx_vld: std_logic;
+  signal MAC_IP_addr_rx: std_logic_vector(79 downto 0);
 
 begin
 
-IP_addr_rx_vld_block:  process (mac_clk)
+MAC_IP_addr_rx_vld_block:  process (mac_clk)
   begin
     if rising_edge(mac_clk) then
 -- Valid RARP response received.
       if my_rx_last = '1' and pkt_drop_rarp = '0' and 
       my_rx_error = '0' then
-        IP_addr_rx_vld <= '1'
+        MAC_IP_addr_rx_vld <= '1'
 -- pragma translate_off
         after 4 ns
 -- pragma translate_on
         ;
       else
-        IP_addr_rx_vld <= '0'
+        MAC_IP_addr_rx_vld <= '0'
 -- pragma translate_off
         after 4 ns
 -- pragma translate_on
@@ -53,25 +55,25 @@ IP_addr_rx_vld_block:  process (mac_clk)
     end if;
   end process;
 
-IP_addr_rx_block: process(mac_clk)
+MAC_IP_addr_rx_block: process(mac_clk)
   variable pkt_mask: std_logic_vector(41 downto 0);
-  variable IP_addr_rx_int: std_logic_vector(31 downto 0);
+  variable MAC_IP_addr_rx_int: std_logic_vector(79 downto 0);
   begin
     if rising_edge(mac_clk) then
       if rx_reset = '1' then
         pkt_mask := "111111" & "111111" & "11" &
         "11" & "11" & "11" & "11" & "111111" &
-        "1111" & "111111" & "0000";
-	IP_addr_rx_int := (Others => '0');
+        "1111" & "000000" & "0000";
+	MAC_IP_addr_rx_int := (Others => '0');
       elsif my_rx_valid = '1' then
         if pkt_drop_rarp = '1' then
-	  IP_addr_rx_int := (Others => '0');
+	  MAC_IP_addr_rx_int := (Others => '0');
         elsif pkt_mask(41) = '0' then
-          IP_addr_rx_int := IP_addr_rx_int(23 downto 0) & my_rx_data;
+          MAC_IP_addr_rx_int := MAC_IP_addr_rx_int(71 downto 0) & my_rx_data;
         end if;
         pkt_mask := pkt_mask(40 downto 0) & '1';
       end if;
-      IP_addr_rx <= IP_addr_rx_int
+      MAC_IP_addr_rx <= MAC_IP_addr_rx_int
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
@@ -79,33 +81,43 @@ IP_addr_rx_block: process(mac_clk)
     end if;
   end process;
 
-My_IP_addr_block:  process (mac_clk)
-  variable Got_IP_addr_rx: std_logic;
-  variable My_IP_addr_int: std_logic_vector(31 downto 0);
+My_MAC_IP_addr_block:  process (mac_clk)
+  variable Got_MAC_IP_addr_rx: std_logic;
+  variable My_MAC_IP_addr_int: std_logic_vector(79 downto 0);
   begin
     if rising_edge(mac_clk) then
       if rst_macclk_reg = '1' then
-        Got_IP_addr_rx := '0';
-	My_IP_addr_int := (Others => '0');
-      elsif IP_addr_rx_vld = '1' then
-        Got_IP_addr_rx := '1';
-	My_IP_addr_int := IP_addr_rx;
+        Got_MAC_IP_addr_rx := '0';
+	My_MAC_IP_addr_int := (Others => '0');
+      elsif MAC_IP_addr_rx_vld = '1' then
+        Got_MAC_IP_addr_rx := '1';
+	My_MAC_IP_addr_int := MAC_IP_addr_rx;
       end if;
 -- Predefined (Non-RARP) mode...
       if rarp_125 = '0' then
+        My_MAC_addr <= MAC_addr
+-- pragma translate_off
+        after 4 ns
+-- pragma translate_on
+        ;
         My_IP_addr <= IP_addr
 -- pragma translate_off
         after 4 ns
 -- pragma translate_on
         ;
       else
-        My_IP_addr <= My_IP_addr_int
+        My_MAC_addr <= My_MAC_IP_addr_int(79 downto 32)
+-- pragma translate_off
+        after 4 ns
+-- pragma translate_on
+        ;
+        My_IP_addr <= My_MAC_IP_addr_int(31 downto 0)
 -- pragma translate_off
         after 4 ns
 -- pragma translate_on
         ;
       end if;
-      rarp_mode <= enable_125 and rarp_125 and not Got_IP_addr_rx
+      rarp_mode <= enable_125 and rarp_125 and not Got_MAC_IP_addr_rx
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on

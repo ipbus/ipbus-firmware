@@ -15,7 +15,7 @@ entity udp_build_arp is
     my_rx_last: in std_logic;
     my_rx_error: in std_logic;
     pkt_drop_arp: in std_logic;
-    MAC_addr: in std_logic_vector(47 downto 0);
+    My_MAC_addr: in std_logic_vector(47 downto 0);
     My_IP_addr: in std_logic_vector(31 downto 0);
     arp_data: out std_logic_vector(7 downto 0);
     arp_addr: out std_logic_vector(12 downto 0);
@@ -134,7 +134,7 @@ build_packet:  process (mac_clk)
       if (rx_reset = '1') then
 	send_buf_int := '1';
 	load_buf_int := '1';
-	buf_to_load_int := MAC_addr;
+	buf_to_load_int := My_MAC_addr;
       elsif (my_rx_valid = '1') and (pkt_drop_arp = '0') then
 -- Because address is buffered this logic needs to switch a byte early...
         case to_integer(address) is
@@ -154,7 +154,7 @@ build_packet:  process (mac_clk)
           when 40 =>
 	    send_buf_int := '1';
 	    load_buf_int := '1';
-	    buf_to_load_int := MAC_addr;
+	    buf_to_load_int := My_MAC_addr;
 -- RX ARP target MAC bytes 32 to 37 => TX write sender MAC bytes 22 to 27...
           when 26 =>
 	    load_buf_int := '1';

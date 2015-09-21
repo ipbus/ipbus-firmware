@@ -53,6 +53,7 @@ ENTITY UDP_if IS
 		mac_tx_last: OUT std_logic;
 		mac_tx_valid: OUT std_logic;
 		My_IP_addr: OUT std_logic_vector(31 DOWNTO 0);
+		Got_IP_addr: OUT std_logic;
 		pkt_rdy: OUT std_logic;
 		rdata: OUT std_logic_vector(31 DOWNTO 0);
 		rxpacket_ignored: OUT std_logic;
@@ -90,6 +91,7 @@ ARCHITECTURE flat OF UDP_if IS
    SIGNAL wea: std_logic;
 --
    SIGNAL My_IP_addr_sig: std_logic_vector(31 DOWNTO 0);
+   SIGNAL My_MAC_addr: std_logic_vector(47 DOWNTO 0);
    SIGNAL pkt_drop_rarp: std_logic;
    SIGNAL rarp_addr: std_logic_vector(12 DOWNTO 0);
    SIGNAL rarp_data: std_logic_vector(7 DOWNTO 0);
@@ -234,6 +236,7 @@ after 4 ns
 	end process rst_macclk_block;
 
 	My_IP_addr <= My_IP_addr_sig;
+	Got_IP_addr <= not rarp_mode;
 
 -- Instance port mappings.
 
@@ -269,9 +272,6 @@ primary_mode: if SECONDARYPORT = '0' generate
 	rx_int_data <= int_data_payload when int_valid_payload = '1' else int_data_ping;
 	
 	RARP_block: entity work.udp_rarp_block
-		GENERIC MAP (
-			SECONDARYPORT => SECONDARYPORT
-		)
 		PORT MAP (
 			mac_clk => mac_clk,
 			rst_macclk_reg => rst_macclk_reg,
@@ -294,7 +294,7 @@ primary_mode: if SECONDARYPORT = '0' generate
 			my_rx_last => my_rx_last,
 			my_rx_error => my_rx_error,
 			pkt_drop_arp => pkt_drop_arp,
-			MAC_addr => MAC_addr,
+			My_MAC_addr => My_MAC_addr,
 			My_IP_addr => My_IP_addr_sig,
 			arp_data => arp_data,
 			arp_addr => arp_addr,
@@ -333,12 +333,14 @@ end generate primary_mode;
 			rx_reset => rx_reset,
 			enable_125 => enable_125,
 			rarp_125 => rarp_125,
+			MAC_addr => MAC_addr,
 			IP_addr => IP_addr,
 			my_rx_data => my_rx_data,
 			my_rx_error => my_rx_error,
 			my_rx_last => my_rx_last,
 			my_rx_valid => my_rx_valid,
 			pkt_drop_rarp => pkt_drop_rarp,
+			My_MAC_addr => My_MAC_addr,
 			My_IP_addr => My_IP_addr_sig,
 			rarp_mode => rarp_mode
 		);
@@ -472,7 +474,7 @@ end generate primary_mode;
 			my_rx_data => my_rx_data,
 			my_rx_last => my_rx_last,
 			my_rx_valid => my_rx_valid,
-			MAC_addr => MAC_addr,
+			My_MAC_addr => My_MAC_addr,
 			My_IP_addr => My_IP_addr_sig,
 			next_pkt_id => next_pkt_id,
 			pkt_broadcast => pkt_broadcast,

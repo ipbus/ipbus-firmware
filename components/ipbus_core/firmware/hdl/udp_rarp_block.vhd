@@ -7,10 +7,6 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity udp_rarp_block is
-generic(
--- Flag whether this instance ignores everything except IPBus traffic
-  SECONDARYPORT: std_logic := '0'
-);
   port (
     mac_clk: in std_logic;
     rst_macclk_reg: in std_logic;
@@ -225,7 +221,7 @@ rarp_req_block: process(mac_clk)
       elsif req_count = req_end then
         req_count := (Others => '0');
 	req_end := unsigned(rndm & "1");
-	rarp_req_int := RARP_mode and not SECONDARYPORT;
+	rarp_req_int := RARP_mode;
       elsif tick = '1' then
         req_count := req_count + 1;
 	rarp_req_int := '0';

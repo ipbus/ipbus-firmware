@@ -17,7 +17,7 @@ entity udp_packet_parser is
     my_rx_data: in std_logic_vector(7 downto 0);
     my_rx_last: in std_logic;
     my_rx_valid: in std_logic;
-    MAC_addr: in std_logic_vector(47 downto 0);
+    My_MAC_addr: in std_logic_vector(47 downto 0);
     My_IP_addr: in std_logic_vector(31 downto 0);
     next_pkt_id: in std_logic_vector(15 downto 0);
     pkt_broadcast: out std_logic;
@@ -149,37 +149,35 @@ ping:  process (mac_clk)
 end generate primary_mode;
 
 -- RARP:
--- Ethernet DST_MAC(6), SRC_MAC(6), Ether_Type = x"8035"
+-- Ethernet DST_MAC(6) = My_MAC_addr, SRC_MAC(6), Ether_Type = x"8035"
 -- HTYPE = x"0001"
 -- PTYPE = x"0800"
 -- HLEN = x"06", PLEN = x"04"
 -- OPER = x"0004"
 -- SHA(6)
 -- SPA(4)
--- THA(6) = MAC_addr
+-- THA(6) = My_MAC_addr
 -- TPA(4) = MY_IP(4)
 rarp:  process (mac_clk)
   variable pkt_data: std_logic_vector(127 downto 0);
-  variable pkt_mask: std_logic_vector(37 downto 0);
+  variable pkt_mask: std_logic_vector(21 downto 0);
   variable pkt_drop: std_logic;
   begin
     if rising_edge(mac_clk) then
       if rx_reset = '1' then
-        pkt_mask := "111111" & "111111" & "00" &
-        "00" & "00" & "00" & "00" & "111111" &
-        "1111" & "000000";
-        pkt_data := x"8035" & x"0001" & x"0800" & x"0604" & x"0004" & MAC_addr;
+        pkt_mask := "000000" & "111111" & "00" & "00" & "00" & "00" & "00";
+        pkt_data := My_MAC_addr & x"8035" & x"0001" & x"0800" & x"0604" & x"0004";
         pkt_drop := not enable_125;
       elsif my_rx_last = '1' then
         pkt_drop := '1';
       elsif my_rx_valid = '1' then
-        if pkt_mask(37) = '0' then
+        if pkt_mask(21) = '0' then
           if pkt_data(127 downto 120) /= my_rx_data then
             pkt_drop := '1';
           end if;
           pkt_data := pkt_data(119 downto 0) & x"00";
         end if;
-        pkt_mask := pkt_mask(36 downto 0) & '1';
+        pkt_mask := pkt_mask(20 downto 0) & '1';
       end if;
       pkt_drop_rarp_sig <= pkt_drop
 -- pragma translate_off
@@ -212,7 +210,7 @@ ip_pkt:  process (mac_clk)
         "00" & "11" & "11" & "00" & "1" & "1" & "11" &
         "1111" & "0000";
         msk_mask := "111111" & "11" & "10";
-        pkt_data := MAC_addr & x"0800" & x"4500" & x"0000" & My_IP_addr;
+        pkt_data := My_MAC_addr & x"0800" & x"4500" & x"0000" & My_IP_addr;
 	msk_data := (Others => '1');
         pkt_drop := not enable_125;
       elsif my_rx_last = '1' then
