@@ -42,6 +42,9 @@ architecture rtl of uc_pipe_interface is
 	signal we_pipe_clked : std_logic_vector(0 downto 0);
 	signal uc_pipe_clked : std_logic_vector(15 downto 0);
 
+	signal r_addr_pipe_ipb_domain, r_addr_pipe_sclk_domain : unsigned(9 downto 0) := (others=>'1');
+	signal w_addr_pipe_ipb_domain, w_addr_pipe_sclk_domain : unsigned(9 downto 0) := (others=>'1');
+
   COMPONENT sdpram_16x10_32x9
     PORT (
       clka : IN STD_LOGIC;
@@ -129,9 +132,44 @@ begin
   ipbus_out.ipb_err <= '0'; 
   ipbus_out.ipb_ack <= ack;
 
+
+  process(sclk)
+  begin
+    if falling_edge(sclk) then 
+
+        -- Jumping direct to reg in ipb domain due to large skew between 
+        -- ipb clk (31.25MHz) and sclk (125MHz).  Sclk drives the DCM
+        -- for IPB, but no BUFG in feedback path (resource saving?) leads to 
+        -- large skew.
+          
+        r_addr_pipe_sclk_domain <= r_addr_pipe;
+        w_addr_pipe_sclk_domain <= w_addr_pipe; 
+
+    end if;
+  end process;
+
+
+
   process(clk)
   begin
     if rising_edge(clk) then 
+
+        -- Jumping direct to reg in ipb domain due to large skew between 
+        -- ipb clk (31.25MHz) and sclk (125MHz).  Sclk drives the DCM
+        -- for IPB, but no BUFG in feedback path (resource saving?) leads to 
+        -- large skew.
+          
+        r_addr_pipe_ipb_domain <= r_addr_pipe_sclk_domain;
+        w_addr_pipe_ipb_domain <= w_addr_pipe_sclk_domain; 
+
+    end if;
+  end process;
+
+
+  process(clk)
+  begin
+    if rising_edge(clk) then 
+        
 
 --       if( ipbus_to_pipe_reset = '1' ) then
 --         ipbus_to_pipe_reset <= '0';  
@@ -147,9 +185,9 @@ begin
 			if ipbus_in.ipb_strobe='1' and ack='0' then
 				if ipbus_in.ipb_write='0' then 
 					if ipbus_in.ipb_addr(1 downto 0)="00" then
-						ipbus_out.ipb_rdata <= "0000000" & std_logic_vector( w_addr_ipbus ) & "000000" & std_logic_vector( r_addr_pipe );
+						ipbus_out.ipb_rdata <= "0000000" & std_logic_vector( w_addr_ipbus ) & "000000" & std_logic_vector( r_addr_pipe_ipb_domain );
 					elsif ipbus_in.ipb_addr(1 downto 0)="01" then
-						ipbus_out.ipb_rdata <= "0000000" & std_logic_vector( r_addr_ipbus ) & "000000" & std_logic_vector( w_addr_pipe );
+						ipbus_out.ipb_rdata <= "0000000" & std_logic_vector( r_addr_ipbus ) & "000000" & std_logic_vector( w_addr_pipe_ipb_domain );
 					end if;
 				else
 -- reset fifo pointers
