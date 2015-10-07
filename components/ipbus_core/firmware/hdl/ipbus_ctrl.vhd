@@ -53,6 +53,9 @@ entity ipbus_ctrl is
 		ip_addr: in std_logic_vector(31 downto 0) := X"00000000";
 		enable: in std_logic := '1';
 		RARP_select: in std_logic := '0';
+		actual_mac_addr: out std_logic_vector(47 downto 0); -- actual MAC and IP addresses
+		actual_ip_addr: out std_logic_vector(31 downto 0);
+		Got_IP_addr: OUT std_logic;
 		pkt: out std_logic;
 		pkt_oob: out std_logic;
 		oob_in: in ipbus_trans_in_array(N_OOB - 1 downto 0) := (others => ('0', X"00000000", '0'));
@@ -111,6 +114,7 @@ begin
 			mac_tx_last => mac_tx_last,
 			mac_tx_valid => mac_tx_valid,
 			My_IP_addr => my_ip_addr_udp,
+			Got_IP_addr => Got_IP_addr,
 			pkt_rdy => trans_in_udp.pkt_rdy,
 			rdata => trans_in_udp.rdata,
 			rxpacket_ignored => udp_rxpacket_ignored,
@@ -172,6 +176,11 @@ begin
     '0' when others;
 
   cfg_out <= my_ip_addr_udp & X"00" & "000" & not rst_macclk & mac_src_flag & ip_src_flag & rarp_en & udp_en & my_mac_addr & X"00000000";
+
+-- expose actual MAC and IP addresses
+  actual_mac_addr <= my_mac_addr;
+  actual_ip_addr <= my_ip_addr_udp;
+
 	
 	with MAC_CFG select my_mac_addr <=
 		mac_addr when EXTERNAL,

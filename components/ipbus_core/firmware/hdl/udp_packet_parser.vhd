@@ -188,8 +188,9 @@ rarp:  process (mac_clk)
   end process;
 
 -- IP packet:
--- Ethernet DST_MAC(6), SRC_MAC(6), Ether_Type = x"0800"
--- IP VERS = x"4", HL = x"5", TOS = x"00"
+-- Ethernet DST_MAC(6) = My_MAC_addr, SRC_MAC(6), Ether_Type = x"0800"
+-- IP VERS = x"4", HL = x"5"
+-- TOS/DSCP
 -- IP LEN
 -- IP ID
 -- IP FLAG-FRAG = x"4000" or x"0000"
@@ -198,35 +199,31 @@ rarp:  process (mac_clk)
 -- IP SPA(4)
 -- IP DPA(4)
 ip_pkt:  process (mac_clk)
-  variable pkt_data: std_logic_vector(127 downto 0);
+  variable pkt_data: std_logic_vector(119 downto 0);
   variable pkt_mask: std_logic_vector(33 downto 0);
-  variable msk_data: std_logic_vector(7 downto 0);
-  variable msk_mask: std_logic_vector(9 downto 0);
+  variable frag_mask: std_logic_vector(9 downto 0);
   variable pkt_drop: std_logic;
   begin
     if rising_edge(mac_clk) then
       if rx_reset = '1' then
         pkt_mask := "000000" & "111111" & "00" &
-        "00" & "11" & "11" & "00" & "1" & "1" & "11" &
+        "0" & "11" & "11" & "00" & "1" & "1" & "11" &
         "1111" & "0000";
-        msk_mask := "111111" & "11" & "10";
-        pkt_data := My_MAC_addr & x"0800" & x"4500" & x"0000" & My_IP_addr;
-	msk_data := (Others => '1');
+        frag_mask := "111111" & "11" & "10";
+        pkt_data := My_MAC_addr & x"0800" & x"45" & x"0000" & My_IP_addr;
         pkt_drop := not enable_125;
       elsif my_rx_last = '1' then
         pkt_drop := '1';
       elsif my_rx_valid = '1' then
         if pkt_mask(33) = '0' then
-          if pkt_data(127 downto 120) /= (my_rx_data and msk_data) then
+-- ignore 'don't fragment' bit on IP FLAG-FRAG test (x"4000" or x"0000")...
+          if pkt_data(119 downto 112) /=
+	  (my_rx_data(7) & (my_rx_data(6) and frag_mask(9)) &
+	  my_rx_data(5 downto 0)) then
             pkt_drop := '1';
           end if;
-          pkt_data := pkt_data(119 downto 0) & x"00";
-	  if msk_mask(9) = '0' then
-	    msk_data := "10111111";
-	  else
-	    msk_data := (Others => '1');
-	  end if;
-	  msk_mask := msk_mask(8 downto 0) & '1';
+          pkt_data := pkt_data(111 downto 0) & x"00";
+	  frag_mask := frag_mask(8 downto 0) & '1';
         end if;
         pkt_mask := pkt_mask(32 downto 0) & '1';
       end if;
