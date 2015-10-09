@@ -20,18 +20,13 @@ ENTITY UDP_master_if IS
 		rarp_rx_last: in std_logic;
 		rarp_rx_valid: in std_logic
 		Got_IP_addr: OUT std_logic;
---  MAC TX
-		mac_tx_ready: IN std_logic;
-		mac_tx_data: OUT std_logic_vector(7 DOWNTO 0);
-		mac_tx_error: OUT std_logic;
-		mac_tx_last: OUT std_logic;
-		mac_tx_valid: OUT std_logic;
+--  TX FIFO
+		FIFO_Full: IN std_logic;
+		FIFO_Data: OUT std_logic_vector(7 DOWNTO 0);
+		FIFO_WriteEn: OUT std_logic;
 -- remote ports
-		master_rx_data: out std_logic_vector(7 DOWNTO 0);
-		master_rx_kchar: out std_logic;
-		master_tx_ready: out std_logic;
-		master_tx_data: in std_logic_vector(7 DOWNTO 0);
-		master_tx_kchar: in std_logic;
+		master_rx_data: out std_logic_vector(8 DOWNTO 0);
+		master_tx_data: in std_logic_vector(8 DOWNTO 0);
 		master_tx_err: in std_logic
    );
 
@@ -79,39 +74,34 @@ With Got_IP_addr_sig select my_rx_error <=
   '0' when Others;
 
 rx_data_block:  process(mac_clk)
-  variable next_last, next_error, kchar, this_last, this_error: std_logic;
-  variable this_data: std_logic_vector(7 DOWNTO 0);
+  variable next_last, next_error, kchar, last, error: std_logic;
+  variable data: std_logic_vector(7 DOWNTO 0);
   begin
     If rising_edge(mac_clk) then
       next_last := '0';
       next_error := '0';
       kchar := '1';
       If rst_macclk = '1' then
-	this_data := "10111100";
+	data := "10111100";
       ElsIf my_rx_valid = '1' then
-        this_data := my_rx_data;
+        data := my_rx_data;
 	next_last := my_rx_last;
 	next_error := my_rx_error;
 	kchar := '0';
 -- End of frame, send K28.0 or K28.2
-      ElsIf this_last = '1' then
-        this_data := "0" & this_error & "011100";
+      ElsIf last = '1' then
+        data := "0" & error & "011100";
 -- Idle, send K28.5
       Else
-        this_data := "10111100";
+        data := "10111100";
       End If;
-      master_rx_data <= this_data
+      master_rx_data <= data & kchar
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
       ;
-      master_rx_kchar <= kchar
--- pragma translate_off
-      after 4 ns
--- pragma translate_on
-      ;
-      this_last := next_last;
-      this_error := next_error;
+      last := next_last;
+      error := next_error;
     end if;
   end process rx_data_block;
 

@@ -24,12 +24,10 @@ ENTITY UDP_slave_if IS
 		mac_tx_last: in std_logic;
 		mac_tx_valid: in std_logic;
 -- remote ports
-		slave_rx_data: in std_logic_vector(7 DOWNTO 0);
-		slave_rx_kchar: in std_logic;
+		slave_rx_data: in std_logic_vector(8 DOWNTO 0);
 		slave_rx_err: in std_logic;
-		slave_tx_ready: in std_logic;
-		slave_tx_data: out std_logic_vector(7 DOWNTO 0);
-		slave_tx_kchar: out std_logic
+		slave_tx_pause: in std_logic;
+		slave_tx_data: out std_logic_vector(8 DOWNTO 0)
    );
 
 END UDP_slave_if;
@@ -57,25 +55,25 @@ architecture rtl of UDP_slave_if is
 Begin
 
 rx_data_block:  process(mac_clk)
-  variable next_valid, this_valid, this_error, this_last, error_pending, frame: std_logic;
-  variable next_data, this_data: std_logic_vector(7 DOWNTO 0);
+  variable next_valid, valid, error, last, error_pending, frame: std_logic;
+  variable next_data, data: std_logic_vector(7 DOWNTO 0);
   begin
     If rising_edge(mac_clk) then
       next_valid := '0';
-      this_last := '0';
-      this_error := '0';
+      last := '0';
+      error := '0';
       If rst_macclk = '1' then
         frame := '0';
-	this_valid := '0';
+	valid := '0';
 	error_pending := '0';
-      ElsIf slave_rx_kchar = '0' then
+      ElsIf slave_rx_data(0) = '0' then
         next_valid := '1';
-	next_data := slave_rx_data;
+	next_data := slave_rx_data(8 downto 1);
 	frame := '1';
 -- K char.  Only K28.n have these bits not all set to 1 so only check for K28.0 and K28.2
-      ElsIf slave_rx_data(7) & slave_rx_data(5) = "00" then
-	this_last := '1';
-	this_error := slave_rx_data(6) or error_pending;  -- K28.2
+      ElsIf slave_rx_data(8) & slave_rx_data(6) = "00" then
+	last := '1';
+	error := slave_rx_data(7) or error_pending;  -- K28.2
 	frame := '0';
 	error_pending := '0';
       End If;
@@ -84,31 +82,68 @@ rx_data_block:  process(mac_clk)
       If slave_rx_err = '1' then
         error_pending := frame;
       End If;
-      mac_rx_data <= this_data
+      mac_rx_data <= data
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
       ;
-      mac_rx_error <= this_error
+      mac_rx_error <= error
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
       ;
-      mac_rx_last <= this_last
+      mac_rx_last <= last
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
       ;
-      mac_rx_valid <= this_valid
+      mac_rx_valid <= valid
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
       ;
-      this_data := next_data;
-      this_valid := next_valid;
+      data := next_data;
+      valid := next_valid;
     end if;
   end process rx_data_block;
 
-
+tx_data_block:  process(mac_clk)
+  variable next_last, next_error, kchar, last, error, ready: std_logic;
+  variable data: std_logic_vector(7 DOWNTO 0);
+  begin
+    If rising_edge(mac_clk) then
+      next_last := '0';
+      next_error := '0';
+      ready := '0';
+      kchar := '1';
+      If rst_macclk = '1' then
+	data := "00111100";
+      ElsIf mac_tx_valid = '1' and slave_tx_pause = '0' then
+        data := mac_tx_data;
+	next_last := mac_tx_last;
+	next_error := mac_tx_error;
+	ready := '1';
+	kchar := '0';
+-- End of frame, send K28.0 or K28.2
+      ElsIf last = '1' then
+        data := "0" & error & "011100";
+-- Idle, send K28.1 (no IP address) or K28.5 (got IP address)
+      Else
+        data := Got_IP_addr & "0111100";
+      End If;
+      master_rx_data <= data & kchar
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+      mac_tx_ready <= ready
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+      last := next_last;
+      error := next_error;
+    end if;
+  end process tx_data_block;
 
 End rtl;
