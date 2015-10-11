@@ -22,7 +22,7 @@ ENTITY UDP_master_if IS
 		Got_IP_addr: OUT std_logic;
 --  TX FIFO
 		FIFO_Full: IN std_logic;
-		FIFO_Data: OUT std_logic_vector(7 DOWNTO 0);
+		FIFO_data: OUT std_logic_vector(9 DOWNTO 0);
 		FIFO_WriteEn: OUT std_logic;
 -- remote ports
 		master_rx_data: out std_logic_vector(8 DOWNTO 0);
@@ -104,5 +104,48 @@ rx_data_block:  process(mac_clk)
       error := next_error;
     end if;
   end process rx_data_block;
+
+tx_data_block:  process(mac_clk)
+  variable next_valid, valid, error, last, error_pending, frame: std_logic;
+  variable next_data, data: std_logic_vector(7 DOWNTO 0);
+  begin
+    If rising_edge(mac_clk) then
+      next_valid := '0';
+      last := '0';
+      error := '0';
+      If rst_macclk = '1' then
+        frame := '0';
+	valid := '0';
+	error_pending := '0';
+      ElsIf master_tx_data(0) = '0' then
+        next_valid := '1';
+	next_data := master_tx_data(8 downto 1);
+	frame := '1';
+-- K char.  Only K28.n have these bits not all set to 1 so only check for K28.0 and K28.2
+      ElsIf master_tx_data(8) & master_tx_data(6) = "00" then
+	last := '1';
+	error := master_tx_data(7) or error_pending;  -- K28.2
+	frame := '0';
+	error_pending := '0';
+      End If;
+-- Capture transmission error during a packet.  This logic will ignore an 
+-- error flagged on the K28.0 and K28.2 character, but that should be OK
+      If (master_tx_err = '1') or (FIFO_Full = '1') then
+        error_pending := frame;
+      End If;
+      FIFO_data <= data & error & last
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+      FIFO_WriteEn <= valid
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+      data := next_data;
+      valid := next_valid;
+    end if;
+  end process tx_data_block;
 
 End rtl;
