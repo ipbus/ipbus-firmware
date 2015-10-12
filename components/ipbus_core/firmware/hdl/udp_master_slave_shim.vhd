@@ -19,6 +19,9 @@ USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;
 
 ENTITY UDP_master_slave_shim IS
+  Generic (
+		constant DELAY: time := 4 ns
+  );
   PORT( 
 		mac_clk: IN std_logic;
 -- master ports
@@ -37,3 +40,33 @@ ENTITY UDP_master_slave_shim IS
    );
 
 END UDP_master_slave_shim;
+
+architecture Behavioral of UDP_master_slave_shim is
+
+Begin
+
+slave_rx_err <= '0';
+master_tx_err <= '0';
+
+Patch_Block: process(mac_clk)
+  Begin
+    If rising_edge(mac_clk) then
+      slave_rx_data <= master_rx_data
+-- pragma translate_off
+      after DELAY
+-- pragma translate_on
+      ;
+      master_tx_data <= slave_tx_data
+-- pragma translate_off
+      after DELAY
+-- pragma translate_on
+      ;
+      slave_tx_pause <= master_tx_pause
+-- pragma translate_off
+      after DELAY
+-- pragma translate_on
+      ;
+    End If;
+  End process Patch_Block;
+
+End Behavioral;

@@ -50,7 +50,6 @@ begin
 			if rst_macclk = '1' then
 				Head := 0;
 				Tail := 0;
-				DataOut := (Others => '0');
 				Looped := false;
 			else
 				if (mac_tx_ready = '1') then
@@ -80,8 +79,6 @@ begin
 					end if;
 				end if;
 				
-				-- Update data to be output
-				DataOut := Memory(Tail);
 			end if;
 
 			if Looped then
@@ -93,6 +90,13 @@ begin
 			-- Start running when FIFO is half full
 			if FillLevel(BUFWIDTH - 1) = '1' then
 				Running := '1';
+			end if;
+
+			If Running = '1' then
+				-- Update data to be output
+				DataOut := Memory(Tail);
+			else
+				DataOut := (Others => '0');
 			end if;
 
 			FIFO_Full <= FillLevel(BUFWIDTH);  -- bad things are happening...

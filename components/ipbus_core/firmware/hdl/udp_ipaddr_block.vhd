@@ -88,7 +88,7 @@ My_MAC_IP_addr_block:  process (mac_clk)
     if rising_edge(mac_clk) then
       if rst_macclk_reg = '1' then
         Got_MAC_IP_addr_rx := '0';
-	My_MAC_IP_addr_int := (Others => '0');
+	My_MAC_IP_addr_int := MAC_addr & x"00000000";
       elsif MAC_IP_addr_rx_vld = '1' then
         Got_MAC_IP_addr_rx := '1';
 	My_MAC_IP_addr_int := MAC_IP_addr_rx;

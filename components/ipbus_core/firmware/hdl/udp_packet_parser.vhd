@@ -207,7 +207,7 @@ ip_pkt:  process (mac_clk)
     if rising_edge(mac_clk) then
       if rx_reset = '1' then
         pkt_mask := "000000" & "111111" & "00" &
-        "0" & "11" & "11" & "00" & "1" & "1" & "11" &
+        "01" & "11" & "11" & "00" & "1" & "1" & "11" &
         "1111" & "0000";
         frag_mask := "111111" & "11" & "10";
         pkt_data := My_MAC_addr & x"0800" & x"45" & x"0000" & My_IP_addr;

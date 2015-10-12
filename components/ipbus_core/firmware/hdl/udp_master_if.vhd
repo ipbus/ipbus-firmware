@@ -18,7 +18,7 @@ ENTITY UDP_master_if IS
 --  RARP stuffing
 		rarp_rx_data: in std_logic_vector(7 downto 0);
 		rarp_rx_last: in std_logic;
-		rarp_rx_valid: in std_logic
+		rarp_rx_valid: in std_logic;
 		Got_IP_addr: OUT std_logic;
 --  TX FIFO
 		FIFO_Full: IN std_logic;
@@ -46,6 +46,9 @@ architecture rtl of UDP_master_if is
 -- Idle is indicated by K28.1 and K28.5
 -- By default K28.5 is used, but in the direction from slave to master K28.1 is used to signify 
 -- Got_IP_addr set to 0
+--
+-- N.B. assumption is that no other K chars are used so tests on K chars are not exhaustive
+--
 --        HGFEDCBA
 -- K28.0 "00011100"
 -- K28.1 "00111100"
@@ -65,13 +68,15 @@ With Got_IP_addr_sig select my_rx_valid <=
   mac_rx_valid when '1',
   rarp_rx_valid when Others;
 
-With Got_IP_addr_sig select mac_rx_last <=
+With Got_IP_addr_sig select my_rx_last <=
   mac_rx_last when '1',
   rarp_rx_last when Others;
 
 With Got_IP_addr_sig select my_rx_error <=
   mac_rx_error when '1',
   '0' when Others;
+
+Got_IP_addr <= Got_IP_addr_sig;
 
 rx_data_block:  process(mac_clk)
   variable next_last, next_error, kchar, last, error: std_logic;
@@ -106,27 +111,31 @@ rx_data_block:  process(mac_clk)
   end process rx_data_block;
 
 tx_data_block:  process(mac_clk)
-  variable next_valid, valid, error, last, error_pending, frame: std_logic;
+  variable next_valid, valid, error, last, error_pending, frame, Got_IP : std_logic;
   variable next_data, data: std_logic_vector(7 DOWNTO 0);
   begin
     If rising_edge(mac_clk) then
       next_valid := '0';
+      next_data := (Others => '0');
       last := '0';
       error := '0';
       If rst_macclk = '1' then
         frame := '0';
 	valid := '0';
 	error_pending := '0';
+	Got_IP := '0';
       ElsIf master_tx_data(0) = '0' then
         next_valid := '1';
 	next_data := master_tx_data(8 downto 1);
 	frame := '1';
 -- K char.  Only K28.n have these bits not all set to 1 so only check for K28.0 and K28.2
-      ElsIf master_tx_data(8) & master_tx_data(6) = "00" then
+      ElsIf (master_tx_data(8)= '0') and (master_tx_data(6) = '0') then
 	last := '1';
 	error := master_tx_data(7) or error_pending;  -- K28.2
 	frame := '0';
 	error_pending := '0';
+      Else
+        Got_IP := master_tx_data(8); -- K28.1 or K28.5...
       End If;
 -- Capture transmission error during a packet.  This logic will ignore an 
 -- error flagged on the K28.0 and K28.2 character, but that should be OK
@@ -139,6 +148,11 @@ tx_data_block:  process(mac_clk)
 -- pragma translate_on
       ;
       FIFO_WriteEn <= valid
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+      Got_IP_addr_sig <= Got_IP
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
