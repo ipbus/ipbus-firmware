@@ -50,9 +50,15 @@ begin
 			if rst_macclk = '1' then
 				Head := 0;
 				Tail := 0;
+				Running := '0';
 				Looped := false;
 			else
-				if (mac_tx_ready = '1') then
+				-- Stop running at EOF or buffer empty (when sampled)
+				if ((Head = Tail) or (DataOut(0) = '1')) and (mac_tx_ready = '1') then
+					Running := '0';
+				end if;
+
+				if ((mac_tx_ready = '1') and (Running = '1')) then
 					if ((Looped = true) or (Head /= Tail)) then
 						-- Update Tail pointer as needed
 						if (Tail = 2**BUFWIDTH - 1) then
@@ -99,17 +105,37 @@ begin
 				DataOut := (Others => '0');
 			end if;
 
-			FIFO_Full <= FillLevel(BUFWIDTH);  -- bad things are happening...
-			master_tx_pause <= FillLevel(BUFWIDTH - 1);
-			mac_tx_valid <= Running;
-			mac_tx_data <= DataOut(9 downto 2);
-			mac_tx_error <= DataOut(1);
-			mac_tx_last <= DataOut(0);
-
-			-- and stop running at EOF or buffer empty
-			if (Head = Tail) or (DataOut(0) = '1') then
-				Running := '0';
-			end if;
+			-- if this is set bad things are happening...
+			FIFO_Full <= FillLevel(BUFWIDTH)
+-- pragma translate_off
+			after 4 ns
+-- pragma translate_on
+			;
+			master_tx_pause <= FillLevel(BUFWIDTH - 1)
+-- pragma translate_off
+			after 4 ns
+-- pragma translate_on
+			;
+			mac_tx_valid <= Running
+-- pragma translate_off
+			after 4 ns
+-- pragma translate_on
+			;
+			mac_tx_data <= DataOut(9 downto 2)
+-- pragma translate_off
+			after 4 ns
+-- pragma translate_on
+			;
+			mac_tx_error <= DataOut(1)
+-- pragma translate_off
+			after 4 ns
+-- pragma translate_on
+			;
+			mac_tx_last <= DataOut(0)
+-- pragma translate_off
+			after 4 ns
+-- pragma translate_on
+			;
 
 		end if;
 	end process fifo_proc;

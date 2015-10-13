@@ -58,7 +58,7 @@ begin
 				else
 					busy <= '1';
 				end if;
-			elsif src_tx_last_bus(sel) = '1' then
+			elsif src_tx_last_bus(sel) = '1' and mac_tx_ready = '1' then
 				busy <= '0';
 			end if;
 		end if;

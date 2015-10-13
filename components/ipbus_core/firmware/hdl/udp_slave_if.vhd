@@ -112,7 +112,7 @@ rx_data_block:  process(mac_clk)
   end process rx_data_block;
 
 tx_data_block:  process(mac_clk)
-  variable next_last, next_error, kchar, last, error, ready: std_logic;
+  variable next_last, next_error, kchar, last, error, ready, last_ready: std_logic;
   variable data: std_logic_vector(7 DOWNTO 0);
   begin
     If rising_edge(mac_clk) then
@@ -122,11 +122,11 @@ tx_data_block:  process(mac_clk)
       kchar := '1';
       If rst_macclk = '1' then
 	data := "00111100";
-      ElsIf mac_tx_valid = '1' and slave_tx_pause = '0' then
+-- Captured data
+      ElsIf mac_tx_valid = '1' and last_ready = '1' then
         data := mac_tx_data;
 	next_last := mac_tx_last;
 	next_error := mac_tx_error;
-	ready := '1';
 	kchar := '0';
 -- End of frame, send K28.0 or K28.2
       ElsIf last = '1' then
@@ -134,6 +134,9 @@ tx_data_block:  process(mac_clk)
 -- Idle, send K28.1 (no IP address) or K28.5 (got IP address)
       Else
         data := Got_IP_addr & "0111100";
+      End If;
+      If rst_macclk = '0' and mac_tx_valid = '1' and slave_tx_pause = '0' then
+	ready := '1';
       End If;
       slave_tx_data <= data & kchar
 -- pragma translate_off
@@ -147,6 +150,7 @@ tx_data_block:  process(mac_clk)
       ;
       last := next_last;
       error := next_error;
+      last_ready := ready;
     end if;
   end process tx_data_block;
 

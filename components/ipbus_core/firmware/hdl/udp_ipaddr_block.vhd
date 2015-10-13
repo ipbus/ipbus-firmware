@@ -82,41 +82,30 @@ MAC_IP_addr_rx_block: process(mac_clk)
   end process;
 
 My_MAC_IP_addr_block:  process (mac_clk)
-  variable Got_MAC_IP_addr_rx: std_logic;
+  variable Got_MAC_IP_addr_rx, last_enable_125: std_logic;
   variable My_MAC_IP_addr_int: std_logic_vector(79 downto 0);
   begin
     if rising_edge(mac_clk) then
-      if rst_macclk_reg = '1' then
+-- Sample MAC_addr & IP_addr on reset or enable going high...
+      if (rst_macclk_reg = '1') or
+      (enable_125 = '1' and last_enable_125 = '0') then
         Got_MAC_IP_addr_rx := '0';
-	My_MAC_IP_addr_int := MAC_addr & x"00000000";
-      elsif MAC_IP_addr_rx_vld = '1' then
+	My_MAC_IP_addr_int := MAC_addr & IP_addr;
+      elsif MAC_IP_addr_rx_vld = '1' and rarp_125 = '1' then
         Got_MAC_IP_addr_rx := '1';
 	My_MAC_IP_addr_int := MAC_IP_addr_rx;
       end if;
--- Predefined (Non-RARP) mode...
-      if rarp_125 = '0' then
-        My_MAC_addr <= MAC_addr
+      last_enable_125 := enable_125;
+      My_MAC_addr <= My_MAC_IP_addr_int(79 downto 32)
 -- pragma translate_off
-        after 4 ns
+      after 4 ns
 -- pragma translate_on
-        ;
-        My_IP_addr <= IP_addr
+      ;
+      My_IP_addr <= My_MAC_IP_addr_int(31 downto 0)
 -- pragma translate_off
-        after 4 ns
+      after 4 ns
 -- pragma translate_on
-        ;
-      else
-        My_MAC_addr <= My_MAC_IP_addr_int(79 downto 32)
--- pragma translate_off
-        after 4 ns
--- pragma translate_on
-        ;
-        My_IP_addr <= My_MAC_IP_addr_int(31 downto 0)
--- pragma translate_off
-        after 4 ns
--- pragma translate_on
-        ;
-      end if;
+      ;
       rarp_mode <= enable_125 and rarp_125 and not Got_MAC_IP_addr_rx
 -- pragma translate_off
       after 4 ns
