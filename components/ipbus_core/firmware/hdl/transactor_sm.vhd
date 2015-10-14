@@ -139,7 +139,7 @@ begin
 				words_todo <= unsigned(rx_data(15 downto 8));
 			elsif state = ST_RMW_1 then
 				words_todo <= (others => '0');
-			elsif state <= ST_ADDR or ack = '1' then
+			elsif state = ST_ADDR or ack = '1' then
 				words_todo <= words_todo - 1;
 			end if;
 
