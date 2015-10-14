@@ -1,11 +1,12 @@
 -- UDP_master_fifo
 --  Dave Sankey Oct 2015
--- derived from http://www.deathbylogic.com/2015/01/vhdl-first_macclk-word-fall-through-fifo/
--- modified to have additional port master_tx_pause driven high when half full
+-- derived from http://www.deathbylogic.com/2015/01/vhdl-first-word-fall-through-fifo/
+-- modified to drive AXI stream interface of Xilinx MAC
+-- and to have additional port master_tx_pause driven high when half full
 -- (as a consequence of which FIFO depth needs to be a power of 2, hence recast as BUFWIDTH)
--- and to drive AXI stream interface of Xilinx MAC
 --
 -- FIFO needs to be deep enough that remote end reacts to master_tx_pause before FIFO either fills or empties
+-- and rather than checking on whether there is data it relies on the embedded mac_tx_last signal to stop emptying
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -53,20 +54,18 @@ begin
 				Running := '0';
 				Looped := false;
 			else
-				-- Stop running at EOF or buffer empty (when sampled)
-				if ((Head = Tail) or (DataOut(0) = '1')) and (mac_tx_ready = '1') then
-					Running := '0';
-				end if;
-
 				if ((mac_tx_ready = '1') and (Running = '1')) then
-					if ((Looped = true) or (Head /= Tail)) then
-						-- Update Tail pointer as needed
-						if (Tail = 2**BUFWIDTH - 1) then
-							Tail := 0;
-							Looped := false;
-						else
-							Tail := Tail + 1;
-						end if;
+					-- Update Tail pointer as needed
+					if (Tail = 2**BUFWIDTH - 1) then
+						Tail := 0;
+						Looped := false;
+					else
+						Tail := Tail + 1;
+					end if;
+
+					-- And stop running if mac_tx_last set
+					if (DataOut(0) = '1') then
+						Running := '0';
 					end if;
 				end if;
 				
