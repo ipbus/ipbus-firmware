@@ -9,10 +9,8 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use work.ipbus.all;
-use work.ipbus_trans_decl.all;
 use work.ipbus_reg_types.all;
 use work.ipbus_decode_ipbus_example.all;
-
 
 entity ipbus_example is
 	port(
@@ -80,10 +78,10 @@ begin
 -- Slave 2: ethernet error injection
 
 	slave2: entity work.ipbus_ctrlreg_v
-                generic map(
-                  N_CTRL => 2,
-                  N_STAT => 2
-                )
+		generic map(
+			N_CTRL => 2,
+			N_STAT => 2
+		)
 		port map(
 			clk => ipb_clk,
 			reset => ipb_rst,
