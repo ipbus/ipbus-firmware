@@ -53,4 +53,3 @@ package ipbus is
 	type ipb_ip_cfg is (EXTERNAL, INTERNAL);
 
 end ipbus;
-

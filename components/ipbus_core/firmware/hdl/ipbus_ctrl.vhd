@@ -186,4 +186,3 @@ begin
 	rarp_en <= cfg(81) or RARP_select;
 			
 end rtl;
-
