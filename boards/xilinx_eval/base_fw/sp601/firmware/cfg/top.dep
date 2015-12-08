@@ -5,7 +5,7 @@
 @boardname = "sp601"
 
 #setup sp601.tcl
-setup -c boards/xilinx_eval/common settings_s6.tcl
+setup -c boards/xilinx_eval/base_fw/common settings_s6.tcl
 setup -z coregen.cgp
 src top_sp601.vhd sp601_infra.vhd
 src -c components/ipbus_util ipbus_example.vhd
