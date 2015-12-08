@@ -98,7 +98,7 @@ begin
 			rx_valid => mac_rx_valid,
 			rx_last => mac_rx_last,
 			rx_error => mac_rx_error
-		)
+		);
 	
 -- ipbus control logic
 
