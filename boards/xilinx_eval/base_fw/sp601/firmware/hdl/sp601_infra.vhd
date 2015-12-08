@@ -41,7 +41,7 @@ end sp601_infra;
 
 architecture rtl of sp601_infra is
 
-	signal clk_125, clk_ipb, locked, rst_125, rst_ipb, onehz, pkt: std_logic;
+	signal clk_125, clk_ipb, clk_ipb_i, locked, rst_125, rst_ipb, onehz, pkt: std_logic;
 	signal mac_tx_data, mac_rx_data: std_logic_vector(7 downto 0);
 	signal mac_tx_valid, mac_tx_last, mac_tx_error, mac_tx_ready, mac_rx_valid, mac_rx_last, mac_rx_error: std_logic;
 	signal led_p: std_logic_vector(0 downto 0);
@@ -55,7 +55,7 @@ begin
 			sysclk_p => sysclk_p,
 			sysclk_n => sysclk_n,
 			clko_125 => clk_125,
-			clko_ipb => clk_ipb,
+			clko_ipb => clk_ipb_i,
 			locked => locked,
 			nuke => nuke,
 			rsto_125 => rst_125,
@@ -63,12 +63,16 @@ begin
 			onehz => onehz
 		);
 
+	clk_ipb <= clk_ipb_i; -- Best to align delta delays on all clocks for simulation
+	clk_ipb_o <= clk_ipb_i;
+	rst_ipb_o <= rst_ipb;
+
 	stretch: entity work.led_stretcher
 		generic map(
 			WIDTH => 1
 		)
 		port map(
-			clk => clk125,
+			clk => clk_125,
 			d(0) => pkt,
 			q => led_p
 		);
@@ -105,7 +109,7 @@ begin
 	ipbus: entity work.ipbus_ctrl
 		port map(
 			mac_clk => clk_125,
-			rst_macclk => rsti_125,
+			rst_macclk => rst_125,
 			ipb_clk => clk_ipb,
 			rst_ipb => rst_ipb, -- Do we need special reset here?
 			mac_rx_data => mac_rx_data,
