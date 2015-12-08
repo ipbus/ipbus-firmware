@@ -41,7 +41,7 @@ end sp601_infra;
 
 architecture rtl of sp601_infra is
 
-	signal clk_125, clk_ipb, locked, rst_125, rst_ipb, onehz, nuke, pkt: std_logic;
+	signal clk_125, clk_ipb, locked, rst_125, rst_ipb, onehz, pkt: std_logic;
 	signal mac_tx_data, mac_rx_data: std_logic_vector(7 downto 0);
 	signal mac_tx_valid, mac_tx_last, mac_tx_error, mac_tx_ready, mac_rx_valid, mac_rx_last, mac_rx_error: std_logic;
 	signal led_p: std_logic_vector(0 downto 0);
@@ -54,8 +54,8 @@ begin
 		port map(
 			sysclk_p => sysclk_p,
 			sysclk_n => sysclk_n,
-			clko_125 => clk125,
-			clko_ipb => ipb_clk,
+			clko_125 => clk_125,
+			clko_ipb => clk_ipb,
 			locked => locked,
 			nuke => nuke,
 			rsto_125 => rst_125,
@@ -83,7 +83,7 @@ begin
 			rst => rst_125,
 			gmii_gtx_clk => gmii_gtx_clk,
 			gmii_txd => gmii_txd,
-			gmii_tx_en => gmii_rx_en,
+			gmii_tx_en => gmii_tx_en,
 			gmii_tx_er => gmii_tx_er,
 			gmii_rx_clk => gmii_rx_clk,
 			gmii_rxd => gmii_rxd,
@@ -104,10 +104,10 @@ begin
 
 	ipbus: entity work.ipbus_ctrl
 		port map(
-			mac_clk => clk125,
+			mac_clk => clk_125,
 			rst_macclk => rsti_125,
-			ipb_clk => ipb_clk,
-			rst_ipb => rsti_ipb_ctrl,
+			ipb_clk => clk_ipb,
+			rst_ipb => rst_ipb, -- Do we need special reset here?
 			mac_rx_data => mac_rx_data,
 			mac_rx_valid => mac_rx_valid,
 			mac_rx_last => mac_rx_last,
