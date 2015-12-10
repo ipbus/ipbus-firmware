@@ -3,13 +3,13 @@ NET sysclk_n LOC = K16 | IOSTANDARD = LVDS_25 | DIFF_TERM = TRUE;
 
 TIMESPEC TS_sysclk = PERIOD tnm_sysclk 200MHz;
 
-NET ipb_clk TNM_NET = tnm_ipb_clk;
-NET clk125 TNM_NET = tnm_clk125;
-TIMESPEC TS_tig_ipb_125 = FROM tnm_ipb_clk TO tnm_clk125 TIG;
-TIMESPEC TS_tig_125_ipb = FROM tnm_clk125 TO tnm_ipb_clk TIG;
+NET clk_ipb TNM_NET = tnm_clk_ipb;
+NET infra/clk_125 TNM_NET = tnm_clk_125;
+TIMESPEC TS_tig_ipb_125 = FROM tnm_clk_ipb TO tnm_clk_125 TIG;
+TIMESPEC TS_tig_125_ipb = FROM tnm_clk_125 TO tnm_clk_ipb TIG;
 
-NET clocks/rst TIG;
-NET clocks/nuke_i TIG;
+#NET infra/clocks/rst TIG;
+#NET infra/clocks/nuke_i TIG;
 
 NET leds<0> LOC=E13 | IOSTANDARD=LVCMOS25;
 NET leds<1> LOC=C14 | IOSTANDARD=LVCMOS25;
