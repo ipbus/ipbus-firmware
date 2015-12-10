@@ -39,9 +39,6 @@ begin
 -- Infrastructure
 
 	infra: entity work.sp601_infra
-		generic map(
-			STATIC_IP_ADDR => true
-		)
 		port map(
 			sysclk_p => sysclk_p,
 			sysclk_n => sysclk_n,
