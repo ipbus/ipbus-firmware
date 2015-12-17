@@ -2,6 +2,6 @@
 
 src eth_7s_1000basex.vhd emac_hostbus_decl.vhd
 src ../cgn/temac_basex_v9_0.xci
-src -g --cd gig_eth_pcs_pma_v15_0/synth *.vhd
-src -g --cd gig_eth_pcs_pma_v15_0/synth/transceiver *.vhd
-src ../cgn/gig_eth_pcs_pma_v15_0.xci
+src -g --cd gig_eth_pcs_pma_basex_v15_0/synth *.vhd
+src -g --cd gig_eth_pcs_pma_basex_v15_0/synth/transceiver *.vhd
+src ../cgn/gig_eth_pcs_pma_basex_v15_0.xci
