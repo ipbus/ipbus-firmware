@@ -36,7 +36,7 @@ begin
 
 -- Infrastructure
 
-	infra: entity work.kc705_infra
+	infra: entity work.kc705_basex_infra
 		port map(
 			eth_clk_p => eth_clk_p,
 			eth_clk_n => eth_clk_n,
