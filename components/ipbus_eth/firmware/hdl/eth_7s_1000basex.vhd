@@ -167,7 +167,7 @@ begin
 			tx_statistics_vector => open,
 			tx_statistics_valid => open,
 			tx_mac_aclk => open,
-			tx_reset_out => open,
+			tx_reset => open,
 			tx_axis_mac_tdata => tx_data,
 			tx_axis_mac_tvalid => tx_valid,
 			tx_axis_mac_tlast => tx_last,
@@ -175,8 +175,6 @@ begin
 			tx_axis_mac_tready => tx_ready,
 			pause_req => '0',
 			pause_val => X"0000",
-			speed_is_100 => open,
-			speed_is_10_100 => open,
 			gmii_txd => gmii_txd,
 			gmii_tx_en => gmii_tx_en,
 			gmii_tx_er => gmii_tx_er,
@@ -234,7 +232,9 @@ begin
 			configuration_vector => "00000",
 			status_vector => open,
 			reset => rsti,
-			signal_detect => '1'
+			signal_detect => '1',
+			gt0_qplloutclk_in => '0',
+			gt0_qplloutrefclk_in => '0'			
 		);
 
 end rtl;

@@ -38,7 +38,7 @@ end kc705_basex_infra;
 
 architecture rtl of kc705_basex_infra is
 
-	signal clk125_fr, clk_125, clk_ipb, clk_ipb_i, locked, rst_125, rst_ipb, rst_ipb_ctrl, onehz, pkt: std_logic;
+	signal clk125_fr, clk125, clk_ipb, clk_ipb_i, locked, clk_locked, eth_locked, rst125, rst_ipb, rst_ipb_ctrl, rst_eth, onehz, pkt: std_logic;
 	signal mac_tx_data, mac_rx_data: std_logic_vector(7 downto 0);
 	signal mac_tx_valid, mac_tx_last, mac_tx_error, mac_tx_ready, mac_rx_valid, mac_rx_last, mac_rx_error: std_logic;
 	signal led_p: std_logic_vector(0 downto 0);
@@ -56,7 +56,7 @@ begin
 			locked => clk_locked,
 			nuke => nuke,
 			soft_rst => soft_rst,
-			rsto_125 => rst_125,
+			rsto_125 => rst125,
 			rsto_ipb => rst_ipb,
 			rsto_eth => rst_eth,
 			rsto_ipb_ctrl => rst_ipb_ctrl,
@@ -74,7 +74,7 @@ begin
 			WIDTH => 1
 		)
 		port map(
-			clk => clk_125,
+			clk => clk125,
 			d(0) => pkt,
 			q => led_p
 		);
@@ -91,7 +91,6 @@ begin
 			gt_txn => eth_tx_n,
 			gt_rxp => eth_rx_p,
 			gt_rxn => eth_rx_n,
-			sig_detn => sfp_los,
 			clk125_out => clk125,
 			clk125_fr => clk125_fr,
 			rsti => rst_eth,
@@ -112,8 +111,8 @@ begin
 	ipbus: entity work.ipbus_ctrl
 		port map(
 			mac_clk => clk125,
-			rst_macclk => rst_125,
-			ipb_clk => ipb_clk,
+			rst_macclk => rst125,
+			ipb_clk => clk_ipb,
 			rst_ipb => rst_ipb_ctrl,
 			mac_rx_data => mac_rx_data,
 			mac_rx_valid => mac_rx_valid,
