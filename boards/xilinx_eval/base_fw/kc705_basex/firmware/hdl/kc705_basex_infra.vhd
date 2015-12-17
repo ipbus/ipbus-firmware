@@ -14,12 +14,12 @@ use work.ipbus.all;
 
 entity kc705_basex_infra is
 	port(
-		gt_clk_p: in std_logic; -- 125MHz MGT clock
-		gt_clk_n: in std_logic;
-		gt_rx_p: in std_logic; -- Ethernet MGT input
-		gt_rx_n: in std_logic;
-		gt_tx_p: out std_logic; -- Ethernet MGT output
-		gt_tx_n: out std_logic;
+		eth_clk_p: in std_logic; -- 125MHz MGT clock
+		eth_clk_n: in std_logic;
+		eth_rx_p: in std_logic; -- Ethernet MGT input
+		eth_rx_n: in std_logic;
+		eth_tx_p: out std_logic; -- Ethernet MGT output
+		eth_tx_n: out std_logic;
 		sfp_los: in std_logic;
 		clk_ipb_o: out std_logic; -- IPbus clock
 		rst_ipb_o: out std_logic;
@@ -85,12 +85,12 @@ begin
 	
 	eth: entity work.eth_7s_1000basex
 		port map(
-			gt_clkp => gt_clk_p,
-			gt_clkn => gt_clk_n,
-			gt_txp => gt_tx_p,
-			gt_txn => gt_tx_n,
-			gt_rxp => gt_rx_p,
-			gt_rxn => gt_rx_n,
+			gt_clkp => eth_clk_p,
+			gt_clkn => eth_clk_n,
+			gt_txp => eth_tx_p,
+			gt_txn => eth_tx_n,
+			gt_rxp => eth_rx_p,
+			gt_rxn => eth_rx_n,
 			sig_detn => sfp_los,
 			clk125_out => clk125,
 			clk125_fr => clk125_fr,

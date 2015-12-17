@@ -1,7 +1,6 @@
 -- Top-level design for ipbus demo
 --
--- This version is for xc6slx16 on Xilinx SP601 eval board
--- Uses the s6 soft TEMAC core with GMII inteface to an external Gb PHY
+-- This version is for KC705 eval board, using SFP ethernet interface
 --
 -- You must edit this file to set the IP and MAC addresses
 --
@@ -13,15 +12,14 @@ use IEEE.STD_LOGIC_1164.ALL;
 use work.ipbus.ALL;
 
 entity top is port(
-		sysclk_p: in std_logic;
-		sysclk_n: in std_logic;
-		leds: out std_logic_vector(3 downto 0);
-		gmii_gtx_clk, gmii_tx_en, gmii_tx_er : out std_logic;
-		gmii_txd : out std_logic_vector(7 downto 0);
-		gmii_rx_clk, gmii_rx_dv, gmii_rx_er: in std_logic;
-		gmii_rxd : in std_logic_vector(7 downto 0);
-		phy_rstb : out std_logic;
-		dip_switch: in std_logic_vector(3 downto 0)
+		eth_clk_p: in std_logic; -- 125MHz MGT clock
+		eth_clk_n: in std_logic;
+		eth_rx_p: in std_logic; -- Ethernet MGT input
+		eth_rx_n: in std_logic;
+		eth_tx_p: out std_logic; -- Ethernet MGT output
+		eth_tx_n: out std_logic;
+		sfp_los: in std_logic;
+		leds: out std_logic_vector(1 downto 0) -- status LEDs
 	);
 
 end top;
@@ -38,23 +36,20 @@ begin
 
 -- Infrastructure
 
-	infra: entity work.sp601_infra
+	infra: entity work.kc705_infra
 		port map(
-			sysclk_p => sysclk_p,
-			sysclk_n => sysclk_n,
+			eth_clk_p => eth_clk_p,
+			eth_clk_n => eth_clk_n,
+			eth_tx_p => eth_tx_p,
+			eth_tx_n => eth_tx_n,
+			eth_rx_p => eth_rx_p,
+			eth_rx_n => eth_rx_n,
+			sfp_los => sfp_los,
 			clk_ipb_o => clk_ipb,
 			rst_ipb_o => rst_ipb,
 			nuke => nuke,
 			soft_rst => soft_rst,
 			leds => leds(1 downto 0),
-			gmii_gtx_clk => gmii_gtx_clk,
-			gmii_txd => gmii_txd,
-			gmii_tx_en => gmii_tx_en,
-			gmii_tx_er => gmii_tx_er,
-			gmii_rx_clk => gmii_rx_clk,
-			gmii_rxd => gmii_rxd,
-			gmii_rx_dv => gmii_rx_dv,
-			gmii_rx_er => gmii_rx_er,
 			mac_addr => mac_addr,
 			ip_addr => ip_addr,
 			ipb_in => ipb_in,
