@@ -2,6 +2,6 @@
 
 src eth_7s_1000basex.vhd emac_hostbus_decl.vhd
 src ../cgn/temac_basex_v9_0.xci
-src -g --cd gig_eth_pcs_pma_basex_v15_0/synth gig_eth_pcs_pma_basex_v15_0_block.vhd gig_eth_pcs_pma_basex_v15_0_reset_sync.vhd gig_eth_pcs_pma_basex_v15_0_sync_block.vhd
-src -g --cd gig_eth_pcs_pma_basex_v15_0/synth/transceiver gig_eth_pcs_pma_basex_v15_0_cpll_railing.vhd gig_eth_pcs_pma_basex_v15_0_gtwizard_multi_gt.vhd gig_eth_pcs_pma_basex_v15_0_rx_startup_fsm.vhd gig_eth_pcs_pma_basex_v15_0_gtwizard_gt.vhd gig_eth_pcs_pma_basex_v15_0_gtwizard.vhd gig_eth_pcs_pma_basex_v15_0_transceiver.vhd gig_eth_pcs_pma_basex_v15_0_gtwizard_init.vhd gig_eth_pcs_pma_basex_v15_0_reset_wtd_timer.vhd gig_eth_pcs_pma_basex_v15_0_tx_startup_fsm.vhd
+src --cd ../gen_hdl/gig_eth_pcs_pma_basex_v15_0/synth gig_eth_pcs_pma_basex_v15_0_block.vhd gig_eth_pcs_pma_basex_v15_0_reset_sync.vhd gig_eth_pcs_pma_basex_v15_0_sync_block.vhd
+src --cd ../gen_hdl/gig_eth_pcs_pma_basex_v15_0/synth/transceiver *.vhd
 src ../cgn/gig_eth_pcs_pma_basex_v15_0.xci
