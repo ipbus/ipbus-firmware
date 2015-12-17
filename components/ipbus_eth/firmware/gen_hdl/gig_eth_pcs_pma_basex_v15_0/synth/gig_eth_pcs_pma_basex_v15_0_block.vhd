@@ -256,7 +256,7 @@ architecture block_level of gig_eth_pcs_pma_basex_v15_0_block is
    -----------------------------------------------------------------------------
    -- Component Declaration for the 1000BASE-X PCS/PMA sublayer core.
    -----------------------------------------------------------------------------
-   component gig_ethernet_pcs_pma_v15_0
+   component gig_ethernet_pcs_pma_basex_v15_0
       generic (
          C_ELABORATION_TRANSIENT_DIR : string := "";
          C_COMPONENT_NAME            : string := "";
@@ -388,7 +388,7 @@ phyaddress <= std_logic_vector(to_unsigned(1, phyaddress'length));
   -- Instantiate the core
   ------------------------------------------------------------------------------
 
-  gig_eth_pcs_pma_basex_v15_0_core : gig_ethernet_pcs_pma_v15_0
+  gig_eth_pcs_pma_basex_v15_0_core : gig_ethernet_pcs_pma_basex_v15_0
     generic map (
       C_ELABORATION_TRANSIENT_DIR => "BlankString",
       C_COMPONENT_NAME            => "gig_eth_pcs_pma_basex_v15_0",

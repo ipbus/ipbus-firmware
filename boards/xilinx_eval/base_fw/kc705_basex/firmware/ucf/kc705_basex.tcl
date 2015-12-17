@@ -29,4 +29,4 @@ set_property PACKAGE_PIN AC9 [get_ports {leds[2]}]
 set_property PACKAGE_PIN AB9 [get_ports {leds[3]}]
 
 set_property IOSTANDARD LVCMOS25 [get_ports {sfp_los}]
-set_property PACKAGE_PIN AP19 [get_ports {sfp_los}]
+set_property PACKAGE_PIN P19 [get_ports {sfp_los}]
