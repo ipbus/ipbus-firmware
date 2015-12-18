@@ -1,9 +1,6 @@
--- mp7_infra
+-- sp601_infra
 --
--- All board-specific stuff goes here. Wrapper for ethernet, ipbus, MMC link
--- and various clock control interfaces
---
--- All clocks are derived from 125MHz xtal clock for backplane ethernet serdes
+-- All board-specific stuff goes here.
 --
 -- Dave Newbold, June 2013
 
@@ -41,7 +38,7 @@ end sp601_infra;
 
 architecture rtl of sp601_infra is
 
-	signal clk_125, clk_ipb, clk_ipb_i, locked, rst_125, rst_ipb, onehz, pkt: std_logic;
+	signal clk125, clk_ipb, clk_ipb_i, locked, rst125, rst_ipb, onehz, pkt: std_logic;
 	signal mac_tx_data, mac_rx_data: std_logic_vector(7 downto 0);
 	signal mac_tx_valid, mac_tx_last, mac_tx_error, mac_tx_ready, mac_rx_valid, mac_rx_last, mac_rx_error: std_logic;
 	signal led_p: std_logic_vector(0 downto 0);
@@ -54,11 +51,12 @@ begin
 		port map(
 			sysclk_p => sysclk_p,
 			sysclk_n => sysclk_n,
-			clko_125 => clk_125,
+			clko_125 => clk125,
 			clko_ipb => clk_ipb_i,
 			locked => locked,
 			nuke => nuke,
-			rsto_125 => rst_125,
+			soft_rst => soft_rst,
+			rsto_125 => rst125,
 			rsto_ipb => rst_ipb,
 			onehz => onehz
 		);
@@ -72,7 +70,7 @@ begin
 			WIDTH => 1
 		)
 		port map(
-			clk => clk_125,
+			clk => clk125,
 			d(0) => pkt,
 			q => led_p
 		);
@@ -83,8 +81,8 @@ begin
 
 	eth: entity work.eth_s6_gmii
 		port map(
-			clk125 => clk_125,
-			rst => rst_125,
+			clk125 => clk125,
+			rst => rst125,
 			gmii_gtx_clk => gmii_gtx_clk,
 			gmii_txd => gmii_txd,
 			gmii_tx_en => gmii_tx_en,
@@ -108,10 +106,10 @@ begin
 
 	ipbus: entity work.ipbus_ctrl
 		port map(
-			mac_clk => clk_125,
-			rst_macclk => rst_125,
+			mac_clk => clk125,
+			rst_macclk => rst125,
 			ipb_clk => clk_ipb,
-			rst_ipb => rst_ipb, -- Do we need special reset here?
+			rst_ipb => rst_ipb_ctrl,
 			mac_rx_data => mac_rx_data,
 			mac_rx_valid => mac_rx_valid,
 			mac_rx_last => mac_rx_last,

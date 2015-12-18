@@ -13,15 +13,18 @@ use ieee.std_logic_1164.all;
 library unisim;
 use unisim.VComponents.all;
 
-entity clocks_s6_extphy is port(
-	sysclk_p, sysclk_n: in std_logic;
-	clko_125: out std_logic;
-	clko_ipb: out std_logic;
-	locked: out std_logic;
-	nuke: in std_logic;
-	rsto_125: out std_logic;
-	rsto_ipb: out std_logic;
-	onehz: out std_logic
+entity clocks_s6_extphy is
+	port(
+		sysclk_p, sysclk_n: in std_logic;
+		clko_125: out std_logic;
+		clko_ipb: out std_logic;
+		locked: out std_logic;
+		nuke: in std_logic;
+		soft_rst: in std_logic;
+		rsto_125: out std_logic;
+		rsto_ipb: out std_logic;
+		rsto_ipb_ctrl: out std_logic;
+		onehz: out std_logic
 	);
 
 end clocks_s6_extphy;
@@ -31,7 +34,8 @@ architecture rtl of clocks_s6_extphy is
 	signal clk_ipb_i, clk_ipb_b, clk_125_i, clk_125_b, sysclk: std_logic;
 	signal d17, d17_d, dcm_locked: std_logic;
 	signal nuke_i, nuke_d, nuke_d2: std_logic := '0';
-	signal rst, rst_ipb, rst_125: std_logic := '1';
+	signal rst, srst, rst_ipb, rst_125, rst_ipb_ctrl: std_logic := '1';
+	signal rctr: unsigned(3 downto 0) := "0000";
 	
 begin
 
@@ -89,16 +93,29 @@ begin
 	end process;
 	
 	locked <= dcm_locked;
-
+	srst <= '1' when rctr /= "0000" else '0';
+	
 	process(clk_ipb_b)
 	begin
 		if rising_edge(clk_ipb_b) then
 			rst_ipb <= rst;
 			nuke_i <= nuke;
+			if srst = '1' or soft_rst = '1' then
+				rctr <= rctr + 1;
+			end if;
 		end if;
 	end process;
 	
 	rsto_ipb <= rst_ipb;
+	
+	process(clk_ipb_b)
+	begin
+		if rising_edge(clk_ipb_b) then
+			rst_ipb_ctrl <= rst;
+		end if;
+	end process;
+	
+	rsto_ipb_ctrl <= rst_ipb_ctrl;
 	
 	process(clk_125_b)
 	begin

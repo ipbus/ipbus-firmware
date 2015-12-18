@@ -1,7 +1,6 @@
 -- Top-level design for ipbus demo
 --
--- This version is for xc6slx16 on Xilinx SP601 eval board
--- Uses the s6 soft TEMAC core with GMII inteface to an external Gb PHY
+-- This version is for KC705 eval board, using SFP ethernet interface
 --
 -- You must edit this file to set the IP and MAC addresses
 --
@@ -20,8 +19,7 @@ entity top is port(
 		gmii_txd: out std_logic_vector(7 downto 0);
 		gmii_rx_clk, gmii_rx_dv, gmii_rx_er: in std_logic;
 		gmii_rxd: in std_logic_vector(7 downto 0);
-		phy_rstb: out std_logic;
-		dip_switch: in std_logic_vector(3 downto 0)
+		phy_rstb: out std_logic
 	);
 
 end top;
@@ -38,7 +36,7 @@ begin
 
 -- Infrastructure
 
-	infra: entity work.sp601_infra
+	infra: entity work.kc705_gmii_infra
 		port map(
 			sysclk_p => sysclk_p,
 			sysclk_n => sysclk_n,
@@ -62,10 +60,9 @@ begin
 		);
 		
 	leds(3 downto 2) <= '0' & userled;
-	phy_rstb <= '1';
 		
-	mac_addr <= X"020ddba115" & dip_switch & X"0"; -- Careful here, arbitrary addresses do not always work
-	ip_addr <= X"c0a8c8" & dip_switch & X"0"; -- 192.168.200.X
+	mac_addr <= X"020ddba11501"; -- Careful here, arbitrary addresses do not always work
+	ip_addr <= X"c0a8c801"; -- 192.168.200.1
 
 -- ipbus slaves live in the entity below, and can expose top-level ports
 -- The ipbus fabric is instantiated within.
