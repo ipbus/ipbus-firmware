@@ -25,7 +25,6 @@ NET dip_switch<3> LOC=V13;
 
 TIMEGRP TG_gmii_tx=PADS("gmii_tx*");
 TIMEGRP TG_gmii_tx OFFSET = OUT AFTER sysclk_p REFERENCE_PIN "gmii_gtx_clk" RISING;
-
 NET gmii_gtx_clk LOC=A9 | IOSTANDARD=LVCMOS25 | SLEW=FAST;
 NET gmii_txd<0> LOC=F8 | IOSTANDARD=LVCMOS25;
 NET gmii_txd<1> LOC=G8 | IOSTANDARD=LVCMOS25;

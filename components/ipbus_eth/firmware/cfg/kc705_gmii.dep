@@ -1,0 +1,4 @@
+# Dependencies for the ethernet gubbins on a k7 part
+
+src eth_7s_gmii.vhd emac_hostbus_decl.vhd
+src ../cgn/temac_gbe_v9_0.xci ../cgn/mac_fifo_axi4.xci

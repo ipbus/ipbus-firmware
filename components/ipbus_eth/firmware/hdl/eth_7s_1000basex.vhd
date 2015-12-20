@@ -40,7 +40,7 @@ end eth_7s_1000basex;
 
 architecture rtl of eth_7s_1000basex is
 
-	COMPONENT temac_basex_v9_0
+	COMPONENT temac_gbe_v9_0
 		PORT (
 			gtx_clk : IN STD_LOGIC;
 			glbl_rstn : IN STD_LOGIC;
@@ -149,7 +149,7 @@ begin
 	locked <= locked_int;
 	rstn <= not (not locked_int or rsti);
 
-	mac: temac_basex_v9_0
+	mac: temac_gbe_v9_0
 		port map(
 			gtx_clk => clk125,
 			glbl_rstn => rstn,

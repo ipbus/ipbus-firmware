@@ -19,7 +19,7 @@ entity top is port(
 		gmii_txd: out std_logic_vector(7 downto 0);
 		gmii_rx_clk, gmii_rx_dv, gmii_rx_er: in std_logic;
 		gmii_rxd: in std_logic_vector(7 downto 0);
-		phy_rstb: out std_logic
+		phy_rst: out std_logic
 	);
 
 end top;
@@ -60,6 +60,7 @@ begin
 		);
 		
 	leds(3 downto 2) <= '0' & userled;
+	phy_rst <= '0';
 		
 	mac_addr <= X"020ddba11501"; -- Careful here, arbitrary addresses do not always work
 	ip_addr <= X"c0a8c801"; -- 192.168.200.1
