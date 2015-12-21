@@ -38,7 +38,7 @@ end sp601_infra;
 
 architecture rtl of sp601_infra is
 
-	signal clk125, clk_ipb, clk_ipb_i, locked, rst125, rst_ipb, onehz, pkt: std_logic;
+	signal clk125, clk_ipb, clk_ipb_i, locked, rst125, rst_ipb, rst_ipb_ctrl, onehz, pkt: std_logic;
 	signal mac_tx_data, mac_rx_data: std_logic_vector(7 downto 0);
 	signal mac_tx_valid, mac_tx_last, mac_tx_error, mac_tx_ready, mac_rx_valid, mac_rx_last, mac_rx_error: std_logic;
 	signal led_p: std_logic_vector(0 downto 0);
@@ -58,6 +58,7 @@ begin
 			soft_rst => soft_rst,
 			rsto_125 => rst125,
 			rsto_ipb => rst_ipb,
+			rsto_ipb_ctrl => rst_ipb_ctrl,
 			onehz => onehz
 		);
 
