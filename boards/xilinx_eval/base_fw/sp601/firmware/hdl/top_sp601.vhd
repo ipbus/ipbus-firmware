@@ -64,7 +64,7 @@ begin
 	leds(3 downto 2) <= '0' & userled;
 	phy_rstb <= '1';
 		
-	mac_addr <= X"020ddba115e680"; -- Careful here, arbitrary addresses do not always work
+	mac_addr <= X"020ddba1e680"; -- Careful here, arbitrary addresses do not always work
 	ip_addr <= X"c0a8e680"; -- 192.168.230.128
 
 -- ipbus slaves live in the entity below, and can expose top-level ports
