@@ -1,0 +1,13 @@
+@device_family = "spartan6"
+@device_name = "xc6slx16"
+@device_package = "csg324"
+@device_speed = "-2"
+@boardname = "sp601"
+
+setup -c boards/xilinx_eval/base_fw/common settings_s6.tcl
+setup -z coregen.cgp
+src top_sp601.vhd
+include sp601_infra.dep
+include -c components/ipbus_util ipbus_example.dep
+src -c components/ipbus_core ipbus_package.vhd
+src --cd ../ucf sp601.ucf

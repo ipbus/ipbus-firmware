@@ -1,0 +1,5 @@
+src sp601_infra.vhd
+src -c components/ipbus_util clocks_s6_extphy.vhd ipbus_clock_div.vhd led_stretcher.vhd
+include -c components/ipbus_core
+include -c components/ipbus_eth s6_extphy.dep
+src -c components/ipbus_core ipbus_fabric_sel.vhd ipbus_package.vhd
