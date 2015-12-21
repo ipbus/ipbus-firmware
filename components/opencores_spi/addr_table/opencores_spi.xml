@@ -1,0 +1,9 @@
+<node description="SPI master controller" fwinfo="endpoint;width=3">
+	<node id="d0" address="0x0" description="Data reg 0"/>
+	<node id="d1" address="0x1" description="Data reg 1"/>
+	<node id="d2" address="0x2" description="Data reg 2"/>
+	<node id="d3" address="0x3" description="Data reg 3"/>
+	<node id="ctrl" address="0x4" description="Control reg"/>
+	<node id="divider" address="0x5" description="Clock divider reg"/>
+	<node id="ss" address="0x6" description="Slave select reg"/>
+</node>

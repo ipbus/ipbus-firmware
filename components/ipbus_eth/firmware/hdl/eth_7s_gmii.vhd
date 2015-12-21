@@ -44,42 +44,43 @@ end eth_7s_gmii;
 
 architecture rtl of eth_7s_gmii is
 
-	COMPONENT tri_mode_eth_mac_v5_4
-	  PORT (
-		 glbl_rstn : IN STD_LOGIC;
-		 rx_axi_rstn : IN STD_LOGIC;
-		 tx_axi_rstn : IN STD_LOGIC;
-		 rx_axi_clk : IN STD_LOGIC;
-		 rx_reset_out : OUT STD_LOGIC;
-		 rx_axis_mac_tdata : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-		 rx_axis_mac_tvalid : OUT STD_LOGIC;
-		 rx_axis_mac_tlast : OUT STD_LOGIC;
-		 rx_axis_mac_tuser : OUT STD_LOGIC;
-		 rx_statistics_vector : OUT STD_LOGIC_VECTOR(27 DOWNTO 0);
-		 rx_statistics_valid : OUT STD_LOGIC;
-		 tx_axi_clk : IN STD_LOGIC;
-		 tx_reset_out : OUT STD_LOGIC;
-		 tx_axis_mac_tdata : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
-		 tx_axis_mac_tvalid : IN STD_LOGIC;
-		 tx_axis_mac_tlast : IN STD_LOGIC;
-		 tx_axis_mac_tuser : IN STD_LOGIC;
-		 tx_axis_mac_tready : OUT STD_LOGIC;
-		 tx_ifg_delay : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
-		 tx_statistics_vector : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-		 tx_statistics_valid : OUT STD_LOGIC;
-		 pause_req : IN STD_LOGIC;
-		 pause_val : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-		 speed_is_100 : OUT STD_LOGIC;
-		 speed_is_10_100 : OUT STD_LOGIC;
-		 gmii_txd : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-		 gmii_tx_en : OUT STD_LOGIC;
-		 gmii_tx_er : OUT STD_LOGIC;
-		 gmii_rxd : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
-		 gmii_rx_dv : IN STD_LOGIC;
-		 gmii_rx_er : IN STD_LOGIC;
-		 rx_mac_config_vector : IN STD_LOGIC_VECTOR(79 DOWNTO 0);
-		 tx_mac_config_vector : IN STD_LOGIC_VECTOR(79 DOWNTO 0)
-	  );
+	COMPONENT temac_gbe_v9_0
+		PORT (
+			gtx_clk : IN STD_LOGIC;
+			glbl_rstn : IN STD_LOGIC;
+			rx_axi_rstn : IN STD_LOGIC;
+			tx_axi_rstn : IN STD_LOGIC;
+			rx_statistics_vector : OUT STD_LOGIC_VECTOR(27 DOWNTO 0);
+			rx_statistics_valid : OUT STD_LOGIC;
+			rx_mac_aclk : OUT STD_LOGIC;
+			rx_reset : OUT STD_LOGIC;
+			rx_axis_mac_tdata : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+			rx_axis_mac_tvalid : OUT STD_LOGIC;
+			rx_axis_mac_tlast : OUT STD_LOGIC;
+			rx_axis_mac_tuser : OUT STD_LOGIC;
+			tx_ifg_delay : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+			tx_statistics_vector : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+			tx_statistics_valid : OUT STD_LOGIC;
+			tx_mac_aclk : OUT STD_LOGIC;
+			tx_reset : OUT STD_LOGIC;
+			tx_axis_mac_tdata : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+			tx_axis_mac_tvalid : IN STD_LOGIC;
+			tx_axis_mac_tlast : IN STD_LOGIC;
+			tx_axis_mac_tuser : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+			tx_axis_mac_tready : OUT STD_LOGIC;
+			pause_req : IN STD_LOGIC;
+			pause_val : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+			speedis100 : OUT STD_LOGIC;
+			speedis10100 : OUT STD_LOGIC;
+			gmii_txd : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+			gmii_tx_en : OUT STD_LOGIC;
+			gmii_tx_er : OUT STD_LOGIC;
+			gmii_rxd : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+			gmii_rx_dv : IN STD_LOGIC;
+			gmii_rx_er : IN STD_LOGIC;
+			rx_configuration_vector : IN STD_LOGIC_VECTOR(79 DOWNTO 0);
+			tx_configuration_vector : IN STD_LOGIC_VECTOR(79 DOWNTO 0)
+		);
 	END COMPONENT;
 	
 	COMPONENT mac_fifo_axi4
@@ -120,7 +121,7 @@ begin
 	idelayctrl0: idelayctrl port map(
 		refclk => clk200,
 		rst => rst
-	); -- V5/6 delay element controller
+	);
 
 	bufio0: bufio port map(
 		i => gmii_rx_clk,
@@ -224,7 +225,7 @@ begin
 
 	rstn <= not rst;
 
-	emac0: tri_mode_eth_mac_v5_4 port map(
+	emac0: temac_gbe_v9_0 port map(
 		glbl_rstn => rstn,
 		rx_axi_rstn => '1',
 		tx_axi_rstn => '1',

@@ -4,8 +4,10 @@
 -- In reality you would add your preferred means of transporting these 
 -- between the two FPGA.
 --
--- The _data ports can be interpreted as input to 8B/10B
--- _err should be asserted if a transmission error is detected
+-- The _data ports can be interpreted as input to 8B/10B,
+-- (8 downto 1 data, 0 isKchar)
+--
+-- _err should be asserted if a transmission error is detected these
 --
 -- _pause is the sloppy FIFO signal
 --

@@ -1,4 +1,0 @@
-src glib_infra_basex.vhd
-include -c components/ipbus_eth v6_basex.dep
-include glib_infra_common.dep
-

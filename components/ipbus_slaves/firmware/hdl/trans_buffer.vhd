@@ -82,7 +82,7 @@ architecture rtl of trans_buffer is
 		);
 	END COMPONENT;
 
-	signal req_d, mode, done_m, done_m_s: std_logic;
+	signal req_d, mode, mode_fall_edge, done_m, done_m_s: std_logic;
 	signal mode_ipb, mode_ipb_s, mode_ipb_d, rdy, done_catch: std_logic;
 	signal addr: unsigned(9 downto 0);
 	signal addr_sl: std_logic_vector(9 downto 0);
@@ -104,10 +104,21 @@ begin
 	
 	m_done <= not mode;
 	
+	
+	-- Need falling edge to move to ipb domain
+	process(clk_m)
+    begin
+        if falling_edge(clk_m) then
+            mode_fall_edge <= mode;
+        end if;
+    end process;
+    
+    m_done <= not mode;
+	
 	process(clk_ipb) -- Synchroniser clk_m -> clk_ipb
 	begin
 		if rising_edge(clk_ipb) then
-			mode_ipb_s <= mode;
+			mode_ipb_s <= mode_fall_edge; --mode;
 			mode_ipb <= mode_ipb_s;
 			mode_ipb_d <= mode_ipb;
 		end if;
