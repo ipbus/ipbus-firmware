@@ -246,7 +246,7 @@ begin
 			gt0_rxbufreset_in         => '0',
 			gt0_drpaddr_in            => (others=>'0'),
 
-			gt0_drpclk_in                => gtrefclk_bufg,
+			gt0_drpclk_in                => clk_fr,
 
 			gt0_drpdi_in              => (others=>'0'),
 			gt0_drpen_in              => '0',
