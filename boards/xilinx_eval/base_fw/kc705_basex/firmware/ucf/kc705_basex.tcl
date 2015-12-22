@@ -22,6 +22,9 @@ set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks eth_
 #set_false_path -through [get_pins infra/clocks/rst_reg/Q]
 #set_false_path -through [get_nets infra/clocks/nuke_i]
 
+set_property PACKAGE_PIN G8 [get_ports eth_clk_p]
+set_property PACKAGE_PIN G7 [get_ports eth_clk_n]
+
 set_property LOC GTXE2_CHANNEL_X0Y10 [get_cells -hier -filter {name=~infra/eth/*/gtxe2_i}]
 
 set_property IOSTANDARD LVCMOS15 [get_ports {leds[*]}]
