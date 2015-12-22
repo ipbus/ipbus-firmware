@@ -2,8 +2,8 @@
 create_clock -period 8.000 -name eth_refclk [get_ports eth_clk_p]
 
 # MGT clocks from Ethernet Transceiver (not propagated by vivado)
-create_clock -name eth_tx [get_pins -hier -filter {name =~ "infra/eth/phy/*/gtxe2_i/TXOUTCLK"}]
-create_clock -name eth_rx [get_pins -hier -filter {name =~ "infra/eth/phy/*/gtxe2_i/RXOUTCLK"}]
+create_clock -name eth_tx -period 16.000 [get_pins -hier -filter {name =~ "infra/eth/phy/*/gtxe2_i/TXOUTCLK"}]
+create_clock -name eth_rx -period 16.000 [get_pins -hier -filter {name =~ "infra/eth/phy/*/gtxe2_i/RXOUTCLK"}]
 
 # The decoupled_clk is driven from a flip-flop to circumvent Xilinx rules for the ethernet sys clk.
 # i.e. sys clk must not be derived from eth refclk so that some monitoring can occur even with reclk failure.
