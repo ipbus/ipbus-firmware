@@ -82,8 +82,8 @@ begin
 	
 	eth: entity work.eth_7s_1000basex
 		generic map(
-			POLARITY_SWAP => '1',
-		);
+			POLARITY_SWAP => '1'
+		)
 		port map(
 			gt_clkp => eth_clk_p,
 			gt_clkn => eth_clk_n,
