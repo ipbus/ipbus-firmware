@@ -14,6 +14,9 @@ use unisim.VComponents.all;
 use work.emac_hostbus_decl.all;
 
 entity eth_7s_1000basex is
+	Generic (
+		constant POLARITY_SWAP: std_logic := '0'
+	);
 	port(
 		gt_clkp, gt_clkn: in std_logic;
 		gt_txp, gt_txn: out std_logic;
@@ -234,7 +237,36 @@ begin
 			reset => rsti,
 			signal_detect => '1',
 			gt0_qplloutclk_in => '0',
-			gt0_qplloutrefclk_in => '0'			
+			gt0_qplloutrefclk_in => '0',			
+-- Addtional debug ports
+			gt0_txpmareset_in         => '0',
+			gt0_txpcsreset_in         => '0',
+			gt0_rxpmareset_in         => '0',
+			gt0_rxpcsreset_in         => '0',
+			gt0_rxbufreset_in         => '0',
+			gt0_drpaddr_in            => (others=>'0'),
+
+			gt0_drpdi_in              => (others=>'0'),
+			gt0_drpen_in              => '0',
+			gt0_drpwe_in              => '0',
+			gt0_rxdfeagcovrden_in     => '0',
+			gt0_rxmonitorsel_in       => (others=>'0'),
+			gt0_txpolarity_in         => '1',
+			gt0_txdiffctrl_in         => "1000",
+			gt0_txinhibit_in          => '0',
+			gt0_txpostcursor_in       => (others=>'0'),
+			gt0_txprecursor_in        => (others=>'0'),
+			gt0_rxpolarity_in         => POLARITY_SWAP,
+			gt0_rxdfelpmreset_in      => '0',
+			gt0_rxlpmen_in            => POLARITY_SWAP,
+			gt0_txprbssel_in          => (others=>'0'),
+			gt0_txprbsforceerr_in     => '0',
+			gt0_rxprbscntreset_in     => '0',
+			gt0_rxprbssel_in          => (others=>'0'),
+			gt0_loopback_in           => (others=>'0'),
+			gt0_eyescanreset_in       => '0',
+			gt0_eyescantrigger_in     => '0',
+			gt0_rxcdrhold_in          => '0'
 		);
 
 end rtl;
