@@ -127,7 +127,7 @@ begin
 		trans_out_udp <= buf_out_a(0);
 		oob_out <= buf_out_a(N_OOB downto 1);
 
-		arb: entity work.trans_arb
+		arb: entity work.ipbus_trans_arb
 			generic map(NSRC => N_OOB + 1)
 			port map(
 				clk => ipb_clk,
@@ -153,7 +153,7 @@ begin
 
 	end generate;
 	
-	trans: entity work.transactor
+	trans: entity work.ipbus_trans
 		port map(
 			clk => ipb_clk,
 			rst => rst_ipb,
