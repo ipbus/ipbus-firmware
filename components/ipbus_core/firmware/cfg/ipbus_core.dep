@@ -23,10 +23,10 @@ src udp_rxtransactor_if_simple.vhd
 src udp_status_buffer.vhd
 src udp_tx_mux.vhd
 src udp_txtransactor_if_simple.vhd
-src trans_arb.vhd
-src transactor.vhd
-src transactor_if.vhd
-src transactor_sm.vhd
-src transactor_cfg.vhd
+src ipbus_trans_arb.vhd
+src ipbus_trans.vhd
+src ipbus_trans_if.vhd
+src ipbus_trans_sm.vhd
+src ipbus_trans_cfg.vhd
 src ipbus_package.vhd
 src ipbus_trans_decl.vhd

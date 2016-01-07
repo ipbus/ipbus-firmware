@@ -1,3 +1,5 @@
+-- ipbus_trans_if
+--
 -- Interface between transactor and packet buffers
 --
 -- This module knows nothing about the ipbus transaction protocol
@@ -7,30 +9,32 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
 use work.ipbus_trans_decl.all;
 
-entity transactor_if is
-  port(
-    clk: in std_logic; 
-    rst: in std_logic;
-    trans_in: in ipbus_trans_in;
-    trans_out: out ipbus_trans_out;
-    ipb_req: out std_logic; -- Bus request
-    ipb_grant: in std_logic; -- Bus grant
-    rx_ready: out std_logic; -- New data is available
-    rx_next: in std_logic; -- Request for new data from transactor
-    rx_data: out std_logic_vector(31 downto 0); -- Packet data to transactor
-    tx_data: in std_logic_vector(31 downto 0); -- Packet data from transactor
-    tx_we: in std_logic; -- Transactor data valid
-    tx_hdr: in std_logic; -- Header word flag from transactor
-    tx_err: in std_logic
-   );
+entity ipbus_trans_if is
+	port(
+		clk: in std_logic;
+		rst: in std_logic;
+		trans_in: in ipbus_trans_in;
+		trans_out: out ipbus_trans_out;
+		ipb_req: out std_logic; -- Bus request
+		ipb_grant: in std_logic; -- Bus grant
+		rx_ready: out std_logic; -- New data is available
+		rx_next: in std_logic; -- Request for new data from transactor
+		rx_data: out std_logic_vector(31 downto 0); -- Packet data to transactor
+		tx_data: in std_logic_vector(31 downto 0); -- Packet data from transactor
+		tx_we: in std_logic; -- Transactor data valid
+		tx_hdr: in std_logic; -- Header word flag from transactor
+		tx_err: in std_logic
+	);
  
-end transactor_if;
+end ipbus_trans_if;
 
-architecture rtl of transactor_if is
+architecture rtl of ipbus_trans_if is
 
-	type state_type is (ST_IDLE, ST_FIRST, ST_HDR, ST_PREBODY, ST_BODY, ST_DONE, ST_GAP);
+	type state_type is (ST_IDLE, ST_FIRST, ST_HDR, ST_PREBODY, ST_BODY, ST_DONE);
+	
 	signal state: state_type;
 	
 	signal dinit, dinit_d, dnext, dnext_d, dsel: std_logic;
@@ -40,8 +44,9 @@ architecture rtl of transactor_if is
 	signal idata: std_logic_vector(31 downto 0);
 	signal first, start, start_d: std_logic;
 
-  
 begin
+
+	dinit <= not trans_in.pkt_rdy;
 
 	process(clk) -- Fall-through RAM
 	begin
@@ -77,7 +82,7 @@ begin
 				case state is
 
 				when ST_IDLE =>  -- Starting state
-					if start = '1' and start_d = '1' then
+					if trans_in.pkt_rdy = '1' then
 						state <= ST_FIRST;
 					end if;
 				
@@ -112,19 +117,16 @@ begin
 					end if;
 
 				when ST_DONE => -- Write buffer header
-					state <= ST_GAP;
+					if trans_in.pkt_rdy = '0' then
+						state <= ST_IDLE;
+					end if;
 					
-				when ST_GAP =>
-					state <= ST_IDLE;
-
 				end case;
 			end if;
 
 		end if;
 	end process;
 
-	start <= trans_in.pkt_rdy and not trans_in.busy;
-	dinit <= not start;
 	dnext <= '1' when state = ST_FIRST or state = ST_HDR or (state = ST_BODY and rx_next = '1') else '0';
 	
 	process(clk)
@@ -179,10 +181,9 @@ begin
 		
 	waddrh <= (others => '0') when state = ST_DONE else waddr;
 	
-	trans_out.pkt_done <= '1' when state = ST_DONE else '0';
+	trans_out.pkt_done <= '1' when state = ST_IDLE else '0';
 	trans_out.we <= '1' when state = ST_HDR or (tx_we = '1' and first = '0') or state = ST_DONE else '0';
 	trans_out.waddr <= std_logic_vector(haddr) when (state = ST_BODY and tx_hdr = '1') else std_logic_vector(waddrh);
 	trans_out.wdata <= tx_data when state = ST_BODY else idata;
 			
 end rtl;
-

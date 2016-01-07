@@ -1,3 +1,5 @@
+-- ipbus_trans_cfg
+--
 -- Some registers to store the config information for the ipbus controller
 --
 -- Typically used to allow ucontroller to set the mac / ip address
@@ -8,9 +10,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library work;
-
-entity transactor_cfg is
+entity ipbus_trans_cfg is
 	port(
 		clk: in std_logic; -- IPbus clock
 		rst: in std_logic; -- Sync reset
@@ -22,9 +22,9 @@ entity transactor_cfg is
 		vec_out: out std_logic_vector(127 downto 0)
 	);
 		
-end transactor_cfg;
+end ipbus_trans_cfg;
 
-architecture rtl of transactor_cfg is
+architecture rtl of ipbus_trans_cfg is
 
 	signal s: integer;
 	

@@ -1,3 +1,5 @@
+-- ipbus_trans
+--
 -- Top level for the ipbus transactor module
 --
 -- Handles the decoding of ipbus packets and the transactions
@@ -15,7 +17,7 @@ library work;
 use work.ipbus.all;
 use work.ipbus_trans_decl.all;
 
-entity transactor is
+entity ipbus_trans is
 	port(
 		clk: in std_logic; -- IPbus clock
 		rst: in std_logic; -- Sync reset
@@ -29,19 +31,19 @@ entity transactor is
 		cfg_vector_out: out std_logic_vector(127 downto 0)
 	);
 		
-end transactor;
+end ipbus_trans;
 
-architecture rtl of transactor is
+architecture rtl of ipbus_trans is
 
 	signal rx_data, tx_data: std_logic_vector(31 downto 0);
-  signal rx_ready, rx_next, tx_we, tx_hdr, tx_err: std_logic;
-  signal cfg_we: std_logic;
-  signal cfg_addr: std_logic_vector(1 downto 0);
-  signal cfg_din, cfg_dout: std_logic_vector(31 downto 0);
+	signal rx_ready, rx_next, tx_we, tx_hdr, tx_err: std_logic;
+	signal cfg_we: std_logic;
+	signal cfg_addr: std_logic_vector(1 downto 0);
+	signal cfg_din, cfg_dout: std_logic_vector(31 downto 0);
 
 begin
 
-	iface: entity work.transactor_if
+	iface: entity work.ipbus_trans_if
 		port map(
 			clk => clk,
 			rst => rst,
@@ -58,8 +60,8 @@ begin
 			tx_err => tx_err
 		);
     
-	sm: entity work.transactor_sm
-    	port map(
+	sm: entity work.ipbus_trans_sm
+		port map(
 			clk => clk,
 			rst => rst,
 			rx_data => rx_data,
@@ -77,7 +79,7 @@ begin
 			cfg_dout => cfg_din
 		);
 
-	cfg: entity work.transactor_cfg
+	cfg: entity work.ipbus_trans_cfg
 		port map(
 			clk => clk,
 			rst => rst,

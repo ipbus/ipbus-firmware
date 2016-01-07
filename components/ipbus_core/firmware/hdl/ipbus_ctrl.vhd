@@ -181,7 +181,6 @@ begin
   actual_mac_addr <= my_mac_addr;
   actual_ip_addr <= my_ip_addr_udp;
 
-	
 	with MAC_CFG select my_mac_addr <=
 		mac_addr when EXTERNAL,
 		cfg(79 downto 32) when others;

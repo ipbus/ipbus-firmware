@@ -1,3 +1,5 @@
+-- ipbus_trans_sm
+--
 -- The state machine which controls the ipbus itself
 --
 -- This version for ipbus 2.0
@@ -15,7 +17,7 @@ use ieee.numeric_std.all;
 library work;
 use work.ipbus.all;
 
-entity transactor_sm is
+entity ipbus_trans_sm is
 	port(
 		clk: in std_logic; 
 		rst: in std_logic;
@@ -34,9 +36,9 @@ entity transactor_sm is
 		cfg_dout: out std_logic_vector(31 downto 0)
 	);
  
-end transactor_sm;
+end ipbus_trans_sm;
 
-architecture rtl of transactor_sm is
+architecture rtl of ipbus_trans_sm is
 
 	constant TIMEOUT: integer := 255;
 
