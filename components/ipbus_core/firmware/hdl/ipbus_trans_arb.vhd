@@ -44,18 +44,15 @@ begin
 			if rst = '1' then
 				busy <= '0';
 				src <= (others => '0');
-			elsif busy = '0' then
-				if buf_in(sel).pkt_rdy /= '1' then
+			else
+				if (busy = '0' and buf_in(sel).pkt_rdy = '0') or (busy = '1' and trans_in.pkt_done = '1') then
 					if src /= (NSRC - 1) then
 						src <= src + 1;
 					else
 						src <= (others => '0');
 					end if;
-				else
-					busy <= '1';
 				end if;
-			elsif trans_in.pkt_done = '1' then
-				busy <= '0';
+				busy <= (busy and not trans_in.pkt_done) or trans_in.new_pkt;
 			end if;
 		end if;
 	end process;
