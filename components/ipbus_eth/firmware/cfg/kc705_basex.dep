@@ -2,4 +2,4 @@
 
 src eth_7s_1000basex.vhd emac_hostbus_decl.vhd
 src ../cgn/temac_gbe_v9_0.xci
-src ../cgn/gig_eth_pcs_pma_basex_v15_0.xci
+src ../cgn/gig_eth_pcs_pma_basex_v15_1.xci

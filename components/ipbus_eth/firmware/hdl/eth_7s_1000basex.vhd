@@ -203,7 +203,7 @@ begin
 		end if;
 	end process;
 
-	phy: entity work.gig_eth_pcs_pma_basex_v15_0
+	phy: entity work.gig_eth_pcs_pma_basex_v15_1
 		port map(
 			gtrefclk => clkin,
 			gtrefclk_bufg => clk_fr,
@@ -233,8 +233,13 @@ begin
 			status_vector => open,
 			reset => rsti,
 			signal_detect => '1',
-			gt0_qplloutclk_in => '0',
-			gt0_qplloutrefclk_in => '0'			
+			gt0_pll0outclk_in => '0',
+			gt0_pll0outrefclk_in => '0',
+			gt0_pll1outclk_in => '0',
+			gt0_pll1outrefclk_in => '0',
+			gt0_pll0refclklost_in => '0',
+			gt0_pll0lock_in => '0',
+			gt0_pll0reset_out => open
 		);
-
+		
 end rtl;
