@@ -185,4 +185,3 @@ begin
 	trans_out.wdata <= tx_data when state = ST_BODY else idata;
 			
 end rtl;
-
