@@ -161,14 +161,14 @@ begin
 
 -- This is pretty crap, but appears the only way to avoid vivado issues
 	
-	dcreg: process(clk_fr)
+	process(clk_fr)
 	begin
 		if rising_edge(clk_fr) then
 			dc <= not dc;
 		end if;
 	end process;
 
-	decoupled_buf: BUFH
+	dc_buf: BUFG
 		port map(
 			i => dc,
 			o => clk_dc
