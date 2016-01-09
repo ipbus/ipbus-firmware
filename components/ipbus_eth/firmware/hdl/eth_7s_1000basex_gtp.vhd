@@ -168,8 +168,6 @@ begin
 			gtrefclk_n => gt_clkn,
 			gtrefclk_out => open,
 			gtrefclk_bufg_out => clk_fr,	
-			gtrefclk => clkin,
-			gtrefclk_bufg => clk_fr,
 			txp => gt_txp,
 			txn => gt_txn,
 			rxp => gt_rxp,
