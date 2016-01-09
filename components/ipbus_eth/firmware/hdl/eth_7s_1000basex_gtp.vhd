@@ -87,14 +87,26 @@ architecture rtl of eth_7s_1000basex_gtp is
 	signal gmii_txd, gmii_rxd: std_logic_vector(7 downto 0);
 	signal gmii_tx_en, gmii_tx_er, gmii_rx_dv, gmii_rx_er: std_logic;
 	signal gmii_rx_clk: std_logic;
-	signal sig_det: std_logic;
+	signal sig_det, gt_clkp_i, gt_clkn_i: std_logic;
 	signal clk125, clk_fr: std_logic;
 	signal rstn, phy_done, mmcm_locked, locked_int: std_logic;
 	signal dc: std_logic := '0';
 	signal clk_dc: std_logic;
 	
 begin
-	
+
+	clkp_buf: IBUF -- required because top level IBUF insertion does not work for IBUFDS_GT buried in PCS/PMA core
+		port map(
+			i => gt_clkp,
+			o => gt_clkp_i
+		);
+		
+	clkn_buf: IBUF
+		port map(
+			i => gt_clkn,
+			o => gt_clkn_i
+		);
+
 	clk125_fr <= clk_fr;
 	clk125_out <= clk125;
 
@@ -164,8 +176,8 @@ begin
 	
 	phy: entity work.gig_eth_pcs_pma_basex_gtp
 		port map(
-			gtrefclk_p => gt_clkp,
-			gtrefclk_n => gt_clkn,
+			gtrefclk_p => gt_clkp_i,
+			gtrefclk_n => gt_clkn_i,
 			gtrefclk_out => open,
 			gtrefclk_bufg_out => clk_fr,	
 			txp => gt_txp,
