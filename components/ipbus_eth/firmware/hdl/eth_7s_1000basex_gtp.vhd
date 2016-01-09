@@ -160,7 +160,7 @@ begin
 		port map(
 			i => dc,
 			o => clk_dc
-		};
+		);
 	
 	phy: entity work.gig_eth_pcs_pma_basex_gtp
 		port map(
