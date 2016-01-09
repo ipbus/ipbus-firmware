@@ -149,7 +149,7 @@ begin
 
 -- This is pretty crap, but appears the only way to avoid vivado issues
 	
-	process(clk_fr)
+	dcreg: process(clk_fr)
 	begin
 		if rising_edge(clk_fr) then
 			dc <= not dc;
