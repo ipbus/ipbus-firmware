@@ -211,7 +211,6 @@ begin
 			gt0_pll0lock_out => open
 		);
 		
---	sig_det <= not sfp_los;
-	sig_det <= '1';
+	sig_det <= not sfp_los;
 
 end rtl;
