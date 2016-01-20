@@ -5,10 +5,5 @@
 		<node id="rst" address="0x0"/>
 		<node id="id" address="0x1"/>
 	</node>
-	<node id="reg" address="0x2" description="read-write register" fwinfo="endpoint;width=0"/>
-	<node id="ram" address="0x1000" mode="block" size="0x400" description="1kword RAM" fwinfo="endpoint;width=10"/>
-	<node id="pram" address="0x2000" description="1kword peephole RAM" fwinfo="endpoint;width=1">
-		<node id="addr" address="0x0"/>
-		<node id="data" mode="port" size="0x400" address="0x1"/>
-	</node>
+	<node id="i2c" address="0x10" module="file://opencores_i2c.xml"/>
 </node>
