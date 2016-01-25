@@ -243,23 +243,23 @@ begin
 		tx_axis_mac_tdata => tx_data,
 		tx_axis_mac_tvalid => tx_valid,
 		tx_axis_mac_tlast => tx_last,
-		tx_axis_mac_tuser => tx_error,
+		tx_axis_mac_tuser(0) => tx_error,
 		tx_axis_mac_tready => tx_ready,
 		tx_ifg_delay => X"00",
 		tx_statistics_vector => open,
 		tx_statistics_valid => open,
 		pause_req => '0',
 		pause_val => X"0000",
-		speed_is_100 => open,
-		speed_is_10_100 => open,
+		speedis100 => open,
+		speedis10100 => open,
 		gmii_txd => txd_e,
 		gmii_tx_en => tx_en_e,
 		gmii_tx_er => tx_er_e,
 		gmii_rxd => rxd_r,
 		gmii_rx_dv => rx_dv_r,
 		gmii_rx_er => rx_er_r,
-		rx_mac_config_vector => X"0000_0000_0000_0000_0812",
-		tx_mac_config_vector => X"0000_0000_0000_0000_0012"
+		rx_configuration_vector => X"0000_0000_0000_0000_0812",
+		tx_configuration_vector => X"0000_0000_0000_0000_0012"
 	);
 	
 	rx_user_ef(0) <= rx_user_e;
