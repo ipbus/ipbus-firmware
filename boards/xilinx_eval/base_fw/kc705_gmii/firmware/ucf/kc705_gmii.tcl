@@ -1,4 +1,4 @@
-# Ethernet RefClk (125MHz)
+# System clock (200MHz)
 create_clock -period 5.000 -name sysclk [get_ports sysclk_p]
 
 # Incoming GMII rx clock
@@ -23,6 +23,8 @@ set_property PACKAGE_PIN AB8 [get_ports {leds[0]}]
 set_property PACKAGE_PIN AA8 [get_ports {leds[1]}]
 set_property PACKAGE_PIN AC9 [get_ports {leds[2]}]
 set_property PACKAGE_PIN AB9 [get_ports {leds[3]}]
+set_output_delay 0 -clock [get_clocks sysclk] [get_ports {leds[*]}]
+set_false_path -to [get_ports {leds[*]}]
 
 set_property IOSTANDARD LVCMOS25 [get_ports {gmii* phy_rst}]
 set_property PACKAGE_PIN K30 [get_ports {gmii_gtx_clk}]
