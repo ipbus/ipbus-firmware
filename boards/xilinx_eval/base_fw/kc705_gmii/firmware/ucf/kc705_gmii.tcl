@@ -3,14 +3,15 @@ create_clock -period 5.000 -name sysclk [get_ports sysclk_p]
 
 # Incoming GMII rx clock
 create_clock -period 8.000 -name gmii_rx_clk [get_ports gmii_rx_clk]
-set_input_delay -clock [get_clocks gmii_rx_clk] -min 5.5 -max 0.5 [get_ports {gmii_rxd[*] gmii_rx_dv gmii_rx_er}]
+set_input_delay -clock [get_clocks gmii_rx_clk] -min 5.5 [get_ports {gmii_rxd[*] gmii_rx_dv gmii_rx_er}]
+set_input_delay -clock [get_clocks gmii_rx_clk] -max 0.5 [get_ports {gmii_rxd[*] gmii_rx_dv gmii_rx_er}]
 
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks gmii_rx_clk]
 
 set_false_path -through [get_pins infra/clocks/rst_reg/Q]
 set_false_path -through [get_nets infra/clocks/nuke_i]
 
-set_property IOB TRUE [get_cells {infra/eth/gmii_txd_reg* infra/eth/gmii_tx_*_reg}]
+set_property IOB TRUE [get_cells -hier -filter {NAME =~ infra/eth/*/gmii_*_obuf_reg*}]
 
 set_property IOSTANDARD LVDS [get_ports {sysclk_*}]
 set_property PACKAGE_PIN AD12 [get_ports sysclk_p]
