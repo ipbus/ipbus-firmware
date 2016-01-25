@@ -75,14 +75,16 @@ architecture rtl of eth_7s_gmii is
 			gmii_txd : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
 			gmii_tx_en : OUT STD_LOGIC;
 			gmii_tx_er : OUT STD_LOGIC;
+			gmii_tx_clk : OUT STD_LOGIC;
 			gmii_rxd : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
 			gmii_rx_dv : IN STD_LOGIC;
 			gmii_rx_er : IN STD_LOGIC;
+			gmii_rx_clk : IN STD_LOGIC;
 			rx_configuration_vector : IN STD_LOGIC_VECTOR(79 DOWNTO 0);
 			tx_configuration_vector : IN STD_LOGIC_VECTOR(79 DOWNTO 0)
 		);
 	END COMPONENT;
-	
+
 	COMPONENT mac_fifo_axi4
 	  PORT (
 		 m_aclk : IN STD_LOGIC;
@@ -100,20 +102,9 @@ architecture rtl of eth_7s_gmii is
 		 m_axis_tuser : OUT STD_LOGIC_VECTOR(0 DOWNTO 0)
 	  );
 	END COMPONENT;
-
-	signal rx_clk, rx_clk_io: std_logic;
-	signal txd_e, rxd_r: std_logic_vector(7 downto 0);
-	signal tx_en_e, tx_er_e, rx_dv_r, rx_er_r: std_logic;
-	signal gmii_rxd_del: std_logic_vector(7 downto 0);
-	signal gmii_rx_dv_del, gmii_rx_er_del: std_logic;
-
-	attribute IODELAY_GROUP: string;
-	attribute IODELAY_GROUP of idelayctrl0: label is "iodel_gmii_rx";
-	attribute IODELAY_GROUP of iodelay_dv: label is "iodel_gmii_rx";
-	attribute IODELAY_GROUP of iodelay_er: label is "iodel_gmii_rx";
 	
 	signal rx_data_e: std_logic_vector(7 downto 0);
-	signal rx_valid_e, rx_last_e, rx_user_e, rx_rst, rstn: std_logic;
+	signal rx_clk_e, rx_valid_e, rx_last_e, rx_user_e, rx_rst_e, rstn: std_logic;
 	signal rx_user_f, rx_user_ef: std_logic_vector(0 downto 0);
 
 begin
@@ -123,163 +114,67 @@ begin
 		rst => rst
 	);
 
-	bufio0: bufio port map(
-		i => gmii_rx_clk,
-		o => rx_clk_io
-	);
-	
-	bufr0: bufr port map(
-		i => gmii_rx_clk,
-		o => rx_clk,
-		ce => '1',
-		clr => '0'
-	);
-	
-	iodelgen: for i in 7 downto 0 generate
-		attribute IODELAY_GROUP of iodelay: label is "iodel_gmii_rx";
-	begin
-
-		iodelay: idelaye2
-			generic map(
-				IDELAY_TYPE => "FIXED"
-			)
-			port map(
-				idatain => gmii_rxd(i),
-				dataout => gmii_rxd_del(i),
-				ce => '0',
-				inc => '0',
-				ld => '0',
-				ldpipeen => '0',
-				regrst => '0',
-				c => '0',
-				cinvctrl => '0',
-				cntvaluein => (others => '0'),
-				datain => '0'
-			); -- Delay element for phase alignment
-	
-	end generate;
-	
-	iodelay_dv: idelaye2
-		generic map(
-			IDELAY_TYPE => "FIXED"
-		)
-		port map(
-			idatain => gmii_rx_dv,
-			dataout => gmii_rx_dv_del,
-			ce => '0',
-			inc => '0',
-			ld => '0',
-			ldpipeen => '0',
-			regrst => '0',
-			c => '0',
-			cinvctrl => '0',
-			cntvaluein => (others => '0'),
-			datain => '0'
-		); -- Delay element on rx clock for phase alignment
-		
-	iodelay_er: idelaye2
-		generic map(
-			IDELAY_TYPE => "FIXED"
-		)
-		port map(
-			idatain => gmii_rx_er,
-			dataout => gmii_rx_er_del,
-			ce => '0',
-			inc => '0',
-			ld => '0',
-			ldpipeen => '0',
-			regrst => '0',
-			c => '0',
-			cinvctrl => '0',
-			cntvaluein => (others => '0'),
-			datain => '0'
-		); -- Delay element for phase alignment
-
-	process(rx_clk_io) -- FFs for incoming GMII data (need to be IOB FFs)
-	begin
-		if rising_edge(rx_clk_io) then
-			rxd_r <= gmii_rxd_del;
-			rx_dv_r <= gmii_rx_dv_del;
-			rx_er_r <= gmii_rx_er_del;
-		end if;
-	end process;
-
-	process(clk125) -- FFs for outgoing GMII data (need to be IOB FFs)
-	begin
-		if rising_edge(clk125) then
-			gmii_txd <= txd_e;
-			gmii_tx_en <= tx_en_e;
-			gmii_tx_er <= tx_er_e;
-		end if;
-	end process;
-	
-	oddr0: oddr port map(
-		q => gmii_gtx_clk,
-		c => clk125,
-		ce => '1',
-		d1 => '0',
-		d2 => '1',
-		r => '0',
-		s => '0'
-	); -- DDR register for clock forwarding
-
 	rstn <= not rst;
 
-	emac0: temac_gbe_v9_0 port map(
-		gtx_clk => clk125,
-		glbl_rstn => rstn,
-		rx_axi_rstn => '1',
-		tx_axi_rstn => '1',
-		rx_mac_aclk => rx_clk,
-		rx_reset => rx_rst,
-		rx_axis_mac_tdata => rx_data_e,
-		rx_axis_mac_tvalid => rx_valid_e,
-		rx_axis_mac_tlast => rx_last_e,
-		rx_axis_mac_tuser => rx_user_e,
-		rx_statistics_vector => open,
-		rx_statistics_valid => open,
-		tx_mac_aclk => open,
-		tx_reset => open,
-		tx_axis_mac_tdata => tx_data,
-		tx_axis_mac_tvalid => tx_valid,
-		tx_axis_mac_tlast => tx_last,
-		tx_axis_mac_tuser(0) => tx_error,
-		tx_axis_mac_tready => tx_ready,
-		tx_ifg_delay => X"00",
-		tx_statistics_vector => open,
-		tx_statistics_valid => open,
-		pause_req => '0',
-		pause_val => X"0000",
-		speedis100 => open,
-		speedis10100 => open,
-		gmii_txd => txd_e,
-		gmii_tx_en => tx_en_e,
-		gmii_tx_er => tx_er_e,
-		gmii_rxd => rxd_r,
-		gmii_rx_dv => rx_dv_r,
-		gmii_rx_er => rx_er_r,
-		rx_configuration_vector => X"0000_0000_0000_0000_0812",
-		tx_configuration_vector => X"0000_0000_0000_0000_0012"
-	);
+	emac0: temac_gbe_v9_0
+		port map(
+			gtx_clk => clk125,
+			glbl_rstn => rstn,
+			rx_axi_rstn => '1',
+			tx_axi_rstn => '1',
+			rx_statistics_vector => open,
+			rx_statistics_valid => open,		
+			rx_mac_aclk => rx_clk_e,
+			rx_reset => rx_rst_e,
+			rx_axis_mac_tdata => rx_data_e,
+			rx_axis_mac_tvalid => rx_valid_e,
+			rx_axis_mac_tlast => rx_last_e,
+			rx_axis_mac_tuser => rx_user_e,
+			tx_ifg_delay => X"00",
+			tx_statistics_vector => open,
+			tx_statistics_valid => open,	
+			tx_mac_aclk => open, -- Internally connected to gtx_clk inside core
+			tx_reset => open,
+			tx_axis_mac_tdata => tx_data,
+			tx_axis_mac_tvalid => tx_valid,
+			tx_axis_mac_tlast => tx_last,
+			tx_axis_mac_tuser(0) => tx_error,
+			tx_axis_mac_tready => tx_ready,
+			pause_req => '0',
+			pause_val => X"0000",
+			speedis100 => open,
+			speedis10100 => open,
+			gmii_txd => gmii_txd,
+			gmii_tx_en => gmii_tx_en,
+			gmii_tx_er => gmii_tx_er,
+			gmii_tx_clk => gmii_gtx_clk,
+			gmii_rxd => gmii_rxd,
+			gmii_rx_dv => gmii_rx_dv,
+			gmii_rx_er => gmii_rx_er,
+			gmii_rx_clk => gmii_rx_clk,
+			rx_configuration_vector => X"0000_0000_0000_0000_0812",
+			tx_configuration_vector => X"0000_0000_0000_0000_0012"
+		);
 	
 	rx_user_ef(0) <= rx_user_e;
 	rx_error <= rx_user_f(0);
 	
-	fifo: mac_fifo_axi4 port map(
-		m_aclk => clk125,
-		s_aclk => rx_clk,
-		s_aresetn => rx_rst,
-		s_axis_tvalid => rx_valid_e,
-		s_axis_tready => open,
-		s_axis_tdata => rx_data_e,
-		s_axis_tlast => rx_last_e,
-		s_axis_tuser => rx_user_ef,
-		m_axis_tvalid => rx_valid,
-		m_axis_tready => '1',
-		m_axis_tdata => rx_data,
-		m_axis_tlast => rx_last,
-		m_axis_tuser => rx_user_f
-	); -- Clock domain crossing FIFO
+	fifo: mac_fifo_axi4
+		port map(
+			m_aclk => clk125,
+			s_aclk => rx_clk_e,
+			s_aresetn => rx_rst_e,
+			s_axis_tvalid => rx_valid_e,
+			s_axis_tready => open,
+			s_axis_tdata => rx_data_e,
+			s_axis_tlast => rx_last_e,
+			s_axis_tuser => rx_user_ef,
+			m_axis_tvalid => rx_valid,
+			m_axis_tready => '1',
+			m_axis_tdata => rx_data,
+			m_axis_tlast => rx_last,
+			m_axis_tuser => rx_user_f
+		); -- Clock domain crossing FIFO
 
 	hostbus_out.hostrddata <= (others => '0');
 	hostbus_out.hostmiimrdy <= '0';
