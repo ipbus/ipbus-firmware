@@ -81,7 +81,7 @@ begin
 	
 -- Ethernet MAC core and PHY interface
 	
-	eth: entity work.eth_7s_1000basex
+	eth: entity work.eth_7s_gmii
 		port map(
 			clk125 => clk125,
 			clk200 => clk200,
