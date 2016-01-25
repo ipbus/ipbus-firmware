@@ -44,7 +44,7 @@ end eth_7s_gmii;
 
 architecture rtl of eth_7s_gmii is
 
-	COMPONENT temac_gbe_v9_0
+	COMPONENT temac_gbe_v9_0_gmii
 		PORT (
 			gtx_clk : IN STD_LOGIC;
 			glbl_rstn : IN STD_LOGIC;
@@ -116,7 +116,7 @@ begin
 
 	rstn <= not rst;
 
-	emac0: temac_gbe_v9_0
+	emac0: temac_gbe_v9_0_gmii
 		port map(
 			gtx_clk => clk125,
 			glbl_rstn => rstn,
