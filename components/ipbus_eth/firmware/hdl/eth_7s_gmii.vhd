@@ -231,6 +231,7 @@ begin
 		rx_axi_rstn => '1',
 		tx_axi_rstn => '1',
 		rx_mac_aclk => rx_clk,
+		rx_reset => rx_rst,
 		rx_axis_mac_tdata => rx_data_e,
 		rx_axis_mac_tvalid => rx_valid_e,
 		rx_axis_mac_tlast => rx_last_e,
@@ -238,7 +239,7 @@ begin
 		rx_statistics_vector => open,
 		rx_statistics_valid => open,
 		tx_mac_aclk => open,
-		tx_reset_out => open,
+		tx_reset => open,
 		tx_axis_mac_tdata => tx_data,
 		tx_axis_mac_tvalid => tx_valid,
 		tx_axis_mac_tlast => tx_last,
@@ -263,13 +264,6 @@ begin
 	
 	rx_user_ef(0) <= rx_user_e;
 	rx_error <= rx_user_f(0);
-	
-	process(rx_clk)
-	begin
-		if rising_edge(rx_clk) then
-			rx_rst <= not rst;
-		end if;
-	end process;
 	
 	fifo: mac_fifo_axi4 port map(
 		m_aclk => clk125,
