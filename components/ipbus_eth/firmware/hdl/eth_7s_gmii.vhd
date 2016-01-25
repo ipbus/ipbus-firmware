@@ -226,18 +226,18 @@ begin
 	rstn <= not rst;
 
 	emac0: temac_gbe_v9_0 port map(
+		gtx_clk => clk125,
 		glbl_rstn => rstn,
 		rx_axi_rstn => '1',
 		tx_axi_rstn => '1',
 		rx_mac_aclk => rx_clk,
-		rx_reset_out => open,
 		rx_axis_mac_tdata => rx_data_e,
 		rx_axis_mac_tvalid => rx_valid_e,
 		rx_axis_mac_tlast => rx_last_e,
 		rx_axis_mac_tuser => rx_user_e,
 		rx_statistics_vector => open,
 		rx_statistics_valid => open,
-		tx_mac_aclk => clk125,
+		tx_mac_aclk => open,
 		tx_reset_out => open,
 		tx_axis_mac_tdata => tx_data,
 		tx_axis_mac_tvalid => tx_valid,
