@@ -10,6 +10,10 @@ use IEEE.STD_LOGIC_1164.ALL;
 use work.ipbus.all;
 
 entity kc705_basex_infra is
+	Generic (
+		constant RXPOLARITY_SWAP: std_logic := '0'
+		constant TXPOLARITY_SWAP: std_logic := '0'
+	);
 	port(
 		eth_clk_p: in std_logic; -- 125MHz MGT clock
 		eth_clk_n: in std_logic;
@@ -82,7 +86,8 @@ begin
 	
 	eth: entity work.eth_7s_1000basex
 		generic map(
-			POLARITY_SWAP => '1'
+			RXPOLARITY_SWAP => RXPOLARITY_SWAP,
+			TXPOLARITY_SWAP => TXPOLARITY_SWAP
 		)
 		port map(
 			gt_clkp => eth_clk_p,

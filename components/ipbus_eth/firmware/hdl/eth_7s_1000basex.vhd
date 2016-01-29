@@ -15,7 +15,8 @@ use work.emac_hostbus_decl.all;
 
 entity eth_7s_1000basex is
 	Generic (
-		constant POLARITY_SWAP: std_logic := '0'
+		constant RXPOLARITY_SWAP: std_logic := '0';
+		constant TXPOLARITY_SWAP: std_logic := '0'
 	);
 	port(
 		gt_clkp, gt_clkn: in std_logic;
@@ -253,12 +254,12 @@ begin
 			gt0_drpwe_in              => '0',
 			gt0_rxdfeagcovrden_in     => '0',
 			gt0_rxmonitorsel_in       => (others=>'0'),
-			gt0_txpolarity_in         => POLARITY_SWAP,
+			gt0_txpolarity_in         => TXPOLARITY_SWAP,
 			gt0_txdiffctrl_in         => "1000",
 			gt0_txinhibit_in          => '0',
 			gt0_txpostcursor_in       => (others=>'0'),
 			gt0_txprecursor_in        => (others=>'0'),
-			gt0_rxpolarity_in         => POLARITY_SWAP,
+			gt0_rxpolarity_in         => RXPOLARITY_SWAP,
 			gt0_rxdfelpmreset_in      => '0',
 			gt0_rxlpmen_in            => '1',
 			gt0_txprbssel_in          => (others=>'0'),

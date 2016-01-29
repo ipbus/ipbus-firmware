@@ -7,7 +7,6 @@ use ieee.std_logic_1164.all;
 
 entity udp_packet_parser is
   generic(
-    IPBUSPORT: std_logic_vector(15 DOWNTO 0) := x"C351";
     SECONDARYPORT: std_logic := '0'
   );
   port (
@@ -19,6 +18,7 @@ entity udp_packet_parser is
     my_rx_valid: in std_logic;
     My_MAC_addr: in std_logic_vector(47 downto 0);
     My_IP_addr: in std_logic_vector(31 downto 0);
+    ipbus_port: in std_logic_vector(15 DOWNTO 0);
     next_pkt_id: in std_logic_vector(15 downto 0);
     pkt_broadcast: out std_logic;
     pkt_byteswap: out std_logic;
@@ -257,7 +257,7 @@ ipbus_pkt:  process (mac_clk)
         pkt_mask := "111111" & "111111" & "11" &
         "11" & "11" & "11" & "11" & "1" & "0" & "11" &
         "1111" & "1111" & "11" & "00";
-        pkt_data := x"11" & IPBUSPORT;
+        pkt_data := x"11" & ipbus_port;
         pkt_drop := not enable_125;
       elsif my_rx_last = '1' then
         pkt_drop := '1';

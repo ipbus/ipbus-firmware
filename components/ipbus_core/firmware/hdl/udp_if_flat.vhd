@@ -21,9 +21,6 @@ ENTITY UDP_if IS
 -- Size of each buffer is 2**ADDRWIDTH
   	ADDRWIDTH: natural := 11;
 
--- UDP port for IPbus traffic in this instance
- 	 IPBUSPORT: std_logic_vector(15 DOWNTO 0) := x"C351";
-
 -- Flag whether this instance ignores everything except IPBus traffic
   	SECONDARYPORT: std_logic := '0'
   );
@@ -34,6 +31,8 @@ ENTITY UDP_if IS
 		rst_ipb: IN std_logic;
 		IP_addr: IN std_logic_vector(31 DOWNTO 0);
 		MAC_addr: IN std_logic_vector(47 DOWNTO 0);
+-- UDP port for IPbus traffic in this instance
+		ipbus_port: in std_logic_vector(15 DOWNTO 0) := x"C351";
 		enable: IN std_logic;
 		RARP: IN std_logic;
 		mac_rx_data: IN std_logic_vector(7 DOWNTO 0);
@@ -47,7 +46,6 @@ ENTITY UDP_if IS
 		waddr: IN std_logic_vector(11 DOWNTO 0);
 		wdata: IN std_logic_vector(31 DOWNTO 0);
 		we: IN std_logic;
-		busy: OUT std_logic;
 		mac_tx_data: OUT std_logic_vector(7 DOWNTO 0);
 		mac_tx_error: OUT std_logic;
 		mac_tx_last: OUT std_logic;
@@ -464,7 +462,6 @@ end generate primary_mode;
 
 	rx_packet_parser: entity work.udp_packet_parser
 		GENERIC MAP (
-			IPBUSPORT => IPBUSPORT,
 			SECONDARYPORT => SECONDARYPORT
 		)
 		PORT MAP (
@@ -476,6 +473,7 @@ end generate primary_mode;
 			my_rx_valid => my_rx_valid,
 			My_MAC_addr => My_MAC_addr,
 			My_IP_addr => My_IP_addr_sig,
+			ipbus_port => ipbus_port,
 			next_pkt_id => next_pkt_id,
 			pkt_broadcast => pkt_broadcast,
 			pkt_byteswap => pkt_byteswap,
@@ -748,7 +746,6 @@ end generate primary_mode;
 			pkt_done_write => pkt_done_write,
 			RARP => RARP,
 			we => we,
-			busy => busy,
 			pkt_rdy => pkt_rdy,
 			rx_read_buffer => rx_read_buffer,
 			tx_write_buffer => tx_write_buffer

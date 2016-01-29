@@ -157,33 +157,36 @@ history_block:  process (mac_clk)
 	pkt_drop_ping & pkt_drop_ipbus;
 	payload_status_resend := pkt_drop_payload & pkt_drop_status & 
 	pkt_drop_resend;
+	event_pending := '1';
+	event_data := (Others => '0');
         case rarp_arp_ping_ipbus is
 	  when "0111" =>
-	    event_data := x"08";
+	    event_data(3 downto 0) := x"8";
 	  when "1011" =>
-	    event_data := x"07";
+	    event_data(3 downto 0) := x"7";
 	  when "1101" =>
-	    event_data := x"06";
+	    event_data(3 downto 0) := x"6";
 	  when "1110" =>
 	    case payload_status_resend is
 	      when "011" =>
-	        event_data := x"02";
+	        event_data(3 downto 0) := x"2";
 	      when "101" =>
-	        event_data := x"03";
+	        event_data(3 downto 0) := x"3";
 	      when "110" =>
-	        event_data := x"04";
+	        event_data(3 downto 0) := x"4";
 	      when Others =>
-	        event_data := x"05";
+	        event_data(3 downto 0) := x"5";
 	    end case;
 	  when Others =>
 	    if pkt_broadcast = '0' then
-	      event_data := x"0F";
+	      event_data(3 downto 0) := x"F";
+	    else -- ignore unknown broadcast packets
+	      event_pending := '0';
 	    end if;
         end case;
         if my_rx_error = '1' then
 	  event_data(7 downto 4) := x"8";
 	end if;
-	event_pending := '1';
       end if;
       if event_pending = '1' then
         if rxpayload_dropped = '1' or rxram_dropped = '1' or

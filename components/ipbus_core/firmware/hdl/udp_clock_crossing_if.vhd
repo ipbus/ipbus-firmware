@@ -48,6 +48,7 @@ architecture rtl of udp_clock_crossing_if is
   busy_down_buf, pkt_done_r_tff, pkt_done_w_tff: std_logic_vector(2 downto 0);
   signal rx_read_buf_buf, tx_write_buf_buf: std_logic_vector(BUFWIDTH - 1 downto 0);
 
+-- Synthesis attribute for Vivado 2015 and later:
   attribute ASYNC_REG: string;
   attribute ASYNC_REG of busy_down_buf: signal is "TRUE";
   attribute ASYNC_REG of busy_up_buf: signal is "TRUE";
@@ -60,6 +61,20 @@ architecture rtl of udp_clock_crossing_if is
   attribute ASYNC_REG of rx_read_buf_buf: signal is "TRUE";
   attribute ASYNC_REG of tx_write_buf_buf: signal is "TRUE";
   attribute ASYNC_REG of we_buf: signal is "TRUE";
+
+-- Synthesis attribute for ISE:
+  attribute KEEP: string;
+  attribute KEEP of busy_down_buf: signal is "TRUE";
+  attribute KEEP of busy_up_buf: signal is "TRUE";
+  attribute KEEP of enable_buf: signal is "TRUE";
+  attribute KEEP of pkt_done_read_buf: signal is "TRUE";
+  attribute KEEP of pkt_done_write_buf: signal is "TRUE";
+  attribute KEEP of rarp_buf: signal is "TRUE";
+  attribute KEEP of req_send_buf: signal is "TRUE";
+  attribute KEEP of rst_ipb_buf: signal is "TRUE";
+  attribute KEEP of rx_read_buf_buf: signal is "TRUE";
+  attribute KEEP of tx_write_buf_buf: signal is "TRUE";
+  attribute KEEP of we_buf: signal is "TRUE";
 
 begin
 
