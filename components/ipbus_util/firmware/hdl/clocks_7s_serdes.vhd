@@ -59,7 +59,7 @@ begin
 	
 	clko_p40 <= clk_p40_b;
 	
-	bufgp40: BUFG port map(
+	bufg200: BUFG port map(
 		i => clk200,
 		o => clko_200
 	);
