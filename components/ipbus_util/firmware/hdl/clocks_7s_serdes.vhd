@@ -17,7 +17,7 @@ entity clocks_7s_serdes is
 		clki_125: in std_logic; -- Ethernet domain clk125
 		clko_ipb: out std_logic; -- ipbus domain clock (31MHz)
 		clko_p40: out std_logic; -- pseudo-40MHz clock
-		clko_200: out std_logic; -- 200MHz unbuffered clock for idelayctrl
+		clko_200: out std_logic; -- 200MHz clock for idelayctrl
 		eth_locked: in std_logic; -- ethernet locked signal
 		locked: out std_logic; -- global locked signal
 		nuke: in std_logic; -- hard reset input
@@ -34,7 +34,7 @@ end clocks_7s_serdes;
 
 architecture rtl of clocks_7s_serdes is
 	
-	signal dcm_locked, sysclk, clk_ipb_i, clk_ipb_b, clkfb: std_logic;
+	signal dcm_locked, sysclk, clk_ipb_i, clk_ipb_b, clkfb, clk200: std_logic;
 	signal clk_p40_i, clk_p40_b: std_logic;
 	signal d17, d17_d: std_logic;
 	signal nuke_i, nuke_d, nuke_d2, eth_done: std_logic := '0';
@@ -59,6 +59,11 @@ begin
 	
 	clko_p40 <= clk_p40_b;
 	
+	bufgp40: BUFG port map(
+		i => clk200,
+		o => clko_200
+	);
+	
 	mmcm: MMCME2_BASE
 		generic map(
 			clkin1_period => 8.0,
@@ -73,7 +78,7 @@ begin
 			clkfbout => clkfb,
 			clkout1 => clk_ipb_i,
 			clkout2 => clk_p40_i,
-			clkout3 => clko_200, -- No BUFG needed here, goes to idelayctrl on local routing
+			clkout3 => clk_200, -- No BUFG needed here, goes to idelayctrl on local routing
 			locked => dcm_locked,
 			rst => '0',
 			pwrdwn => '0'
