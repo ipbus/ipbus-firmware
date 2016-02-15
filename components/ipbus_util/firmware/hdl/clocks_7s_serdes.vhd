@@ -78,7 +78,7 @@ begin
 			clkfbout => clkfb,
 			clkout1 => clk_ipb_i,
 			clkout2 => clk_p40_i,
-			clkout3 => clk_200, -- No BUFG needed here, goes to idelayctrl on local routing
+			clkout3 => clk200, -- No BUFG needed here, goes to idelayctrl on local routing
 			locked => dcm_locked,
 			rst => '0',
 			pwrdwn => '0'
