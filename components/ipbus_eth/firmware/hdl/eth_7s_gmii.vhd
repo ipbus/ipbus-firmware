@@ -104,7 +104,7 @@ architecture rtl of eth_7s_gmii is
 	END COMPONENT;
 	
 	signal rx_data_e: std_logic_vector(7 downto 0);
-	signal rx_clk_e, rx_valid_e, rx_last_e, rx_user_e, rx_rst_e, rstn: std_logic;
+	signal rx_clk_e, rx_valid_e, rx_last_e, rx_user_e, rx_rst_e, rx_rst_en, rstn: std_logic;
 	signal rx_user_f, rx_user_ef: std_logic_vector(0 downto 0);
 
 begin
@@ -158,12 +158,13 @@ begin
 	
 	rx_user_ef(0) <= rx_user_e;
 	rx_error <= rx_user_f(0);
+	rx_rst_en <= not rx_rst_e;
 	
 	fifo: mac_fifo_axi4
 		port map(
 			m_aclk => clk125,
 			s_aclk => rx_clk_e,
-			s_aresetn => rx_rst_e,
+			s_aresetn => rx_rst_en,
 			s_axis_tvalid => rx_valid_e,
 			s_axis_tready => open,
 			s_axis_tdata => rx_data_e,

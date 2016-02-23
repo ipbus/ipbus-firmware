@@ -26,7 +26,7 @@ end top;
 
 architecture rtl of top is
 
-	signal clk_ipb, rst_ipb, nuke, soft_rst, userled: std_logic;
+	signal clk_ipb, rst_ipb, nuke, soft_rst, phy_rst_e, userled: std_logic;
 	signal mac_addr: std_logic_vector(47 downto 0);
 	signal ip_addr: std_logic_vector(31 downto 0);
 	signal ipb_out: ipb_wbus;
@@ -42,6 +42,7 @@ begin
 			sysclk_n => sysclk_n,
 			clk_ipb_o => clk_ipb,
 			rst_ipb_o => rst_ipb,
+			rst_125_o => phy_rst_e,
 			nuke => nuke,
 			soft_rst => soft_rst,
 			leds => leds(1 downto 0),
@@ -60,7 +61,7 @@ begin
 		);
 		
 	leds(3 downto 2) <= '0' & userled;
-	phy_rst <= '0';
+	phy_rst <= not phy_rst_e;
 		
 	mac_addr <= X"020ddba11501"; -- Careful here, arbitrary addresses do not always work
 	ip_addr <= X"c0a8c801"; -- 192.168.200.1
