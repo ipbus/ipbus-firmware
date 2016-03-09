@@ -88,6 +88,7 @@ begin
 			gt_txn => eth_tx_n,
 			gt_rxp => eth_rx_p,
 			gt_rxn => eth_rx_n,
+			sfp_los => sfp_los,
 			clk125_out => clk125,
 			clk125_fr => clk125_fr,
 			rsti => rst_eth,

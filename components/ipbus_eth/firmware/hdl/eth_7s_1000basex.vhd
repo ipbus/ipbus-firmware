@@ -14,6 +14,10 @@ use unisim.VComponents.all;
 use work.emac_hostbus_decl.all;
 
 entity eth_7s_1000basex is
+    generic(
+        RXPOLARITY_SWAP: boolean := false;
+        TXPOLARITY_SWAP: boolean := false
+    );
 	port(
 		gt_clkp, gt_clkn: in std_logic;
 		gt_txp, gt_txn: out std_logic;
@@ -88,6 +92,7 @@ architecture rtl of eth_7s_1000basex is
 	signal clk62_5_ub, clk62_5, clkfb: std_logic;
 	signal rstn, phy_done, mmcm_locked, locked_int: std_logic;
 	signal decoupled_clk: std_logic := '0';
+	signal txpol, rxpol: std_logic;
 
 begin
 	
@@ -204,6 +209,9 @@ begin
 			decoupled_clk <= not decoupled_clk;
 		end if;
 	end process;
+	
+	rxpol <= '1' when RXPOLARITY_SWAP else '0';
+	txpol <= '1' when TXPOLARITY_SWAP else '0';
 
 	phy: entity work.gig_eth_pcs_pma_basex_v15_1
 		port map(
@@ -216,6 +224,7 @@ begin
 			txoutclk => txoutclk_ub,
 			rxoutclk => open,
 			resetdone => phy_done,
+			cplllock => open,
 			mmcm_reset => open,
 			mmcm_locked => mmcm_locked,
 			userclk => clk62_5,
@@ -236,7 +245,52 @@ begin
 			reset => rsti,
 			signal_detect => sig_det,
 			gt0_qplloutclk_in => '0',
-			gt0_qplloutrefclk_in => '0'
+			gt0_qplloutrefclk_in => '0',
+            gt0_rxchariscomma_out => open,
+            gt0_rxcharisk_out => open,
+            gt0_rxbyteisaligned_out => open,
+            gt0_rxbyterealign_out => open,
+            gt0_rxcommadet_out => open,
+            gt0_txpolarity_in => txpol,
+            gt0_txdiffctrl_in => "1000",
+            gt0_txpostcursor_in => (others => '0'),
+            gt0_txprecursor_in => (others => '0'),
+            gt0_rxpolarity_in => rxpol,
+            gt0_txinhibit_in => '0',
+            gt0_txprbssel_in => (others => '0'),
+            gt0_txprbsforceerr_in => '0',
+            gt0_rxprbscntreset_in => '0',
+            gt0_rxprbserr_out => open,
+            gt0_rxprbssel_in => (others => '0'),
+            gt0_loopback_in => (others => '0'),
+            gt0_txresetdone_out => open,
+            gt0_rxresetdone_out => open,
+            gt0_rxdisperr_out => open,
+            gt0_txbufstatus_out => open,
+            gt0_rxnotintable_out => open,
+            gt0_eyescanreset_in => '0',
+            gt0_eyescandataerror_out => open,
+            gt0_eyescantrigger_in => '0',
+            gt0_rxcdrhold_in => '0',
+            gt0_rxpmareset_in => '0',
+            gt0_txpmareset_in => '0',
+            gt0_rxpcsreset_in => '0',
+            gt0_txpcsreset_in => '0',
+            gt0_rxbufreset_in => '0',
+            gt0_rxbufstatus_out => open,
+            gt0_rxdfelpmreset_in => '0',
+            gt0_rxdfeagcovrden_in => '0',
+            gt0_rxlpmen_in => '1',
+            gt0_rxmonitorout_out => open,
+            gt0_rxmonitorsel_in => (others => '0'),
+            gt0_drpaddr_in => (others => '0'),
+            gt0_drpclk_in => clk_fr,
+            gt0_drpdi_in => (others => '0'),
+            gt0_drpdo_out => open,
+            gt0_drpen_in => '0',
+            gt0_drprdy_out => open,
+            gt0_drpwe_in => '0',
+            gt0_dmonitorout_out => open
 		);
 		
 	sig_det <= not sfp_los;
