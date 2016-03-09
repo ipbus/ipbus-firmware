@@ -1,7 +1,6 @@
 # Dependencies for the ethernet gubbins on a v7 '690 ES part
 
-src eth_7s_1000basex_gth.vhd 
-#?toolset=="Vivado"?    src eth_7s_1000basex_gth_viv.vhd     
+src eth_7s_1000basex.vhd 
 
 src emac_hostbus_decl.vhd
 src ../gen_hdl/gig_eth_pcs_pma_v11_5/gig_eth_pcs_pma_v11_5_transceiver_gth.vhd
