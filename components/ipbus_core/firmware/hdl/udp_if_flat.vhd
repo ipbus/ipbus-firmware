@@ -40,8 +40,7 @@ ENTITY UDP_if IS
 		mac_rx_last: IN std_logic;
 		mac_rx_valid: IN std_logic;
 		mac_tx_ready: IN std_logic;
-		pkt_done_read: IN std_logic;
-		pkt_done_write: IN std_logic;
+		pkt_done: IN std_logic;
 		raddr: IN std_logic_vector(11 DOWNTO 0);
 		waddr: IN std_logic_vector(11 DOWNTO 0);
 		wdata: IN std_logic_vector(31 DOWNTO 0);
@@ -165,7 +164,7 @@ ARCHITECTURE flat OF UDP_if IS
    SIGNAL rx_full_addra, tx_full_addrb: std_logic_vector(BUFWIDTH + ADDRWIDTH - 1 downto 0);
    SIGNAL rx_full_addrb, tx_full_addra: std_logic_vector(BUFWIDTH + ADDRWIDTH - 3 downto 0);
    signal pkt_resend, pkt_rcvd, rx_ram_busy, rx_req_send_125, udpram_sent: std_logic;
-   signal busy_125, enable_125, rarp_125, rx_ram_sent, tx_ram_written: std_logic;
+   signal enable_125, rarp_125, rx_ram_sent, tx_ram_written: std_logic;
    signal rxreq_not_found: std_logic;
    signal resend_pkt_id: std_logic_vector(15 downto 0);
    signal clean_buf: std_logic_vector(2**BUFWIDTH - 1 downto 0);
@@ -234,7 +233,7 @@ after 4 ns
 	end process rst_macclk_block;
 
 	My_IP_addr <= My_IP_addr_sig;
-	Got_IP_addr <= not rarp_mode;
+	Got_IP_addr <= enable_125 and not rarp_mode;
 
 -- Instance port mappings.
 
@@ -653,7 +652,7 @@ end generate primary_mode;
 			sent => udpram_sent,
 			req_resend => req_resend,
 			resend_buf => resend_buf,
-			busy => busy_125,
+			busy => open,
 			write_buf => tx_write_buffer_125,
 			req_send => udpram_send,
 			send_buf => tx_read_buffer,
@@ -729,7 +728,6 @@ end generate primary_mode;
 		PORT MAP (
 			mac_clk => mac_clk,
 			rst_macclk_reg => rst_macclk_reg,
-			busy_125 => busy_125,
 			rx_read_buffer_125 => rx_read_buffer_125,
 			rx_req_send_125 => rx_req_send_125,
 			tx_write_buffer_125 => tx_write_buffer_125,
@@ -742,8 +740,7 @@ end generate primary_mode;
 			ipb_clk => ipb_clk,
 			rst_ipb => rst_ipb,
 			enable => enable,
-			pkt_done_read => pkt_done_read,
-			pkt_done_write => pkt_done_write,
+			pkt_done => pkt_done,
 			RARP => RARP,
 			we => we,
 			pkt_rdy => pkt_rdy,

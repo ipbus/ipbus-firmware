@@ -45,6 +45,7 @@ architecture rtl of UDP_slave_if is
 --
 -- Idle is indicated by K28.1 and K28.5
 -- By default K28.5 is used, but in the direction from slave to master K28.1 is used to signify 
+-- Got_IP_addr set to 0
 --
 -- N.B. assumption is that no other K chars are used so tests on K chars are not exhaustive
 --
@@ -75,7 +76,7 @@ rx_data_block:  process(mac_clk)
 	next_data := slave_rx_data(8 downto 1);
 	frame := '1';
 -- K char.  Only K28.n have these bits not all set to 1 so only check for K28.0 and K28.2
-      ElsIf (slave_rx_data(8) = '0') and (slave_rx_data(6) = '0') then
+      ElsIf (slave_rx_data(8) = '0') and (slave_rx_data(6 downto 1)= "011100") then
 	last := '1';
 	error := slave_rx_data(7) or error_pending;  -- K28.2
 	frame := '0';

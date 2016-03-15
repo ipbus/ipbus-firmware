@@ -125,17 +125,22 @@ tx_data_block:  process(mac_clk)
 	error_pending := '0';
 	Got_IP := '0';
       ElsIf master_tx_data(0) = '0' then
-        next_valid := '1';
+-- Incoming Data from slave: ignore data until it's got its IP address...
+        next_valid := Got_IP;
+	frame := Got_IP;
 	next_data := master_tx_data(8 downto 1);
-	frame := '1';
--- K char.  Only K28.n have these bits not all set to 1 so only check for K28.0 and K28.2
-      ElsIf (master_tx_data(8)= '0') and (master_tx_data(6) = '0') then
-	last := '1';
-	error := master_tx_data(7) or error_pending;  -- K28.2
-	frame := '0';
-	error_pending := '0';
-      Else
-        Got_IP := master_tx_data(8); -- K28.1 or K28.5...
+      ElsIf master_tx_data(5 downto 1)= "11100" then
+-- K28.n
+        If (master_tx_data(8)= '0') and (master_tx_data(6) = '0') then
+-- K28.0 or K28.2
+          last := '1';
+	  error := master_tx_data(7) or error_pending;  -- K28.2
+	  frame := '0';
+	  error_pending := '0';
+	ElsIf master_tx_data(7 downto 6)= "01" then
+-- K28.1 or K28.5...
+          Got_IP := master_tx_data(8);
+	End If;
       End If;
 -- Capture transmission error during a packet.  This logic will ignore an 
 -- error flagged on the K28.0 and K28.2 character, but that should be OK
