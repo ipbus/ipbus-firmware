@@ -11,7 +11,7 @@ use work.ipbus.all;
 
 entity kc705_basex_infra is
 	Generic (
-		constant RXPOLARITY_SWAP: std_logic := '0'
+		constant RXPOLARITY_SWAP: std_logic := '0';
 		constant TXPOLARITY_SWAP: std_logic := '0'
 	);
 	port(
