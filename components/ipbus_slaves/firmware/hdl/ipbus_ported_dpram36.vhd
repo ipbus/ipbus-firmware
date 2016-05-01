@@ -36,7 +36,7 @@ architecture rtl of ipbus_ported_dpram36 is
 	type ram_array is array(2 ** ADDR_WIDTH - 1 downto 0) of std_logic_vector(17 downto 0);
 	shared variable ram_l, ram_h: ram_array;
 	signal sel, rsel: integer range 0 to 2 ** ADDR_WIDTH - 1 := 0;
-	signal wcyc, wcyc_d, dsel: std_logic;
+	signal wcyc, wcyc_d, dsel, rcyc: std_logic;
 	signal ptr: unsigned(ADDR_WIDTH downto 0);
 	signal data: std_logic_vector(35 downto 0);
 	signal data_o: std_logic_vector(31 downto 0);
@@ -45,20 +45,19 @@ architecture rtl of ipbus_ported_dpram36 is
 begin
 
 	wcyc <= ipb_in.ipb_strobe and ipb_in.ipb_write;
+	rcyc <= ipb_in.ipb_strobe and not ipb_in.ipb_write;
 
 	process(clk)
 	begin
 		if falling_edge(clk) then
 			if rst = '1' then
 				ptr <= (others => '0');				
-			elsif ipb_in.ipb_addr(0) = '0' then
-				if wcyc = '1' then
-					ptr <= unsigned(ipb_in.ipb_wdata(ADDR_WIDTH downto 0));
-				end if;
-			else
-				if (ipb_in.ipb_strobe = '1' and ipb_in.ipb_write = '0') or (wcyc_d = '1') then
-					ptr <= ptr + 1;
-				end if;
+			elsif ipb_in.ipb_addr(0) = '0' and wcyc = '1' then
+				ptr <= unsigned(ipb_in.ipb_wdata(ADDR_WIDTH downto 0));
+			elsif ipb_in.ipb_addr(0) = '1' and rcyc = '1' then
+				ptr <= ptr + 1;
+			elsif (wcyc_d = '1') then
+				ptr <= ptr + 1;
 			end if;
 		end if;
 	end process;
