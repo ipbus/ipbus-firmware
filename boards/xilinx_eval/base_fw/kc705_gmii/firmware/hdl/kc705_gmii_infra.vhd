@@ -15,6 +15,7 @@ entity kc705_gmii_infra is
 		sysclk_n: in std_logic;
 		clk_ipb_o: out std_logic; -- IPbus clock
 		rst_ipb_o: out std_logic;
+		rst_125_o: out std_logic;
 		clk_aux_o: out std_logic; -- 40MHz generated clock
 		rst_aux_o: out std_logic;
 		nuke: in std_logic; -- The signal of doom
@@ -66,6 +67,7 @@ begin
 	clk_ipb <= clk_ipb_i; -- Best to align delta delays on all clocks for simulation
 	clk_ipb_o <= clk_ipb_i;
 	rst_ipb_o <= rst_ipb;
+	rst_125_o <= rst125;
 	
 	stretch: entity work.led_stretcher
 		generic map(
@@ -81,7 +83,7 @@ begin
 	
 -- Ethernet MAC core and PHY interface
 	
-	eth: entity work.eth_7s_1000basex
+	eth: entity work.eth_7s_gmii
 		port map(
 			clk125 => clk125,
 			clk200 => clk200,

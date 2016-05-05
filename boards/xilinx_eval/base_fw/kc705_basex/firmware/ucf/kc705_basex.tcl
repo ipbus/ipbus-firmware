@@ -1,12 +1,10 @@
 # Ethernet RefClk (125MHz)
 create_clock -period 8.000 -name eth_refclk [get_ports eth_clk_p]
 
-# The decoupled_clk is driven from a flip-flop to circumvent Xilinx rules for the ethernet sys clk.
-# i.e. sys clk must not be derived from eth refclk so that some monitoring can occur even with reclk failure.
-# This is not good design practice, but ned some method to breach design rule.
-create_generated_clock -name decoupled_clk -source [get_pins infra/eth/decoupled_clk_reg/C] -divide_by 2 [get_pins infra/eth/decoupled_clk_reg/Q]
+# Ethernet monitor clock hack (62.5MHz)
+create_clock -period 16.000 -name clk_dc [get_pins infra/eth/decoupled_clk_reg/Q]
 
-set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks eth_refclk] -group [get_clocks -include_generated_clocks infra/eth/phy/*/gtxe2_i/TXOUTCLK] -group [get_clocks -include_generated_clocks infra/eth/phy/*/gtxe2_i/RXOUTCLK]
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks eth_refclk] -group [get_clocks clk_dc] -group [get_clocks -include_generated_clocks [get_clocks -filter {name =~ infra/eth/phy/*/RXOUTCLK}]] -group [get_clocks -include_generated_clocks [get_clocks -filter {name =~ infra/eth/phy/*/TXOUTCLK}]]
 
 # Ethernet driven by Ethernet txoutclk (i.e. via transceiver)
 #create_generated_clock -name eth_clk_62_5 -source [get_pins infra/eth/mmcm/CLKIN1] [get_pins infra/eth/mmcm/CLKOUT1]
@@ -17,9 +15,6 @@ set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks eth_
 
 #set_false_path -through [get_pins infra/clocks/rst_reg/Q]
 #set_false_path -through [get_nets infra/clocks/nuke_i]
-
-set_property PACKAGE_PIN G8 [get_ports eth_clk_p]
-set_property PACKAGE_PIN G7 [get_ports eth_clk_n]
 
 set_property LOC GTXE2_CHANNEL_X0Y10 [get_cells -hier -filter {name=~infra/eth/*/gtxe2_i}]
 

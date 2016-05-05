@@ -1,10 +1,13 @@
+-- eth_7s_1000basex_gtp
+--
 -- Contains the instantiation of the Xilinx MAC & 1000baseX pcs/pma & GTP transceiver cores
+--
+-- This version is for the artix GTP transceivers, and has the GTPE2_COMMON included in this block.
+-- Various PLL clock outputs are therefore provided for use by other MGTs in the same quad.
 --
 -- Do not change signal names in here without corresponding alteration to the timing contraints file
 --
--- Dave Newbold, April 2011
---
--- $Id$
+-- Dave Newbold, January 2016
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -13,11 +16,7 @@ library unisim;
 use unisim.VComponents.all;
 use work.emac_hostbus_decl.all;
 
-entity eth_7s_1000basex is
-    generic(
-        RXPOLARITY_SWAP: boolean := false;
-        TXPOLARITY_SWAP: boolean := false
-    );
+entity eth_7s_1000basex_gtp is
 	port(
 		gt_clkp, gt_clkn: in std_logic;
 		gt_txp, gt_txn: out std_logic;
@@ -25,7 +24,8 @@ entity eth_7s_1000basex is
 		sfp_los: in std_logic;
 		clk125_out: out std_logic;
 		clk125_fr: out std_logic;
-		refclk_out: out std_logic;
+		pllclk_out: out std_logic;
+		pllrefclk_out: out std_logic;
 		rsti: in std_logic;
 		locked: out std_logic;
 		tx_data: in std_logic_vector(7 downto 0);
@@ -41,9 +41,9 @@ entity eth_7s_1000basex is
 		hostbus_out: out emac_hostbus_out
 	);
 
-end eth_7s_1000basex;
+end eth_7s_1000basex_gtp;
 
-architecture rtl of eth_7s_1000basex is
+architecture rtl of eth_7s_1000basex_gtp is
 
 	COMPONENT temac_gbe_v9_0
 		PORT (
@@ -87,64 +87,28 @@ architecture rtl of eth_7s_1000basex is
 	signal gmii_txd, gmii_rxd: std_logic_vector(7 downto 0);
 	signal gmii_tx_en, gmii_tx_er, gmii_rx_dv, gmii_rx_er: std_logic;
 	signal gmii_rx_clk: std_logic;
-	signal sig_det: std_logic;
-	signal clkin, clk125, txoutclk_ub, txoutclk, clk125_ub, clk_fr: std_logic;
-	signal clk62_5_ub, clk62_5, clkfb: std_logic;
+	signal sig_det, gt_clkp_i, gt_clkn_i: std_logic;
+	signal clk125, clk_fr: std_logic;
 	signal rstn, phy_done, mmcm_locked, locked_int: std_logic;
-	signal decoupled_clk: std_logic := '0';
-	signal txpol, rxpol: std_logic;
-
+	signal dc: std_logic := '0';
+	signal clk_dc: std_logic;
+	
 begin
-	
-	ibuf0: IBUFDS_GTE2 port map(
-		i => gt_clkp,
-		ib => gt_clkn,
-		o => clkin,
-		ceb => '0'
-	);
-	
-	bufg_fr: BUFG port map(
-		i => clkin,
-		o => clk_fr
-	);
-	
-	refclk_out <= clkin;
+
+	clkp_buf: IBUF -- required because top level IBUF insertion does not work for IBUFDS_GT buried in PCS/PMA core
+		port map(
+			i => gt_clkp,
+			o => gt_clkp_i
+		);
+		
+	clkn_buf: IBUF
+		port map(
+			i => gt_clkn,
+			o => gt_clkn_i
+		);
+
 	clk125_fr <= clk_fr;
-	
-	bufh_tx: BUFH port map(
-		i => txoutclk_ub,
-		o => txoutclk
-	);
-	
-	mmcm: MMCME2_BASE
-		generic map(
-			CLKIN1_PERIOD => 16.0,
-			CLKFBOUT_MULT_F => 16.0,
-			CLKOUT1_DIVIDE => 16,
-			CLKOUT2_DIVIDE => 8)
-		port map(
-			clkin1 => txoutclk,
-			clkout1 => clk62_5_ub,
-			clkout2 => clk125_ub,
-			clkfbout => clkfb,
-			clkfbin => clkfb,
-			rst => rsti,
-			pwrdwn => '0',
-			locked => mmcm_locked);
-	
-	bufr_125: BUFH
-		port map(
-			i => clk125_ub,
-			o => clk125
-		);
-
 	clk125_out <= clk125;
-
-	bufr_62_5: BUFH
-		port map(
-			i => clk62_5_ub,
-			o => clk62_5
-		);
 
 	process(clk_fr)
 	begin
@@ -195,44 +159,39 @@ begin
 	hostbus_out.hostrddata <= (others => '0');
 	hostbus_out.hostmiimrdy <= '0';
 
-	-- Vivado generates a CRC error if you drive the CPLLLOCKDET circuitry with
-	-- the same clock used to drive the transceiver PLL.  While this makes sense
-	-- if the clk is derved from the CPLL (e.g. TXOUTCLK) it is less clear is 
-	-- essential if you use the clock raw from the input pins.  The short story
-	-- is that it has always worked in the past with ISE, but Vivado generates 
-	-- DRC error.  Can be bypassed by decoupling the clock from the perpective 
-	-- of the tools by just toggling a flip flop, which is what is done below.
-
+-- This is pretty crap, but appears the only way to avoid vivado issues
+	
 	process(clk_fr)
 	begin
 		if rising_edge(clk_fr) then
-			decoupled_clk <= not decoupled_clk;
+			dc <= not dc;
 		end if;
 	end process;
-	
-	rxpol <= '1' when RXPOLARITY_SWAP else '0';
-	txpol <= '1' when TXPOLARITY_SWAP else '0';
 
-	phy: entity work.gig_eth_pcs_pma_basex_v15_1
+	dc_buf: BUFG
 		port map(
-			gtrefclk => clkin,
-			gtrefclk_bufg => clk_fr,
+			i => dc,
+			o => clk_dc
+		);
+	
+	phy: entity work.gig_eth_pcs_pma_basex_gtp
+		port map(
+			gtrefclk_p => gt_clkp_i,
+			gtrefclk_n => gt_clkn_i,
+			gtrefclk_out => open,
+			gtrefclk_bufg_out => clk_fr,	
 			txp => gt_txp,
 			txn => gt_txn,
 			rxp => gt_rxp,
 			rxn => gt_rxn,
-			txoutclk => txoutclk_ub,
-			rxoutclk => open,
 			resetdone => phy_done,
-			cplllock => open,
-			mmcm_reset => open,
-			mmcm_locked => mmcm_locked,
-			userclk => clk62_5,
-			userclk2 => clk125,
-			rxuserclk => clk62_5,
-			rxuserclk2 => clk125,
-			independent_clock_bufg => decoupled_clk,
-			pma_reset => rsti,
+			userclk_out => open,
+			userclk2_out => clk125,
+			rxuserclk_out => open,
+			rxuserclk2_out => open,
+			pma_reset_out => open,
+			mmcm_locked_out => mmcm_locked,
+			independent_clock_bufg => clk_dc,
 			gmii_txd => gmii_txd,
 			gmii_tx_en => gmii_tx_en,
 			gmii_tx_er => gmii_tx_er,
@@ -244,53 +203,12 @@ begin
 			status_vector => open,
 			reset => rsti,
 			signal_detect => sig_det,
-			gt0_qplloutclk_in => '0',
-			gt0_qplloutrefclk_in => '0',
-            gt0_rxchariscomma_out => open,
-            gt0_rxcharisk_out => open,
-            gt0_rxbyteisaligned_out => open,
-            gt0_rxbyterealign_out => open,
-            gt0_rxcommadet_out => open,
-            gt0_txpolarity_in => txpol,
-            gt0_txdiffctrl_in => "1000",
-            gt0_txpostcursor_in => (others => '0'),
-            gt0_txprecursor_in => (others => '0'),
-            gt0_rxpolarity_in => rxpol,
-            gt0_txinhibit_in => '0',
-            gt0_txprbssel_in => (others => '0'),
-            gt0_txprbsforceerr_in => '0',
-            gt0_rxprbscntreset_in => '0',
-            gt0_rxprbserr_out => open,
-            gt0_rxprbssel_in => (others => '0'),
-            gt0_loopback_in => (others => '0'),
-            gt0_txresetdone_out => open,
-            gt0_rxresetdone_out => open,
-            gt0_rxdisperr_out => open,
-            gt0_txbufstatus_out => open,
-            gt0_rxnotintable_out => open,
-            gt0_eyescanreset_in => '0',
-            gt0_eyescandataerror_out => open,
-            gt0_eyescantrigger_in => '0',
-            gt0_rxcdrhold_in => '0',
-            gt0_rxpmareset_in => '0',
-            gt0_txpmareset_in => '0',
-            gt0_rxpcsreset_in => '0',
-            gt0_txpcsreset_in => '0',
-            gt0_rxbufreset_in => '0',
-            gt0_rxbufstatus_out => open,
-            gt0_rxdfelpmreset_in => '0',
-            gt0_rxdfeagcovrden_in => '0',
-            gt0_rxlpmen_in => '1',
-            gt0_rxmonitorout_out => open,
-            gt0_rxmonitorsel_in => (others => '0'),
-            gt0_drpaddr_in => (others => '0'),
-            gt0_drpclk_in => clk_fr,
-            gt0_drpdi_in => (others => '0'),
-            gt0_drpdo_out => open,
-            gt0_drpen_in => '0',
-            gt0_drprdy_out => open,
-            gt0_drpwe_in => '0',
-            gt0_dmonitorout_out => open
+			gt0_pll0outclk_out => pllclk_out,
+			gt0_pll0outrefclk_out => pllrefclk_out,
+			gt0_pll1outclk_out => open,
+			gt0_pll1outrefclk_out => open,
+			gt0_pll0refclklost_out => open,
+			gt0_pll0lock_out => open
 		);
 		
 	sig_det <= not sfp_los;

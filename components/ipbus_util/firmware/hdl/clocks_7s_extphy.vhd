@@ -10,6 +10,7 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 library unisim;
 use unisim.VComponents.all;
@@ -106,7 +107,7 @@ begin
 	process(clk_ipb_b)
 	begin
 		if rising_edge(clk_ipb_b) then
-			rst_ipb <= rst;
+			rst_ipb <= rst or srst;
 			nuke_i <= nuke;
 			if srst = '1' or soft_rst = '1' then
 				rctr <= rctr + 1;

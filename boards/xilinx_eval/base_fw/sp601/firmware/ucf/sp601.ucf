@@ -4,9 +4,9 @@ NET sysclk_n LOC = K16 | IOSTANDARD = LVDS_25 | DIFF_TERM = TRUE;
 TIMESPEC TS_sysclk = PERIOD tnm_sysclk 200MHz;
 
 NET clk_ipb TNM_NET = tnm_clk_ipb;
-NET infra/clk_125 TNM_NET = tnm_clk_125;
-TIMESPEC TS_tig_ipb_125 = FROM tnm_clk_ipb TO tnm_clk_125 TIG;
-TIMESPEC TS_tig_125_ipb = FROM tnm_clk_125 TO tnm_clk_ipb TIG;
+NET infra/clk125 TNM_NET = tnm_clk125;
+TIMESPEC TS_tig_ipb_125 = FROM tnm_clk_ipb TO tnm_clk125 TIG;
+TIMESPEC TS_tig_125_ipb = FROM tnm_clk125 TO tnm_clk_ipb TIG;
 
 #NET infra/clocks/rst TIG;
 #NET infra/clocks/nuke_i TIG;

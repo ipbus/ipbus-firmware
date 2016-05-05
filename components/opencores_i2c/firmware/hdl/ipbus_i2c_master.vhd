@@ -54,4 +54,3 @@ begin
 	scl <= scl_i;
 	
 end rtl;
-

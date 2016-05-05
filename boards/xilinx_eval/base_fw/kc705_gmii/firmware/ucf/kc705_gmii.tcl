@@ -1,12 +1,8 @@
-# Ethernet RefClk (125MHz)
+# System clock (200MHz)
 create_clock -period 5.000 -name sysclk [get_ports sysclk_p]
 
-# Incoming GMII rx clock
-create_clock -period 8.000 -name gmii_rx_clk [get_ports gmii_rx_clk]
-set_input_delay -clock [get_clocks gmii_rx_clk] -min 5.5 [get_ports {gmii_rxd[*]}] [get_ports {gmii_rx_dv}] [get_ports {gmii_rx_er}]
-set_input_delay -clock [get_clocks gmii_rx_clk] -max 0.5 [get_ports {gmii_rxd[*]}] [get_ports {gmii_rx_dv}] [get_ports {gmii_rx_er}]
-
-set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks gmii_rx_clk]
+set_false_path -through [get_pins infra/clocks/rst_reg/Q]
+set_false_path -through [get_nets infra/clocks/nuke_i]
 
 set_property IOSTANDARD LVDS [get_ports {sysclk_*}]
 set_property PACKAGE_PIN AD12 [get_ports sysclk_p]
@@ -18,8 +14,10 @@ set_property PACKAGE_PIN AB8 [get_ports {leds[0]}]
 set_property PACKAGE_PIN AA8 [get_ports {leds[1]}]
 set_property PACKAGE_PIN AC9 [get_ports {leds[2]}]
 set_property PACKAGE_PIN AB9 [get_ports {leds[3]}]
+set_output_delay 0 -clock [get_clocks sysclk] [get_ports {leds[*]}]
+set_false_path -to [get_ports {leds[*]}]
 
-set_property IOSTANDARD LVCMOS25 [get_ports {gmii*}]
+set_property IOSTANDARD LVCMOS25 [get_ports {gmii* phy_rst}]
 set_property PACKAGE_PIN K30 [get_ports {gmii_gtx_clk}]
 set_property PACKAGE_PIN M27 [get_ports {gmii_tx_en}]
 set_property PACKAGE_PIN N29 [get_ports {gmii_tx_er}]
