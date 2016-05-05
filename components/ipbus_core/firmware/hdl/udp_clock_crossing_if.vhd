@@ -39,7 +39,7 @@ end udp_clock_crossing_if;
 
 architecture rtl of udp_clock_crossing_if is
 
-  signal req_send_tff: std_logic;
+  signal req_send_tff, we_latch : std_logic;
   signal enable_buf, rarp_buf, we_buf, rst_ipb_buf, pkt_done_tff: std_logic_vector(1 downto 0);
   signal req_send_buf, pkt_done_buf: std_logic_vector(2 downto 0);
   signal rx_read_buf_buf, tx_write_buf_buf: std_logic_vector(BUFWIDTH - 1 downto 0);
@@ -182,22 +182,22 @@ rarp_mac_clk: process(mac_clk)
 
 we_ipb_clk: process(ipb_clk)
 -- catch any we signal during packet
-  variable we_latch: std_logic;
+  variable we_latch_v : std_logic;
   begin
     if rising_edge(ipb_clk) then
       if pkt_done = '1' then
-        we_latch := '0';
+        we_latch_v := '0';
       elsif we = '1' then
-        we_latch := '1';
+        we_latch_v := '1';
       end if;
-      we_buf <= we_buf(0) & we_latch;
+      we_latch <= we_latch_v;
     end if;
   end process;      
 
 we_mac_clk: process(mac_clk)
   begin
     if rising_edge(mac_clk) then
-      we_buf <= we_buf(0) & we;
+      we_buf <= we_buf(0) & we_latch;
     end if;
   end process;      
 

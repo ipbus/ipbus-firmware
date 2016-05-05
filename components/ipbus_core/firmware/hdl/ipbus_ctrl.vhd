@@ -58,7 +58,7 @@ entity ipbus_ctrl is
 		Got_IP_addr: OUT std_logic;
 		pkt: out std_logic;
 		pkt_oob: out std_logic;
-		oob_in: in ipbus_trans_in_array(N_OOB - 1 downto 0) := (others => ('0', X"00000000", '0'));
+		oob_in: in ipbus_trans_in_array(N_OOB - 1 downto 0) := (others => ('0', X"00000000"));
 		oob_out: out ipbus_trans_out_array(N_OOB - 1 downto 0)
 	);
 

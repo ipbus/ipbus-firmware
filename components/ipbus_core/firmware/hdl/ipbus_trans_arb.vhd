@@ -52,7 +52,7 @@ begin
 						src <= (others => '0');
 					end if;
 				end if;
-				busy <= (busy and not trans_in.pkt_done) or trans_in.new_pkt;
+				busy <= (busy and not trans_in.pkt_done) or buf_in(sel).pkt_rdy;
 			end if;
 		end if;
 	end process;
