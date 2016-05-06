@@ -36,8 +36,9 @@ architecture rtl of UDP_slave_if is
 
 -- Inter FPGA protocol is as follows:
 -- a frame is defined from first valid data until last is asserted (i.e. no explicit BOF)
--- Valid data are sent as data with kchar set to 0 (i.e. kchar 0 implies valid data)
--- Valid data are put into a FIFO and if a kchar is sent the next tick then this is
+-- Format of the data between the FPGA is 8 bit data & 1 bit valid
+-- valid set to 1 implies valid data, valid set to 0 that the data are a K character as below
+-- Valid data are put into a FIFO and if a K character is sent the next tick then this is
 -- used to assert last and error (corresponding to tuser in the AXI MAC) as follows:
 -- K28.0  => last
 -- K28.2  => last and error
@@ -49,7 +50,6 @@ architecture rtl of UDP_slave_if is
 --
 -- N.B. assumption is that no other K chars are used so tests on K chars are not exhaustive
 --
--- Got_IP_addr set to 0
 --        HGFEDCBA
 -- K28.0 "00011100"
 -- K28.1 "00111100"
@@ -71,7 +71,7 @@ rx_data_block:  process(mac_clk)
         frame := '0';
 	valid := '0';
 	error_pending := '0';
-      ElsIf slave_rx_data(0) = '0' then
+      ElsIf slave_rx_data(0) = '1' then
         next_valid := '1';
 	next_data := slave_rx_data(8 downto 1);
 	frame := '1';
@@ -113,14 +113,14 @@ rx_data_block:  process(mac_clk)
   end process rx_data_block;
 
 tx_data_block:  process(mac_clk)
-  variable next_last, next_error, kchar, last, error, ready, last_ready: std_logic;
+  variable next_last, next_error, valid, last, error, ready, last_ready: std_logic;
   variable data: std_logic_vector(7 DOWNTO 0);
   begin
     If rising_edge(mac_clk) then
       next_last := '0';
       next_error := '0';
       ready := '0';
-      kchar := '1';
+      valid := '0';
       If rst_macclk = '1' then
 	data := "00111100";
 -- Captured data
@@ -128,7 +128,7 @@ tx_data_block:  process(mac_clk)
         data := mac_tx_data;
 	next_last := mac_tx_last;
 	next_error := mac_tx_error;
-	kchar := '0';
+	valid := '1';
 -- End of frame, send K28.0 or K28.2
       ElsIf last = '1' then
         data := "0" & error & "011100";
@@ -139,7 +139,7 @@ tx_data_block:  process(mac_clk)
       If rst_macclk = '0' and mac_tx_valid = '1' and slave_tx_pause = '0' then
 	ready := '1';
       End If;
-      slave_tx_data <= data & kchar
+      slave_tx_data <= data & valid
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on

@@ -5,8 +5,9 @@
 -- and to have additional port master_tx_pause driven high when half full
 -- (as a consequence of which FIFO depth needs to be a power of 2, hence recast as BUFWIDTH)
 --
--- FIFO needs to be deep enough that remote end reacts to master_tx_pause before FIFO either fills or empties
--- and rather than checking on whether there is data it relies on the embedded mac_tx_last signal to stop emptying
+-- FIFO needs to be deep enough that remote end reacts to master_tx_pause before FIFO
+-- either fills or empties and rather than just checking on whether there is data it
+-- primarily relies on the embedded mac_tx_last signal to stop emptying
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -14,7 +15,7 @@ USE IEEE.NUMERIC_STD.ALL;
  
 entity UDP_master_fifo is
 	Generic (
-		constant BUFWIDTH: positive := 4
+		constant BUFWIDTH: positive := 5
 	);
 	Port ( 
 		mac_clk		: in  STD_LOGIC;
@@ -98,8 +99,13 @@ begin
 			end if;
 
 			If Running = '1' then
+				-- Die gracefully if the FIFO runs dry...
+				If FillLevel = 0 then
+					DataOut := "0000000011";
+				else
 				-- Update data to be output
-				DataOut := Memory(Tail);
+					DataOut := Memory(Tail);
+				end if;
 			else
 				DataOut := (Others => '0');
 			end if;

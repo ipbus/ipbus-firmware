@@ -36,8 +36,9 @@ architecture rtl of UDP_master_if is
 
 -- Inter FPGA protocol is as follows:
 -- a frame is defined from first valid data until last is asserted (i.e. no explicit BOF)
--- Valid data are sent as data with kchar set to 0 (i.e. kchar 0 implies valid data)
--- Valid data are put into a FIFO and if a kchar is sent the next tick then this is
+-- Format of the data between the FPGA is 8 bit data & 1 bit valid
+-- valid set to 1 implies valid data, valid set to 0 that the data are a K character as below
+-- Valid data are put into a FIFO and if a K character is sent the next tick then this is
 -- used to assert last and error (corresponding to tuser in the AXI MAC) as follows:
 -- K28.0  => last
 -- K28.2  => last and error
@@ -79,20 +80,20 @@ With Got_IP_addr_sig select my_rx_error <=
 Got_IP_addr <= Got_IP_addr_sig;
 
 rx_data_block:  process(mac_clk)
-  variable next_last, next_error, kchar, last, error: std_logic;
+  variable next_last, next_error, valid, last, error: std_logic;
   variable data: std_logic_vector(7 DOWNTO 0);
   begin
     If rising_edge(mac_clk) then
       next_last := '0';
       next_error := '0';
-      kchar := '1';
+      valid := '0';
       If rst_macclk = '1' then
 	data := "10111100";
       ElsIf my_rx_valid = '1' then
         data := my_rx_data;
 	next_last := my_rx_last;
 	next_error := my_rx_error;
-	kchar := '0';
+	valid := '1';
 -- End of frame, send K28.0 or K28.2
       ElsIf last = '1' then
         data := "0" & error & "011100";
@@ -100,7 +101,7 @@ rx_data_block:  process(mac_clk)
       Else
         data := "10111100";
       End If;
-      master_rx_data <= data & kchar
+      master_rx_data <= data & valid
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
@@ -124,7 +125,7 @@ tx_data_block:  process(mac_clk)
 	valid := '0';
 	error_pending := '0';
 	Got_IP := '0';
-      ElsIf master_tx_data(0) = '0' then
+      ElsIf master_tx_data(0) = '1' then
 -- Incoming Data from slave: ignore data until it's got its IP address...
         next_valid := Got_IP;
 	frame := Got_IP;
