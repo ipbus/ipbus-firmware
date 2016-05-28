@@ -41,7 +41,13 @@ architecture rtl of clocks_7s_serdes is
 	signal d17, d17_d: std_logic;
 	signal nuke_i, nuke_d, nuke_d2, eth_done: std_logic := '0';
 	signal rst, srst, rst_ipb, rst_125, rst_ipb_ctrl: std_logic := '1';
+	signal rst_ipb_int: std_logic := '1';
 	signal rctr: unsigned(3 downto 0) := "0000";
+	
+	-- Allow some register duplication for ipb reset.  
+	-- Approx 60 destinations, perhaps distributed over fpga. 
+	attribute MAX_FANOUT : integer;
+	attribute MAX_FANOUT of rst_ipb : signal is 10; 
 	
 begin
 	
@@ -107,7 +113,8 @@ begin
 	process(clk_ipb_b)
 	begin
 		if rising_edge(clk_ipb_b) then
-			rst_ipb <= rst or srst;
+			rst_ipb_int <= rst or srst;
+			rst_ipb <= rst_ipb_int;  -- Ease fanout & avoid metastability
 			nuke_i <= nuke;
 			if srst = '1' or soft_rst = '1' then
 				rctr <= rctr + 1;
