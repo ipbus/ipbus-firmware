@@ -43,9 +43,10 @@ architecture rtl of clocks_7s_serdes is
 	signal rst, srst, rst_ipb, rst_125, rst_ipb_ctrl: std_logic := '1';
 	signal rst_ipb_int: std_logic := '1';
 	signal rctr: unsigned(3 downto 0) := "0000";
+	signal rst_125_int: std_logic;
 	
 	-- Allow some register duplication for ipb reset.  
-	-- Approx 60 destinations, perhaps distributed over fpga. 
+    -- Not sure if it will propagate down through hierarchy
 	attribute MAX_FANOUT : integer;
 	attribute MAX_FANOUT of rst_ipb : signal is 10; 
 	
@@ -110,11 +111,21 @@ begin
 	locked <= dcm_locked;
 	srst <= '1' when rctr /= "0000" else '0';
 	
+	
+	-- Large skew between incoming sysclk and clk_ipb_b leads to hold violations on rsto_ipb & rsto_ipb_ctrl.
+	-- First move reset to ipb_clk domain via async path and then generate resets.
+	
+    sync_rst_to_clk_ipb: entity work.synchroniser 
+    port map(
+        clk => clk_ipb_b,
+        d => rst,
+        q => rst_ipb_ctrl);
+        
 	process(clk_ipb_b)
 	begin
 		if rising_edge(clk_ipb_b) then
-			rst_ipb_int <= rst or srst;
-			rst_ipb <= rst_ipb_int;  -- Ease fanout & avoid metastability
+			rst_ipb_int <= rst_ipb_ctrl or srst;
+			rst_ipb <= rst_ipb_int;
 			nuke_i <= nuke;
 			if srst = '1' or soft_rst = '1' then
 				rctr <= rctr + 1;
@@ -122,23 +133,27 @@ begin
 		end if;
 	end process;
 	
-	rsto_ipb <= rst_ipb;
-	
-	process(clk_ipb_b)
-	begin
-		if rising_edge(clk_ipb_b) then
-			rst_ipb_ctrl <= rst;
-		end if;
-	end process;
-	
 	rsto_ipb_ctrl <= rst_ipb_ctrl;
+
+	rsto_ipb <= rst_ipb;	
 	
-	process(clki_125)
-	begin
-		if rising_edge(clki_125) then
-			rst_125 <= rst or not eth_done;
-		end if;
-	end process;
+	-- clki_125 derived from txoutclk from transceiver driven by oscillator that also drives sysclk.
+	-- Vivado probably treats clocks as async.  Play it safe and also add sync unit here.
+	-- First derive rst_125_int in sysclk domain (i.e. that of rst & eth_done)
+	
+	process(sysclk)
+    begin
+        if rising_edge(sysclk) then
+			rst_125_int <= rst or not eth_done;
+        end if;
+    end process;	
+	
+    sync_rst_to_clk_125: entity work.synchroniser 
+    port map(
+        clk => clki_125,
+        d => rst_125_int,
+        q => rst_125);	
+	
 	
 	rsto_125 <= rst_125;
 	
