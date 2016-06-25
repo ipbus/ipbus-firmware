@@ -11,12 +11,15 @@ use IEEE.STD_LOGIC_1164.ALL;
 use work.ipbus.all;
 
 entity ipbus_spi is
+	generic(
+		N_SS: positive := 8
+	)
 	port(
 		clk: in std_logic;
 		rst: in std_logic;
 		ipb_in: in ipb_wbus;
 		ipb_out: out ipb_rbus;
-		ss: out std_logic_vector(7 downto 0);
+		ss: out std_logic_vector(N_SS - 1 downto 0);
 		mosi: out std_logic;
 		miso: in std_logic;
 		sclk: out std_logic
@@ -29,6 +32,7 @@ architecture rtl of ipbus_spi is
 	signal stb, ack, err, onebit, miso_sig: std_logic;
 	signal onenib: std_logic_vector(3 downto 0);
 	signal twobit: std_logic_vector(1 downto 0);
+	signal ss_i: std_logic_vector(7 downto 0);
 
 	component spi_top port(
 		wb_clk_i : IN std_logic;
@@ -46,9 +50,11 @@ architecture rtl of ipbus_spi is
 		ss_pad_o : OUT std_logic_vector(7 downto 0);
 		sclk_pad_o: OUT std_logic;
 		mosi_pad_o: OUT std_logic;
-		miso_pad_i: OUT std_logic);
+		miso_pad_i: IN std_logic);
 	end component;
+	
 begin
+
 	miso_sig <= miso;
 	onenib <= "1111";
 	twobit <= "00";
@@ -70,12 +76,14 @@ begin
 			wb_ack_o => ack,
 			wb_err_o => err,
 			wb_int_o => open,
-			ss_pad_o => ss,
+			ss_pad_o => ss_i,
 			sclk_pad_o => sclk,
 			mosi_pad_o => mosi,
 			miso_pad_i => miso_sig
 		);
 	
+	ss <= ss_i(N_SS - 1 downto 0);
+		
 	ipb_out.ipb_ack <= ack;
 	ipb_out.ipb_err <= err;
 	

@@ -87,6 +87,7 @@ begin
 	clkdiv: entity work.ipbus_clock_div port map(
 		clk => sysclk,
 		d17 => d17,
+		d25 => open,
 		d28 => onehz
 	);
 	
