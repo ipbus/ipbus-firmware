@@ -32,12 +32,34 @@ architecture rtl of ipbus_spi is
 	signal stb, ack, err, onebit, miso_sig: std_logic;
 	signal ss_i: std_logic_vector(7 downto 0);
 	
+	component spi_top
+		port(
+			wb_clk_i: IN std_logic;
+			wb_rst_i: IN std_logic;	
+			wb_adr_i : IN std_logic_vector(4 downto 0);
+			wb_dat_i : IN std_logic_vector(31 downto 0);
+			wb_dat_o : OUT std_logic_vector(31 downto 0);
+			wb_sel_i : IN std_logic_vector(3 downto 0);
+			wb_we_i  : IN std_logic;
+			wb_stb_i : IN std_logic;
+			wb_cyc_i : IN std_logic;
+			wb_ack_o : OUT std_logic;
+			wb_err_o : OUT std_logic;
+			wb_int_o : OUT std_logic;
+			ss_pad_o : OUT std_logic_vector(7 downto 0);
+			sclk_pad_o: OUT std_logic;
+			mosi_pad_o: OUT std_logic;
+			miso_pad_i: IN std_logic
+		);
+	end component;
+
+	
 begin
 
 	miso_sig <= miso;
 	stb <= ipb_in.ipb_strobe and not (ack or err);
 
-	spi: entity work.spi_top
+	spi: spi_top
 		port map(
 			wb_clk_i => clk,
 			wb_rst_i => rst,
