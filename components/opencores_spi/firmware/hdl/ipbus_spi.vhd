@@ -37,7 +37,7 @@ begin
 	miso_sig <= miso;
 	stb <= ipb_in.ipb_strobe and not (ack or err);
 
-	spi: spi_top
+	spi: entity work.spi_top
 		port map(
 			wb_clk_i => clk,
 			wb_rst_i => rst,
