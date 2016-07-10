@@ -57,7 +57,7 @@ begin
 				ptr <= (others => '0');				
 			elsif ipb_in.ipb_addr(0) = '0' then
 				if wcyc = '1' then
-					ptr <= unsigned(ipb_in.ipb_wdata(ADDR_WIDTH downto 0));
+					ptr <= unsigned(ipb_in.ipb_wdata(ADDR_WIDTH - 1 downto 0));
 				end if;
 			else
 				if (ipb_in.ipb_strobe = '1' and ipb_in.ipb_write = '0') or (wcyc_d = '1') then
@@ -67,7 +67,7 @@ begin
 		end if;
 	end process;
 	
-	sel <= to_integer(ptr(ADDR_WIDTH downto 1));
+	sel <= to_integer(ptr);
 	
 	process(clk)
 	begin
