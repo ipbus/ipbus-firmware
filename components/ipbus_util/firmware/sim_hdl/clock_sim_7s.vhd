@@ -38,7 +38,7 @@ begin
 	clk40 <= not clk40 after 12.5 ns;
 	
 	clko_125 <= clk125;
-	clko_ipb <= clk25;
+	clko_ipb <= clk_ipb;
 	clko_p40 <= clk40;
 	
 	srst <= '1' when rctr /= "0000" else '0';
@@ -59,7 +59,7 @@ begin
 	begin
 		if rising_edge(clk_ipb) then
 			rsto_ipb_ctrl <= reset_vec(0) or nuke_del;
-			rsto <= reset_vec(0) or nuke_del or srst;
+			rsto_ipb <= reset_vec(0) or nuke_del or srst;
 		end if;
 	end process;
 	
