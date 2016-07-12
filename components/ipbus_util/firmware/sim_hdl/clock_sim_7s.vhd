@@ -20,7 +20,7 @@ entity clock_sim_7s is
 		rsto_125: out std_logic;
 		rsto_ipb: out std_logic;
 		rsto_ipb_ctrl: out std_logic;
-		rsto_p40: out std_logic;
+		rsto_p40: out std_logic
 	);
 
 end clock_sim_7s;
