@@ -83,7 +83,7 @@ begin
 	ipb_out.ipb_ack <= ipb_in.ipb_strobe;
 	ipb_out.ipb_err <= '0';
 	ipb_out.ipb_rdata <= (32 - ADDR_WIDTH downto 0 => '0') & std_logic_vector(ptr) when ipb_in.ipb_addr(0)='0'
-		else (32 - DATA_WIDTH downto 0 => '0') & data;
+		else (31 - DATA_WIDTH downto 0 => '0') & data;
 	
 	rsel <= to_integer(unsigned(addr));
 	
