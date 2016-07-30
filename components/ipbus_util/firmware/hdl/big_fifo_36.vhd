@@ -41,7 +41,7 @@ architecture rtl of big_fifo_36 is
 	signal en: std_logic_vector(N_FIFO downto 0);
 	signal ifull, iempty: std_logic_vector(N_FIFO - 1  downto 0);
 	signal rsti, warn_i, fifo_rst: std_logic;
-	type fifo_d_t is array(N_FIFO downto 0) of std_logic_vector(35 downto 0);
+	type fifo_d_t is array(N_FIFO downto 0) of std_logic_vector(71 downto 0);
 	signal fifo_d: fifo_d_t;
 	signal rst_ctr: unsigned(3 downto 0);
 	signal ctri: unsigned(17 downto 0);
@@ -62,7 +62,7 @@ begin
 	rsti <= '0' when rst_ctr = "1111" else '1';
 	fifo_rst <= rsti and rst_ctr(3) when rising_edge(clk);
 	
-	fifo_d(0) <= d;
+	fifo_d(0) <= X"0" & d(35 downto 32) & X"00000000" & d(31 downto 0);
 	en(0) <= wen and not (rsti or ifull(0));
 	en(N_FIFO) <= ren and not (rsti or iempty(N_FIFO - 1));
 
@@ -76,10 +76,10 @@ begin
 				FIRST_WORD_FALL_THROUGH => true
 			)
 			port map(
-				di => fifo_d(i)(31 downto 0),
-				dip => fifo_d(i)(35 downto 32),
-				do => fifo_d(i + 1)(31 downto 0),
-				dop => fifo_d(i + 1)(35 downto 32),
+				di => fifo_d(i)(63 downto 0),
+				dip => fifo_d(i)(71 downto 64),
+				do => fifo_d(i + 1)(63 downto 0),
+				dop => fifo_d(i + 1)(71 downto 64),
 				empty => iempty(i),
 				full => ifull(i),
 				injectdbiterr => '0',
@@ -97,7 +97,7 @@ begin
 	
 	en(N_FIFO - 1 downto 1) <= not ifull(N_FIFO - 1 downto 1) and not iempty(N_FIFO - 2 downto 0) and not (N_FIFO - 2 downto 0 => rsti);
 	
-	q <= fifo_d(N_FIFO);
+	q <= fifo_d(N_FIFO)(67 downto 64) & fifo_d(N_FIFO)(31 downto 0);
 	valid <= not iempty(N_FIFO - 1);
 	full <= ifull(0);
 	empty <= iempty(N_FIFO - 1);
