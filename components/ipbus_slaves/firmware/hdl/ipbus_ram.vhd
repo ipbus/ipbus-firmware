@@ -40,7 +40,7 @@ end ipbus_ram;
 architecture rtl of ipbus_ram is
 
 	type reg_array is array(2 ** ADDR_WIDTH - 1 downto 0) of std_logic_vector(31 downto 0);
-	signal reg: reg_array;
+	signal reg: reg_array := (others => (others => '0'));
 	signal sel: integer range 0 to 2 ** ADDR_WIDTH - 1 := 0;
 	signal ack: std_logic;
 

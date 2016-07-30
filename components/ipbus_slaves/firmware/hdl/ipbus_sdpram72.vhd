@@ -39,7 +39,7 @@ end ipbus_sdpram72;
 architecture rtl of ipbus_sdpram72 is
 
 	type ram_array is array(2 ** ADDR_WIDTH - 1 downto 0) of std_logic_vector(71 downto 0);
-	shared variable ram: ram_array;
+	shared variable ram: ram_array := (others => (others => '0'));
 	signal sel: integer range 0 to 2 ** ADDR_WIDTH - 3 := 0;
 	signal rsel: integer range 0 to 2 ** ADDR_WIDTH - 1 := 0;
 	signal rdata: std_logic_vector(17 downto 0);

@@ -28,7 +28,7 @@ end clock_sim_7s;
 architecture behavioural of clock_sim_7s is
 
 	signal clk125, clk_ipb, clk40, nuke_del, srst: std_logic := '0';
-	signal reset_vec: std_logic_vector(3 downto 0) := X"f";
+	signal reset_vec: std_logic_vector(7 downto 0) := X"ff";
 	signal rctr: unsigned(3 downto 0) := "0000";
 
 begin
@@ -46,7 +46,7 @@ begin
 	process(clk_ipb)
 	begin
 		if rising_edge(clk_ipb) then
-			reset_vec <= '0' & reset_vec(3 downto 1);
+			reset_vec <= '0' & reset_vec(7 downto 1);
 			if srst = '1' or soft_rst = '1' then
 				rctr <= rctr + 1;
 			end if;

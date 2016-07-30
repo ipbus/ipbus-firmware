@@ -39,7 +39,7 @@ end ipbus_ported_dpram;
 architecture rtl of ipbus_ported_dpram is
 
 	type ram_array is array(2 ** ADDR_WIDTH - 1 downto 0) of std_logic_vector(DATA_WIDTH - 1 downto 0);
-	shared variable ram: ram_array;
+	shared variable ram: ram_array := (others => (others => '0'));
 	signal sel, rsel: integer range 0 to 2 ** ADDR_WIDTH - 1 := 0;
 	signal wcyc, wcyc_d: std_logic;
 	signal ptr: unsigned(ADDR_WIDTH - 1 downto 0);
