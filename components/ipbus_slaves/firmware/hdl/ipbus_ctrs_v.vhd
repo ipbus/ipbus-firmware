@@ -17,7 +17,7 @@ use work.ipbus_reg_types.all;
 entity ipbus_ctrs_v is
 	generic(
 		N_CTRS: natural := 1;
-		CTR_WIDTH: natural := 32
+		CTR_WIDTH: natural := 32;
 		LIMIT: boolean := true
 	);
 	port(
