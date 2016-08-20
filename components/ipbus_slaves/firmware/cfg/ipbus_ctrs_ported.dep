@@ -1,0 +1,2 @@
+src ipbus_ctrs_ported.vhd
+include syncreg_v.dep

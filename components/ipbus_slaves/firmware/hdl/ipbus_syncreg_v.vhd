@@ -55,7 +55,8 @@ begin
 
 	ctrl_cyc_w <= ipb_in.ipb_strobe and ipb_in.ipb_write and not ipb_in.ipb_addr(ADDR_WIDTH);
 	ctrl_cyc_r <= ipb_in.ipb_strobe and not ipb_in.ipb_write and not ipb_in.ipb_addr(ADDR_WIDTH);
-	stat_cyc <= ipb_in.ipb_strobe and not ipb_in.ipb_write and ipb_in.ipb_addr(ADDR_WIDTH);
+	stat_cyc <= ipb_in.ipb_strobe and not ipb_in.ipb_write and ipb_in.ipb_addr(ADDR_WIDTH) when N_CTRL /= 0
+		else ipb_in.ipb_strobe and not ipb_in.ipb_write;
 	
 	w_gen: for i in N_CTRL - 1 downto 0 generate
 	

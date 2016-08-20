@@ -1,5 +1,5 @@
 src ipbus_syncreg_v.vhd
-src ipbus_reg_types.vhd
 src syncreg_w.vhd
 src syncreg_r.vhd
-
+src ipbus_reg_types.vhd
+src -c components/ipbus_core ipbus_package.vhd

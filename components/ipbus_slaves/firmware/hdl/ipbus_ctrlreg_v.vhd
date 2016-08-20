@@ -45,7 +45,7 @@ architecture rtl of ipbus_ctrlreg_v is
 begin
 
 	sel <= to_integer(unsigned(ipbus_in.ipb_addr(ADDR_WIDTH - 1 downto 0))) when ADDR_WIDTH > 0 else 0;
-	stat_cyc <= ipbus_in.ipb_addr(ADDR_WIDTH);
+	stat_cyc <= ipbus_in.ipb_addr(ADDR_WIDTH) when N_CTRL /= 0 else '1';
 	cw_cyc <= ipbus_in.ipb_strobe and ipbus_in.ipb_write and not stat_cyc;
 
 	process(clk)
