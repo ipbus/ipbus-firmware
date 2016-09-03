@@ -60,7 +60,7 @@ begin
 	end process;
 	
 	rsti <= '0' when rst_ctr = "1111" else '1';
-	fifo_rst <= rsti and rst_ctr(3) when rising_edge(clk);
+	fifo_rst <= rsti and rst_ctr(3);
 	
 	fifo_d(0) <= X"0" & d(35 downto 32) & X"00000000" & d(31 downto 0);
 	en(0) <= wen and not (rsti or ifull(0));
