@@ -1,8 +1,8 @@
--- clock_div_v6
+-- ipbus_clock_div
+--
+-- Various divided clocks for reset logic, flashing lights, etc
 --
 -- Dave Newbold, March 2013. Rewritten by Paschalis Vichoudis, June 2013
---
--- $Id$
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -24,33 +24,34 @@ end ipbus_clock_div;
 architecture rtl of ipbus_clock_div is
 
 	signal rst_b: std_logic;
+	signal cnt: unsigned(27 downto 0);
 
 begin
 
-	reset_gen : component srl16
-   port map 
-	(				
-		 a0 	=> '1'  ,
-		 a1 	=> '1'  ,
-		 a2 	=> '1'  ,
-		 a3 	=> '1'  ,
-		 clk 	=> clk  ,
-		 d 	=> '1'  ,
-		 q 	=> rst_b
-	);	
-
+	reset_gen: component SRL16
+		port map(
+			a0 	=> '1',
+			a1 	=> '1',
+			a2 	=> '1',
+			a3 	=> '1',
+			clk => clk,
+			d => '1',
+			q => rst_b
+		);	
 
 	process(rst_b, clk)
-		variable cnt : std_logic_vector(27 downto 0);
 	begin
-	if rst_b = '0' then
-		cnt:=(others => '0');
-	elsif rising_edge(clk) then
-		d28 <= cnt(27);
-		d25 <= cnt(24);
-		d17 <= cnt(16);
-		cnt:=cnt+1;
-	end if;
+		if rising_edge(clk) then
+			if rst_b = '0' then
+				cnt <= (others => '0');
+			else
+				cnt <= cnt + 1;
+			end if;
+		end if;
 	end process;
+	
+	d28 <= cnt(27);
+	d25 <= cnt(24);
+	d17 <= cnt(16);
 
 end rtl;
