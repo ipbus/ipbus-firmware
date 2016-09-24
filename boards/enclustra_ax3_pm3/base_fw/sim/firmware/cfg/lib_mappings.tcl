@@ -1,0 +1,9 @@
+set xlib $::env(XILINX_SIMLIBS)
+vmap secureip $xlib/secureip
+vmap unisim $xlib/unisim
+vmap unimacro $xlib/unimacro
+vmap unifast $xlib/unifast
+vmap unisims_ver $xlib/unisims_ver
+vmap unimacro_ver $xlib/unimacro_ver
+vmap unifast_ver $xlib/unifast_ver
+vmap simprims_ver $xlib/simprims_ver
