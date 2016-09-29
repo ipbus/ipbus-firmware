@@ -1,3 +1,18 @@
+set_property BITSTREAM.GENERAL.COMPRESS TRUE [current_design]
+
+proc false_path {patt clk} {
+    set p [get_ports -quiet $patt -filter {direction != out}]
+    if {[llength $p] != 0} {
+        set_input_delay 0 -clock [get_clocks $clk] [get_ports $patt -filter {direction != out}]
+        set_false_path -from [get_ports $patt -filter {direction != out}]
+    }
+    set p [get_ports -quiet $patt -filter {direction != in}]
+    if {[llength $p] != 0} {
+       	set_output_delay 0 -clock [get_clocks $clk] [get_ports $patt -filter {direction != in}]
+	    set_false_path -to [get_ports $patt -filter {direction != in}]
+	}
+}
+
 # System clock (200MHz)
 create_clock -period 5.000 -name sysclk [get_ports sysclk_p]
 
@@ -14,8 +29,14 @@ set_property PACKAGE_PIN AB8 [get_ports {leds[0]}]
 set_property PACKAGE_PIN AA8 [get_ports {leds[1]}]
 set_property PACKAGE_PIN AC9 [get_ports {leds[2]}]
 set_property PACKAGE_PIN AB9 [get_ports {leds[3]}]
-set_output_delay 0 -clock [get_clocks sysclk] [get_ports {leds[*]}]
-set_false_path -to [get_ports {leds[*]}]
+false_path {leds[*]} sysclk
+
+set_property IOSTANDARD LVCMOS25 [get_ports {dip_sw[*]}]
+set_property PACKAGE_PIN Y29 [get_ports {dip_sw[0]}]
+set_property PACKAGE_PIN W29 [get_ports {dip_sw[1]}]
+set_property PACKAGE_PIN AA28 [get_ports {dip_sw[2]}]
+set_property PACKAGE_PIN Y28 [get_ports {dip_sw[3]}]
+false_path {dip_sw[*]} sysclk
 
 set_property IOSTANDARD LVCMOS25 [get_ports {gmii* phy_rst}]
 set_property PACKAGE_PIN K30 [get_ports {gmii_gtx_clk}]

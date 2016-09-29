@@ -4,7 +4,7 @@
 @device_speed = "-2"
 @boardname = "kc705_basex"
 
-setup -c boards/xilinx_eval/base_fw/common settings_v7.tcl
+setup settings_v7.tcl
 src top_kc705_gmii.vhd
 include kc705_gmii_infra.dep
 include -c components/ipbus_util ipbus_example.dep

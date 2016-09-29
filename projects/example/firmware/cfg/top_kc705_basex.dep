@@ -1,0 +1,2 @@
+include -c boards/kc705/base_fw/kc705_basex/synth top.dep
+include -c components/ipbus_util ipbus_example.dep

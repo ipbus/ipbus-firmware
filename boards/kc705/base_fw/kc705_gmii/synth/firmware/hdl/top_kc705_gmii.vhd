@@ -14,7 +14,8 @@ use work.ipbus.ALL;
 entity top is port(
 		sysclk_p: in std_logic;
 		sysclk_n: in std_logic;
-		leds: out std_logic_vector(3 downto 0);
+		leds: out std_logic_vector(3 downto 0); -- status LEDs
+		dip_sw: in std_logic_vector(3 downto 0); -- switches
 		gmii_gtx_clk, gmii_tx_en, gmii_tx_er: out std_logic;
 		gmii_txd: out std_logic_vector(7 downto 0);
 		gmii_rx_clk, gmii_rx_dv, gmii_rx_er: in std_logic;
@@ -63,8 +64,8 @@ begin
 	leds(3 downto 2) <= '0' & userled;
 	phy_rst <= not phy_rst_e;
 		
-	mac_addr <= X"020ddba11501"; -- Careful here, arbitrary addresses do not always work
-	ip_addr <= X"c0a8c801"; -- 192.168.200.1
+	mac_addr <= X"020ddba1151" & dip_sw; -- Careful here, arbitrary addresses do not always work
+	ip_addr <= X"c0a8c81" & dip_sw; -- 192.168.200.16+n
 
 -- ipbus slaves live in the entity below, and can expose top-level ports
 -- The ipbus fabric is instantiated within.

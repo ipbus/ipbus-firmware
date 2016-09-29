@@ -19,7 +19,9 @@ entity top is port(
 		eth_tx_p: out std_logic; -- Ethernet MGT output
 		eth_tx_n: out std_logic;
 		sfp_los: in std_logic;
-		leds: out std_logic_vector(3 downto 0) -- status LEDs
+		sfp_tx_disable: out std_logic;
+		leds: out std_logic_vector(3 downto 0); -- status LEDs
+		dip_sw: in std_logic_vector(3 downto 0) -- switches
 	);
 
 end top;
@@ -57,9 +59,10 @@ begin
 		);
 		
 	leds(3 downto 2) <= '0' & userled;
+	sfp_tx_disable <= '0';
 		
-	mac_addr <= X"020ddba11501"; -- Careful here, arbitrary addresses do not always work
-	ip_addr <= X"c0a8c801"; -- 192.168.200.1
+	mac_addr <= X"020ddba1151" & dip_sw; -- Careful here, arbitrary addresses do not always work
+	ip_addr <= X"c0a8c81" & dip_sw; -- 192.168.200.16+n
 
 -- ipbus slaves live in the entity below, and can expose top-level ports
 -- The ipbus fabric is instantiated within.
