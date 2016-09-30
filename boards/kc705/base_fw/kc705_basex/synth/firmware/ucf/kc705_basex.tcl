@@ -51,6 +51,7 @@ set_property PACKAGE_PIN AA28 [get_ports {dip_sw[2]}]
 set_property PACKAGE_PIN Y28 [get_ports {dip_sw[3]}]
 false_path {dip_sw[*]} eth_refclk
 
-set_property IOSTANDARD LVCMOS25 [get_ports {sfp_los}]
+set_property IOSTANDARD LVCMOS25 [get_ports {sfp_*}]
 set_property PACKAGE_PIN P19 [get_ports {sfp_los}]
+set_property PACKAGE_PIN Y20 [get_ports {sfp_tx_disable}]
 false_path sfp_* eth_refclk
