@@ -1,6 +1,6 @@
--- kc705_basex_infra
+-- enclustra_ax3_pm3_infra
 --
--- All board-specific stuff goes here.
+-- All board-specific stuff goes here
 --
 -- Dave Newbold, June 2013
 
@@ -9,35 +9,35 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 use work.ipbus.all;
 
-entity pc051a_infra is
+entity enclustra_ax3_pm3_infra is
 	port(
-		eth_clk_p: in std_logic; -- 125MHz MGT clock
-		eth_clk_n: in std_logic;
-		eth_rx_p: in std_logic; -- Ethernet MGT input
-		eth_rx_n: in std_logic;
-		eth_tx_p: out std_logic; -- Ethernet MGT output
-		eth_tx_n: out std_logic;
-		sfp_los: in std_logic;
+		sysclk_p: in std_logic; -- 200MHz board crystal clock
+		sysclk_n: in std_logic;
 		clk_ipb_o: out std_logic; -- IPbus clock
 		rst_ipb_o: out std_logic;
-		clk125_o: out std_logic;
-		rst125_o: out std_logic;
-		clk200: out std_logic; -- 200MHz unbuffered clock for IDELAYCTRL
+		rst_125_o: out std_logic;
+		clk_aux_o: out std_logic; -- 40MHz generated clock
+		rst_aux_o: out std_logic;
 		nuke: in std_logic; -- The signal of doom
 		soft_rst: in std_logic; -- The signal of lesser doom
 		leds: out std_logic_vector(1 downto 0); -- status LEDs
-		debug: out std_logic_vector(3 downto 0);
+		rgmii_txd: out std_logic_vector(3 downto 0);
+		rgmii_tx_ctl: out std_logic;
+		rgmii_txc: out std_logic;
+		rgmii_rxd: in std_logic_vector(3 downto 0);
+		rgmii_rx_ctl: in std_logic;
+		rgmii_rxc: in std_logic;
 		mac_addr: in std_logic_vector(47 downto 0); -- MAC address
 		ip_addr: in std_logic_vector(31 downto 0); -- IP address
 		ipb_in: in ipb_rbus; -- ipbus
 		ipb_out: out ipb_wbus
 	);
 
-end pc051a_infra;
+end enclustra_ax3_pm3_infra;
 
-architecture rtl of pc051a_infra is
+architecture rtl of enclustra_ax3_pm3_infra is
 
-	signal clk125_fr, clk125, clk_ipb, clk_ipb_i, locked, clk_locked, eth_locked, rst125, rst_ipb, rst_ipb_ctrl, rst_eth, onehz, pkt: std_logic;
+	signal clk125_fr, clk125, clk125_90, clk200, clk_ipb, clk_ipb_i, locked, rst125, rst_ipb, rst_ipb_ctrl, rst_eth, onehz, pkt: std_logic;
 	signal mac_tx_data, mac_rx_data: std_logic_vector(7 downto 0);
 	signal mac_tx_valid, mac_tx_last, mac_tx_error, mac_tx_ready, mac_rx_valid, mac_rx_last, mac_rx_error: std_logic;
 	signal led_p: std_logic_vector(0 downto 0);
@@ -46,19 +46,19 @@ begin
 
 --	DCM clock generation for internal bus, ethernet
 
-	clocks: entity work.clocks_7s_serdes
+	clocks: entity work.clocks_7s_extphy
 		port map(
-			clki_fr => clk125_fr,
-			clki_125 => clk125,
-			clko_ipb => clk_ipb_i,
+			sysclk_p => sysclk_p,
+			sysclk_n => sysclk_n,
+			clko_125 => clk125,
+			clko_125_90 => clk125_90,
 			clko_200 => clk200,
-			eth_locked => eth_locked,
-			locked => clk_locked,
+			clko_ipb => clk_ipb_i,
+			locked => locked,
 			nuke => nuke,
 			soft_rst => soft_rst,
 			rsto_125 => rst125,
 			rsto_ipb => rst_ipb,
-			rsto_eth => rst_eth,
 			rsto_ipb_ctrl => rst_ipb_ctrl,
 			onehz => onehz
 		);
@@ -66,10 +66,7 @@ begin
 	clk_ipb <= clk_ipb_i; -- Best to align delta delays on all clocks for simulation
 	clk_ipb_o <= clk_ipb_i;
 	rst_ipb_o <= rst_ipb;
-	clk125_o <= clk125;
-	rst125_o <= rst125;
-
-	locked <= clk_locked and eth_locked;
+	rst_125_o <= rst125;
 	
 	stretch: entity work.led_stretcher
 		generic map(
@@ -81,25 +78,21 @@ begin
 			q => led_p
 		);
 
-	leds <= ('0', onehz);
-	
-	debug <= sfp_los & '0' & led_p(0) & (locked and onehz);
+	leds <= (led_p(0), locked and onehz);
 	
 -- Ethernet MAC core and PHY interface
 	
-	eth: entity work.eth_7s_1000basex_gtp
+	eth: entity work.eth_7s_rgmii
 		port map(
-			gt_clkp => eth_clk_p,
-			gt_clkn => eth_clk_n,
-			gt_txp => eth_tx_p,
-			gt_txn => eth_tx_n,
-			gt_rxp => eth_rx_p,
-			gt_rxn => eth_rx_n,
-			sfp_los => sfp_los,
-			clk125_out => clk125,
-			clk125_fr => clk125_fr,
-			rsti => rst_eth,
-			locked => eth_locked,
+			clk125 => clk125,
+			clk125_90 => clk125_90,
+			rst => rst125,
+			rgmii_txd => rgmii_txd,
+			rgmii_tx_ctl => rgmii_rx_ctl,
+			rgmii_txc => rgmii_txc,
+			rgmii_rxd => rgmii_rxd,
+			rgmii_rx_ctl => rgmii_rx_ctl,
+			rgmii_rxc => rgmii_rxc,
 			tx_data => mac_tx_data,
 			tx_valid => mac_tx_valid,
 			tx_last => mac_tx_last,

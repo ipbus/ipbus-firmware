@@ -20,6 +20,7 @@ entity clocks_7s_extphy is
 		sysclk_p: in std_logic;
 		sysclk_n: in std_logic;
 		clko_125: out std_logic;
+		clko_125_90: out std_logic;
 		clko_200: out std_logic;
 		clko_ipb: out std_logic;
 		locked: out std_logic;
@@ -35,7 +36,7 @@ end clocks_7s_extphy;
 
 architecture rtl of clocks_7s_extphy is
 	
-	signal dcm_locked, sysclk, clk_ipb_i, clk_125_i, clkfb, clk_ipb_b, clk_125_b: std_logic;
+	signal dcm_locked, sysclk, clk_ipb_i, clk_125_i, clk_125_90_i, clkfb, clk_ipb_b, clk_125_b: std_logic;
 	signal d17, d17_d: std_logic;
 	signal nuke_i, nuke_d, nuke_d2: std_logic := '0';
 	signal rst, srst, rst_ipb, rst_125, rst_ipb_ctrl: std_logic := '1';
@@ -55,8 +56,13 @@ begin
 		i => clk_125_i,
 		o => clk_125_b
 	);
-	
+
 	clko_125 <= clk_125_b;
+
+	bufg125_90: BUFG port map(
+		i => clk_125_90_i,
+		o => clk_125_90
+	);
 	
 	bufgipb: BUFG port map(
 		i => clk_ipb_i,
@@ -69,7 +75,9 @@ begin
 		generic map(
 			clkfbout_mult_f => 5.0,
 			clkout1_divide => 8,
-			clkout2_divide => 32,
+			clkout2_divide => 8,
+			clkout2_phase => 90,
+			clkout3_divide => 32,
 			clkin1_period => 5.0
 		)
 		port map(
@@ -77,7 +85,8 @@ begin
 			clkfbin => clkfb,
 			clkfbout => clkfb,
 			clkout1 => clk_125_i,
-			clkout2 => clk_ipb_i,
+			clkout2 => clk125_90_i,
+			clkout3 => clk_ipb_i,
 			locked => dcm_locked,
 			rst => '0',
 			pwrdwn => '0'
