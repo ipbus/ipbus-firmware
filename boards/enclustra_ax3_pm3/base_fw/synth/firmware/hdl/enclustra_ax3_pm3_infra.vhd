@@ -84,6 +84,7 @@ begin
 		port map(
 			clk125 => clk125,
 			clk125_90 => clk125_90,
+			clk200 => clk200,
 			rst => rst125,
 			rgmii_txd => rgmii_txd,
 			rgmii_tx_ctl => rgmii_rx_ctl,

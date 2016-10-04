@@ -52,6 +52,7 @@ set_property PACKAGE_PIN R16 [get_ports {rgmii_rx_ctl}]
 set_property PACKAGE_PIN T14 [get_ports {rgmii_rxc}]
 set_property PACKAGE_PIN M13 [get_ports {phy_rstn}]
 create_clock -period 8.0 -name rxc [get_ports rgmii_rxc]
-set_input_delay -clock rxc -min 1.5 [get_ports {rgmii_rxd[*] rgmii_rx_ctl}]
-set_input_delay -clock rxc -max -1.5 [get_ports {rgmii_rxd[*] rgmii_rx_ctl}]
-set_false_path {rgmii_t*} sysclk
+
+#set_input_delay -clock rxc -min 1.5 [get_ports {rgmii_rxd[*] rgmii_rx_ctl}]
+#set_input_delay -clock rxc -max -1.5 [get_ports {rgmii_rxd[*] rgmii_rx_ctl}]
+#set_false_path {rgmii_t*} sysclk

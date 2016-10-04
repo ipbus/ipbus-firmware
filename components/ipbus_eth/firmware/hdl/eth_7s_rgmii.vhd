@@ -15,6 +15,7 @@ entity eth_7s_rgmii is
 	port(
 		clk125: in std_logic;
 		clk125_90: in std_logic;
+		clk200: in std_logic;
 		rst: in std_logic;
 		rgmii_txd: out std_logic_vector(3 downto 0);
 		rgmii_tx_ctl: out std_logic;
@@ -106,6 +107,11 @@ architecture rtl of eth_7s_rgmii is
 	signal rx_user_f, rx_user_ef: std_logic_vector(0 downto 0);
 	
 begin
+
+	idelayctrl0: idelayctrl port map(
+		refclk => clk200,
+		rst => rst
+	);
 	
 	rstn <= not rst;
 
