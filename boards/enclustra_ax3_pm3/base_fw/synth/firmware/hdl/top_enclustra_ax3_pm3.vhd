@@ -12,10 +12,9 @@ use IEEE.STD_LOGIC_1164.ALL;
 use work.ipbus.ALL;
 
 entity top is port(
-		sysclk_p: in std_logic;
-		sysclk_n: in std_logic;
+		sysclk: in std_logic;
 		leds: out std_logic_vector(3 downto 0); -- status LEDs
-		dip_sw: in std_logic_vector(3 downto 0); -- switches
+--		dip_sw: in std_logic_vector(3 downto 0); -- switches
 		rgmii_txd: out std_logic_vector(3 downto 0);
 		rgmii_tx_ctl: out std_logic;
 		rgmii_txc: out std_logic;
@@ -34,6 +33,7 @@ architecture rtl of top is
 	signal ip_addr: std_logic_vector(31 downto 0);
 	signal ipb_out: ipb_wbus;
 	signal ipb_in: ipb_rbus;
+	signal inf_leds: std_logic_vector(1 downto 0);
 	
 begin
 
@@ -41,14 +41,13 @@ begin
 
 	infra: entity work.enclustra_ax3_pm3_infra
 		port map(
-			sysclk_p => sysclk_p,
-			sysclk_n => sysclk_n,
+			sysclk => sysclk,
 			clk_ipb_o => clk_ipb,
 			rst_ipb_o => rst_ipb,
 			rst_125_o => phy_rst_e,
 			nuke => nuke,
 			soft_rst => soft_rst,
-			leds => leds(1 downto 0),
+			leds => inf_leds,
 			rgmii_txd => rgmii_txd,
 			rgmii_tx_ctl => rgmii_rx_ctl,
 			rgmii_txc => rgmii_txc,
@@ -61,11 +60,13 @@ begin
 			ipb_out => ipb_out
 		);
 		
-	leds(3 downto 2) <= '0' & userled;
-	phy_rst <= not phy_rst_e;
+	leds <= not ('0' & userled & inf_leds);
+	phy_rstn <= not phy_rst_e;
 		
-	mac_addr <= X"020ddba1151" & dip_sw; -- Careful here, arbitrary addresses do not always work
-	ip_addr <= X"c0a8c81" & dip_sw; -- 192.168.200.16+n
+--	mac_addr <= X"020ddba1151" & dip_sw; -- Careful here, arbitrary addresses do not always work
+--	ip_addr <= X"c0a8c81" & dip_sw; -- 192.168.200.16+n
+	mac_addr <= X"020ddba1151f"; -- Careful here, arbitrary addresses do not always work
+	ip_addr <= X"c0a8c81f"; -- 192.168.200.16+n
 
 -- ipbus slaves live in the entity below, and can expose top-level ports
 -- The ipbus fabric is instantiated within.

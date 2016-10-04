@@ -11,8 +11,7 @@ use work.ipbus.all;
 
 entity enclustra_ax3_pm3_infra is
 	port(
-		sysclk_p: in std_logic; -- 200MHz board crystal clock
-		sysclk_n: in std_logic;
+		sysclk: in std_logic; -- 50MHz board crystal clock
 		clk_ipb_o: out std_logic; -- IPbus clock
 		rst_ipb_o: out std_logic;
 		rst_125_o: out std_logic;
@@ -46,10 +45,9 @@ begin
 
 --	DCM clock generation for internal bus, ethernet
 
-	clocks: entity work.clocks_7s_extphy
+	clocks: entity work.clocks_7s_extphy_se
 		port map(
-			sysclk_p => sysclk_p,
-			sysclk_n => sysclk_n,
+			sysclk => sysclk,
 			clko_125 => clk125,
 			clko_125_90 => clk125_90,
 			clko_200 => clk200,

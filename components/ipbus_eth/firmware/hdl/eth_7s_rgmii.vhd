@@ -32,16 +32,18 @@ entity eth_7s_rgmii is
 		rx_last: out std_logic;
 		rx_error: out std_logic;
 		hostbus_in: in emac_hostbus_in := ('0', "00", "0000000000", X"00000000", '0', '0', '0');
-		hostbus_out: out emac_hostbus_out
+		hostbus_out: out emac_hostbus_out;
+		status: out std_logic_vector(3 downto 0)
 	);
 
 end eth_7s_rgmii;
 
 architecture rtl of eth_7s_rgmii is
 
-	COMPONENT temac_gbe_v9_0
+	COMPONENT temac_gbe_v9_0_rgmii
 		PORT (
 			gtx_clk : IN STD_LOGIC;
+			gtx_clk90 : IN STD_LOGIC;
 			glbl_rstn : IN STD_LOGIC;
 			rx_axi_rstn : IN STD_LOGIC;
 			tx_axi_rstn : IN STD_LOGIC;
@@ -67,41 +69,65 @@ architecture rtl of eth_7s_rgmii is
 			pause_val : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
 			speedis100 : OUT STD_LOGIC;
 			speedis10100 : OUT STD_LOGIC;
-			gmii_txd : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-			gmii_tx_en : OUT STD_LOGIC;
-			gmii_tx_er : OUT STD_LOGIC;
-			gmii_rxd : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
-			gmii_rx_dv : IN STD_LOGIC;
-			gmii_rx_er : IN STD_LOGIC;
+			rgmii_txd : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+			rgmii_tx_ctl : OUT STD_LOGIC;
+			rgmii_txc : OUT STD_LOGIC;
+			rgmii_rxd : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+			rgmii_rx_ctl : IN STD_LOGIC;
+			rgmii_rxc : IN STD_LOGIC;
+			inband_link_status : OUT STD_LOGIC;
+			inband_clock_speed : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+			inband_duplex_status : OUT STD_LOGIC;
 			rx_configuration_vector : IN STD_LOGIC_VECTOR(79 DOWNTO 0);
 			tx_configuration_vector : IN STD_LOGIC_VECTOR(79 DOWNTO 0)
 		);
 	END COMPONENT;
 
-	signal gmii_txd, gmii_rxd: std_logic_vector(7 downto 0);
-	signal gmii_tx_en, gmii_tx_er, gmii_rx_dv, gmii_rx_er: std_logic;
-	signal gmii_rx_clk: std_logic;
-
+	COMPONENT mac_fifo_axi4
+	  PORT (
+		 m_aclk : IN STD_LOGIC;
+		 s_aclk : IN STD_LOGIC;
+		 s_aresetn : IN STD_LOGIC;
+		 s_axis_tvalid : IN STD_LOGIC;
+		 s_axis_tready : OUT STD_LOGIC;
+		 s_axis_tdata : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+		 s_axis_tlast : IN STD_LOGIC;
+		 s_axis_tuser : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+		 m_axis_tvalid : OUT STD_LOGIC;
+		 m_axis_tready : IN STD_LOGIC;
+		 m_axis_tdata : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+		 m_axis_tlast : OUT STD_LOGIC;
+		 m_axis_tuser : OUT STD_LOGIC_VECTOR(0 DOWNTO 0)
+	  );
+	END COMPONENT;
+	
+	signal rx_data_e: std_logic_vector(7 downto 0);
+	signal rx_clk_e, rx_valid_e, rx_last_e, rx_user_e, rx_rst_e, rx_rst_en, rstn: std_logic;
+	signal rx_user_f, rx_user_ef: std_logic_vector(0 downto 0);
+	
 begin
 	
-	mac: temac_gbe_v9_0
+	rstn <= not rst;
+
+	emac0: temac_gbe_v9_0_rgmii
 		port map(
 			gtx_clk => clk125,
+			gtx_clk90 => clk125_90,
 			glbl_rstn => rstn,
 			rx_axi_rstn => '1',
 			tx_axi_rstn => '1',
 			rx_statistics_vector => open,
-			rx_statistics_valid => open,
-			rx_mac_aclk => open,
-			rx_reset => open,
-			rx_axis_mac_tdata => rx_data,
-			rx_axis_mac_tvalid => rx_valid,
-			rx_axis_mac_tlast => rx_last,
-			rx_axis_mac_tuser => rx_error,
+			rx_statistics_valid => open,		
+			rx_mac_aclk => rx_clk_e,
+			rx_reset => rx_rst_e,
+			rx_axis_mac_tdata => rx_data_e,
+			rx_axis_mac_tvalid => rx_valid_e,
+			rx_axis_mac_tlast => rx_last_e,
+			rx_axis_mac_tuser => rx_user_e,
 			tx_ifg_delay => X"00",
 			tx_statistics_vector => open,
-			tx_statistics_valid => open,
-			tx_mac_aclk => open,
+			tx_statistics_valid => open,	
+			tx_mac_aclk => open, -- Internally connected to gtx_clk inside core
 			tx_reset => open,
 			tx_axis_mac_tdata => tx_data,
 			tx_axis_mac_tvalid => tx_valid,
@@ -110,25 +136,43 @@ begin
 			tx_axis_mac_tready => tx_ready,
 			pause_req => '0',
 			pause_val => X"0000",
-			gmii_txd => gmii_txd,
-			gmii_tx_en => gmii_tx_en,
-			gmii_tx_er => gmii_tx_er,
-			gmii_rxd => gmii_rxd,
-			gmii_rx_dv => gmii_rx_dv,
-			gmii_rx_er => gmii_rx_er,
+			speedis100 => open,
+			speedis10100 => open,
+			rgmii_txd => rgmii_txd,
+			rgmii_tx_ctl => rgmii_tx_ctl,
+			rgmii_txc => rgmii_txc,
+			rgmii_rxd => rgmii_rxd,
+			rgmii_rx_ctl => rgmii_rx_ctl,
+			rgmii_rxc => rgmii_rxc,
+			inband_link_status => status(0),
+			inband_lock_speed => status(3 downto 2),
+			inband_duplex_status => status(1),
 			rx_configuration_vector => X"0000_0000_0000_0000_0812",
 			tx_configuration_vector => X"0000_0000_0000_0000_0012"
 		);
+	
+	rx_user_ef(0) <= rx_user_e;
+	rx_error <= rx_user_f(0);
+	rx_rst_en <= not rx_rst_e;
+	
+	fifo: mac_fifo_axi4
+		port map(
+			m_aclk => clk125,
+			s_aclk => rx_clk_e,
+			s_aresetn => rx_rst_en,
+			s_axis_tvalid => rx_valid_e,
+			s_axis_tready => open,
+			s_axis_tdata => rx_data_e,
+			s_axis_tlast => rx_last_e,
+			s_axis_tuser => rx_user_ef,
+			m_axis_tvalid => rx_valid,
+			m_axis_tready => '1',
+			m_axis_tdata => rx_data,
+			m_axis_tlast => rx_last,
+			m_axis_tuser => rx_user_f
+		); -- Clock domain crossing FIFO
 
 	hostbus_out.hostrddata <= (others => '0');
 	hostbus_out.hostmiimrdy <= '0';
 	
-	gmii_rxd <= (others => '0');
-	gmii_rx_dv <= '0';
-	gmii_rx_er <= '0';
-	
-	rgmii_txd <= (others => '0');
-	rgmii_tx_ctl <= '0';
-	rgmii_txc <= '0';
-
 end rtl;
