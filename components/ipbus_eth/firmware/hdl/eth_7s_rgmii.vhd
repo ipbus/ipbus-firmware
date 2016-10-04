@@ -151,7 +151,7 @@ begin
 			rgmii_rx_ctl => rgmii_rx_ctl,
 			rgmii_rxc => rgmii_rxc,
 			inband_link_status => status(0),
-			inband_lock_speed => status(3 downto 2),
+			inband_clock_speed => status(3 downto 2),
 			inband_duplex_status => status(1),
 			rx_configuration_vector => X"0000_0000_0000_0000_0812",
 			tx_configuration_vector => X"0000_0000_0000_0000_0012"

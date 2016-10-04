@@ -49,7 +49,7 @@ begin
 			soft_rst => soft_rst,
 			leds => inf_leds,
 			rgmii_txd => rgmii_txd,
-			rgmii_tx_ctl => rgmii_rx_ctl,
+			rgmii_tx_ctl => rgmii_tx_ctl,
 			rgmii_txc => rgmii_txc,
 			rgmii_rxd => rgmii_rxd,
 			rgmii_rx_ctl => rgmii_rx_ctl,

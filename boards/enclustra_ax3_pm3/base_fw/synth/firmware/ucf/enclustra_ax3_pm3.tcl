@@ -37,7 +37,7 @@ false_path {leds[*]} sysclk
 #set_property PACKAGE_PIN Y28 [get_ports {dip_sw[3]}]
 #false_path {dip_sw[*]} sysclk
 
-set_property IOSTANDARD LVCMOS33 [get_ports {rgmii* phy_rst}]
+set_property IOSTANDARD LVCMOS33 [get_ports {rgmii_* phy_rstn}]
 set_property PACKAGE_PIN R18 [get_ports {rgmii_txd[0]}]
 set_property PACKAGE_PIN T18 [get_ports {rgmii_txd[1]}]
 set_property PACKAGE_PIN U17 [get_ports {rgmii_txd[2]}]
@@ -51,8 +51,9 @@ set_property PACKAGE_PIN V16 [get_ports {rgmii_rxd[3]}]
 set_property PACKAGE_PIN R16 [get_ports {rgmii_rx_ctl}]
 set_property PACKAGE_PIN T14 [get_ports {rgmii_rxc}]
 set_property PACKAGE_PIN M13 [get_ports {phy_rstn}]
-create_clock -period 8.0 -name rxc [get_ports rgmii_rxc]
+set_false_path {phy_rstn} sysclk
 
+#create_clock -period 8.0 -name rxc [get_ports rgmii_rxc]
 #set_input_delay -clock rxc -min 1.5 [get_ports {rgmii_rxd[*] rgmii_rx_ctl}]
 #set_input_delay -clock rxc -max -1.5 [get_ports {rgmii_rxd[*] rgmii_rx_ctl}]
 #set_false_path {rgmii_t*} sysclk

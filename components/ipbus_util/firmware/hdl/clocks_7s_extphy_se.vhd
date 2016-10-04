@@ -20,6 +20,7 @@ entity clocks_7s_extphy_Se is
 		sysclk: in std_logic;
 		clko_125: out std_logic;
 		clko_125_90: out std_logic;
+		clko_200: out std_logic;
 		clko_ipb: out std_logic;
 		locked: out std_logic;
 		nuke: in std_logic;
@@ -34,7 +35,7 @@ end clocks_7s_extphy_se;
 
 architecture rtl of clocks_7s_extphy_se is
 	
-	signal dcm_locked, sysclk_i, clk_ipb_i, clk_125_i, clk_125_90_i, clkfb, clk_ipb_b, clk_125_b: std_logic;
+	signal dcm_locked, sysclk_i, clk_ipb_i, clk_125_i, clk_125_90_i, clkfb, clk_ipb_b, clk_125_b, clk_200_i: std_logic;
 	signal d17, d17_d: std_logic;
 	signal nuke_i, nuke_d, nuke_d2: std_logic := '0';
 	signal rst, srst, rst_ipb, rst_125, rst_ipb_ctrl: std_logic := '1';
@@ -56,7 +57,7 @@ begin
 
 	bufg125_90: BUFG port map(
 		i => clk_125_90_i,
-		o => clk_125_90
+		o => clko_125_90
 	);
 	
 	bufgipb: BUFG port map(
@@ -66,13 +67,19 @@ begin
 	
 	clko_ipb <= clk_ipb_b;
 	
+	bufg200: BUFG port map(
+		i => clk_200_i,
+		o => clko_200
+	);	
+	
 	mmcm: MMCME2_BASE
 		generic map(
 			clkfbout_mult_f => 20.0,
 			clkout1_divide => 8,
 			clkout2_divide => 8,
-			clkout2_phase => 90,
+			clkout2_phase => 90.0,
 			clkout3_divide => 32,
+			clkout4_divide => 5,
 			clkin1_period => 20.0
 		)
 		port map(
@@ -80,18 +87,20 @@ begin
 			clkfbin => clkfb,
 			clkfbout => clkfb,
 			clkout1 => clk_125_i,
-			clkout2 => clk125_90_i,
+			clkout2 => clk_125_90_i,
 			clkout3 => clk_ipb_i,
+			clkout4 => clk_200_i,
 			locked => dcm_locked,
 			rst => '0',
 			pwrdwn => '0'
 		);
 	
-	clkdiv: entity work.ipbus_clock_div port map(
-		clk => sysclk_i,
-		d17 => d17,
-		d28 => onehz
-	);
+	clkdiv: entity work.ipbus_clock_div
+		port map(
+			clk => sysclk_i,
+			d17 => d17,
+			d28 => onehz
+		);
 	
 	process(sysclk_i)
 	begin

@@ -87,7 +87,7 @@ begin
 			clk200 => clk200,
 			rst => rst125,
 			rgmii_txd => rgmii_txd,
-			rgmii_tx_ctl => rgmii_rx_ctl,
+			rgmii_tx_ctl => rgmii_tx_ctl,
 			rgmii_txc => rgmii_txc,
 			rgmii_rxd => rgmii_rxd,
 			rgmii_rx_ctl => rgmii_rx_ctl,
