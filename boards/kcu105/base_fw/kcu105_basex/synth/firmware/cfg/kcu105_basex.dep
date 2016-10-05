@@ -1,12 +1,12 @@
-@device_family = "kintex7"
-@device_name = "xc7k325t"
-@device_package = "ffg900"
+@device_family = "kintexu"
+@device_name = "xcku040"
+@device_package = "ffva1156"
 @device_speed = "-2"
-@boardname = "kc705_basex"
+@boardname = "kcu105_basex"
 
-setup settings_v7.tcl
-src top_kc705_basex.vhd
-include kc705_basex_infra.dep
+setup settings_ku.tcl
+src top_kcu105_basex.vhd
+include kcu105_basex_infra.dep
 include -c components/ipbus_util ipbus_example.dep
 src -c components/ipbus_core ipbus_package.vhd
-src --cd ../ucf kc705_basex.tcl
+src --cd ../ucf kcu105_basex.tcl

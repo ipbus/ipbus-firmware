@@ -1,0 +1,5 @@
+# Dependencies for the ethernet gubbins on a ku part
+
+src eth_us_1000basex.vhd emac_hostbus_decl.vhd
+src ../cgn/temac_gbe_v9_0.xci
+src ../cgn/gig_ethernet_pcs_pma_basex_156_25.xci

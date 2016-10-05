@@ -1,10 +1,10 @@
 -- Top-level design for ipbus demo
 --
--- This version is for KC705 eval board, using SFP ethernet interface
+-- This version is for KCU105 eval board, using SFP ethernet interface
 --
 -- You must edit this file to set the IP and MAC addresses
 --
--- Dave Newbold, 23/2/11
+-- Dave Newbold, 24/10/16
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -12,14 +12,14 @@ use IEEE.STD_LOGIC_1164.ALL;
 use work.ipbus.ALL;
 
 entity top is port(
+		sysclk_p: in std_logic;
+		sysclk_n: in std_logic;
 		eth_clk_p: in std_logic; -- 125MHz MGT clock
 		eth_clk_n: in std_logic;
 		eth_rx_p: in std_logic; -- Ethernet MGT input
 		eth_rx_n: in std_logic;
 		eth_tx_p: out std_logic; -- Ethernet MGT output
 		eth_tx_n: out std_logic;
-		sfp_los: in std_logic;
-		sfp_tx_disable: out std_logic;
 		leds: out std_logic_vector(3 downto 0); -- status LEDs
 		dip_sw: in std_logic_vector(3 downto 0) -- switches
 	);
@@ -38,15 +38,17 @@ begin
 
 -- Infrastructure
 
-	infra: entity work.kc705_basex_infra
+	infra: entity work.kcu105_basex_infra
 		port map(
+			sysclk_p => sysclk_p,
+			sysclk_n => sysclk_n,
 			eth_clk_p => eth_clk_p,
 			eth_clk_n => eth_clk_n,
 			eth_tx_p => eth_tx_p,
 			eth_tx_n => eth_tx_n,
 			eth_rx_p => eth_rx_p,
 			eth_rx_n => eth_rx_n,
-			sfp_los => sfp_los,
+			sfp_los => '0',
 			clk_ipb_o => clk_ipb,
 			rst_ipb_o => rst_ipb,
 			nuke => nuke,
@@ -59,7 +61,6 @@ begin
 		);
 		
 	leds(3 downto 2) <= '0' & userled;
-	sfp_tx_disable <= '0';
 		
 	mac_addr <= X"020ddba1151" & dip_sw; -- Careful here, arbitrary addresses do not always work
 	ip_addr <= X"c0a8c81" & dip_sw; -- 192.168.200.16+n

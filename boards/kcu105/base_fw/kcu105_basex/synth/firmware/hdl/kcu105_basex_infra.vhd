@@ -7,10 +7,15 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
+library unisim;
+use unisim.VComponents.all;
+
 use work.ipbus.all;
 
-entity kc705_basex_infra is
+entity kcu105_basex_infra is
 	port(
+		sysclk_p: in std_logic;
+		sysclk_n: in std_logic;
 		eth_clk_p: in std_logic; -- 125MHz MGT clock
 		eth_clk_n: in std_logic;
 		eth_rx_p: in std_logic; -- Ethernet MGT input
@@ -31,22 +36,29 @@ entity kc705_basex_infra is
 		ipb_out: out ipb_wbus
 	);
 
-end kc705_basex_infra;
+end kcu105_basex_infra;
 
-architecture rtl of kc705_basex_infra is
+architecture rtl of kcu105_basex_infra is
 
-	signal clk125_fr, clk125, clk_ipb, clk_ipb_i, locked, clk_locked, eth_locked, rst125, rst_ipb, rst_ipb_ctrl, rst_eth, onehz, pkt: std_logic;
+	signal sysclk, clk125, clk_ipb, clk_ipb_i, locked, clk_locked, eth_locked, rst125, rst_ipb, rst_ipb_ctrl, rst_eth, onehz, pkt: std_logic;
 	signal mac_tx_data, mac_rx_data: std_logic_vector(7 downto 0);
 	signal mac_tx_valid, mac_tx_last, mac_tx_error, mac_tx_ready, mac_rx_valid, mac_rx_last, mac_rx_error: std_logic;
 	signal led_p: std_logic_vector(0 downto 0);
 	
 begin
 
+	ibuf: IBUFDS
+		port map(
+			i => sysclk_p,
+			ib => sysclk_n,
+			o => sysclk
+		);
+
 --	DCM clock generation for internal bus, ethernet
 
-	clocks: entity work.clocks_7s_serdes
+	clocks: entity work.clocks_us_serdes
 		port map(
-			clki_fr => clk125_fr,
+			clki_fr => sysclk,
 			clki_125 => clk125,
 			clko_ipb => clk_ipb_i,
 			eth_locked => eth_locked,
@@ -80,7 +92,7 @@ begin
 	
 -- Ethernet MAC core and PHY interface
 	
-	eth: entity work.eth_7s_1000basex
+	eth: entity work.eth_us_1000basex
 		port map(
 			gt_clkp => eth_clk_p,
 			gt_clkn => eth_clk_n,
@@ -90,7 +102,7 @@ begin
 			gt_rxn => eth_rx_n,
 			sfp_los => sfp_los,
 			clk125_out => clk125,
-			clk125_fr => clk125_fr,
+			indep_clk_in => clk_ipb, -- Might as well use the IPB clock for this
 			rsti => rst_eth,
 			locked => eth_locked,
 			tx_data => mac_tx_data,
