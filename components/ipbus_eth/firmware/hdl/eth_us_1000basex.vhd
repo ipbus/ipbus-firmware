@@ -82,7 +82,7 @@ architecture rtl of eth_us_1000basex is
 	signal gmii_tx_en, gmii_tx_er, gmii_rx_dv, gmii_rx_er: std_logic;
 	signal gmii_rx_clk: std_logic;
 	signal sig_det: std_logic;
-	signal clk125, resetdone, mmcm_locked: std_logic;
+	signal clk125, resetdone, mmcm_locked, pma_reset: std_logic;
 
 begin
 
@@ -154,10 +154,10 @@ begin
 			gmii_rx_dv => gmii_rx_dv,
 			gmii_rx_er => gmii_rx_er,
 			gmii_isolate => open,
-			configuration_vector => open,
+			configuration_vector => "10000",
 			status_vector => open,
 			reset => rsti,
-			signal_detect => signal_det
+			signal_detect => sig_det
 		);
 		
   locked <= resetdone and mmcm_locked;

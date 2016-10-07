@@ -1,0 +1,2 @@
+include -c boards/kcu105/base_fw/kcu105_basex/synth kcu105_basex.dep
+include -c components/ipbus_util ipbus_example.dep

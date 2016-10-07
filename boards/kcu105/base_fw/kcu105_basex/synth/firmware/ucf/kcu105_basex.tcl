@@ -14,14 +14,14 @@ proc false_path {patt clk} {
 }
 
 # Ethernet RefClk (125MHz)
-#create_clock -period 8.000 -name eth_refclk [get_ports eth_clk_p]
+create_clock -period 6.4 -name eth_refclk [get_ports eth_clk_p]
 
 # System clock (125MHz)
-create_clock -period 8.000 -name sysclk [get_ports sysclk_p]
+create_clock -period 8 -name sysclk [get_ports sysclk_p]
 
-set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks sysclk] -group [get_clocks -include_generated_clocks [get_clocks -filter {name =~ infra/eth/phy/*/RXOUTCLK}]] -group [get_clocks -include_generated_clocks [get_clocks -filter {name =~ infra/eth/phy/*/TXOUTCLK}]]
-
-set_property LOC GTHE3_CHANNEL_X0Y10 [get_cells -hier -filter {name=~infra/eth/*/gtxe2_i}]
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks sysclk] -group [get_clocks -include_generated_clocks [get_clocks -filter {name =~ infra/eth/phy/*/rxoutclk*}]] -group [get_clocks -include_generated_clocks [get_clocks -filter {name =~ txoutclk*}]]
+                                                 
+set_property LOC GTHE3_CHANNEL_X0Y10 [get_cells -hier -filter {name=~infra/eth/*/*GTHE3_CHANNEL_PRIM_INST}]
 
 set_property PACKAGE_PIN P6 [get_ports eth_clk_p]
 set_property PACKAGE_PIN P5 [get_ports eth_clk_n]
