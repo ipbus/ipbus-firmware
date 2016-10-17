@@ -26,9 +26,9 @@ set_property LOC GTHE3_CHANNEL_X0Y10 [get_cells -hier -filter {name=~infra/eth/*
 set_property PACKAGE_PIN P6 [get_ports eth_clk_p]
 set_property PACKAGE_PIN P5 [get_ports eth_clk_n]
 
-set_property IOSTANDARD LVDS_25 [get_ports {sysclk_*}]
-set_property PACKAGE_PIN P26 [get_ports sysclk_p]
-set_property PACKAGE_PIN N26 [get_ports sysclk_n]
+set_property IOSTANDARD LVDS [get_ports {sysclk_*}]
+set_property PACKAGE_PIN G10 [get_ports sysclk_p]
+set_property PACKAGE_PIN F10 [get_ports sysclk_n]
 
 set_property IOSTANDARD LVCMOS18 [get_ports {leds[*]}]
 set_property SLEW SLOW [get_ports {leds[*]}]

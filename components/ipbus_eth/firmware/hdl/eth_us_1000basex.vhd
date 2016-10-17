@@ -82,19 +82,23 @@ architecture rtl of eth_us_1000basex is
 	signal gmii_tx_en, gmii_tx_er, gmii_rx_dv, gmii_rx_er: std_logic;
 	signal gmii_rx_clk: std_logic;
 	signal sig_det: std_logic;
-	signal clk125, resetdone, mmcm_locked, pma_reset: std_logic;
+	signal clk125, resetdone, mmcm_locked, locked_i, rstn: std_logic;
 
 begin
 
-	bufg_125: BUFG port map(
-		i => clk125,
-		o => clk125_out
-	);
+--	bufg_125: BUFG port map(
+--		i => clk125,
+--		o => clk125_out
+--	);
+
+	clk125_out <= clk125;
+	
+	rstn <= not (rsti or not locked_i);
 
 	mac: temac_gbe_v9_0
 		port map(
 			gtx_clk => clk125,
-			glbl_rstn => pma_reset,
+			glbl_rstn => rstn,
 			rx_axi_rstn => '1',
 			tx_axi_rstn => '1',
 			rx_statistics_vector => open,
@@ -145,7 +149,7 @@ begin
 			rxuserclk_out => open,
 			rxuserclk2_out => open,
 			resetdone => resetdone,
-			pma_reset_out => pma_reset,
+			pma_reset_out => open,
 			mmcm_locked_out => mmcm_locked,
 			gmii_txd => gmii_txd,
 			gmii_tx_en => gmii_tx_en,
@@ -160,7 +164,8 @@ begin
 			signal_detect => sig_det
 		);
 		
-  locked <= resetdone and mmcm_locked;
+  locked_i <= resetdone and mmcm_locked;
+  locked <= locked_i;
   
 	sig_det <= not sfp_los;
 

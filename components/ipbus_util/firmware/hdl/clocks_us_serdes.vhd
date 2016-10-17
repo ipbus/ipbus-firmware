@@ -1,6 +1,6 @@
 -- clocks_us_serdes
 --
--- Input is a free-running 125MHz clock
+-- Input is a free-running crystal clock
 --
 -- Dave Newbold, October 2016
 
@@ -12,8 +12,12 @@ library unisim;
 use unisim.VComponents.all;
 
 entity clocks_us_serdes is
+	generic(
+		CLK_FR_FREQ: real := 125.0;
+		CLK_VCO_FREQ: real := 1000.0
+	);
 	port(
-		clki_fr: in std_logic; -- Input free-running clock (125MHz)
+		clki_fr: in std_logic; -- Input free-running clock (125MHz default)
 		clki_125: in std_logic; -- Ethernet domain clk125
 		clko_ipb: out std_logic; -- ipbus domain clock (31MHz)
 		clko_p40: out std_logic; -- pseudo-40MHz clock
@@ -66,11 +70,11 @@ begin
 	
 	mmcm: MMCME3_BASE
 		generic map(
-			clkin1_period => 8.0,
-			clkfbout_mult_f => 8.0, -- VCO freq 1000MHz
-			clkout1_divide => 32,
-			clkout2_divide => 25,
-			clkout3_divide => 5
+			clkin1_period => CLK_VCO_FREQ / CLK_FR_FREQ,
+			clkfbout_mult_f => CLK_VCO_FREQ / CLK_FR_FREQ,
+			clkout1_divide => integer(CLK_VCO_FREQ / 31.25),
+			clkout2_divide => integer(CLK_VCO_FREQ / 40.00),
+			clkout3_divide => integer(CLK_VCO_FREQ / 200.00)
 		)
 		port map(
 			clkin1 => sysclk,
