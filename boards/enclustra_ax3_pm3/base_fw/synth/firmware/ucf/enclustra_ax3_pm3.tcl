@@ -30,13 +30,6 @@ set_property PACKAGE_PIN L18 [get_ports {leds[2]}]
 set_property PACKAGE_PIN M18 [get_ports {leds[3]}]
 false_path {leds[*]} sysclk
 
-set_property IOSTANDARD LVCMOS25 [get_ports {dip_sw[*]}]
-set_property PACKAGE_PIN Y29 [get_ports {dip_sw[0]}]
-set_property PACKAGE_PIN W29 [get_ports {dip_sw[1]}]
-set_property PACKAGE_PIN AA28 [get_ports {dip_sw[2]}]
-set_property PACKAGE_PIN Y28 [get_ports {dip_sw[3]}]
-false_path {dip_sw[*]} sysclk
-
 set_property IOSTANDARD LVCMOS33 [get_ports {rgmii_* phy_rstn}]
 set_property PACKAGE_PIN R18 [get_ports {rgmii_txd[0]}]
 set_property PACKAGE_PIN T18 [get_ports {rgmii_txd[1]}]
