@@ -1,2 +1,0 @@
-include -c boards/enclustra_ax3_pm3/base_fw/synth enclustra_ax3_pm3.dep
-include -c components/ipbus_util ipbus_example.dep
