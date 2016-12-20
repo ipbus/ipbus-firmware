@@ -14,8 +14,9 @@ entity enclustra_ax3_pm3_infra is
 		sysclk: in std_logic; -- 50MHz board crystal clock
 		clk_ipb_o: out std_logic; -- IPbus clock
 		rst_ipb_o: out std_logic;
-		rst_125_o: out std_logic;
-		clk_aux_o: out std_logic; -- 40MHz generated clock
+		clk125_o: out std_logic;
+		rst125_o: out std_logic;
+		clk_aux_o: out std_logic; -- 50MHz clock
 		rst_aux_o: out std_logic;
 		nuke: in std_logic; -- The signal of doom
 		soft_rst: in std_logic; -- The signal of lesser doom
@@ -64,7 +65,8 @@ begin
 	clk_ipb <= clk_ipb_i; -- Best to align delta delays on all clocks for simulation
 	clk_ipb_o <= clk_ipb_i;
 	rst_ipb_o <= rst_ipb;
-	rst_125_o <= rst125;
+	clk125_o <= clk125;	
+	rst125_o <= rst125;
 	
 	stretch: entity work.led_stretcher
 		generic map(
