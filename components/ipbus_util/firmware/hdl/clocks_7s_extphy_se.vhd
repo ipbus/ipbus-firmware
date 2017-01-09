@@ -35,7 +35,7 @@ end clocks_7s_extphy_se;
 
 architecture rtl of clocks_7s_extphy_se is
 	
-	signal dcm_locked, sysclk_i, clk_ipb_i, clk_125_i, clk_125_90_i, clkfb, clk_ipb_b, clk_125_b, clk_200_i: std_logic;
+	signal dcm_locked, sysclk_u, sysclk_i, clk_ipb_i, clk_125_i, clk_125_90_i, clkfb, clk_ipb_b, clk_125_b, clk_200_i: std_logic;
 	signal d17, d17_d: std_logic;
 	signal nuke_i, nuke_d, nuke_d2: std_logic := '0';
 	signal rst, srst, rst_ipb, rst_125, rst_ipb_ctrl: std_logic := '1';
@@ -45,6 +45,11 @@ begin
 
 	ibufgds0: IBUFG port map(
 		i => sysclk,
+		o => sysclk_u
+	);
+	
+	bufhsys: BUFH port map(
+		i => sysclk_u,
 		o => sysclk_i
 	);
 	
