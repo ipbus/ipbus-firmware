@@ -19,10 +19,10 @@ create_clock -period 20.000 -name sysclk [get_ports sysclk]
 set_false_path -through [get_pins infra/clocks/rst_reg/Q]
 set_false_path -through [get_nets infra/clocks/nuke_i]
 
-set_property IOSTANDARD LVCMOS33 [get_ports sysclk]
+set_property IOSTANDARD LVCMOS25 [get_ports sysclk]
 set_property PACKAGE_PIN P17 [get_ports sysclk]
 
-set_property IOSTANDARD LVCMOS33 [get_ports {leds[*]}]
+set_property IOSTANDARD LVCMOS25 [get_ports {leds[*]}]
 set_property SLEW SLOW [get_ports {leds[*]}]
 set_property PACKAGE_PIN M16 [get_ports {leds[0]}]
 set_property PACKAGE_PIN M17 [get_ports {leds[1]}]
@@ -30,7 +30,7 @@ set_property PACKAGE_PIN L18 [get_ports {leds[2]}]
 set_property PACKAGE_PIN M18 [get_ports {leds[3]}]
 false_path {leds[*]} sysclk
 
-set_property IOSTANDARD LVCMOS33 [get_ports {rgmii_* phy_rstn}]
+set_property IOSTANDARD LVCMOS25 [get_ports {rgmii_* phy_rstn}]
 set_property PACKAGE_PIN R18 [get_ports {rgmii_txd[0]}]
 set_property PACKAGE_PIN T18 [get_ports {rgmii_txd[1]}]
 set_property PACKAGE_PIN U17 [get_ports {rgmii_txd[2]}]
@@ -46,7 +46,10 @@ set_property PACKAGE_PIN T14 [get_ports {rgmii_rxc}]
 set_property PACKAGE_PIN M13 [get_ports {phy_rstn}]
 false_path {phy_rstn} sysclk
 
-#create_clock -period 8.0 -name rxc [get_ports rgmii_rxc]
-#set_input_delay -clock rxc -min 1.5 [get_ports {rgmii_rxd[*] rgmii_rx_ctl}]
-#set_input_delay -clock rxc -max -1.5 [get_ports {rgmii_rxd[*] rgmii_rx_ctl}]
-#set_false_path {rgmii_t*} sysclk
+set_property IOSTANDARD LVCMOS25 [get_ports {cfg[*]}]
+set_property PULLUP TRUE [get_ports {cfg[*]}]
+set_property PACKAGE_PIN K2 [get_ports {cfg[0]}]
+set_property PACKAGE_PIN K1 [get_ports {cfg[1]}]
+set_property PACKAGE_PIN J4 [get_ports {cfg[2]}]
+set_property PACKAGE_PIN H4 [get_ports {cfg[3]}]
+
