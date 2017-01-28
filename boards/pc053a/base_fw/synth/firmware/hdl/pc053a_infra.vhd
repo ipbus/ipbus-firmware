@@ -1,4 +1,4 @@
--- kc705_basex_infra
+-- pc053a_infra
 --
 -- All board-specific stuff goes here.
 --
@@ -9,7 +9,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 use work.ipbus.all;
 
-entity pc051a_infra is
+entity pc053a_infra is
 	port(
 		eth_clk_p: in std_logic; -- 125MHz MGT clock
 		eth_clk_n: in std_logic;
@@ -33,9 +33,9 @@ entity pc051a_infra is
 		ipb_out: out ipb_wbus
 	);
 
-end pc051a_infra;
+end pc053a_infra;
 
-architecture rtl of pc051a_infra is
+architecture rtl of pc053a_infra is
 
 	signal clk125_fr, clk125, clk_ipb, clk_ipb_i, locked, clk_locked, eth_locked, rst125, rst_ipb, rst_ipb_ctrl, rst_eth, onehz, pkt: std_logic;
 	signal mac_tx_data, mac_rx_data: std_logic_vector(7 downto 0);

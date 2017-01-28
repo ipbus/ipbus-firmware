@@ -1,4 +1,4 @@
-src pc051a_infra.vhd
+src pc053a_infra.vhd
 src -c components/ipbus_util clocks_7s_serdes.vhd ipbus_clock_div.vhd led_stretcher.vhd
 include -c components/ipbus_core
 include -c components/ipbus_eth artix_basex.dep

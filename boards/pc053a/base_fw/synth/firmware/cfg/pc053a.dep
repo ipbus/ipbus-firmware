@@ -2,10 +2,10 @@
 @device_name = "xc7a200t"
 @device_package = "fbg484"
 @device_speed = "-2"
-@boardname = "pc051a"
+@boardname = "pc053a"
 
 setup settings_v7.tcl
-src top_pc051a.vhd
-include pc051a_infra.dep
+src top_pc031a.vhd
+include pc053a_infra.dep
 src -c components/ipbus_core ipbus_package.vhd
-src --cd ../ucf pc051a.tcl
+src --cd ../ucf pc053a.tcl
