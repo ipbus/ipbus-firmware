@@ -1,8 +1,0 @@
-hdl ipbus_test/sp605_basex/hdl/top.vhd
-hdl ipbus_test/sp605_basex/ucf/sp605_basex.ucf
-hdl ipbus/firmware/example_designs/hdl/clocks_s6_basex.vhd
-hdl ipbus/firmware/ethernet/hdl/eth_s6_1000basex.vhd
-include ipbus/firmware/ipbus_core/cfg/file_list
-include ipbus_test/sp605_basex/cfg/file_list
-include ipbus/firmware/ethernet/cfg/file_list_gig_eth_pcs_pma_v11_4
-

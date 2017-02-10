@@ -1,9 +1,0 @@
-hdl glib_v3/hdl/top_basex.vhd
-hdl glib_v3/ucf/glib_v3_basex.ucf
-hdl ipbus/firmware/example_designs/hdl/clocks_v6_serdes_noxtal.vhd
-hdl ipbus/firmware/ethernet/hdl/mac_arbiter.vhd
-hdl ipbus/firmware/ethernet/hdl/mac_arbiter_decl.vhd
-include ipbus/firmware/ethernet/cfg/file_list_v6_basex
-include ipbus/firmware/ipbus_core/cfg/file_list
-include ipbus/firmware/example_designs/cfg/file_list
-include glib_infrastructure/firmware/cfg/file_list

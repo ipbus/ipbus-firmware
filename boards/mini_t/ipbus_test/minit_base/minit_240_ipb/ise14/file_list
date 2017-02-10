@@ -1,8 +1,0 @@
-hdl minit_base/hdl/top.vhd
-hdl minit_base/ucf/minit_240_ipb.ucf
-hdl ipbus/firmware/example_designs/hdl/clocks_v5_serdes.vhd
-hdl ipbus/firmware/example_designs/hdl/clock_div.vhd
-include ipbus/firmware/ethernet/cfg/file_list_minit_240_ipb
-include ipbus/firmware/ipbus_core/cfg/file_list
-include ipbus/firmware/example_designs/cfg/file_list
-
