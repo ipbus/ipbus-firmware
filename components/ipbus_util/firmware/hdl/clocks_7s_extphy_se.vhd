@@ -21,7 +21,7 @@ entity clocks_7s_extphy_Se is
 		clko_125: out std_logic;
 		clko_125_90: out std_logic;
 		clko_200: out std_logic;
-		clko_ipb: out std_logic;
+		clko_ipb: out std_logic; 
 		locked: out std_logic;
 		nuke: in std_logic;
 		soft_rst: in std_logic;
