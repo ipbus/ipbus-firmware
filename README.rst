@@ -15,7 +15,7 @@ The IPbus suite of software and firmware implement a reliable high-performance c
   The Hardware Access Library (HAL) providing an end-user C++/Python API for IPbus reads, writes and RMW (read-modify-write) transactions.
 
 
-.. rubric:: Further reading
+*Further reading*
 
 The **most recent paper** describing IPbus is from the proceedings for TWEPP2014
 
