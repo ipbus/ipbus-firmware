@@ -35,7 +35,10 @@ architecture rtl of syncreg_r is
 	attribute SHREG_EXTRACT: string;
 	attribute SHREG_EXTRACT of s1: signal is "no"; -- Synchroniser not to be optimised into shreg
 	attribute SHREG_EXTRACT of m1: signal is "no"; -- Synchroniser not to be optimised into shreg
-	
+	attribute ASYNC_REG: string;
+	attribute ASYNC_REG of s1: signal is "yes";
+	attribute ASYNC_REG of m1: signal is "yes";
+
 begin
 
 	process(s_clk)
