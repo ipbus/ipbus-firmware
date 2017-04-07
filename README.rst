@@ -14,6 +14,7 @@ The IPbus suite of software and firmware implement a reliable high-performance c
 **uHAL** 
   The Hardware Access Library (HAL) providing an end-user C++/Python API for IPbus reads, writes and RMW (read-modify-write) transactions.
 
+This repository contains a reference implementation for an IPbus 2.0 UDP server. It has been extensively tested on several different boards within several particle physics experiments. However, it is supported on a best-effort basis, and is provided on an "AS IS" BASIS, WITHOUT WARRANTY OF ANY KIND, either express or implied, including, without limitation, any warranties or conditions of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A PARTICULAR PURPOSE.
 
 *Further reading*
 
