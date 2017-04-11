@@ -73,7 +73,7 @@ begin
 			elsif ipb_in.ipb_strobe = '1' then
 				if ipb_in.ipb_write = '1' and ipb_in.ipb_addr(0) = '0' then
 					ptr <= unsigned(ipb_in.ipb_wdata(ptr'range));
-				elsif ipb_in.ipb_write = '0' and ipb_in.ipb_addr(0) = '1' then
+				elsif ipb_in.ipb_write = '0' and ipb_in.ipb_addr(0) = '1' and s_ipb_out.ipb_ack = '1' then
 					ptr <= ptr + 1;
 				end if;
 			end if;
