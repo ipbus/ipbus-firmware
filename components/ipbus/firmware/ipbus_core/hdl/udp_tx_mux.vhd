@@ -369,7 +369,7 @@ udp_build_data:  process(mac_clk)
 	    int_data_int := (Others => '0');
 	  when 13 =>
 	    ip_cksum_int(15 downto 8) := not outbyte;
-	    int_data_int := x"20”;
+	    int_data_int := x"20";
 	  when 14 =>
 -- then payload length...
 	    int_data_int := pay_len(15 downto 8);
