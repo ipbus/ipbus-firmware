@@ -53,8 +53,10 @@ begin
 
 	sel <= to_integer(unsigned(ipb_in.ipb_addr(ADDR_WIDTH - 1 downto 0))) when ADDR_WIDTH > 0 else 0;
 
-	ctrl_cyc_w <= ipb_in.ipb_strobe and ipb_in.ipb_write and not ipb_in.ipb_addr(ADDR_WIDTH);
-	ctrl_cyc_r <= ipb_in.ipb_strobe and not ipb_in.ipb_write and not ipb_in.ipb_addr(ADDR_WIDTH);
+	ctrl_cyc_w <= ipb_in.ipb_strobe and ipb_in.ipb_write and not ipb_in.ipb_addr(ADDR_WIDTH) when N_CTRL /= 0
+		else '0';
+	ctrl_cyc_r <= ipb_in.ipb_strobe and not ipb_in.ipb_write and not ipb_in.ipb_addr(ADDR_WIDTH) when N_CTRL /= 0
+		else '0';
 	stat_cyc <= ipb_in.ipb_strobe and not ipb_in.ipb_write and ipb_in.ipb_addr(ADDR_WIDTH) when N_CTRL /= 0
 		else ipb_in.ipb_strobe and not ipb_in.ipb_write;
 	
