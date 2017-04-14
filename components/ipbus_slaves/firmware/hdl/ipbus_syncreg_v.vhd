@@ -32,7 +32,8 @@ entity ipbus_syncreg_v is
 		d: in ipb_reg_v(N_STAT - 1 downto 0) := (others => (others => '0'));
 		q: out ipb_reg_v(N_CTRL - 1 downto 0);
 		qmask: in ipb_reg_v(N_CTRL - 1 downto 0) := (others => (others => '1'));
-		stb: out std_logic_vector(N_CTRL - 1 downto 0)
+		stb: out std_logic_vector(N_CTRL - 1 downto 0);
+		rstb: out std_logic_vector(N_STAT - 1 downto 0)
 	);
 	
 end ipbus_syncreg_v;
@@ -46,7 +47,7 @@ architecture rtl of ipbus_syncreg_v is
 	signal cq: ipb_reg_v(2 ** ADDR_WIDTH - 1 downto 0);
 	signal sq, ds: std_logic_vector(31 downto 0);
 	signal cbusy, cack: std_logic_vector(N_CTRL - 1 downto 0);
-	signal sbusy, sack, sre: std_logic;
+	signal sbusy, sack, sre, sstb: std_logic;
 	signal busy, ack, busy_d, pend: std_logic;
 
 begin
@@ -100,8 +101,11 @@ begin
 			m_ack => sack,
 			m_q => sq,
 			s_clk => slv_clk,
-			s_d => ds
+			s_d => ds,
+			s_stb => sstb
 		);
+
+	rstb <= (sel => sstb, others => '0') when sel < N_STAT else (others => '0');
 
 	process(clk)
 	begin
@@ -119,4 +123,3 @@ begin
 	ipb_out.ipb_err <= '0';
 	
 end rtl;
-
