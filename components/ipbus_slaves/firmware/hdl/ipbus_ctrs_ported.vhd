@@ -59,7 +59,7 @@ begin
 					if inc(i) = '1' and dec(i) = '0' then
 						if ctrs(i) /= (ctrs(i)'range => '1') or not LIMIT then
 							if rstb(0) = '1' and RST_ON_READ then
-								ctrs(i) <= 1
+								ctrs(i) <= 1;
 							else
 								ctrs(i) <= ctrs(i) + 1;
 							end if;
