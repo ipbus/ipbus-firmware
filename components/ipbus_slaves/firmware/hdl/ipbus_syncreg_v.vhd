@@ -105,7 +105,15 @@ begin
 			s_stb => sstb
 		);
 
-	rstb <= (sel => sstb, others => '0') when sel < N_STAT else (others => '0');
+    process(sel, sstb)
+    begin
+        rstb <= (others => '0');
+        for i in rstb'range loop
+            if sel = i then
+                rstb(i) <= sstb;
+            end if;
+        end loop;
+end process;
 
 	process(clk)
 	begin

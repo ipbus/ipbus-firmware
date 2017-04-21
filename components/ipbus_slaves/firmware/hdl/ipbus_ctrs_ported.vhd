@@ -106,7 +106,7 @@ begin
 		end if;
 	end process;
 	
-	dr <= d(to_integer(ptr));
+	dr(0) <= d(to_integer(ptr));
 	
 	sreg: entity work.ipbus_syncreg_v
 		generic map(
