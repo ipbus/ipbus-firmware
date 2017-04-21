@@ -34,7 +34,7 @@ architecture rtl of ipbus_fabric_sel is
 
 begin
 
-	sel_i <= to_integer(unsigned(sel));
+	sel_i <= to_integer(unsigned(sel)) when NSLV > 1 else 0;
 
 	ored_ack(NSLV) <= '0';
 	ored_err(NSLV) <= '0';
