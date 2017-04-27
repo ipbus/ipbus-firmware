@@ -105,15 +105,17 @@ begin
 			s_stb => sstb
 		);
 
-    process(sel, sstb)
-    begin
-        rstb <= (others => '0');
-        for i in rstb'range loop
-            if sel = i then
-                rstb(i) <= sstb;
-            end if;
-        end loop;
-end process;
+	process(sel, sstb)
+	begin
+		rstb <= (others => '0');
+		for i in rstb'range loop
+			if sel = i then
+				rstb(i) <= sstb;
+			else
+				rstb(i) <= '0';
+			end if;
+		end loop;
+	end process;
 
 	process(clk)
 	begin
