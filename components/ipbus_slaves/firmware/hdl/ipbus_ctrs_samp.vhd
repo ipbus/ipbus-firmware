@@ -41,7 +41,7 @@ begin
 			if rstb(0) = '1' then
 				for i in N_CTRS - 1 downto 0 loop
 					for j in CTR_WDS - 1 downto 0 loop
-						di(i * CTR_WDS + j) <= std_logic_vector(d(32 * (CTR_WDS * i + (j + 1) - 1) downto 32 * (CTR_WDS * i + j)));
+						di(i * CTR_WDS + j) <= std_logic_vector(ctrs(i)(32 * (j + 1) - 1 downto 32 * j));
 					end loop;
 				end loop;
 			end if;
