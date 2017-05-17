@@ -15,6 +15,7 @@ entity kc705_gmii_infra is
 		sysclk_n: in std_logic;
 		clk_ipb_o: out std_logic; -- IPbus clock
 		rst_ipb_o: out std_logic;
+		clk_125_o: out std_logic;
 		rst_125_o: out std_logic;
 		clk_aux_o: out std_logic; -- 40MHz generated clock
 		rst_aux_o: out std_logic;
