@@ -39,6 +39,26 @@ begin
 -- Infrastructure
 
 	infra: entity work.kc705_basex_infra
+
+-- RX and TX polarity on early KC705 boards
+--
+-- We think the story is as follows:
+-- rev 1.0	TX and RX polarity both swapped
+-- rev 1.1	TX polarity correct, slight chance that RX polarity might still be swapped
+-- rev 1.2	polarity correct
+--
+-- The story from Xilinx is not clear.
+--
+-- http://www.xilinx.com/support/answers/46614.html says that both TX and RX polarity are swapped on rev 1.0
+-- http://www.xilinx.com/support/answers/59750.html says that TX polarity was swapped between rev 1.0 and 1.1, no mention of RX polarity
+-- http://www.xilinx.com/support/answers/59751.html makes no mention of RX polarity changing between rev 1.1 and 1.2.
+--
+-- Set xxPOLARITY_SWAP to true to swap, false to not
+
+		generic map(
+			RXPOLARITY_SWAP => TRUE,
+			TXPOLARITY_SWAP => TRUE
+		)
 		port map(
 			eth_clk_p => eth_clk_p,
 			eth_clk_n => eth_clk_n,

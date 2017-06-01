@@ -10,6 +10,10 @@ use IEEE.STD_LOGIC_1164.ALL;
 use work.ipbus.all;
 
 entity kc705_basex_infra is
+	Generic (
+		constant RXPOLARITY_SWAP: boolean := false;
+		constant TXPOLARITY_SWAP: boolean := false
+	);
 	port(
 		eth_clk_p: in std_logic; -- 125MHz MGT clock
 		eth_clk_n: in std_logic;
@@ -81,6 +85,10 @@ begin
 -- Ethernet MAC core and PHY interface
 	
 	eth: entity work.eth_7s_1000basex
+		generic map(
+			RXPOLARITY_SWAP => RXPOLARITY_SWAP,
+			TXPOLARITY_SWAP => TXPOLARITY_SWAP
+		)
 		port map(
 			gt_clkp => eth_clk_p,
 			gt_clkn => eth_clk_n,
