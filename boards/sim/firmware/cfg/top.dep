@@ -1,4 +1,3 @@
-setup lib_mappings.tcl
 src top_sim.vhd
 include sim_infra.dep
 include -c components/ipbus_util ipbus_example.dep

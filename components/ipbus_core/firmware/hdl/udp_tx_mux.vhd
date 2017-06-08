@@ -362,14 +362,13 @@ udp_build_data:  process(mac_clk)
 	    int_data_int := pay_len(15 downto 8);
 	  when 5 =>
 	    int_data_int := pay_len(7 downto 0);
-	  when 11 =>
--- capture cksum...
-	    ip_cksum_int(15 downto 8) := not outbyte;
 	  when 12 =>
+-- capture cksum...
 	    ip_cksum_int(7 downto 0) := not outbyte;
 -- now start on IP length, first headers 20 + 8 + 4...
 	    int_data_int := (Others => '0');
 	  when 13 =>
+	    ip_cksum_int(15 downto 8) := not outbyte;
 	    int_data_int := x"20";
 	  when 14 =>
 -- then payload length...
