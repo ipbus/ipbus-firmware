@@ -22,7 +22,10 @@
 
 #include <mti.h>
 
-#define TAP_DEV "tap0"
+#define Q(x) #x
+#define QUOTE(x) Q(x)
+
+#define TAP_DEV_STR QUOTE(TAP_DEV)
 #define TAP_MTU 1500
 #define WAIT_USECS 50000 /* 50ms */
 
@@ -49,7 +52,7 @@ __attribute__((constructor)) static void cinit()
       return;
     }
 
-    tun_fd = tun_alloc ( TAP_DEV, IFF_TAP | IFF_NO_PI );
+    tun_fd = tun_alloc ( TAP_DEV_STR, IFF_TAP | IFF_NO_PI );
 
     if ( tun_fd < 0 )
     {
