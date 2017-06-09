@@ -14,7 +14,7 @@ entity ipbus_fabric_sel is
   generic(
     NSLV: positive;
     STROBE_GAP: boolean := false;
-    SEL_WIDTH: positive
+    SEL_WIDTH: natural
    );
   port(
   	sel: in std_logic_vector(SEL_WIDTH - 1 downto 0);
@@ -34,7 +34,7 @@ architecture rtl of ipbus_fabric_sel is
 
 begin
 
-	sel_i <= to_integer(unsigned(sel));
+	sel_i <= to_integer(unsigned(sel)) when NSLV > 1 else 0;
 
 	ored_ack(NSLV) <= '0';
 	ored_err(NSLV) <= '0';
@@ -42,7 +42,7 @@ begin
 	qstrobe <= ipb_in.ipb_strobe when STROBE_GAP = false else
 	 ipb_in.ipb_strobe and not (ored_ack(0) or ored_err(0));
 
-	busgen: for i in NSLV-1 downto 0 generate
+	busgen: for i in NSLV - 1 downto 0 generate
 	begin
 
 		ipb_to_slaves(i).ipb_addr <= ipb_in.ipb_addr;

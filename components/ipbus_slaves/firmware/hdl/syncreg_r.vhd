@@ -30,7 +30,7 @@ end syncreg_r;
 
 architecture rtl of syncreg_r is
 		
-	signal we, busy, ack, s1, s2, s3, m1, m2, m3: std_logic;
+	signal we, busy, ack, s1, s2, s3, s4, m1, m2, m3: std_logic;
 	
 	attribute SHREG_EXTRACT: string;
 	attribute SHREG_EXTRACT of s1: signal is "no"; -- Synchroniser not to be optimised into shreg
@@ -68,11 +68,12 @@ begin
 			s1 <= busy; -- Clock domain crossing for we handshake
 			s2 <= s1;
 			s3 <= s2;
+			s4 <= s3;
 		end if;
 	end process;
 	
-	we <= s2 and not s3;
-	s_stb <= we;
+	we <= s3 and not s4;
+	s_stb <= s2 and not s3;
 	
 	m_busy <= busy;
 	m_ack <= ack;

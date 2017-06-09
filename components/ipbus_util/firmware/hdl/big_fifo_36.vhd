@@ -40,7 +40,7 @@ architecture rtl of big_fifo_36 is
 
 	signal en: std_logic_vector(N_FIFO downto 0);
 	signal ifull, iempty: std_logic_vector(N_FIFO - 1  downto 0);
-	signal rsti, warn_i, fifo_rst: std_logic;
+	signal rsti, fifo_rst: std_logic;
 	type fifo_d_t is array(N_FIFO downto 0) of std_logic_vector(71 downto 0);
 	signal fifo_d: fifo_d_t;
 	signal rst_ctr: unsigned(3 downto 0);

@@ -15,6 +15,7 @@ entity kc705_gmii_infra is
 		sysclk_n: in std_logic;
 		clk_ipb_o: out std_logic; -- IPbus clock
 		rst_ipb_o: out std_logic;
+		clk_125_o: out std_logic;
 		rst_125_o: out std_logic;
 		clk_aux_o: out std_logic; -- 40MHz generated clock
 		rst_aux_o: out std_logic;
@@ -67,6 +68,7 @@ begin
 	clk_ipb <= clk_ipb_i; -- Best to align delta delays on all clocks for simulation
 	clk_ipb_o <= clk_ipb_i;
 	rst_ipb_o <= rst_ipb;
+	clk_125_o <= clk125;
 	rst_125_o <= rst125;
 	
 	stretch: entity work.led_stretcher

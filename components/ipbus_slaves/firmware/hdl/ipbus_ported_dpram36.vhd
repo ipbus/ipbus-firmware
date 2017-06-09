@@ -51,14 +51,10 @@ begin
 		if falling_edge(clk) then
 			if rst = '1' then
 				ptr <= (others => '0');				
-			elsif ipb_in.ipb_addr(0) = '0' then
-				if wcyc = '1' then
-					ptr <= unsigned(ipb_in.ipb_wdata(ADDR_WIDTH downto 0));
-				end if;
-			else
-				if (ipb_in.ipb_strobe = '1' and ipb_in.ipb_write = '0') or (wcyc_d = '1') then
-					ptr <= ptr + 1;
-				end if;
+			elsif ipb_in.ipb_addr(0) = '0' and wcyc = '1' then
+				ptr <= unsigned(ipb_in.ipb_wdata(ADDR_WIDTH downto 0));
+			elsif (ipb_in.ipb_strobe = '1' and ipb_in.ipb_write = '0' and ipb_in.ipb_addr(0) = '1') or wcyc_d = '1' then
+				ptr <= ptr + 1;
 			end if;
 		end if;
 	end process;
