@@ -18,6 +18,6 @@ This repository contains a reference implementation for an IPbus 2.0 UDP server.
 
 *Further reading*
 
-The **most recent paper** describing IPbus is from the proceedings for TWEPP2014
+The **most recent paper** describing IPbus is from the proceedings for TWEPP2014:
 
-  C. Ghabrous Larrea, K. Harder, D. Newbold, D. Sankey, A. Rose, A. Thea and T. Williams, "IPbus: a flexible Ethernet-based control system for xTCA hardware", *JINST* **10** (2015) no.02, C02019. `DOI: 10.1088/1748-0221/10/02/C02019 <http://dx.doi.org/10.1088/1748-0221/10/02/C02019>`__
+  \C. Ghabrous Larrea, K. Harder, D. Newbold, D. Sankey, A. Rose, A. Thea and T. Williams, "IPbus: a flexible Ethernet-based control system for xTCA hardware", *JINST* **10** (2015) no.02, C02019. `DOI: 10.1088/1748-0221/10/02/C02019 <http://dx.doi.org/10.1088/1748-0221/10/02/C02019>`__
