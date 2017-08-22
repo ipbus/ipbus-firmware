@@ -1,10 +1,5 @@
-@device_family = "kintex7"
-@device_name = "xc7k325t"
-@device_package = "ffg900"
-@device_speed = "-2"
-@boardname = "kc705_basex"
-
-setup settings_v7.tcl
+setup -c boards/kc705/base_fw/common settings_v7.tcl
+include -c boards/kc705/base_fw/common k325.dep
 src top_kc705_basex.vhd
 include kc705_basex_infra.dep
 include -c components/ipbus_util ipbus_example.dep

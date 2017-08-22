@@ -27,4 +27,3 @@
 @device_name = "xc7a50t"
 @device_package = "csg324"
 @device_speed = "-2"
-@boardname = "enclustra_ax3_pm3"

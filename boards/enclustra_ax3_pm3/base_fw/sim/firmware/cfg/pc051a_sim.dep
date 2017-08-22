@@ -1,9 +1,3 @@
-@device_family = "artix7"
-@device_name = "xc7a200t"
-@device_package = "fbg484"
-@device_speed = "-2"
-@boardname = "pc051a"
-
 setup lib_mappings.tcl
 src top_pc051a_sim.vhd
 include pc051a_infra_sim.dep
