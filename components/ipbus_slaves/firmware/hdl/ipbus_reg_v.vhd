@@ -20,7 +20,8 @@ entity ipbus_reg_v is
 		ipbus_in: in ipb_wbus;
 		ipbus_out: out ipb_rbus;
 		q: out ipb_reg_v(N_REG - 1 downto 0);
-		qmask: in ipb_reg_v(N_REG - 1 downto 0) := (others => (others => '1'))
+		qmask: in ipb_reg_v(N_REG - 1 downto 0) := (others => (others => '1'));
+		stb: out std_logic_vector(N_REG - 1 downto 0)
 	);
 	
 end ipbus_reg_v;
@@ -45,6 +46,19 @@ begin
 			elsif ipbus_in.ipb_strobe = '1' and ipbus_in.ipb_write = '1' and sel < N_REG then
 				reg(sel) <= ipbus_in.ipb_wdata and qmask(sel);
 			end if;
+		end if;
+	end process;
+	
+	process(clk)
+	begin
+		if rising_edge(clk) then
+			for i in N_REG - 1 downto 0 loop
+				if sel = i then
+					stb(i) <= ipbus_in.ipb_strobe and ipbus_in.ipb_write;
+				else
+					stb(i) <= '0';
+				end if;
+			end loop;
 		end if;
 	end process;
 	

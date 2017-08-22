@@ -65,6 +65,8 @@ begin
 			for i in N_CTRL - 1 downto 0 loop
 				if sel = i then
 					stb(i) <= cw_cyc;
+				else
+					stb(i) <= '0';
 				end if;
 			end loop;
 		end if;
