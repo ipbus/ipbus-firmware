@@ -1,2 +1,4 @@
-include -c boards/enclustra_ax3_pm3/base_fw/synth enclustra_ax3_pm3_a50.dep
+src -c boards/enclustra_ax3_pm3/base_fw/synth top_enclustra_ax3_pm3.vhd
+include -c boards/enclustra_ax3_pm3/base_fw/synth a50.dep
+include -c boards/enclustra_ax3_pm3/base_fw/synth enclustra_ax3_pm3.dep
 include -c components/ipbus_util ipbus_example.dep
