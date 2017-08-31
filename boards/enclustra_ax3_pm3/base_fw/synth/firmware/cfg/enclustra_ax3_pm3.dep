@@ -23,9 +23,7 @@
 #
 #-------------------------------------------------------------------------------
 
-
-set obj [get_projects top]
-set_property "default_lib" "xil_defaultlib" $obj
-set_property "simulator_language" "Mixed" $obj
-set_property "source_mgmt_mode" "DisplayOnly" $obj
-set_property "target_language" "VHDL" $obj
+setup settings_v7.tcl
+include enclustra_ax3_pm3_infra.dep
+src -c components/ipbus_core ipbus_package.vhd
+src --cd ../ucf enclustra_ax3_pm3.tcl

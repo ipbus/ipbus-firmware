@@ -1,0 +1,5 @@
+@device_family = "kintexu"
+@device_name = "xcku040"
+@device_package = "-ffva1156"
+@device_speed = "-2-e"
+@boardname = "kcu105_basex"

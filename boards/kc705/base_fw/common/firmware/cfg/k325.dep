@@ -1,0 +1,4 @@
+@device_family = "kintex7"
+@device_name = "xc7k325t"
+@device_package = "ffg900"
+@device_speed = "-2"
