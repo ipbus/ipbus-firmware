@@ -1,10 +1,5 @@
-@device_family = "kintexu"
-@device_name = "xcku040"
-@device_package = "-ffva1156"
-@device_speed = "-2-e"
-@boardname = "kcu105_basex"
-
 setup settings_ku.tcl
+include ku040.dep
 src kcu105_basex.vhd
 include kcu105_basex_infra.dep
 include -c components/ipbus_util ipbus_example.dep
