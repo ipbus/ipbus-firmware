@@ -23,7 +23,7 @@ fi
 
 # Stop on the first error
 set -e
-set -x
+# set -x
 
 cd ${WORK_ROOT}
 rm -rf proj/${PROJ}
