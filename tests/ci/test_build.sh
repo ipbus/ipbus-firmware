@@ -35,7 +35,7 @@ PROJECTS=(sim enclustra_ax3_pm3_a35 enclustra_ax3_pm3_a50 kc705_basex kc705_gmii
 
 if (( $# != 1 )); then
   echo "No project specified."
-  echo "Available projects: ${PROJECTS[@]}"
+  echo "Available projects:" $(printf "'%s' " "${PROJECTS[@]}")
 
   exit -1
 fi
