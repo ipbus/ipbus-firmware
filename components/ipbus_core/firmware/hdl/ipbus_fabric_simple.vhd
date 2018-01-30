@@ -60,7 +60,7 @@ architecture rtl of ipbus_fabric_simple is
 
 begin
 
-	sel <= to_integer(unsigned(ipbus_in.ipb_addr(DECODE_BASE + DECODE_BITS downto DECODE_BASE)));
+	sel <= to_integer(unsigned(ipb_in.ipb_addr(DECODE_BASE + DECODE_BITS - 1 downto DECODE_BASE)));
 
 	ored_ack(NSLV) <= '0';
 	ored_err(NSLV) <= '0';
