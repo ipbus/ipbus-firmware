@@ -40,6 +40,7 @@ use unisim.VComponents.all;
 entity ipbus_clock_div is
 	port(
 		clk: in std_logic;
+		d7: out std_logic;
 		d17: out std_logic;
 		d25: out std_logic;
 		d28: out std_logic
@@ -79,5 +80,6 @@ begin
 	d28 <= cnt(27);
 	d25 <= cnt(24);
 	d17 <= cnt(16);
+	d7 <= cnt(6);
 
 end rtl;
