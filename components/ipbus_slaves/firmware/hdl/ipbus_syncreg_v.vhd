@@ -26,12 +26,16 @@
 
 -- ipbus_syncreg_v
 --
--- Generic control / status register bank
+-- Clock-domain crossing control / status register bank
 --
 -- Provides N_CTRL control registers (32b each), rw
 -- Provides N_STAT status registers (32b each), ro
 --
--- Bottom part of read address space is control, top is status
+-- Address space needed is twice that needed by the largest block of registers, unless
+-- one of N_CTRL or N_STAT is zero.
+--
+-- By default, bottom part of read address space is control, top is status.
+-- Set SWAP_ORDER to reverse this.
 --
 -- Both control and status are moved across clock domains with full handshaking
 -- This may be overkill for some applications
@@ -47,7 +51,8 @@ use work.ipbus_reg_types.all;
 entity ipbus_syncreg_v is
 	generic(
 		N_CTRL: natural := 1;
-		N_STAT: natural := 1
+		N_STAT: natural := 1;
+		SWAP_ORDER: boolean := false
 	);
 	port(
 		clk: in std_logic;
@@ -69,7 +74,7 @@ architecture rtl of ipbus_syncreg_v is
 	constant ADDR_WIDTH: integer := integer_max(calc_width(N_CTRL), calc_width(N_STAT));
 
 	signal sel: integer range 0 to 2 ** ADDR_WIDTH - 1 := 0;
-	signal ctrl_cyc_w, ctrl_cyc_r, stat_cyc: std_logic;
+	signal s_cyc, ctrl_cyc_w, ctrl_cyc_r, stat_cyc: std_logic;
 	signal cq: ipb_reg_v(2 ** ADDR_WIDTH - 1 downto 0);
 	signal sq, ds: std_logic_vector(31 downto 0);
 	signal cbusy, cack: std_logic_vector(N_CTRL - 1 downto 0);
@@ -79,13 +84,11 @@ architecture rtl of ipbus_syncreg_v is
 begin
 
 	sel <= to_integer(unsigned(ipb_in.ipb_addr(ADDR_WIDTH - 1 downto 0))) when ADDR_WIDTH > 0 else 0;
-
-	ctrl_cyc_w <= ipb_in.ipb_strobe and ipb_in.ipb_write and not ipb_in.ipb_addr(ADDR_WIDTH) when N_CTRL /= 0
-		else '0';
-	ctrl_cyc_r <= ipb_in.ipb_strobe and not ipb_in.ipb_write and not ipb_in.ipb_addr(ADDR_WIDTH) when N_CTRL /= 0
-		else '0';
-	stat_cyc <= ipb_in.ipb_strobe and not ipb_in.ipb_write and ipb_in.ipb_addr(ADDR_WIDTH) when N_CTRL /= 0
-		else ipb_in.ipb_strobe and not ipb_in.ipb_write;
+	s_cyc <= '0' when N_STAT = 0 else '1' when N_CTRL = 0 else
+		ipbus_in.ipb_addr(ADDR_WIDTH) when not SWAP_ORDER else not ipbus_in.ipb_addr(ADDR_WIDTH);
+	stat_cyc <= ipb_in.ipb_strobe and not ipb_in.ipb_write and s_cyc;
+	ctrl_cyc_r <= ipb_in.ipb_strobe and not ipb_in.ipb_write and not s_cyc;
+	ctrl_cyc_w <= ipb_in.ipb_strobe and ipb_in.ipb_write and not s_cyc;
 	
 	w_gen: for i in N_CTRL - 1 downto 0 generate
 	
