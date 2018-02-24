@@ -108,9 +108,8 @@ begin
 				m_busy => cbusy(i),
 				m_ack => cack(i),
 				m_d => ctrl_m,
-				m_q => cq(i),
 				s_clk => slv_clk,
-				s_q => q(i),
+				s_q => cq(i),
 				s_stb => stb(i)
 			);
 
@@ -157,8 +156,10 @@ begin
 	busy <= '1' when cbusy /= (cbusy'range => '0') or sbusy = '1' else '0';
 	ack <= '1' when (cack /= (cack'range => '0') or sack = '1') and pend = '1' else '0';
 	
-	ipb_out.ipb_rdata <= cq(sel) when ctrl_cyc_r = '1' else sq;
+	ipb_out.ipb_rdata <= q(sel) when ctrl_cyc_r = '1' else sq;
 	ipb_out.ipb_ack <= ((ctrl_cyc_w or stat_cyc) and ack) or ctrl_cyc_r;
 	ipb_out.ipb_err <= '0';
+	
+	q <= cq(N_CTRL - 1 downto 0);
 	
 end rtl;
