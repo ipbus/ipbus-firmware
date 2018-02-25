@@ -89,7 +89,7 @@ begin
 
 	sel <= to_integer(unsigned(ipb_in.ipb_addr(ADDR_WIDTH - 1 downto 0))) when ADDR_WIDTH > 0 else 0;
 	s_cyc <= '0' when N_STAT = 0 else '1' when N_CTRL = 0 else
-		ipbus_in.ipb_addr(ADDR_WIDTH) when not SWAP_ORDER else not ipbus_in.ipb_addr(ADDR_WIDTH);
+		ipb_in.ipb_addr(ADDR_WIDTH) when not SWAP_ORDER else not ipb_in.ipb_addr(ADDR_WIDTH);
 	stat_cyc <= ipb_in.ipb_strobe and not ipb_in.ipb_write and s_cyc and rdy;
 	ctrl_cyc_r <= ipb_in.ipb_strobe and not ipb_in.ipb_write and not s_cyc and rdy;
 	ctrl_cyc_w <= ipb_in.ipb_strobe and ipb_in.ipb_write and not s_cyc and rdy;
@@ -163,11 +163,11 @@ begin
 	end process;
 	
 	rdy <= and_reduce(crdy) and srdy;
-	ack <= (or_reduce(cack) or sack) and pend = '1' else '0';
+	ack <= (or_reduce(cack) or sack) and pend;
 	
 -- ipbus interface
 	
-	ipb_out.ipb_rdata <= q(sel) when ctrl_cyc_r = '1' else sq;
+	ipb_out.ipb_rdata <= cq(sel) when ctrl_cyc_r = '1' else sq;
 	ipb_out.ipb_ack <= ((ctrl_cyc_w or stat_cyc) and ack) or ctrl_cyc_r;
 	ipb_out.ipb_err <= '0';
 	

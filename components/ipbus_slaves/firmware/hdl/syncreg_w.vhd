@@ -75,7 +75,7 @@ begin
 			m2 <= m1;
 			m3 <= m2;
 			cyc <= (cyc or (m_we and rdy)) and not (ack or m_rst);
-			rdy <= (rdy or rst or (m3 and not m2)) and not m_we;
+			rdy <= (rdy or m_rst or (m3 and not m2)) and not m_we;
 		end if;
 	end process;
 	
