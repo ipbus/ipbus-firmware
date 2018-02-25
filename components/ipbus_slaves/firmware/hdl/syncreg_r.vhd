@@ -26,10 +26,11 @@
 
 -- syncreg_r
 --
--- Clock domain crossing register with full handshaking
--- 	Data are transferred from slave to master when re is asserted
--- 	New requests are ignored while busy is high
--- 	Ack signals completed transfer
+-- Clock domain crossing register with two-way handshaking
+-- Data are transferred from slave to master when re is asserted
+-- New requests are ignored while rdy is low
+-- Ack signals completed transfer
+-- Data is sampled from slv side on cycle after s_stb goes high
 --
 -- Dave Newbold, June 2013
 
@@ -65,10 +66,12 @@ architecture rtl of syncreg_r is
 
 begin
 	
+-- Generate cyc and recover handshake into master domain
+
 	process(m_clk)
 	begin
 		if rising_edge(m_clk) then
-			m1 <= s4; -- Clock domain crossing for ack handshake
+			m1 <= s4; -- CDC, with synchroniser
 			m2 <= m1;
 			m3 <= m2;
 			cyc <= (cyc or (m_re and rdy)) and not (ack or m_rst);
@@ -78,16 +81,21 @@ begin
 	
 	ack <= m2 and not m3;
 	m_ack <= ack;
+	m_rdy <= rdy;
+	
+-- Move cyc into slave domain, generate handshake
 	
 	process(s_clk)
 	begin
 		if rising_edge(s_clk) then
-			s1 <= busy; -- Clock domain crossing for we handshake
+			s1 <= cyc; -- CDC, with synchroniser
 			s2 <= s1;
 			s3 <= s2;
 			s4 <= s3;
 		end if;
 	end process;
+	
+-- Capture register, in slave domain
 	
 	we <= s3 and not s4;
 	s_stb <= s2 and not s3;

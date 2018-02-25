@@ -80,17 +80,21 @@ architecture rtl of ipbus_syncreg_v is
 	signal cq: ipb_reg_v(2 ** ADDR_WIDTH - 1 downto 0);
 	signal sq, ds: std_logic_vector(31 downto 0);
 	signal crdy, cack: std_logic_vector(N_CTRL - 1 downto 0);
-	signal srdy, sack, sre, sstb: std_logic;
+	signal srdy, sack, sstb: std_logic;
 	signal rdy, ack, rdy_d, pend: std_logic;
 
 begin
 
+-- Address selects
+
 	sel <= to_integer(unsigned(ipb_in.ipb_addr(ADDR_WIDTH - 1 downto 0))) when ADDR_WIDTH > 0 else 0;
 	s_cyc <= '0' when N_STAT = 0 else '1' when N_CTRL = 0 else
 		ipbus_in.ipb_addr(ADDR_WIDTH) when not SWAP_ORDER else not ipbus_in.ipb_addr(ADDR_WIDTH);
-	stat_cyc <= ipb_in.ipb_strobe and not ipb_in.ipb_write and s_cyc;
-	ctrl_cyc_r <= ipb_in.ipb_strobe and not ipb_in.ipb_write and not s_cyc;
-	ctrl_cyc_w <= ipb_in.ipb_strobe and ipb_in.ipb_write and not s_cyc;
+	stat_cyc <= ipb_in.ipb_strobe and not ipb_in.ipb_write and s_cyc and rdy;
+	ctrl_cyc_r <= ipb_in.ipb_strobe and not ipb_in.ipb_write and not s_cyc and rdy;
+	ctrl_cyc_w <= ipb_in.ipb_strobe and ipb_in.ipb_write and not s_cyc and rdy;
+
+-- Write registers
 	
 	w_gen: for i in N_CTRL - 1 downto 0 generate
 	
@@ -99,7 +103,7 @@ begin
 		
 	begin
 	
-		cwe <= '1' when ctrl_cyc_w = '1' and sel = i and rdy = '1' else '0';
+		cwe <= '1' when ctrl_cyc_w = '1' and sel = i else '0';
 		ctrl_m <= ipb_in.ipb_wdata and qmask(i);
 		
 		wsync: entity work.syncreg_w
@@ -119,14 +123,15 @@ begin
 	
 	cq(2 ** ADDR_WIDTH - 1 downto N_CTRL) <= (others => (others => '0'));
 
+-- Read register	
+	
 	ds <= d(sel) when sel < N_STAT else (others => '0');
-	sre <= '1' when stat_cyc = '1' and rdy = '1' else '0';
 	
 	rsync: entity work.syncreg_r
 		port map(
 			m_clk => clk,
 			m_rst => rst,
-			m_re => sre,
+			m_re => stat_cyc,
 			m_rdy => srdy,
 			m_ack => sack,
 			m_q => sq,
@@ -146,6 +151,8 @@ begin
 			end if;
 		end loop;
 	end process;
+	
+-- Interlock to catch situation where strobe is dropped in middle of write / read cycle
 
 	process(clk)
 	begin
@@ -156,9 +163,9 @@ begin
 	end process;
 	
 	rdy <= and_reduce(crdy) and srdy;
-	
-	rdy <= '1' when cbusy /= (cbusy'range => '0') or sbusy = '1' else '0';
 	ack <= (or_reduce(cack) or sack) and pend = '1' else '0';
+	
+-- ipbus interface
 	
 	ipb_out.ipb_rdata <= q(sel) when ctrl_cyc_r = '1' else sq;
 	ipb_out.ipb_ack <= ((ctrl_cyc_w or stat_cyc) and ack) or ctrl_cyc_r;
