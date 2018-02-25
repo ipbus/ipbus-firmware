@@ -45,6 +45,8 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use ieee.numeric_std.all;
+use ieee.std_logic_misc.all;
+
 use work.ipbus.all;
 use work.ipbus_reg_types.all;
 
@@ -77,9 +79,9 @@ architecture rtl of ipbus_syncreg_v is
 	signal s_cyc, ctrl_cyc_w, ctrl_cyc_r, stat_cyc: std_logic;
 	signal cq: ipb_reg_v(2 ** ADDR_WIDTH - 1 downto 0);
 	signal sq, ds: std_logic_vector(31 downto 0);
-	signal cbusy, cack: std_logic_vector(N_CTRL - 1 downto 0);
-	signal sbusy, sack, sre, sstb: std_logic;
-	signal busy, ack, busy_d, pend: std_logic;
+	signal crdy, cack: std_logic_vector(N_CTRL - 1 downto 0);
+	signal srdy, sack, sre, sstb: std_logic;
+	signal rdy, ack, rdy_d, pend: std_logic;
 
 begin
 
@@ -97,7 +99,7 @@ begin
 		
 	begin
 	
-		cwe <= '1' when ctrl_cyc_w = '1' and sel = i and busy = '0' else '0';
+		cwe <= '1' when ctrl_cyc_w = '1' and sel = i and rdy = '1' else '0';
 		ctrl_m <= ipb_in.ipb_wdata and qmask(i);
 		
 		wsync: entity work.syncreg_w
@@ -105,7 +107,7 @@ begin
 				m_clk => clk,
 				m_rst => rst,
 				m_we => cwe,
-				m_busy => cbusy(i),
+				m_rdy => crdy(i),
 				m_ack => cack(i),
 				m_d => ctrl_m,
 				s_clk => slv_clk,
@@ -118,14 +120,14 @@ begin
 	cq(2 ** ADDR_WIDTH - 1 downto N_CTRL) <= (others => (others => '0'));
 
 	ds <= d(sel) when sel < N_STAT else (others => '0');
-	sre <= '1' when stat_cyc = '1' and busy = '0' else '0';
+	sre <= '1' when stat_cyc = '1' and rdy = '1' else '0';
 	
 	rsync: entity work.syncreg_r
 		port map(
 			m_clk => clk,
 			m_rst => rst,
 			m_re => sre,
-			m_busy => sbusy,
+			m_rdy => srdy,
 			m_ack => sack,
 			m_q => sq,
 			s_clk => slv_clk,
@@ -148,13 +150,15 @@ begin
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			busy_d <= busy;
-			pend <= (pend or (busy and not busy_d)) and ipb_in.ipb_strobe and not rst;
+			rdy_d <= rdy;
+			pend <= (pend or (not rdy and rdy_d)) and ipb_in.ipb_strobe and not rst and not ack;
 		end if;
 	end process;
 	
-	busy <= '1' when cbusy /= (cbusy'range => '0') or sbusy = '1' else '0';
-	ack <= '1' when (cack /= (cack'range => '0') or sack = '1') and pend = '1' else '0';
+	rdy <= and_reduce(crdy) and srdy;
+	
+	rdy <= '1' when cbusy /= (cbusy'range => '0') or sbusy = '1' else '0';
+	ack <= (or_reduce(cack) or sack) and pend = '1' else '0';
 	
 	ipb_out.ipb_rdata <= q(sel) when ctrl_cyc_r = '1' else sq;
 	ipb_out.ipb_ack <= ((ctrl_cyc_w or stat_cyc) and ack) or ctrl_cyc_r;

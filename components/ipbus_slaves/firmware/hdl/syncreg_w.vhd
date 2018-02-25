@@ -45,7 +45,6 @@ entity syncreg_w is
 		m_clk: in std_logic;
 		m_rst: in std_logic;
 		m_we: in std_logic;
-		m_busy: out std_logic;
 		m_ack: out std_logic;
 		m_d: in std_logic_vector(SIZE - 1 downto 0);
 		s_clk: in std_logic;
@@ -57,7 +56,7 @@ end syncreg_w;
 
 architecture rtl of syncreg_w is
 		
-	signal busy, ack, done, s1, s2, s3, m1, m2, m3: std_logic;
+	signal rdy, cyc, ack, s1, s2, s3, m1, m2, m3: std_logic;
 	
 	attribute SHREG_EXTRACT: string;
 	attribute SHREG_EXTRACT of s1, m1: signal is "no"; -- Synchroniser not to be optimised into shreg
@@ -72,12 +71,13 @@ begin
 			m1 <= s3; -- Clock domain crossing for ack handshake
 			m2 <= m1;
 			m3 <= m2;
-			busy <= (busy or m_we) and not (done or m_rst);
+			cyc <= (cyc or (m_we and rdy)) and not (ack or m_rst);
+			rdy <= (rdy or rst or (m3 and not m2)) and not m_we;
 		end if;
 	end process;
 	
 	ack <= m2 and not m3;
-	done <= not m2 and m3;
+	m_ack <= ack;
 	
 	process(s_clk)
 	begin
@@ -93,8 +93,5 @@ begin
 			s_stb <= s2 and not s3;
 		end if;
 	end process;
-		
-	m_busy <= busy;
-	m_ack <= ack;
 
 end rtl;
