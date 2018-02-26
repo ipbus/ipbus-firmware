@@ -80,7 +80,7 @@ architecture rtl of ipbus_syncreg_v is
 	signal cq: ipb_reg_v(2 ** ADDR_WIDTH - 1 downto 0);
 	signal sq, ds: std_logic_vector(31 downto 0);
 	signal crdy, cack: std_logic_vector(N_CTRL - 1 downto 0);
-	signal srdy, sack, sstb: std_logic;
+	signal sre, srdy, sack, sstb: std_logic;
 	signal rdy, ack, rdy_d, pend: std_logic;
 
 begin
@@ -90,9 +90,9 @@ begin
 	sel <= to_integer(unsigned(ipb_in.ipb_addr(ADDR_WIDTH - 1 downto 0))) when ADDR_WIDTH > 0 else 0;
 	s_cyc <= '0' when N_STAT = 0 else '1' when N_CTRL = 0 else
 		ipb_in.ipb_addr(ADDR_WIDTH) when not SWAP_ORDER else not ipb_in.ipb_addr(ADDR_WIDTH);
-	stat_cyc <= ipb_in.ipb_strobe and not ipb_in.ipb_write and s_cyc and rdy;
-	ctrl_cyc_r <= ipb_in.ipb_strobe and not ipb_in.ipb_write and not s_cyc and rdy;
-	ctrl_cyc_w <= ipb_in.ipb_strobe and ipb_in.ipb_write and not s_cyc and rdy;
+	stat_cyc <= ipb_in.ipb_strobe and not ipb_in.ipb_write and s_cyc;
+	ctrl_cyc_r <= ipb_in.ipb_strobe and not ipb_in.ipb_write and not s_cyc;
+	ctrl_cyc_w <= ipb_in.ipb_strobe and ipb_in.ipb_write and not s_cyc;
 
 -- Write registers
 	
@@ -103,7 +103,7 @@ begin
 		
 	begin
 	
-		cwe <= '1' when ctrl_cyc_w = '1' and sel = i else '0';
+		cwe <= '1' when ctrl_cyc_w = '1' and sel = i and rdy = '1' else '0';
 		ctrl_m <= ipb_in.ipb_wdata and qmask(i);
 		
 		wsync: entity work.syncreg_w
@@ -127,11 +127,13 @@ begin
 	
 	ds <= d(sel) when sel < N_STAT else (others => '0');
 	
+	sre <= stat_cyc and rdy;
+	
 	rsync: entity work.syncreg_r
 		port map(
 			m_clk => clk,
 			m_rst => rst,
-			m_re => stat_cyc,
+			m_re => sre,
 			m_rdy => srdy,
 			m_ack => sack,
 			m_q => sq,
@@ -168,7 +170,7 @@ begin
 -- ipbus interface
 	
 	ipb_out.ipb_rdata <= cq(sel) when ctrl_cyc_r = '1' else sq;
-	ipb_out.ipb_ack <= ((ctrl_cyc_w or stat_cyc) and ack) or ctrl_cyc_r;
+	ipb_out.ipb_ack <= ((ctrl_cyc_w or stat_cyc) and ack) or (ctrl_cyc_r and rdy);
 	ipb_out.ipb_err <= '0';
 	
 	q <= cq(N_CTRL - 1 downto 0);
