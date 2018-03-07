@@ -31,7 +31,11 @@
 -- Provides N_CTRL control registers (32b each), rw
 -- Provides N_STAT status registers (32b each), ro
 --
--- Bottom part of read address space is control, top is status
+-- Address space needed is twice that needed by the largest block of registers, unless
+-- one of N_CTRL or N_STAT is zero.
+--
+-- By default, bottom part of read address space is control, top is status.
+-- Set SWAP_ORDER to reverse this.
 --
 -- Dave Newbold, July 2012
 
@@ -44,7 +48,8 @@ use work.ipbus_reg_types.all;
 entity ipbus_ctrlreg_v is
 	generic(
 		N_CTRL: natural := 1;
-		N_STAT: natural := 1
+		N_STAT: natural := 1;
+		SWAP_ORDER: boolean := false
 	);
 	port(
 		clk: in std_logic;
@@ -71,7 +76,8 @@ architecture rtl of ipbus_ctrlreg_v is
 begin
 
 	sel <= to_integer(unsigned(ipbus_in.ipb_addr(ADDR_WIDTH - 1 downto 0))) when ADDR_WIDTH > 0 else 0;
-	stat_cyc <= ipbus_in.ipb_addr(ADDR_WIDTH) when N_CTRL /= 0 else '1'; -- FIXME; this is incorrect when N_STAT = 0
+	stat_cyc <= '0' when N_STAT = 0 else '1' when N_CTRL = 0 else
+		ipbus_in.ipb_addr(ADDR_WIDTH) when not SWAP_ORDER else not ipbus_in.ipb_addr(ADDR_WIDTH);
 	cw_cyc <= ipbus_in.ipb_strobe and ipbus_in.ipb_write and not stat_cyc;
 
 	process(clk)
