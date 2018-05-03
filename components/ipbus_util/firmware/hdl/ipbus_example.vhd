@@ -88,6 +88,7 @@ begin
 		stat(0) <= X"abcdfedc";
 		soft_rst <= ctrl(0)(0);
 		nuke <= ctrl(0)(1);
+		userled <= ctrl(0)(2);
 
 -- Slave 1: register
 
