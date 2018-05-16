@@ -72,10 +72,11 @@ set_property PACKAGE_PIN T14 [get_ports {rgmii_rxc}]
 set_property PACKAGE_PIN M13 [get_ports {phy_rstn}]
 false_path {phy_rstn} sysclk
 
-set_property IOSTANDARD LVCMOS25 [get_ports {cfg[*]}]
-set_property PULLUP TRUE [get_ports {cfg[*]}]
-set_property PACKAGE_PIN K2 [get_ports {cfg[0]}]
-set_property PACKAGE_PIN K1 [get_ports {cfg[1]}]
-set_property PACKAGE_PIN J4 [get_ports {cfg[2]}]
-set_property PACKAGE_PIN H4 [get_ports {cfg[3]}]
-
+if { [llength [get_ports {cfg[*]}]] > 0} {
+  set_property IOSTANDARD LVCMOS25 [get_ports {cfg[*]}]
+  set_property PULLUP TRUE [get_ports {cfg[*]}]
+  set_property PACKAGE_PIN K2 [get_ports {cfg[0]}]
+  set_property PACKAGE_PIN K1 [get_ports {cfg[1]}]
+  set_property PACKAGE_PIN J4 [get_ports {cfg[2]}]
+  set_property PACKAGE_PIN H4 [get_ports {cfg[3]}]
+}
