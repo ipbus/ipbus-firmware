@@ -79,8 +79,8 @@ begin
 		port map(
 			clk => ipb_clk,
 			reset => ipb_rst,
-			ipbus_in => ipbw(N_SLV_CTRL_REG),
-			ipbus_out => ipbr(N_SLV_CTRL_REG),
+			ipbus_in => ipbw(N_SLV_CSR),
+			ipbus_out => ipbr(N_SLV_CSR),
 			d => stat,
 			q => ctrl
 		);
@@ -88,6 +88,7 @@ begin
 		stat(0) <= X"abcdfedc";
 		soft_rst <= ctrl(0)(0);
 		nuke <= ctrl(0)(1);
+		userled <= ctrl(0)(2);
 
 -- Slave 1: register
 

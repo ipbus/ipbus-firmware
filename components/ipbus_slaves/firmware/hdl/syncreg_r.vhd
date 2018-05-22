@@ -60,9 +60,9 @@ architecture rtl of syncreg_r is
 	signal we, rdy, cyc, ack, s1, s2, s3, s4, m1, m2, m3: std_logic;
 	
 	attribute SHREG_EXTRACT: string;
-	attribute SHREG_EXTRACT of s1, m1: signal is "no"; -- Synchroniser not to be optimised into shreg
+	attribute SHREG_EXTRACT of s1, m1, s2, m2: signal is "no"; -- Synchroniser not to be optimised into shreg
 	attribute ASYNC_REG: string;
-	attribute ASYNC_REG of s1, m1: signal is "yes";
+	attribute ASYNC_REG of s1, m1, s2, m2: signal is "yes";
 
 begin
 	
