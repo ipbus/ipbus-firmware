@@ -58,9 +58,18 @@ echo "Building Project ${PROJ}"
 echo "#------------------------------------------------"
 if [[ "$PROJ" == "sim" ]]; then
   ipbb proj create sim sim ipbus-firmware:boards/sim
+  ipbb sim -p ${PROJ} setup-simlib
   ipbb sim -p ${PROJ} ipcores
   ipbb sim -p ${PROJ} fli
   ipbb sim -p ${PROJ} project
+  cd proj/sim
+  ./vsim -c work.top -gIP_ADDR='X"c0a8c902"' -do 'run 60sec' -do 'quit' > /dev/null 2>&1 &
+  VSIM_PID=$!
+  # tickle the simulation
+  ping 192.168.201.2 -c 5
+  # Cleanup, send sigint to the whole process group 
+  # (that is the parent PID, put a - in front to indicate it's the group you're after)
+  kill -SIGINT -- -${VSIM_PID}
 else
   ipbb proj create vivado -t top_${PROJ}.dep ${PROJ} ipbus-firmware:projects/example
   ipbb vivado -p ${PROJ} project
