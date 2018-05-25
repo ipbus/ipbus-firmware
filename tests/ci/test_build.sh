@@ -63,13 +63,16 @@ if [[ "$PROJ" == "sim" ]]; then
   ipbb sim -p ${PROJ} fli
   ipbb sim -p ${PROJ} project
   cd proj/sim
+  set -x
   ./vsim -c work.top -gIP_ADDR='X"c0a8c902"' -do 'run 60sec' -do 'quit' > /dev/null 2>&1 &
   VSIM_PID=$!
   # tickle the simulation
+  sleep 10
   ping 192.168.201.2 -c 5
   # Cleanup, send sigint to the whole process group 
   # (that is the parent PID, put a - in front to indicate it's the group you're after)
   kill -SIGINT -- -${VSIM_PID}
+  set +x
 else
   ipbb proj create vivado -t top_${PROJ}.dep ${PROJ} ipbus-firmware:projects/example
   ipbb vivado -p ${PROJ} project
