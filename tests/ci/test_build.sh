@@ -66,6 +66,7 @@ if [[ "$PROJ" == "sim" ]]; then
   set -x
   ./vsim -c work.top -gIP_ADDR='X"c0a8c902"' -do 'run 60sec' -do 'quit' > /dev/null 2>&1 &
   VSIM_PID=$!
+  VSIM_PGRP=$(ps -p ${VSIM_PID} -o pgrp=)
   # tickle the simulation
   sleep 10
   ping 192.168.201.2 -c 5
@@ -73,7 +74,7 @@ if [[ "$PROJ" == "sim" ]]; then
   # (that is the parent PID, put a - in front to indicate it's the group you're after)
   pstree -p ${VSIM_PID}
   ps x -o  "%p %r %y %x %c "  | grep vsim
-  kill -SIGINT -- -${VSIM_PID}
+  pkill -SIGINT -g ${VSIM_PGRP} vsimk
   set +x
 else
   ipbb proj create vivado -t top_${PROJ}.dep ${PROJ} ipbus-firmware:projects/example
