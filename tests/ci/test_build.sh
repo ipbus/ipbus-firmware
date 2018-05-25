@@ -61,24 +61,22 @@ if [[ "$PROJ" == "sim" ]]; then
   ipbb sim -p ${PROJ} setup-simlib
   ipbb sim -p ${PROJ} ipcores
   ipbb sim -p ${PROJ} fli
-  ipbb sim -p ${PROJ} project
+  ipbb sim -p ${PROJ} make-project
   cd proj/sim
   set -x
   ./vsim -c work.top -gIP_ADDR='X"c0a8c902"' -do 'run 60sec' -do 'quit' > /dev/null 2>&1 &
   VSIM_PID=$!
   VSIM_PGRP=$(ps -p ${VSIM_PID} -o pgrp=)
-  # tickle the simulation
+  # ait for the simulation to start
   sleep 10
+  # tickle the simulation
   ping 192.168.201.2 -c 5
-  # Cleanup, send sigint to the whole process group 
-  # (that is the parent PID, put a - in front to indicate it's the group you're after)
-  pstree -p ${VSIM_PID}
-  ps x -o  "%p %r %y %x %c "  | grep vsim
+  # Cleanup, send SIGINT to the vsimk process in the current process group
   pkill -SIGINT -g ${VSIM_PGRP} vsimk
   set +x
 else
   ipbb proj create vivado -t top_${PROJ}.dep ${PROJ} ipbus-firmware:projects/example
-  ipbb vivado -p ${PROJ} project
+  ipbb vivado -p ${PROJ} make-project
   ipbb vivado -p ${PROJ} synth 
   ipbb vivado -p ${PROJ} impl 
   ipbb vivado -p ${PROJ} bitfile
