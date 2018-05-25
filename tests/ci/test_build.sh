@@ -71,6 +71,8 @@ if [[ "$PROJ" == "sim" ]]; then
   ping 192.168.201.2 -c 5
   # Cleanup, send sigint to the whole process group 
   # (that is the parent PID, put a - in front to indicate it's the group you're after)
+  pstree -p ${VSIM_PID}
+  ps x -o  "%p %r %y %x %c "  | grep vsim
   kill -SIGINT -- -${VSIM_PID}
   set +x
 else
