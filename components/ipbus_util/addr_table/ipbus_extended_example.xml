@@ -8,9 +8,23 @@
         <node id="stat" address="0x1"/>
     </node>
     <node id="reg" address="0x2" description="read-write register" fwinfo="endpoint;width=0"/>
-    <node id="ram" address="0x1000" mode="block" size="0x400" description="1kword RAM" fwinfo="endpoint;width=12"/>
-    <node id="pram" address="0x2000" description="1kword peephole RAM" fwinfo="endpoint;width=1">
+
+    <node id="pram" address="0x4" description="1kword peephole RAM" fwinfo="endpoint;width=1">
         <node id="addr" address="0x0"/>
         <node id="data" mode="port" size="0x400" address="0x1"/>
     </node>
+
+    <node id="pdpram" address="0x6" description="1kword dual-port RAM" fwinfo="endpoint;width=1">
+        <node id="addr" address="0x0"/>
+        <node id="data" mode="port" size="0x400" address="0x1"/>
+    </node>
+
+    <node id="pdpram36" address="0x8" description="1kword dual-port RAM36" fwinfo="endpoint;width=1">
+        <node id="addr" address="0x0"/>
+        <node id="data" mode="port" size="0x400" address="0x1"/>
+    </node>
+
+    <node id="ram"     address="0x1000" mode="block" size="0x400" description="1kword RAM" fwinfo="endpoint;width=9"/>
+    <node id="dpram"   address="0x2000" mode="block" size="0x400" description="Dual port RAM" fwinfo="endpoint;width=9"/>
+    <node id="dpram36" address="0x3000" mode="block" size="0x400" description="Dual port RAM (36 bits)" fwinfo="endpoint;width=9"/> 
 </node>

@@ -24,7 +24,7 @@
 ---------------------------------------------------------------------------------
 
 
--- ipbus_example
+-- ipbus_extended_example
 --
 -- selection of different IPBus slaves without actual function,
 -- just for performance evaluation of the IPbus/uhal system
@@ -36,7 +36,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use work.ipbus.all;
 use work.ipbus_reg_types.all;
-use work.ipbus_decode_ipbus_example.all;
+use work.ipbus_decode_ipbus_extended_example.all;
 
 entity ipbus_example is
 	port(
@@ -44,6 +44,8 @@ entity ipbus_example is
 		ipb_rst: in std_logic;
 		ipb_in: in ipb_wbus;
 		ipb_out: out ipb_rbus;
+		clk: in std_logic;
+		rst: in std_logic;
 		nuke: out std_logic;
 		soft_rst: out std_logic;
 		userled: out std_logic
@@ -68,7 +70,7 @@ begin
     port map(
       ipb_in => ipb_in,
       ipb_out => ipb_out,
-      sel => ipbus_sel_ipbus_example(ipb_in.ipb_addr),
+      sel => ipbus_sel_ipbus_extended_example(ipb_in.ipb_addr),
       ipb_to_slaves => ipbw,
       ipb_from_slaves => ipbr
     );
@@ -101,9 +103,49 @@ begin
 			q => open
 		);
 
--- Slave 2: 1kword RAM
+-- Slave Ported RAM 1: peephole RAM
 
-	slave4: entity work.ipbus_ram
+	pram_slave1: entity work.ipbus_peephole_ram
+		generic map(ADDR_WIDTH => 10)
+		port map(
+			clk => ipb_clk,
+			reset => ipb_rst,
+			ipbus_in => ipbw(N_SLV_PRAM),
+			ipbus_out => ipbr(N_SLV_PRAM)
+		);
+
+-- Slave Ported RAM 2: 1kword dual-port RAM
+	pram_slave2: entity work.ipbus_ported_dpram
+		generic map(ADDR_WIDTH => 10)
+		port map(
+			clk => ipb_clk,
+			rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_PDPRAM),
+			ipb_out => ipbr(N_SLV_PDPRAM),
+			rclk => clk,
+			we => '0',
+			d => (others => '0'),
+			q => open,
+			addr => (others => '0')
+		);
+
+--  Ported RAM slave 3: 1kword dual-port RAM
+	pram_slave3: entity work.ipbus_ported_dpram36
+		generic map(ADDR_WIDTH => 10)
+		port map(
+			clk => ipb_clk,
+			rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_PDPRAM),
+			ipb_out => ipbr(N_SLV_PDPRAM),
+			rclk => clk,
+			we => '0',
+			d => (others => '0'),
+			q => open,
+			addr => (others => '0')
+		);
+
+-- RAM Slave 1: 1kword RAM
+	ram_slave1: entity work.ipbus_ram
 		generic map(ADDR_WIDTH => 10)
 		port map(
 			clk => ipb_clk,
@@ -111,16 +153,37 @@ begin
 			ipbus_in => ipbw(N_SLV_RAM),
 			ipbus_out => ipbr(N_SLV_RAM)
 		);
-	
--- Slave 3: peephole RAM
 
-	slave5: entity work.ipbus_peephole_ram
+
+-- RAM Slave 2: 1kB dual port RAM
+	ram_slave2: entity work.ipbus_dpram
 		generic map(ADDR_WIDTH => 10)
 		port map(
 			clk => ipb_clk,
-			reset => ipb_rst,
-			ipbus_in => ipbw(N_SLV_PRAM),
-			ipbus_out => ipbr(N_SLV_PRAM)
+			rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_DPRAM),
+			ipb_out => ipbr(N_SLV_DPRAM),
+			rclk => clk,
+			we => '0',
+			d => (others => '0'),
+			q => open,
+			addr => (others => '0')
+		);
+
+
+-- RAM Slave 3: 1kB dual port RAM 36
+	ram_slave3: entity work.ipbus_dpram36
+		generic map(ADDR_WIDTH => 10)
+		port map(
+			clk => ipb_clk,
+			rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_DPRAM36),
+			ipb_out => ipbr(N_SLV_DPRAM36),
+			rclk => clk,
+			we => '0',
+			d => (others => '0'),
+			q => open,
+			addr => (others => '0')
 		);
 
 end rtl;
