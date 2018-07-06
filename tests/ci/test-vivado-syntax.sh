@@ -31,7 +31,7 @@ SH_SOURCE=${BASH_SOURCE}
 IPBUS_PATH=$(cd $(dirname ${SH_SOURCE})/../.. && pwd)
 WORK_ROOT=$(cd ${IPBUS_PATH}/../.. && pwd)
 
-PROJECTS=(sim enclustra_ax3_pm3_a35 enclustra_ax3_pm3_a50 kc705_basex kc705_gmii kcu105_basex)
+PROJECTS=(enclustra_ax3_pm3_a35 enclustra_ax3_pm3_a50 kc705_basex kc705_gmii kcu105_basex)
 
 if (( $# != 1 )); then
   echo "No project specified."
@@ -56,30 +56,10 @@ rm -rf proj/${PROJ}
 echo "#------------------------------------------------"
 echo "Building Project ${PROJ}"
 echo "#------------------------------------------------"
-if [[ "$PROJ" == "sim" ]]; then
-  ipbb proj create sim sim ipbus-firmware:boards/sim
-  ipbb sim -p ${PROJ} setup-simlib
-  ipbb sim -p ${PROJ} ipcores
-  ipbb sim -p ${PROJ} fli
-  ipbb sim -p ${PROJ} make-project
-  cd proj/sim
-  set -x
-  ./vsim -c work.top -gIP_ADDR='X"c0a8c902"' -do 'run 60sec' -do 'quit' > /dev/null 2>&1 &
-  VSIM_PID=$!
-  VSIM_PGRP=$(ps -p ${VSIM_PID} -o pgrp=)
-  # ait for the simulation to start
-  sleep 10
-  # tickle the simulation
-  ping 192.168.201.2 -c 5
-  # Cleanup, send SIGINT to the vsimk process in the current process group
-  pkill -SIGINT -g ${VSIM_PGRP} vsimk
-  set +x
-else
-  ipbb proj create vivado -t top_${PROJ}.dep ${PROJ} ipbus-firmware:projects/example
-  ipbb vivado -p ${PROJ} make-project
-  ipbb vivado -p ${PROJ} synth 
-  ipbb vivado -p ${PROJ} impl 
-  ipbb vivado -p ${PROJ} bitfile
-fi
+ipbb proj create vivado -t top_${PROJ}.dep ${PROJ} ipbus-firmware:projects/example
+ipbb vivado -p ${PROJ} make-project
+ipbb vivado -p ${PROJ} check-syntax
+
+
 
 exit 0

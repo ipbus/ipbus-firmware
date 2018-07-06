@@ -31,7 +31,7 @@ SH_SOURCE=${BASH_SOURCE}
 IPBUS_PATH=$(cd $(dirname ${SH_SOURCE})/../.. && pwd)
 WORK_ROOT=$(cd ${IPBUS_PATH}/../.. && pwd)
 
-PROJECTS=(sim enclustra_ax3_pm3_a35 enclustra_ax3_pm3_a50 kc705_basex kc705_gmii kcu105_basex)
+PROJECTS=(sim)
 
 if (( $# != 1 )); then
   echo "No project specified."
@@ -77,9 +77,10 @@ if [[ "$PROJ" == "sim" ]]; then
 else
   ipbb proj create vivado -t top_${PROJ}.dep ${PROJ} ipbus-firmware:projects/example
   ipbb vivado -p ${PROJ} make-project
-  ipbb vivado -p ${PROJ} synth 
-  ipbb vivado -p ${PROJ} impl 
-  ipbb vivado -p ${PROJ} bitfile
+  ipbb vivado -p ${PROJ} check-syntax
+  # ipbb vivado -p ${PROJ} synth 
+  # ipbb vivado -p ${PROJ} impl 
+  # ipbb vivado -p ${PROJ} bitfile
 fi
 
 exit 0
