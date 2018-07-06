@@ -54,10 +54,16 @@ entity ipbus_example is
 end ipbus_example;
 
 architecture rtl of ipbus_example is
-
+	constant ADDR_WIDTH : positive := 10;
+	constant PATT_DATA_WIDTH : positive := 36;
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl, stat: ipb_reg_v(0 downto 0);
+	signal ctrl_stb: std_logic_vector(0 downto 0);
+	signal patt_stb: std_logic;
+	signal patt_addr: std_logic_vector(ADDR_WIDTH-1 downto 0);
+	signal patt_data: std_logic_vector(PATT_DATA_WIDTH-1 downto 0);
+
 
 begin
 
@@ -68,29 +74,51 @@ begin
     	NSLV => N_SLAVES,
     	SEL_WIDTH => IPBUS_SEL_WIDTH)
     port map(
-      ipb_in => ipb_in,
-      ipb_out => ipb_out,
-      sel => ipbus_sel_ipbus_extended_example(ipb_in.ipb_addr),
-      ipb_to_slaves => ipbw,
-      ipb_from_slaves => ipbr
+		ipb_in => ipb_in,
+		ipb_out => ipb_out,
+		sel => ipbus_sel_ipbus_extended_example(ipb_in.ipb_addr),
+		ipb_to_slaves => ipbw,
+		ipb_from_slaves => ipbr
     );
+
 
 -- Slave 0: id / rst reg
 
-	slave0: entity work.ipbus_ctrlreg_v
+	csr_slave0: entity work.ipbus_ctrlreg_v
 		port map(
 			clk => ipb_clk,
 			reset => ipb_rst,
 			ipbus_in => ipbw(N_SLV_CSR),
 			ipbus_out => ipbr(N_SLV_CSR),
 			d => stat,
-			q => ctrl
+			q => ctrl,
+			stb => ctrl_stb
 		);
 		
 		stat(0) <= X"abcdfedc";
 		soft_rst <= ctrl(0)(0);
 		nuke <= ctrl(0)(1);
 		userled <= ctrl(0)(2);
+
+
+-- Slave 0.1: pattern generator
+	patt_gen: entity work.patt_gen
+		generic map(
+			ADDR_WIDTH => ADDR_WIDTH,
+			DATA_WIDTH => 36
+			)
+	  	port map (
+			ipb_clk => ipb_clk,
+			ipb_rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_PATT_GEN),
+			ipb_out => ipbr(N_SLV_PATT_GEN),
+			clk => clk,
+			rst => rst,
+			stb => patt_stb,
+			addr => patt_addr,
+			q => patt_data
+	  	);
+
 
 -- Slave 1: register
 
@@ -106,7 +134,7 @@ begin
 -- Slave Ported RAM 1: peephole RAM
 
 	pram_slave1: entity work.ipbus_peephole_ram
-		generic map(ADDR_WIDTH => 10)
+		generic map(ADDR_WIDTH => ADDR_WIDTH)
 		port map(
 			clk => ipb_clk,
 			reset => ipb_rst,
@@ -116,37 +144,37 @@ begin
 
 -- Slave Ported RAM 2: 1kword dual-port RAM
 	pram_slave2: entity work.ipbus_ported_dpram
-		generic map(ADDR_WIDTH => 10)
+		generic map(ADDR_WIDTH => ADDR_WIDTH)
 		port map(
 			clk => ipb_clk,
 			rst => ipb_rst,
 			ipb_in => ipbw(N_SLV_PDPRAM),
 			ipb_out => ipbr(N_SLV_PDPRAM),
 			rclk => clk,
-			we => '0',
-			d => (others => '0'),
+			we => patt_stb,
+			d => patt_data(31 downto 0),
 			q => open,
-			addr => (others => '0')
+			addr => patt_addr
 		);
 
 --  Ported RAM slave 3: 1kword dual-port RAM
 	pram_slave3: entity work.ipbus_ported_dpram36
-		generic map(ADDR_WIDTH => 10)
+		generic map(ADDR_WIDTH => ADDR_WIDTH)
 		port map(
 			clk => ipb_clk,
 			rst => ipb_rst,
 			ipb_in => ipbw(N_SLV_PDPRAM36),
 			ipb_out => ipbr(N_SLV_PDPRAM36),
 			rclk => clk,
-			we => '0',
-			d => (others => '0'),
+			we => patt_stb,
+			d => patt_data,
 			q => open,
-			addr => (others => '0')
+			addr => patt_addr
 		);
 
 -- RAM Slave 1: 1kword RAM
 	ram_slave1: entity work.ipbus_ram
-		generic map(ADDR_WIDTH => 10)
+		generic map(ADDR_WIDTH => ADDR_WIDTH)
 		port map(
 			clk => ipb_clk,
 			reset => ipb_rst,
@@ -157,33 +185,37 @@ begin
 
 -- RAM Slave 2: 1kB dual port RAM
 	ram_slave2: entity work.ipbus_dpram
-		generic map(ADDR_WIDTH => 10)
+		generic map(ADDR_WIDTH => ADDR_WIDTH)
 		port map(
 			clk => ipb_clk,
 			rst => ipb_rst,
 			ipb_in => ipbw(N_SLV_DPRAM),
 			ipb_out => ipbr(N_SLV_DPRAM),
 			rclk => clk,
-			we => '0',
-			d => (others => '0'),
+			we => patt_stb,
+			d => patt_data(31 downto 0),
 			q => open,
-			addr => (others => '0')
+			addr => patt_addr
 		);
 
 
 -- RAM Slave 3: 1kB dual port RAM 36
 	ram_slave3: entity work.ipbus_dpram36
-		generic map(ADDR_WIDTH => 10)
+		generic map(ADDR_WIDTH => ADDR_WIDTH)
 		port map(
 			clk => ipb_clk,
 			rst => ipb_rst,
 			ipb_in => ipbw(N_SLV_DPRAM36),
 			ipb_out => ipbr(N_SLV_DPRAM36),
 			rclk => clk,
-			we => '0',
-			d => (others => '0'),
+			we => patt_stb,
+			d => patt_data,
 			q => open,
-			addr => (others => '0')
+			addr => patt_addr
 		);
+
+
+
+
 
 end rtl;

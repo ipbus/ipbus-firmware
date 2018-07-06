@@ -78,8 +78,14 @@ addrtabpath = 'file://'+os.path.normpath(os.path.join(os.path.abspath(os.path.di
 
 device = uhal.getDevice('SIM', 'ipbusudp-2.0://192.168.201.2:50001', addrtabpath)
 
+# Reset
+# device.getNode('csr.ctrl.rst').write(0x1)
+# device.dispatch()
+
+# Read magic word
 csr_stat = device.getNode('csr.stat').read()
 device.dispatch()
+
 
 print 'stat =',hex(csr_stat)
 
@@ -94,18 +100,52 @@ val = reg_node.read()
 device.dispatch()
 print 'reg A =',hex(val)
 
-# ----- peephole ram
-portedram_writeandreadback(device.getNode('pram'))
+# # ----- peephole ram
+# portedram_writeandreadback(device.getNode('pram'))
 
-portedram_writeandreadback(device.getNode('pdpram'))
+# # ----- ported ram (32 bits)
+# portedram_writeandreadback(device.getNode('pdpram'))
 
-portedram_writeandreadback(device.getNode('pdpram36'))
+# # ----- ported ram (36 bits)
+# portedram_writeandreadback(device.getNode('pdpram36'))
 
-ram_writeandreadback(device.getNode('ram'))
+# # ----- ram (36 bits)
+# ram_writeandreadback(device.getNode('ram'))
 
-ram_writeandreadback(device.getNode('dpram'))
+# ----- duap-port ram (32 bits)
+# ram_writeandreadback(device.getNode('dpram'))
 
-ram_writeandreadback(device.getNode('dpram36'))
+# # ----- duap-port ram (36 bits)
+# ram_writeandreadback(device.getNode('dpram36'))
+
+print '--- Before ---'
+device.getNode('dpram').writeBlock([0]*device.getNode('dpram').getSize())
+device.dispatch()
+
+valvec = device.getNode('dpram').readBlock(device.getNode('dpram').getSize())
+device.dispatch()
+print list(valvec)
+
+device.getNode('patt_gen.ctrl.mode').write(0x1)
+device.getNode('patt_gen.ctrl.word').write(0xff)
+
+device.getNode('patt_gen.ctrl.fire').write(0x1)
+device.dispatch()
+
+print '--- After ---'
+valvec = device.getNode('dpram').readBlock(device.getNode('dpram').getSize())
+device.dispatch()
+print [ hex(x) for x in valvec]
 
 
+valvec = readported(device.getNode('pdpram'))
+device.dispatch()
+print [ hex(x) for x in valvec]
+
+
+
+
+valvec = readported(device.getNode('pdpram36'))
+device.dispatch()
+print [ hex(x) for x in valvec]
 
