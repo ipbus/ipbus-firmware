@@ -24,11 +24,13 @@ end patt_gen;
 
 architecture rtl of patt_gen is
 
+    constant N_WORDS : positive := DATA_WIDTH/8+1; -- +1 to be on the safe side with rounding
     signal actr: unsigned(ADDR_WIDTH - 1 downto 0);
     signal ctrl: ipb_reg_v(0 downto 0);
     signal ctrl_stb: std_logic_vector(0 downto 0);
     signal mode: std_logic_vector(1 downto 0);
     signal word: std_logic_vector(7 downto 0);
+    signal long_word: std_logic_vector((N_WORDS)*8-1 downto 0);
 
     signal fire, last, stb_i: std_logic; 
 begin
@@ -53,6 +55,14 @@ begin
     mode <= ctrl(0)(2 downto 1);
     word <= ctrl(0)(31 downto 24);
 
+    -- Build the long word when 'word' is updated
+    process(word)
+    begin
+        for i in 0 to N_WORDS-1 loop
+            long_word( (i+1)*8-1 downto i*8 ) <= word;
+        end loop;
+    end process;
+
     process( clk )
     begin
 
@@ -75,7 +85,7 @@ begin
     stb <= stb_i;
 
     with mode select q <= 
-        (word(3 downto 0) & word & word & word & word) when "01",
+        long_word( DATA_WIDTH - 1 downto 0) when "01",
         (q'left downto addr'left+1 => '0') & std_logic_vector(actr) when others;
         
 end rtl;
