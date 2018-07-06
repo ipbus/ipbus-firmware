@@ -57,7 +57,7 @@ echo "#------------------------------------------------"
 echo "Building Project ${PROJ}"
 echo "#------------------------------------------------"
 if [[ "$PROJ" == "sim" ]]; then
-  ipbb proj create sim sim ipbus-firmware:boards/sim
+  ipbb proj create sim -t top_sim.dep sim ipbus-firmware:projects/example 
   ipbb sim -p ${PROJ} setup-simlib
   ipbb sim -p ${PROJ} ipcores
   ipbb sim -p ${PROJ} fli
