@@ -55,7 +55,7 @@ begin
     mode <= ctrl(0)(2 downto 1);
     word <= ctrl(0)(31 downto 24);
 
-    -- Build the long word when 'word' is updated
+    -- Rebuild the long word when 'word' is updated
     process(word)
     begin
         for i in 0 to N_WORDS-1 loop
@@ -65,6 +65,7 @@ begin
 
     process( clk )
     begin
+
 
     if rising_edge(clk) then
         stb_i <= (fire or (stb_i and not last)) and not rst;
@@ -78,9 +79,10 @@ begin
 
     end process;
 
-    -- Last is when 
+    -- Last is when we're at the max values
     last <= '1' when actr = to_unsigned(2 ** actr'length - 1, actr'length) else '0';
     
+    -- outputs
     addr <= std_logic_vector(actr);
     stb <= stb_i;
 
