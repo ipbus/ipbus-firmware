@@ -126,7 +126,7 @@ valvec = device.getNode('dpram').readBlock(device.getNode('dpram').getSize())
 device.dispatch()
 print list(valvec)
 
-device.getNode('patt_gen.ctrl.mode').write(0x1)
+device.getNode('patt_gen.ctrl.mode').write(0x0)
 device.getNode('patt_gen.ctrl.word').write(0xff)
 
 device.getNode('patt_gen.ctrl.fire').write(0x1)
@@ -138,12 +138,13 @@ device.dispatch()
 print [ hex(x) for x in valvec]
 
 
-valvec = readported(device.getNode('pdpram'))
+valvec = device.getNode('dpram36').readBlock(device.getNode('dpram36').getSize())
 device.dispatch()
 print [ hex(x) for x in valvec]
 
-
-
+valvec = readported(device.getNode('pdpram'))
+device.dispatch()
+print [ hex(x) for x in valvec]
 
 valvec = readported(device.getNode('pdpram36'))
 device.dispatch()
