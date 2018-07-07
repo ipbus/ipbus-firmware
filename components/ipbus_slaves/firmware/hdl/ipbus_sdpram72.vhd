@@ -79,7 +79,7 @@ begin
 		ram(sel)(71 downto 54) when "11",
 		ram(sel)(53 downto 36) when "10",
 		ram(sel)(35 downto 18) when "01",
-		ral(sel)(17 downto 0) when others;
+		ram(sel)(17 downto 0) when others;
 
 	process(clk)
 	begin

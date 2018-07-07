@@ -55,7 +55,7 @@ end ipbus_example;
 
 architecture rtl of ipbus_example is
 	constant ADDR_WIDTH : positive := 10;
-	constant PATT_DATA_WIDTH : positive := 36;
+	constant PATT_DATA_WIDTH : positive := 72;
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl, stat: ipb_reg_v(0 downto 0);
@@ -105,7 +105,7 @@ begin
 	patt_gen: entity work.patt_gen
 		generic map(
 			ADDR_WIDTH => ADDR_WIDTH,
-			DATA_WIDTH => 36
+			DATA_WIDTH => PATT_DATA_WIDTH
 			)
 	  	port map (
 			ipb_clk => ipb_clk,
@@ -167,8 +167,23 @@ begin
 			ipb_out => ipbr(N_SLV_PDPRAM36),
 			rclk => clk,
 			we => patt_stb,
-			d => patt_data,
+			d => patt_data(35 downto 0),
 			q => open,
+			addr => patt_addr
+		);
+
+	--  Ported RAM slave 3: 1kword dual-port RAM
+	pram_slave4: entity work.ipbus_ported_sdpram72
+		generic map(ADDR_WIDTH => ADDR_WIDTH)
+		port map(
+			clk => ipb_clk,
+			rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_SPDPRAM72),
+			ipb_out => ipbr(N_SLV_SPDPRAM72),
+			wclk => clk,
+			we => patt_stb,
+			d => patt_data,
+			--q => open,
 			addr => patt_addr
 		);
 
@@ -209,12 +224,25 @@ begin
 			ipb_out => ipbr(N_SLV_DPRAM36),
 			rclk => clk,
 			we => patt_stb,
-			d => patt_data,
+			d => patt_data(35 downto 0),
 			q => open,
 			addr => patt_addr
 		);
 
-
+-- RAM Slave 3: 1kB dual port RAM 36
+	ram_slave4: entity work.ipbus_sdpram72
+		generic map(ADDR_WIDTH => ADDR_WIDTH)
+		port map(
+			clk => ipb_clk,
+			rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_SDPRAM72),
+			ipb_out => ipbr(N_SLV_SDPRAM72),
+			wclk => clk,
+			we => patt_stb,
+			d => patt_data,
+			--q => open,
+			addr => patt_addr
+		);
 
 
 
