@@ -35,7 +35,7 @@
         <node id="data" mode="port" size="0x800" address="0x1"/>
     </node>
 
-    <node id="spdpram72" address="0x18" description="1kword simple dual-port RAM72" fwinfo="endpoint;width=1">
+    <node id="pdpram72" address="0x18" description="1kword simple dual-port RAM72" fwinfo="endpoint;width=1">
         <node id="addr" address="0x0"/>
         <node id="data" mode="port" size="0x800" address="0x1"/>
     </node>

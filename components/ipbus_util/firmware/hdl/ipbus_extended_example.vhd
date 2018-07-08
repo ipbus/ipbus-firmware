@@ -173,14 +173,14 @@ begin
 		);
 
 	--  Ported RAM slave 3: 1kword dual-port RAM
-	pram_slave4: entity work.ipbus_ported_sdpram72
+	pram_slave4: entity work.ipbus_ported_dpram72
 		generic map(ADDR_WIDTH => ADDR_WIDTH)
 		port map(
 			clk => ipb_clk,
 			rst => ipb_rst,
-			ipb_in => ipbw(N_SLV_SPDPRAM72),
-			ipb_out => ipbr(N_SLV_SPDPRAM72),
-			wclk => clk,
+			ipb_in => ipbw(N_SLV_PDPRAM72),
+			ipb_out => ipbr(N_SLV_PDPRAM72),
+			rclk => clk,
 			we => patt_stb,
 			d => patt_data,
 			--q => open,

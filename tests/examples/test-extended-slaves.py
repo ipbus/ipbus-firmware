@@ -119,34 +119,48 @@ print 'reg A =',hex(val)
 # ram_writeandreadback(device.getNode('dpram36'))
 
 print '--- Before ---'
-device.getNode('dpram').writeBlock([0]*device.getNode('dpram').getSize())
-device.dispatch()
+# device.getNode('dpram').writeBlock([0]*device.getNode('dpram').getSize())
+# device.dispatch()
 
-valvec = device.getNode('dpram').readBlock(device.getNode('dpram').getSize())
-device.dispatch()
-print list(valvec)
+# valvec = device.getNode('dpram').readBlock(device.getNode('dpram').getSize())
+# device.dispatch()
+# print list(valvec)
 
-device.getNode('patt_gen.ctrl.mode').write(0x0)
+device.getNode('patt_gen.ctrl.mode').write(0x2)
 device.getNode('patt_gen.ctrl.word').write(0xff)
 
 device.getNode('patt_gen.ctrl.fire').write(0x1)
+device.getNode('patt_gen.ctrl.fire').write(0x0)
 device.dispatch()
+
+# raise SystemExit(0)
 
 print '--- After ---'
-valvec = device.getNode('dpram').readBlock(device.getNode('dpram').getSize())
-device.dispatch()
-print [ hex(x) for x in valvec]
+# valvec = device.getNode('dpram').readBlock(device.getNode('dpram').getSize())
+# device.dispatch()
+# print [ hex(x) for x in valvec]
 
 
-valvec = device.getNode('dpram36').readBlock(device.getNode('dpram36').getSize())
-device.dispatch()
-print [ hex(x) for x in valvec]
+# valvec = device.getNode('dpram36').readBlock(device.getNode('dpram36').getSize())
+# device.dispatch()
+# print '\n'.join([ hex(x) for i,x in enumerate(valvec[:32])])
 
-valvec = readported(device.getNode('pdpram'))
-device.dispatch()
-print [ hex(x) for x in valvec]
+# valvec = readported(device.getNode('pdpram'))
+# device.dispatch()
+# print [ hex(x) for x in valvec[:0x20]]
 
+print '---pdpram 36---'
 valvec = readported(device.getNode('pdpram36'))
 device.dispatch()
-print [ hex(x) for x in valvec]
+print '\n'.join([
+     "%02d %s" % (i,hex(x)) for i,x in enumerate(valvec[:32])
+    ])
+
+print '---pdpram 72---'
+valvec = readported(device.getNode('pdpram72'))
+device.dispatch()
+print '\n'.join([
+     "%02d %s" % (i,hex(x)) for i,x in enumerate(valvec[:32])
+    ])
+
 

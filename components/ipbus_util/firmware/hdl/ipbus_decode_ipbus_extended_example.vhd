@@ -17,14 +17,14 @@ package ipbus_decode_ipbus_extended_example is
   subtype ipbus_sel_t is std_logic_vector(IPBUS_SEL_WIDTH - 1 downto 0);
   function ipbus_sel_ipbus_extended_example(addr : in std_logic_vector(31 downto 0)) return ipbus_sel_t;
 
--- START automatically  generated VHDL the Sat Jul  7 17:15:54 2018 
+-- START automatically  generated VHDL the Sat Jul  7 23:39:52 2018 
   constant N_SLV_CSR: integer := 0;
   constant N_SLV_PATT_GEN: integer := 1;
   constant N_SLV_REG: integer := 2;
   constant N_SLV_PRAM: integer := 3;
   constant N_SLV_PDPRAM: integer := 4;
   constant N_SLV_PDPRAM36: integer := 5;
-  constant N_SLV_SPDPRAM72: integer := 6;
+  constant N_SLV_PDPRAM72: integer := 6;
   constant N_SLV_RAM: integer := 7;
   constant N_SLV_DPRAM: integer := 8;
   constant N_SLV_DPRAM36: integer := 9;
@@ -41,7 +41,7 @@ package body ipbus_decode_ipbus_extended_example is
     variable sel: ipbus_sel_t;
   begin
 
--- START automatically  generated VHDL the Sat Jul  7 17:15:54 2018 
+-- START automatically  generated VHDL the Sat Jul  7 23:39:52 2018 
     if    std_match(addr, "---------------0--00-------0000-") then
       sel := ipbus_sel_t(to_unsigned(N_SLV_CSR, IPBUS_SEL_WIDTH)); -- csr / base 0x00000000 / mask 0x0001301e
     elsif std_match(addr, "---------------0--00-------0001-") then
@@ -55,7 +55,7 @@ package body ipbus_decode_ipbus_extended_example is
     elsif std_match(addr, "---------------0--00-------1011-") then
       sel := ipbus_sel_t(to_unsigned(N_SLV_PDPRAM36, IPBUS_SEL_WIDTH)); -- pdpram36 / base 0x00000016 / mask 0x0001301e
     elsif std_match(addr, "---------------0--00-------1100-") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_SPDPRAM72, IPBUS_SEL_WIDTH)); -- spdpram72 / base 0x00000018 / mask 0x0001301e
+      sel := ipbus_sel_t(to_unsigned(N_SLV_PDPRAM72, IPBUS_SEL_WIDTH)); -- pdpram72 / base 0x00000018 / mask 0x0001301e
     elsif std_match(addr, "---------------0--01------------") then
       sel := ipbus_sel_t(to_unsigned(N_SLV_RAM, IPBUS_SEL_WIDTH)); -- ram / base 0x00001000 / mask 0x00013000
     elsif std_match(addr, "---------------0--10------------") then
