@@ -40,13 +40,14 @@ use unisim.VComponents.all;
 entity clocks_us_serdes is
 	generic(
 		CLK_FR_FREQ: real := 125.0;
-		CLK_VCO_FREQ: real := 1000.0
+		CLK_VCO_FREQ: real := 1000.0;
+		CLK_AUX_FREQ: real := 40.0
 	);
 	port(
 		clki_fr: in std_logic; -- Input free-running clock (125MHz default)
 		clki_125: in std_logic; -- Ethernet domain clk125
 		clko_ipb: out std_logic; -- ipbus domain clock (31MHz)
-		clko_p40: out std_logic; -- pseudo-40MHz clock
+		clko_aux: out std_logic; -- pseudo-40MHz clock
 		clko_200: out std_logic; -- 200MHz clock for idelayctrl
 		eth_locked: in std_logic; -- ethernet locked signal
 		locked: out std_logic; -- global locked signal
@@ -57,6 +58,7 @@ entity clocks_us_serdes is
 		rsto_eth: out std_logic; -- ethernet startup reset (required!)
 		rsto_ipb_ctrl: out std_logic; -- ipbus domain reset for controller
 		rsto_fr: out std_logic; -- free-running clock domain reset
+		rsto_aux: out std_logic;
 		onehz: out std_logic -- blinkenlights output
 	);
 
@@ -65,10 +67,10 @@ end clocks_us_serdes;
 architecture rtl of clocks_us_serdes is
 	
 	signal dcm_locked, sysclk, clk_ipb_i, clk_ipb_b, clkfb, clk200: std_logic;
-	signal clk_p40_i, clk_p40_b: std_logic;
+	signal clk_aux_i, clk_aux_b: std_logic;
 	signal d17, d17_d: std_logic;
 	signal nuke_i, nuke_d, nuke_d2, eth_done: std_logic := '0';
-	signal rst, srst, rst_ipb, rst_125, rst_ipb_ctrl: std_logic := '1';
+	signal rst, srst, rst_ipb, rst_125, rst_aux, rst_ipb_ctrl: std_logic := '1';
 	signal rctr: unsigned(3 downto 0) := "0000";
 	
 begin
@@ -83,11 +85,11 @@ begin
 	clko_ipb <= clk_ipb_b;
 	
 	bufgp40: BUFG port map(
-		i => clk_p40_i,
-		o => clk_p40_b
+		i => clk_aux_i,
+		o => clk_aux_b
 	);
 	
-	clko_p40 <= clk_p40_b;
+	clko_aux <= clk_p40_b;
 	
 	bufg200: BUFG port map(
 		i => clk200,
@@ -99,7 +101,7 @@ begin
 			clkin1_period => CLK_VCO_FREQ / CLK_FR_FREQ,
 			clkfbout_mult_f => CLK_VCO_FREQ / CLK_FR_FREQ,
 			clkout1_divide => integer(CLK_VCO_FREQ / 31.25),
-			clkout2_divide => integer(CLK_VCO_FREQ / 40.00),
+			clkout2_divide => integer(CLK_VCO_FREQ / CLK_AUX_FREQ),
 			clkout3_divide => integer(CLK_VCO_FREQ / 200.00)
 		)
 		port map(
@@ -107,7 +109,7 @@ begin
 			clkfbin => clkfb,
 			clkfbout => clkfb,
 			clkout1 => clk_ipb_i,
-			clkout2 => clk_p40_i,
+			clkout2 => clk_aux_i,
 			clkout3 => clk200,
 			locked => dcm_locked,
 			rst => '0',
@@ -170,5 +172,14 @@ begin
 	rsto_125 <= rst_125;
 	
 	rsto_fr <= rst;
+	
+	process(clk_aux_i)
+	begin
+		if rising_edge(clk_aux_i) then
+			rst_aux <= rst;
+		end if;
+	end process;
+	
+	rsto_aux <= rst_aux;
 		
 end rtl;
