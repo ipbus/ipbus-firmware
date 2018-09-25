@@ -80,7 +80,7 @@ begin
 			elsif stb(N_CTRS * CTR_WDS - 1) = '1' then
 				for i in N_CTRS - 1 downto 0 loop
 					for j in CTR_WDS - 1 downto 0 loop
-						ctrs(i)(32 * (j + 1) - 1 downto 32 * j) <= qi(i * CTR_WDS + j);
+						ctrs(i)(32 * (j + 1) - 1 downto 32 * j) <= unsigned(qi(i * CTR_WDS + j));
 					end loop;
 				end loop;			
 			else
