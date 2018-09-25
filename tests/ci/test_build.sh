@@ -77,7 +77,7 @@ if [[ "$PROJ" == "sim" ]]; then
 else
   ipbb proj create vivado -t top_${PROJ}.dep ${PROJ} ipbus-firmware:projects/example
   ipbb vivado -p ${PROJ} make-project
-  ipbb vivado -p ${PROJ} synth 
+  ipbb vivado -p ${PROJ} synth -j4
   ipbb vivado -p ${PROJ} impl 
   ipbb vivado -p ${PROJ} bitfile
 fi
