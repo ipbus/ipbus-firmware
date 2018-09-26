@@ -69,9 +69,9 @@ architecture rtl of ipbus_ctrs_ported is
 	signal ptr: unsigned(calc_width(N_CTRS * CTR_WDS) - 1 downto 0);
 	signal s_ipb_in: ipb_wbus;
 	signal s_ipb_out: ipb_rbus;
-	signal d: ipb_reg_v(N_CTRS * CTR_WDS - 1 downto 0);
+	signal d, qi: ipb_reg_v(N_CTRS * CTR_WDS - 1 downto 0);
 	signal dr: ipb_reg_v(0 downto 0);
-	signal rstb: std_logic_vector(0 downto 0);
+	signal rstb, stb: std_logic_vector(0 downto 0);
 
 begin
 
@@ -80,6 +80,12 @@ begin
 		if rising_edge(clk) then
 			if rst = '1' then
 				ctrs <= (others => (others => '0'));
+			elsif stb(N_CTRS * CTR_WDS - 1) = '1' then
+				for i in N_CTRS - 1 downto 0 loop
+					for j in CTR_WDS - 1 downto 0 loop
+						ctrs(i)(32 * (j + 1) - 1 downto 32 * j) <= unsigned(qi(i * CTR_WDS + j));
+					end loop;
+				end loop;
 			else
 				for i in N_CTRS - 1 downto 0 loop
 					if inc(i) = '1' and dec(i) = '0' then
@@ -134,20 +140,48 @@ begin
 	
 	dr(0) <= d(to_integer(ptr));
 	
-	sreg: entity work.ipbus_syncreg_v
-		generic map(
-			N_CTRL => 0,
-			N_STAT => 1
-		)
-		port map(
-			clk => ipb_clk,
-			rst => ipb_rst,
-			ipb_in => s_ipb_in,
-			ipb_out => s_ipb_out,
-			slv_clk => clk,
-			d => dr,
-			rstb => rstb			
-		);
+	sgen: if READ_ONLY generate
+	
+		sreg: entity work.ipbus_syncreg_v
+			generic map(
+				N_CTRL => 0,
+				N_STAT => N_CTRS * CTR_WDS
+			)
+			port map(
+				clk => ipb_clk,
+				rst => ipb_rst,
+				ipb_in => ipb_in,
+				ipb_out => ipb_out,
+				slv_clk => clk,
+				d => d,
+				rstb => rstb
+			);
+			
+		qi <= (others	=> (others => '0'));
+		stb <= (others => '0');
+			
+	end generate;
+	
+	nsgen: if not READ_ONLY generate
+	
+		sreg: entity work.ipbus_syncreg_v
+			generic map(
+				N_CTRL => N_CTRS * CTR_WDS,
+				N_STAT => N_CTRS * CTR_WDS
+			)
+			port map(
+				clk => ipb_clk,
+				rst => ipb_rst,
+				ipb_in => ipb_in,
+				ipb_out => ipb_out,
+				slv_clk => clk,
+				q => qi,
+				stb => stb,
+				d => d,
+				rstb => rstb
+			);
+			
+	end generate;
 	
 	s_ipb_in.ipb_addr <= (others => '0');
 	s_ipb_in.ipb_wdata <= (others => '0');
