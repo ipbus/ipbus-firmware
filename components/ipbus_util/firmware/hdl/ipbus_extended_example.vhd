@@ -38,7 +38,7 @@ use work.ipbus.all;
 use work.ipbus_reg_types.all;
 use work.ipbus_decode_ipbus_extended_example.all;
 
-entity ipbus_example is
+entity ipbus_extended_example is
 	port(
 		ipb_clk: in std_logic;
 		ipb_rst: in std_logic;
@@ -51,9 +51,9 @@ entity ipbus_example is
 		userled: out std_logic
 	);
 
-end ipbus_example;
+end ipbus_extended_example;
 
-architecture rtl of ipbus_example is
+architecture rtl of ipbus_extended_example is
 	constant ADDR_WIDTH : positive := 10;
 	constant PATT_DATA_WIDTH : positive := 72;
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
@@ -243,7 +243,5 @@ begin
 			--q => open,
 			addr => patt_addr
 		);
-
-
 
 end rtl;

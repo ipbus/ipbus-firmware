@@ -24,6 +24,7 @@
 #-------------------------------------------------------------------------------
 
 
+src payload_extended_example.vhd
 src ipbus_extended_example.vhd
 src -c components/ipbus_core ipbus_fabric_sel.vhd
 src ipbus_decode_ipbus_extended_example.vhd
