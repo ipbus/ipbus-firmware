@@ -95,7 +95,8 @@ begin
 
 -- Infrastructure
 
-	infra: entity work.pc053a_infra -- Should work for artix also...
+	-- Should work for artix also...
+	infra: entity work.pc053a_infra 
 		port map(
 			eth_clk_p => eth_clk_p,
 			eth_clk_n => eth_clk_n,
