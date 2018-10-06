@@ -1,0 +1,5 @@
+@device_family = "zynq7000"
+@device_name = "xc7z020"
+@device_package = "clg400"
+@device_speed = "-1"
+@boardname = "microzed_7020"
