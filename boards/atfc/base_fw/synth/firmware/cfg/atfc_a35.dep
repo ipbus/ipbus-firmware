@@ -1,0 +1,10 @@
+@device_family = "artix7"
+@device_name = "xc7a35t"
+@device_package = "fgg484"
+@device_speed = "-1"
+@boardname = "atfc"
+
+setup settings_v7.tcl
+include atfc_infra.dep
+src -c ipbus-firmware:components/ipbus_core ipbus_package.vhd
+src --cd ../ucf atfc.tcl
