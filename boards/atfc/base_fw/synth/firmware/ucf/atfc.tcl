@@ -46,10 +46,9 @@ set_property PACKAGE_PIN C18 [get_ports {leds[6]}]
 set_property PACKAGE_PIN C17 [get_ports {leds[7]}]
 false_path {leds[*]} eth_refclk
 
-#set_property IOSTANDARD LVCMOS33 [get_ports {dip_sw[*]}]
-#set_property PACKAGE_PIN AA18 [get_ports {dip_sw[0]}]
-#set_property PACKAGE_PIN AA19 [get_ports {dip_sw[1]}]
-#set_property PACKAGE_PIN AA20 [get_ports {dip_sw[2]}]
-#set_property PACKAGE_PIN AA21 [get_ports {dip_sw[3]}]
-#false_path {dip_sw[*]} eth_refclk
-
+set_property IOSTANDARD LVCMOS33 [get_ports {dip_sw[*]}]
+set_property PACKAGE_PIN P17 [get_ports {dip_sw[0]}]
+set_property PACKAGE_PIN R18 [get_ports {dip_sw[1]}]
+set_property PACKAGE_PIN T18 [get_ports {dip_sw[2]}]
+set_property PACKAGE_PIN N17 [get_ports {dip_sw[3]}]
+false_path {dip_sw[*]} eth_refclk
