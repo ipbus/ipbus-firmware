@@ -36,6 +36,9 @@ use IEEE.STD_LOGIC_1164.ALL;
 use work.ipbus.all;
 
 entity sim_infra is
+	generic(
+		CLK_AUX_FREQ: real := 40.0
+	);
 	port(
 		clk_ipb_o: out std_logic; -- IPbus clock
 		rst_ipb_o: out std_logic;
@@ -65,7 +68,7 @@ begin
 		port map(
 			clko125 => clk125,
 			clko25 => clk_ipb_i,
-			clko40 => clk_aux_o,
+			clko_aux => clk_aux_o,
 			nuke => nuke,
 			soft_rst => soft_rst,
 			rsto => rst,
