@@ -23,9 +23,6 @@
 --
 ---------------------------------------------------------------------------------
 
-
--- sp601_infra
---
 -- All board-specific stuff goes here.
 --
 -- Dave Newbold, June 2013
@@ -42,7 +39,7 @@ entity sim_infra is
 	port(
 		clk_ipb_o: out std_logic; -- IPbus clock
 		rst_ipb_o: out std_logic;
-		clk_aux_o: out std_logic; -- 40MHz generated clock
+		clk_aux_o: out std_logic; -- Aux generated clock
 		rst_aux_o: out std_logic;
 		nuke: in std_logic; -- The signal of doom
 		soft_rst: in std_logic; -- The signal of lesser doom
