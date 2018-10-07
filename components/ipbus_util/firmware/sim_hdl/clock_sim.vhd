@@ -62,7 +62,7 @@ begin
 
 	clk125 <= not clk125 after 4 ns;
 	clk25 <= not clk25 after 20 ns;
-	clk_aux <= not clk_aux after ((1000.0 / CLK_AUX_FREQ) / 2.0) ns;
+	clk_aux <= not clk_aux after (500000.0 / CLK_AUX_FREQ) * 1 ps;
 	clk62_5 <= not clk62_5 after 8 ns;
 	
 	clko125 <= clk125;
