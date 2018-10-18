@@ -36,10 +36,13 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity clock_sim is
+	generic(
+		CLK_AUX_FREQ: real := 40.0
+	);
 	port(
 		clko125: out std_logic;
 		clko25: out std_logic;
-		clko40: out std_logic;
+		clko_aux: out std_logic;
 		clko62_5: out std_logic;
 		nuke: in std_logic;
 		soft_rst: in std_logic;
@@ -51,7 +54,7 @@ end clock_sim;
 
 architecture behavioural of clock_sim is
 
-	signal clk125, clk25, clk40, clk62_5, nuke_del, srst: std_logic := '0';
+	signal clk125, clk25, clk_aux, clk62_5, nuke_del, srst: std_logic := '0';
 	signal reset_vec: std_logic_vector(3 downto 0) := X"f";
 	signal rctr: unsigned(3 downto 0) := "0000";
 
@@ -59,12 +62,12 @@ begin
 
 	clk125 <= not clk125 after 4 ns;
 	clk25 <= not clk25 after 20 ns;
-	clk40 <= not clk40 after 12.5 ns;
+	clk_aux <= not clk_aux after (500000.0 / CLK_AUX_FREQ) * 1 ps;
 	clk62_5 <= not clk62_5 after 8 ns;
 	
 	clko125 <= clk125;
 	clko25 <= clk25;
-	clko40 <= clk40;
+	clko_aux <= clk_aux;
 	clko62_5 <= clk62_5;
 	
 	srst <= '1' when rctr /= "0000" else '0';

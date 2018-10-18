@@ -23,9 +23,6 @@
 --
 ---------------------------------------------------------------------------------
 
-
--- sp601_infra
---
 -- All board-specific stuff goes here.
 --
 -- Dave Newbold, June 2013
@@ -36,10 +33,13 @@ use IEEE.STD_LOGIC_1164.ALL;
 use work.ipbus.all;
 
 entity sim_infra is
+	generic(
+		CLK_AUX_FREQ: real := 40.0
+	);
 	port(
 		clk_ipb_o: out std_logic; -- IPbus clock
 		rst_ipb_o: out std_logic;
-		clk_aux_o: out std_logic; -- 40MHz generated clock
+		clk_aux_o: out std_logic; -- Aux generated clock
 		rst_aux_o: out std_logic;
 		nuke: in std_logic; -- The signal of doom
 		soft_rst: in std_logic; -- The signal of lesser doom
@@ -65,7 +65,7 @@ begin
 		port map(
 			clko125 => clk125,
 			clko25 => clk_ipb_i,
-			clko40 => clk_aux_o,
+			clko_aux => clk_aux_o,
 			nuke => nuke,
 			soft_rst => soft_rst,
 			rsto => rst,
