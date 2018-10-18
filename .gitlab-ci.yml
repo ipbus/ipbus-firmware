@@ -236,8 +236,6 @@ run_sim:vivado2016.4:modelsim10.5:
     - docker-device-net-tun
     - xilinx-tools
   stage: quick_checks
-  only:
-    - /^pull-requests.[0-9]+$/
   variables:
     VIVADO_VERSION: "2016.4"
     IPBB_SIMLIB_BASE: /scratch/xilinx-simlibs/modelsim_10.5
