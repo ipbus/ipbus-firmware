@@ -84,12 +84,12 @@ begin
 	
 	clko_ipb <= clk_ipb_b;
 	
-	bufgp40: BUFG port map(
+	bufgaux: BUFG port map(
 		i => clk_aux_i,
 		o => clk_aux_b
 	);
 	
-	clko_aux <= clk_p40_b;
+	clko_aux <= clk_aux_b;
 	
 	bufg200: BUFG port map(
 		i => clk200,
