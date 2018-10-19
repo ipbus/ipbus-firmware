@@ -1,0 +1,2 @@
+include -c boards/zcu102/base_fw/zcu102_basex/synth zcu102_basex.dep
+include -c components/ipbus_util ipbus_example.dep
