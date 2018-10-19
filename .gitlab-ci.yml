@@ -41,6 +41,8 @@ github_commit_status:midway:success:
 github_commit_status:end:failure:
   <<: *jobTemplate_github_commit_status
   stage: final_report
+  only:
+    - /^pull-requests
   when: on_failure
   script:
     - "curl -H \"Authorization: token ${GITHUB_API_TOKEN}\" --data '{\"state\" : \"failure\", \"target_url\" : \"'\"${CI_PROJECT_URL}\"'/pipelines/'\"${CI_PIPELINE_ID}\"'\", \"description\" : \"Jobs have failed in CI pipeline\", \"context\" : \"gitlab-ci\"}' ${GITHUB_REPO_API_URL}/statuses/${CI_COMMIT_SHA}"
