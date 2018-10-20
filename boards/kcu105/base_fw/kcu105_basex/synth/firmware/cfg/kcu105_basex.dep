@@ -25,7 +25,7 @@
 
 setup settings_ku.tcl
 include ku040.dep
-src kcu105_basex.vhd
+src top_kcu105_basex.vhd
 include kcu105_basex_infra.dep
 src -c components/ipbus_core ipbus_package.vhd
 src --cd ../ucf kcu105_basex.tcl
