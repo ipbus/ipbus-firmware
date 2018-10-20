@@ -93,6 +93,7 @@ github_commit_status:end:success:
   stage: builds
   only:
     - /^pull-requests.[0-9]+$/
+    - web
   script:
     - cd work_area/proj/${CI_JOB_NAME#build:}
     - ipbb vivado synth -j3
