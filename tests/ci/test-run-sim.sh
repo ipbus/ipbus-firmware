@@ -74,13 +74,6 @@ if [[ "$PROJ" == "sim" ]]; then
   # Cleanup, send SIGINT to the vsimk process in the current process group
   pkill -SIGINT -g ${VSIM_PGRP} vsimk
   set +x
-else
-  # ipbb proj create vivado -t top_${PROJ}.dep ${PROJ} ipbus-firmware:projects/example
-  # ipbb vivado -p ${PROJ} make-project
-  # ipbb vivado -p ${PROJ} check-syntax
-  # ipbb vivado -p ${PROJ} synth 
-  # ipbb vivado -p ${PROJ} impl 
-  # ipbb vivado -p ${PROJ} bitfile
 fi
 
 exit 0
