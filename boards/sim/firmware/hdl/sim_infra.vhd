@@ -72,7 +72,7 @@ begin
 			rsto_ctrl => rst_ipb_ctrl
 		);
 		
-	rst125 <= rst;
+	rst125 <= rst_ipb_ctrl;
 	rst_ipb <= rst;
 
 	clk_ipb <= clk_ipb_i; -- Best to align delta delays on all clocks for simulation
