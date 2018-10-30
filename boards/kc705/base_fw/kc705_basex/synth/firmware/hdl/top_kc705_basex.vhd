@@ -95,7 +95,7 @@ begin
 -- ipbus slaves live in the entity below, and can expose top-level ports
 -- The ipbus fabric is instantiated within.
 
-	slaves: entity work.payload
+	payload: entity work.payload
 		port map(
 			ipb_clk => clk_ipb,
 			ipb_rst => rst_ipb,
