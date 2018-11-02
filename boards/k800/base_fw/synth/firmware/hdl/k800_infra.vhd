@@ -101,7 +101,6 @@ begin
     );
 
   --  DCM clock generation for internal bus, ethernet
-  -- TODO : Replace use of AXI clock here with external oscillator
   clocks: entity work.clocks_us_serdes
     generic map (
       CLK_FR_FREQ => 200.0

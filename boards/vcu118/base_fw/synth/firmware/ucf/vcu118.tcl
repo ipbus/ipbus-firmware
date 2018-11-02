@@ -22,15 +22,15 @@ set_property BITSTREAM.CONFIG.SPI_FALL_EDGE YES [current_design]
 set_property BITSTREAM.GENERAL.COMPRESS TRUE [current_design]
 set_property BITSTREAM.CONFIG.UNUSEDPIN Pulldown [current_design]
 
-# PCIe Sys Reset
+
+# PCIe
+create_clock -period 10.000 -name pcie_sys_clk [get_ports pcie_sys_clk_p]
+set_property PACKAGE_PIN AC9 [get_ports pcie_sys_clk_p]
+
 set_property IOSTANDARD LVCMOS18 [get_ports pcie_sys_rst_n]
 set_property PACKAGE_PIN AM17 [get_ports pcie_sys_rst_n]
 set_property PULLUP true [get_ports pcie_sys_rst_n]
 set_false_path -from [get_ports pcie_sys_rst_n]
-
-# PCIe Ref Clock
-create_clock -period 10.000 -name sys_clk [get_ports pcie_sys_clk_p]
-set_property PACKAGE_PIN AC9 [get_ports pcie_sys_clk_p]
 
 # PCIe location constraints.  Not sure what is best Clock Root: X5Y5 through to X5Y8
 set_property LOC GTYE4_CHANNEL_X1Y35 [get_cells -hierarchical -filter {NAME =~infra/dma/*GTYE4_CHANNEL_PRIM_INST}]
@@ -39,3 +39,29 @@ set_property USER_CLOCK_ROOT X5Y5 [get_nets -of_objects [get_pins -hierarchical 
 set_property USER_CLOCK_ROOT X5Y5 [get_nets -of_objects [get_pins -hierarchical -filter NAME=~infra/dma/*/phy_clk_i/bufg_gt_intclk/O]]
 set_property USER_CLOCK_ROOT X5Y5 [get_nets -of_objects [get_pins -hierarchical -filter NAME=~infra/dma/*/phy_clk_i/bufg_gt_coreclk/O]]
 set_property USER_CLOCK_ROOT X5Y5 [get_nets -of_objects [get_pins -hierarchical -filter NAME=~infra/dma/*/phy_clk_i/bufg_gt_userclk/O]]
+
+
+# External 300 MHz oscillator
+create_clock -period 3.333 -name osc_clk [get_ports osc_clk_p]
+set_property PACKAGE_PIN F31         [get_ports osc_clk_n] ;# Bank  47 VCCO - VCC1V2_FPGA - IO_L13N_T2L_N1_GC_QBC_47
+set_property IOSTANDARD  DIFF_SSTL12 [get_ports osc_clk_n] ;# Bank  47 VCCO - VCC1V2_FPGA - IO_L13N_T2L_N1_GC_QBC_47
+set_property PACKAGE_PIN G31         [get_ports osc_clk_p] ;# Bank  47 VCCO - VCC1V2_FPGA - IO_L13P_T2L_N0_GC_QBC_47
+set_property IOSTANDARD  DIFF_SSTL12 [get_ports osc_clk_p] ;# Bank  47 VCCO - VCC1V2_FPGA - IO_L13P_T2L_N0_GC_QBC_47
+
+
+# LED pin constraints
+set_property IOSTANDARD  LVCMOS12 [get_ports {leds[*]}]
+set_property PACKAGE_PIN AT32     [get_ports {leds[0]}] ;# Bank  40 VCCO - VCC1V2_FPGA - IO_L19N_T3L_N1_DBC_AD9N_40
+set_property PACKAGE_PIN AV34     [get_ports {leds[1]}] ;# Bank  40 VCCO - VCC1V2_FPGA - IO_T2U_N12_40
+set_property PACKAGE_PIN AY30     [get_ports {leds[2]}] ;# Bank  40 VCCO - VCC1V2_FPGA - IO_T1U_N12_40
+set_property PACKAGE_PIN BB32     [get_ports {leds[3]}] ;# Bank  40 VCCO - VCC1V2_FPGA - IO_L7N_T1L_N1_QBC_AD13N_40
+
+
+# Clock constraints
+create_generated_clock -name axi_clk [get_pins -hierarchical -filter {NAME =~infra/dma/xdma/*/phy_clk_i/bufg_gt_userclk/O}]
+create_generated_clock -name ipbus_clk -source [get_pins infra/clocks/mmcm/CLKIN1] [get_pins infra/clocks/mmcm/CLKOUT1]
+set_clock_groups -asynch -group [get_clocks -include_generated_clocks axi_clk] -group [get_clocks -include_generated_clocks osc_clk]
+set_false_path -from [get_pins infra/clocks/nuke_i_reg/C] -to [get_pins infra/clocks/nuke_d_reg/D]
+set_false_path -from [get_pins infra/clocks/rst_reg/C] -to [get_pins infra/clocks/rst_ipb_ctrl_reg/D]
+set_false_path -from [get_pins infra/clocks/rst_reg/C] -to [get_pins infra/clocks/rst_ipb_reg/D]
+

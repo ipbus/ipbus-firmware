@@ -49,10 +49,10 @@ entity top is
     pcie_sys_rst   : in std_logic;  -- active high reset derived from the
                                     -- active low reset from the pcie edge connector
     -- PCIe lanes
-    pcie_rx_p      : in std_logic_vector(0 downto 0);
-    pcie_rx_n      : in std_logic_vector(0 downto 0);
-    pcie_tx_p      : out std_logic_vector(0 downto 0);
-    pcie_tx_n      : out std_logic_vector(0 downto 0);
+    pcie_rx_p : in std_logic_vector(0 downto 0);
+    pcie_rx_n : in std_logic_vector(0 downto 0);
+    pcie_tx_p : out std_logic_vector(0 downto 0);
+    pcie_tx_n : out std_logic_vector(0 downto 0);
 
     -- External oscillator
     osc_clk_p : in std_logic;
@@ -71,7 +71,7 @@ architecture rtl of top is
   
   signal ipb_out: ipb_wbus;
   signal ipb_in: ipb_rbus;
-  
+
 
 begin
 

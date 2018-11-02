@@ -28,7 +28,7 @@ entity pcie_xdma_axi_usp_if is
 
     pcie_user_lnk_up: out std_logic;
 
-    axi_ms : out axi4mm_ms(araddr(12 downto 0), awaddr(12 downto 0), wdata(63 downto 0));
+    axi_ms : out axi4mm_ms(araddr(15 downto 0), awaddr(15 downto 0), wdata(63 downto 0));
     axi_sm : in axi4mm_sm(rdata(63 downto 0));
 
     -- User interrupts
@@ -57,7 +57,7 @@ architecture rtl of pcie_xdma_axi_usp_if is
   signal msi_vector_width: std_logic_vector ( 2 downto 0 );
   signal msi_enable: std_logic;
 
-  signal axi_ms_i: axi4mm_ms(araddr(12 downto 0), awaddr(12 downto 0), wdata(C_AXI_DATA_WIDTH - 1 downto 0));
+  signal axi_ms_i: axi4mm_ms(araddr(15 downto 0), awaddr(15 downto 0), wdata(C_AXI_DATA_WIDTH - 1 downto 0));
 
   signal cfg_ltssm_state: std_logic_vector ( 5 downto 0 ) ;
 
