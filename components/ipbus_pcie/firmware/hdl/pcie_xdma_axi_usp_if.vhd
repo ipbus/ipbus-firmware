@@ -59,8 +59,6 @@ architecture rtl of pcie_xdma_axi_usp_if is
 
   signal axi_ms_i: axi4mm_ms(araddr(15 downto 0), awaddr(15 downto 0), wdata(C_AXI_DATA_WIDTH - 1 downto 0));
 
-  signal cfg_ltssm_state: std_logic_vector ( 5 downto 0 ) ;
-
   -- components
 
   COMPONENT xdma_0
