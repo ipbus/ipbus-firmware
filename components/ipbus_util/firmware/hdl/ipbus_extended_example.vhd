@@ -138,8 +138,8 @@ begin
 		port map(
 			clk => ipb_clk,
 			reset => ipb_rst,
-			ipbus_in => ipbw(N_SLV_PRAM),
-			ipbus_out => ipbr(N_SLV_PRAM)
+			ipbus_in => ipbw(N_SLV_PORTED_RAM),
+			ipbus_out => ipbr(N_SLV_PORTED_RAM)
 		);
 
 -- Slave Ported RAM 2: 1kword dual-port RAM
@@ -148,8 +148,8 @@ begin
 		port map(
 			clk => ipb_clk,
 			rst => ipb_rst,
-			ipb_in => ipbw(N_SLV_PDPRAM),
-			ipb_out => ipbr(N_SLV_PDPRAM),
+			ipb_in => ipbw(N_SLV_PORTED_DPRAM),
+			ipb_out => ipbr(N_SLV_PORTED_DPRAM),
 			rclk => clk,
 			we => patt_stb,
 			d => patt_data(31 downto 0),
@@ -163,8 +163,8 @@ begin
 		port map(
 			clk => ipb_clk,
 			rst => ipb_rst,
-			ipb_in => ipbw(N_SLV_PDPRAM36),
-			ipb_out => ipbr(N_SLV_PDPRAM36),
+			ipb_in => ipbw(N_SLV_PORTED_DPRAM36),
+			ipb_out => ipbr(N_SLV_PORTED_DPRAM36),
 			rclk => clk,
 			we => patt_stb,
 			d => patt_data(35 downto 0),
@@ -172,15 +172,31 @@ begin
 			addr => patt_addr
 		);
 
-	--  Ported RAM slave 3: 1kword dual-port RAM
+	--  Ported RAM slave 4: 1kword dual-port RAM
 	pram_slave4: entity work.ipbus_ported_dpram72
 		generic map(ADDR_WIDTH => ADDR_WIDTH)
 		port map(
 			clk => ipb_clk,
 			rst => ipb_rst,
-			ipb_in => ipbw(N_SLV_PDPRAM72),
-			ipb_out => ipbr(N_SLV_PDPRAM72),
+			ipb_in => ipbw(N_SLV_PORTED_DPRAM72),
+			ipb_out => ipbr(N_SLV_PORTED_DPRAM72),
 			rclk => clk,
+			we => patt_stb,
+			d => patt_data,
+			q => open,
+			addr => patt_addr
+		);
+
+
+	--  Ported RAM slave 5: 1kword simple dual-port RAM
+	pram_slave5: entity work.ipbus_ported_sdpram72
+		generic map(ADDR_WIDTH => ADDR_WIDTH)
+		port map(
+			clk => ipb_clk,
+			rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_PORTED_SDPRAM72),
+			ipb_out => ipbr(N_SLV_PORTED_SDPRAM72),
+			wclk => clk,
 			we => patt_stb,
 			d => patt_data,
 			--q => open,

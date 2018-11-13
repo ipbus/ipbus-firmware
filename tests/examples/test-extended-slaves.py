@@ -101,13 +101,13 @@ device.dispatch()
 print 'reg A =',hex(val)
 
 # # ----- peephole ram
-# portedram_writeandreadback(device.getNode('pram'))
+# portedram_writeandreadback(device.getNode('ported-ram'))
 
 # # ----- ported ram (32 bits)
-# portedram_writeandreadback(device.getNode('pdpram'))
+# portedram_writeandreadback(device.getNode('ported-dpram'))
 
 # # ----- ported ram (36 bits)
-# portedram_writeandreadback(device.getNode('pdpram36'))
+# portedram_writeandreadback(device.getNode('ported-dpram36'))
 
 # # ----- ram (36 bits)
 # ram_writeandreadback(device.getNode('ram'))
@@ -150,14 +150,14 @@ print '--- After ---'
 # print [ hex(x) for x in valvec[:0x20]]
 
 print '---pdpram 36---'
-valvec = readported(device.getNode('pdpram36'))
+valvec = readported(device.getNode('ported-dpram36'))
 device.dispatch()
 print '\n'.join([
      "%02d %s" % (i,hex(x)) for i,x in enumerate(valvec[:32])
     ])
 
 print '---pdpram 72---'
-valvec = readported(device.getNode('pdpram72'))
+valvec = readported(device.getNode('ported-dpram72'))
 device.dispatch()
 print '\n'.join([
      "%02d %s" % (i,hex(x)) for i,x in enumerate(valvec[:32])

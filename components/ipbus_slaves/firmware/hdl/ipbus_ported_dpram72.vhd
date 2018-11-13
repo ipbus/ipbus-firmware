@@ -117,19 +117,13 @@ begin
 		end if;
 	end process;
 	
-	--with datasrc select q.data <=
-	--	d.data when "00", -- input data source
-	--	qs.data when "01", -- buffer source
-	--	orb & bctr & std_logic_vector(to_unsigned(INDEX, 8)) when "10", -- pattern source
-	--	(others => '0') when others; -- zeroes source
-	
 	with dsel select data_o(17 downto 0) <=
 		data(17 downto 0) when "00",
 		data(35 downto 18) when "01",
 		data(53 downto 36) when "10",
 		data(71 downto 54) when "11",
 		(others => '0') when others;
-	--data_o(17 downto 0) <= data(17 downto 0) when dsel = '0' else data(35 downto 18);
+
 	data_o(31 downto 18) <= (others => '0');
 	
 	ipb_out.ipb_ack <= ipb_in.ipb_strobe;

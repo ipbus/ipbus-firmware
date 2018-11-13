@@ -13,23 +13,24 @@ use ieee.numeric_std.all;
 
 package ipbus_decode_ipbus_extended_example is
 
-  constant IPBUS_SEL_WIDTH: positive := 5; -- Should be enough for now?
+  constant IPBUS_SEL_WIDTH: positive := 4;
   subtype ipbus_sel_t is std_logic_vector(IPBUS_SEL_WIDTH - 1 downto 0);
   function ipbus_sel_ipbus_extended_example(addr : in std_logic_vector(31 downto 0)) return ipbus_sel_t;
 
--- START automatically  generated VHDL the Sat Jul  7 23:39:52 2018 
+-- START automatically  generated VHDL the Mon Nov 12 23:38:24 2018 
   constant N_SLV_CSR: integer := 0;
   constant N_SLV_PATT_GEN: integer := 1;
   constant N_SLV_REG: integer := 2;
-  constant N_SLV_PRAM: integer := 3;
-  constant N_SLV_PDPRAM: integer := 4;
-  constant N_SLV_PDPRAM36: integer := 5;
-  constant N_SLV_PDPRAM72: integer := 6;
-  constant N_SLV_RAM: integer := 7;
-  constant N_SLV_DPRAM: integer := 8;
-  constant N_SLV_DPRAM36: integer := 9;
-  constant N_SLV_SDPRAM72: integer := 10;
-  constant N_SLAVES: integer := 11;
+  constant N_SLV_PORTED_RAM: integer := 3;
+  constant N_SLV_PORTED_DPRAM: integer := 4;
+  constant N_SLV_PORTED_DPRAM36: integer := 5;
+  constant N_SLV_PORTED_DPRAM72: integer := 6;
+  constant N_SLV_PORTED_SDPRAM72: integer := 7;
+  constant N_SLV_RAM: integer := 8;
+  constant N_SLV_DPRAM: integer := 9;
+  constant N_SLV_DPRAM36: integer := 10;
+  constant N_SLV_SDPRAM72: integer := 11;
+  constant N_SLAVES: integer := 12;
 -- END automatically generated VHDL
 
     
@@ -41,7 +42,7 @@ package body ipbus_decode_ipbus_extended_example is
     variable sel: ipbus_sel_t;
   begin
 
--- START automatically  generated VHDL the Sat Jul  7 23:39:52 2018 
+-- START automatically  generated VHDL the Mon Nov 12 23:38:24 2018 
     if    std_match(addr, "---------------0--00-------0000-") then
       sel := ipbus_sel_t(to_unsigned(N_SLV_CSR, IPBUS_SEL_WIDTH)); -- csr / base 0x00000000 / mask 0x0001301e
     elsif std_match(addr, "---------------0--00-------0001-") then
@@ -49,13 +50,15 @@ package body ipbus_decode_ipbus_extended_example is
     elsif std_match(addr, "---------------0--00-------1000-") then
       sel := ipbus_sel_t(to_unsigned(N_SLV_REG, IPBUS_SEL_WIDTH)); -- reg / base 0x00000010 / mask 0x0001301e
     elsif std_match(addr, "---------------0--00-------1001-") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_PRAM, IPBUS_SEL_WIDTH)); -- pram / base 0x00000012 / mask 0x0001301e
+      sel := ipbus_sel_t(to_unsigned(N_SLV_PORTED_RAM, IPBUS_SEL_WIDTH)); -- ported_ram / base 0x00000012 / mask 0x0001301e
     elsif std_match(addr, "---------------0--00-------1010-") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_PDPRAM, IPBUS_SEL_WIDTH)); -- pdpram / base 0x00000014 / mask 0x0001301e
+      sel := ipbus_sel_t(to_unsigned(N_SLV_PORTED_DPRAM, IPBUS_SEL_WIDTH)); -- ported_dpram / base 0x00000014 / mask 0x0001301e
     elsif std_match(addr, "---------------0--00-------1011-") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_PDPRAM36, IPBUS_SEL_WIDTH)); -- pdpram36 / base 0x00000016 / mask 0x0001301e
+      sel := ipbus_sel_t(to_unsigned(N_SLV_PORTED_DPRAM36, IPBUS_SEL_WIDTH)); -- ported_dpram36 / base 0x00000016 / mask 0x0001301e
     elsif std_match(addr, "---------------0--00-------1100-") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_PDPRAM72, IPBUS_SEL_WIDTH)); -- pdpram72 / base 0x00000018 / mask 0x0001301e
+      sel := ipbus_sel_t(to_unsigned(N_SLV_PORTED_DPRAM72, IPBUS_SEL_WIDTH)); -- ported_dpram72 / base 0x00000018 / mask 0x0001301e
+    elsif std_match(addr, "---------------0--00-------1101-") then
+      sel := ipbus_sel_t(to_unsigned(N_SLV_PORTED_SDPRAM72, IPBUS_SEL_WIDTH)); -- ported_sdpram72 / base 0x0000001a / mask 0x0001301e
     elsif std_match(addr, "---------------0--01------------") then
       sel := ipbus_sel_t(to_unsigned(N_SLV_RAM, IPBUS_SEL_WIDTH)); -- ram / base 0x00001000 / mask 0x00013000
     elsif std_match(addr, "---------------0--10------------") then

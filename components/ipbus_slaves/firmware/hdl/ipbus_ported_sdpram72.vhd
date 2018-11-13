@@ -65,6 +65,7 @@ architecture rtl of ipbus_ported_sdpram72 is
 	signal sel: integer range 0 to 2 ** ADDR_WIDTH - 1 := 0;
 	signal rsel: integer range 0 to 2 ** ADDR_WIDTH - 1 := 0;
 	signal ptr: unsigned(ADDR_WIDTH + 1 downto 0);
+	signal data: std_logic_vector(71 downto 0);
 	signal data_o: std_logic_vector(31 downto 0);
 	signal rdata: std_logic_vector(17 downto 0);
 	signal v: std_logic;
@@ -74,13 +75,17 @@ begin
 	process(clk)
 	begin
 		if falling_edge(clk) then
+			-- reset ram pointer
 			if rst = '1' then
 				ptr <= (others => '0');
 			elsif ipb_in.ipb_strobe = '1' then
+				-- Update the ipbus address pointer if writing to the addr register (at 0)
 				if ipb_in.ipb_addr(0) = '0' then
 					if ipb_in.ipb_write = '1' then	
 						ptr <= unsigned(ipb_in.ipb_wdata(ADDR_WIDTH + 1 downto 0));
 					end if;
+
+				-- increment the pointer otherwise
 				else
 					ptr <= ptr + 1;
 				end if;
@@ -89,20 +94,27 @@ begin
 	 end process;
 	
 	sel <= to_integer(unsigned(ptr(ADDR_WIDTH + 1 downto 2)));
-	
-	with ptr(1 downto 0) select rdata <=
-		ram(sel)(71 downto 54) when "11",
-		ram(sel)(53 downto 36) when "10",
-		ram(sel)(35 downto 18) when "01",
-		ram(sel)(17 downto 0) when others;
-	
+		
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			data_o <= X"000" & "00" & rdata;
+			data <= ram(sel);
+			--data_o <= X"000" & "00" & rdata;
 		end if;
 	end process;
-	
+
+	-- Pick the bitrange based on pointer	
+	with ptr(1 downto 0) select rdata <=
+		data(71 downto 54) when "11",
+		data(53 downto 36) when "10",
+		data(35 downto 18) when "01",
+		data(17 downto 0) when "00",
+		(others => '0') when others;
+
+	-- re-build the output 32b word
+	data_o <= X"000" & "00" & rdata;
+
+	-- define valid as reading addr 
 	v <= not ipb_in.ipb_addr(0) or not ipb_in.ipb_write;
 	
 	ipb_out.ipb_ack <= ipb_in.ipb_strobe and v;
