@@ -3,6 +3,7 @@
 import uhal
 import os.path
 import random
+import time
 
 #----------------------------------------------------------
 def readported( ram_node ):
@@ -101,13 +102,13 @@ device.dispatch()
 print 'reg A =',hex(val)
 
 # # ----- peephole ram
-# portedram_writeandreadback(device.getNode('ported-ram'))
+# portedram_writeandreadback(device.getNode('ported_ram'))
 
 # # ----- ported ram (32 bits)
-# portedram_writeandreadback(device.getNode('ported-dpram'))
+# portedram_writeandreadback(device.getNode('ported_dpram'))
 
 # # ----- ported ram (36 bits)
-# portedram_writeandreadback(device.getNode('ported-dpram36'))
+# portedram_writeandreadback(device.getNode('ported_dpram36'))
 
 # # ----- ram (36 bits)
 # ram_writeandreadback(device.getNode('ram'))
@@ -133,6 +134,7 @@ device.getNode('patt_gen.ctrl.fire').write(0x1)
 device.getNode('patt_gen.ctrl.fire').write(0x0)
 device.dispatch()
 
+time.sleep(5)
 # raise SystemExit(0)
 
 print '--- After ---'
@@ -149,18 +151,26 @@ print '--- After ---'
 # device.dispatch()
 # print [ hex(x) for x in valvec[:0x20]]
 
-print '---pdpram 36---'
-valvec = readported(device.getNode('ported-dpram36'))
-device.dispatch()
-print '\n'.join([
-     "%02d %s" % (i,hex(x)) for i,x in enumerate(valvec[:32])
-    ])
+# print '---pdpram 36---'
+# valvec = readported(device.getNode('ported_dpram36'))
+# device.dispatch()
+# print '\n'.join([
+#      "%02d 0x%08x" % (i,x) for i,x in enumerate(valvec[:32])
+#     ])
 
-print '---pdpram 72---'
-valvec = readported(device.getNode('ported-dpram72'))
+# print '---pdpram 72---'
+# valvec = readported(device.getNode('ported_dpram72'))
+# device.dispatch()
+# print '\n'.join([
+#      "%02d 0x%08x" % (i,x) for i,x in enumerate(valvec[:32])
+#     ])
+
+
+print '---spdpram 72---'
+valvec = readported(device.getNode('ported_sdpram72'))
 device.dispatch()
 print '\n'.join([
-     "%02d %s" % (i,hex(x)) for i,x in enumerate(valvec[:32])
+     "%02d 0x%08x" % (i,x) for i,x in enumerate(valvec[:32])
     ])
 
 
