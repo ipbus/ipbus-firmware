@@ -24,11 +24,11 @@
 #-------------------------------------------------------------------------------
 
 
-src payload_extended_example.vhd
-src ipbus_extended_example.vhd
+src payload_ram_tests.vhd
+src ipbus_ram_tests.vhd
 src -c components/ipbus_core ipbus_fabric_sel.vhd
-src ipbus_decode_ipbus_extended_example.vhd
-addrtab -t ipbus_extended_example.xml
+src ipbus_decode_ipbus_ram_tests.vhd
+addrtab -t ipbus_ram_tests.xml
 src patt_gen.vhd
 src -c components/ipbus_slaves ipbus_ported_dpram.vhd ipbus_ported_dpram36.vhd ipbus_ported_dpram72.vhd ipbus_ported_sdpram72.vhd
 src -c components/ipbus_slaves ipbus_dpram.vhd ipbus_dpram36.vhd ipbus_sdpram72.vhd
