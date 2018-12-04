@@ -11,11 +11,11 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use ieee.numeric_std.all;
 
-package ipbus_decode_ipbus_ram_tests is
+package ipbus_decode_rams_tb is
 
   constant IPBUS_SEL_WIDTH: positive := 4;
   subtype ipbus_sel_t is std_logic_vector(IPBUS_SEL_WIDTH - 1 downto 0);
-  function ipbus_sel_ipbus_ram_tests(addr : in std_logic_vector(31 downto 0)) return ipbus_sel_t;
+  function ipbus_sel_rams_tb(addr : in std_logic_vector(31 downto 0)) return ipbus_sel_t;
 
 -- START automatically  generated VHDL the Mon Nov 12 23:38:24 2018 
   constant N_SLV_CSR: integer := 0;
@@ -34,11 +34,11 @@ package ipbus_decode_ipbus_ram_tests is
 -- END automatically generated VHDL
 
     
-end ipbus_decode_ipbus_ram_tests;
+end ipbus_decode_rams_tb;
 
-package body ipbus_decode_ipbus_ram_tests is
+package body ipbus_decode_rams_tb is
 
-  function ipbus_sel_ipbus_ram_tests(addr : in std_logic_vector(31 downto 0)) return ipbus_sel_t is
+  function ipbus_sel_rams_tb(addr : in std_logic_vector(31 downto 0)) return ipbus_sel_t is
     variable sel: ipbus_sel_t;
   begin
 
@@ -75,7 +75,7 @@ package body ipbus_decode_ipbus_ram_tests is
 
     return sel;
 
-  end function ipbus_sel_ipbus_ram_tests;
+  end function ipbus_sel_rams_tb;
 
-end ipbus_decode_ipbus_ram_tests;
+end ipbus_decode_rams_tb;
 

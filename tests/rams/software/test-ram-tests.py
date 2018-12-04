@@ -5,19 +5,20 @@ import os.path
 import random
 import time
 
-#----------------------------------------------------------
-def readported( ram_node ):
+
+# ----------------------------------------------------------
+def readported(ram_node):
 
     addr_node = ram_node.getNode('addr')
     data_node = ram_node.getNode('data')
 
     addr_node.write(0x0)
     return data_node.readBlock(data_node.getSize())
-#----------------------------------------------------------
+# ----------------------------------------------------------
 
 
-#----------------------------------------------------------
-def writeported( ram_node, data ):
+# ----------------------------------------------------------
+def writeported(ram_node, data):
     addr_node = ram_node.getNode('addr')
     data_node = ram_node.getNode('data')
 
@@ -30,11 +31,11 @@ def writeported( ram_node, data ):
     # print 'written  =', data
     addr_node.write(0x0)
     return data_node.writeBlock(data)
-#----------------------------------------------------------
+# ----------------------------------------------------------
 
 
-#----------------------------------------------------------
-def portedram_writeandreadback( pram_node ):
+# ----------------------------------------------------------
+def portedram_writeandreadback(pram_node):
     valvec = readported(pram_node)
     device.dispatch()
 
@@ -51,11 +52,11 @@ def portedram_writeandreadback( pram_node ):
     if not ok:
         print '   First mismatch at:', next( (idx, x, y) for idx, (x, y) in enumerate(zip(in_words, val_vec)) if x!=y )
 
-#----------------------------------------------------------
+# ----------------------------------------------------------
 
 
-#----------------------------------------------------------
-def ram_writeandreadback( ram_node ):
+# ----------------------------------------------------------
+def ram_writeandreadback(ram_node):
     valvec = ram_node.readBlock(ram_node.getSize())
     ram_node.getClient().dispatch()
 
@@ -70,11 +71,10 @@ def ram_writeandreadback( ram_node ):
 
     if not ok:
         print '   First mismatch at:', next( (idx, x, y) for idx, (x, y) in enumerate(zip(in_words, val_vec)) if x!=y )
-#----------------------------------------------------------
+# ----------------------------------------------------------
 
 
-
-reladdrpath = [os.pardir, os.pardir, 'components', 'ipbus_util', 'addr_table', 'ipbus_ram_tests.xml']
+reladdrpath = [os.pardir, os.pardir, 'components', 'ipbus_util', 'addr_table', 'tb_rams.xml']
 addrtabpath = 'file://'+os.path.normpath(os.path.join(os.path.abspath(os.path.dirname(__file__)), *reladdrpath ))
 
 device = uhal.getDevice('SIM', 'ipbusudp-2.0://192.168.201.2:50001', addrtabpath)

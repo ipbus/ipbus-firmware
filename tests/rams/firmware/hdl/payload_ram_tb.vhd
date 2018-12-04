@@ -55,7 +55,7 @@ architecture rtl of payload is
 
 begin
 
-    example: entity work.ipbus_ram_tests
+    example: entity work.rams_tb
         port map(
             ipb_clk => ipb_clk,
             ipb_rst => ipb_rst,

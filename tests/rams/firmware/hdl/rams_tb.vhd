@@ -24,7 +24,7 @@
 ---------------------------------------------------------------------------------
 
 
--- ipbus_ram_tests
+-- tb_rams
 --
 -- selection of different IPBus slaves without actual function,
 -- just for performance evaluation of the IPbus/uhal system
@@ -36,9 +36,9 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use work.ipbus.all;
 use work.ipbus_reg_types.all;
-use work.ipbus_decode_ipbus_ram_tests.all;
+use work.ipbus_decode_tb_rams.all;
 
-entity ipbus_ram_tests is
+entity tb_rams is
 	port(
 		ipb_clk: in std_logic;
 		ipb_rst: in std_logic;
@@ -51,9 +51,9 @@ entity ipbus_ram_tests is
 		userled: out std_logic
 	);
 
-end ipbus_ram_tests;
+end tb_rams;
 
-architecture rtl of ipbus_ram_tests is
+architecture rtl of tb_rams is
 	constant ADDR_WIDTH : positive := 10;
 	constant PATT_DATA_WIDTH : positive := 72;
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
@@ -76,7 +76,7 @@ begin
     port map(
 		ipb_in => ipb_in,
 		ipb_out => ipb_out,
-		sel => ipbus_sel_ipbus_ram_tests(ipb_in.ipb_addr),
+		sel => ipbus_sel_tb_rams(ipb_in.ipb_addr),
 		ipb_to_slaves => ipbw,
 		ipb_from_slaves => ipbr
     );
