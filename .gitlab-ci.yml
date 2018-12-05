@@ -13,7 +13,9 @@ variables:
 
 
 
-.job_template: &jobTemplate_github_commit_status
+# -----------------------------------------------------------------------------
+# GitHub interface jobs
+.job_template: &template_github_commit_status
   image: cern/cc7-base:20170113
   tags:
     - docker
@@ -22,9 +24,8 @@ variables:
     - web
   dependencies: []
 
-
 github_commit_status:start:
-  <<: *jobTemplate_github_commit_status
+  <<: *template_github_commit_status
   stage: initial_report
   when: always
   script:
@@ -32,14 +33,14 @@ github_commit_status:start:
     - "if [[ $CI_COMMIT_REF_NAME =~ ^pull-requests/[0-9]+$ ]]; then curl -H \"Authorization: token ${GITHUB_API_TOKEN}\" --data '{\"state\" : \"pending\", \"target_url\" : \"'\"${CI_PROJECT_URL}\"'/pipelines/'\"${CI_PIPELINE_ID}\"'\", \"description\" : \"CI pipeline has started\", \"context\" : \"gitlab-ci\"}' ${GITHUB_REPO_API_URL}/statuses/${CI_COMMIT_SHA} ; fi"
 
 github_commit_status:midway:success:
-  <<: *jobTemplate_github_commit_status
+  <<: *template_github_commit_status
   stage: midway_report
   when: on_success
   script:
     - "curl -H \"Authorization: token ${GITHUB_API_TOKEN}\" --data '{\"state\" : \"success\", \"target_url\" : \"'\"${CI_PROJECT_URL}\"'/pipelines/'\"${CI_PIPELINE_ID}\"'\", \"description\" : \"CI quick jobs completed successfully!\", \"context\" : \"gitlab-ci-quick\"}' ${GITHUB_REPO_API_URL}/statuses/${CI_COMMIT_SHA}"
 
 github_commit_status:end:failure:
-  <<: *jobTemplate_github_commit_status
+  <<: *template_github_commit_status
   stage: final_report
   only:
     - /^pull-requests
@@ -48,23 +49,26 @@ github_commit_status:end:failure:
     - "curl -H \"Authorization: token ${GITHUB_API_TOKEN}\" --data '{\"state\" : \"failure\", \"target_url\" : \"'\"${CI_PROJECT_URL}\"'/pipelines/'\"${CI_PIPELINE_ID}\"'\", \"description\" : \"Jobs have failed in CI pipeline\", \"context\" : \"gitlab-ci\"}' ${GITHUB_REPO_API_URL}/statuses/${CI_COMMIT_SHA}"
 
 github_commit_status:end:success:
-  <<: *jobTemplate_github_commit_status
+  <<: *template_github_commit_status
   stage: final_report
   only:
     - /^pull-requests.*$/
   when: on_success
   script:
     - "curl -H \"Authorization: token ${GITHUB_API_TOKEN}\" --data '{\"state\" : \"success\", \"target_url\" : \"'\"${CI_PROJECT_URL}\"'/pipelines/'\"${CI_PIPELINE_ID}\"'\", \"description\" : \"CI pipeline completed successfully!\", \"context\" : \"gitlab-ci\"}' ${GITHUB_REPO_API_URL}/statuses/${CI_COMMIT_SHA}"
+# -----------------------------------------------------------------------------
 
 
 
-.job_template: &jobTemplate_base
+# -----------------------------------------------------------------------------
+# Job templates
+.job_template: &template_base
   image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-cc7:2018-10-17__ipbb0.3.5
   before_script:
     - source /software/Xilinx/Vivado/${VIVADO_VERSION}/settings64.sh
 
-.job_template: &jobTemplate_vivado_quick_check
-  <<: *jobTemplate_base
+.job_template: &template_vivado_quick_check
+  <<: *template_base
   tags:
     - docker
     - xilinx-tools
@@ -85,8 +89,8 @@ github_commit_status:end:success:
 
 
 
-.job_template: &jobTemplate_vivado_build
-  <<: *jobTemplate_base
+.job_template: &template_vivado_build
+  <<: *template_base
   tags:
     - docker
     - xilinx-tools
@@ -96,7 +100,7 @@ github_commit_status:end:success:
     - web
   script:
     - cd work_area/proj/${CI_JOB_NAME#build:}
-    - ipbb vivado synth -j3
+    - ipbb vivado synth -j4
     - ipbb vivado impl
     - ipbb vivado bitfile
     - ipbb vivado package
@@ -105,60 +109,61 @@ github_commit_status:end:success:
     paths:
       - work_area/proj/*/package/*.tgz
     expire_in: 2 weeks
+# -----------------------------------------------------------------------------
 
 
 
 quick_check:enclustra_ax3_pm3_a35__2017.4:
-  <<: *jobTemplate_vivado_quick_check
+  <<: *template_vivado_quick_check
   variables:
     VIVADO_VERSION: "2017.4"
     PROJ: enclustra_ax3_pm3_a35
 quick_check:enclustra_ax3_pm3_a35__2018.2:
-  <<: *jobTemplate_vivado_quick_check
+  <<: *template_vivado_quick_check
   variables:
     VIVADO_VERSION: "2018.2"
     PROJ: enclustra_ax3_pm3_a35
 
 quick_check:enclustra_ax3_pm3_a50__2017.4:
-  <<: *jobTemplate_vivado_quick_check
+  <<: *template_vivado_quick_check
   variables:
     VIVADO_VERSION: "2017.4"
     PROJ: enclustra_ax3_pm3_a50
 quick_check:enclustra_ax3_pm3_a50__2018.2:
-  <<: *jobTemplate_vivado_quick_check
+  <<: *template_vivado_quick_check
   variables:
     VIVADO_VERSION: "2018.2"
     PROJ: enclustra_ax3_pm3_a50
 
 quick_check:kc705_basex__2017.4:
-  <<: *jobTemplate_vivado_quick_check
+  <<: *template_vivado_quick_check
   variables:
     VIVADO_VERSION: "2017.4"
     PROJ: kc705_basex
 quick_check:kc705_basex__2018.2:
-  <<: *jobTemplate_vivado_quick_check
+  <<: *template_vivado_quick_check
   variables:
     VIVADO_VERSION: "2018.2"
     PROJ: kc705_basex
 
 quick_check:kc705_gmii__2017.4:
-  <<: *jobTemplate_vivado_quick_check
+  <<: *template_vivado_quick_check
   variables:
     VIVADO_VERSION: "2017.4"
     PROJ: kc705_gmii
 quick_check:kc705_gmii__2018.2:
-  <<: *jobTemplate_vivado_quick_check
+  <<: *template_vivado_quick_check
   variables:
     VIVADO_VERSION: "2018.2"
     PROJ: kc705_gmii
 
 quick_check:kcu105_basex__2017.4:
-  <<: *jobTemplate_vivado_quick_check
+  <<: *template_vivado_quick_check
   variables:
     VIVADO_VERSION: "2017.4"
     PROJ: kcu105_basex
 quick_check:kcu105_basex__2018.2:
-  <<: *jobTemplate_vivado_quick_check
+  <<: *template_vivado_quick_check
   variables:
     VIVADO_VERSION: "2018.2"
     PROJ: kcu105_basex
@@ -166,73 +171,72 @@ quick_check:kcu105_basex__2018.2:
 
 
 build:enclustra_ax3_pm3_a35__2017.4:
-  <<: *jobTemplate_vivado_build
+  <<: *template_vivado_build
   variables:
     VIVADO_VERSION: "2017.4"
   dependencies:
     - quick_check:enclustra_ax3_pm3_a35__2017.4
 build:enclustra_ax3_pm3_a35__2018.2:
-  <<: *jobTemplate_vivado_build
+  <<: *template_vivado_build
   variables:
     VIVADO_VERSION: "2018.2"
   dependencies:
     - quick_check:enclustra_ax3_pm3_a35__2018.2
 
 build:enclustra_ax3_pm3_a50__2017.4:
-  <<: *jobTemplate_vivado_build
+  <<: *template_vivado_build
   variables:
     VIVADO_VERSION: "2017.4"
   dependencies:
     - quick_check:enclustra_ax3_pm3_a50__2017.4
 build:enclustra_ax3_pm3_a50__2018.2:
-  <<: *jobTemplate_vivado_build
+  <<: *template_vivado_build
   variables:
     VIVADO_VERSION: "2018.2"
   dependencies:
     - quick_check:enclustra_ax3_pm3_a50__2018.2
 
 build:kc705_basex__2017.4:
-  <<: *jobTemplate_vivado_build
+  <<: *template_vivado_build
   variables:
     VIVADO_VERSION: "2017.4"
   dependencies:
     - quick_check:kc705_basex__2017.4
 build:kc705_basex__2018.2:
-  <<: *jobTemplate_vivado_build
+  <<: *template_vivado_build
   variables:
     VIVADO_VERSION: "2018.2"
   dependencies:
     - quick_check:kc705_basex__2018.2
 
 build:kc705_gmii__2017.4:
-  <<: *jobTemplate_vivado_build
+  <<: *template_vivado_build
   variables:
     VIVADO_VERSION: "2017.4"
   dependencies:
     - quick_check:kc705_gmii__2017.4
 build:kc705_gmii__2018.2:
-  <<: *jobTemplate_vivado_build
+  <<: *template_vivado_build
   variables:
     VIVADO_VERSION: "2018.2"
   dependencies:
     - quick_check:kc705_gmii__2018.2
 
 build:kcu105_basex__2017.4:
-  <<: *jobTemplate_vivado_build
+  <<: *template_vivado_build
   variables:
     VIVADO_VERSION: "2017.4"
   dependencies:
     - quick_check:kcu105_basex__2017.4
 build:kcu105_basex__2018.2:
-  <<: *jobTemplate_vivado_build
+  <<: *template_vivado_build
   variables:
     VIVADO_VERSION: "2018.2"
   dependencies:
     - quick_check:kcu105_basex__2018.2
 
-
 run_sim:vivado2017.4:modelsim10.6c:
-  <<: *jobTemplate_base
+  <<: *template_base
   tags:
     - docker
     - docker-cap-net-admin
@@ -252,3 +256,30 @@ run_sim:vivado2017.4:modelsim10.6c:
     - cd work_area
     - ln -s ${CI_PROJECT_DIR} src/ipbus-firmware
     - /${CI_PROJECT_DIR}/work_area/src/ipbus-firmware/tests/ci/test-run-sim.sh sim
+
+run_rams_tb_sim:vivado2017.4:modelsim10.6c:
+  <<: *template_base
+  tags:
+    - docker
+    - docker-cap-net-admin
+    - docker-device-net-tun
+    - xilinx-tools
+  stage: quick_checks
+  variables:
+    VIVADO_VERSION: "2018.2"
+    IPBB_SIMLIB_BASE: /scratch/xilinx-simlibs/modelsim_10.6c
+  script:
+    - sudo openvpn --mktun --dev tap0
+    - sudo /sbin/ifconfig tap0 up 192.168.201.1
+    - sudo chmod a+rw /dev/net/tun
+    - export PATH=/software/mentor/modelsim_10.6c/modeltech/bin:$PATH
+    - ipbb init work_area
+    - cd work_area
+    - ln -s ${CI_PROJECT_DIR} src/ipbus-firmware
+    - ipbb proj create vivado rams_tb_sim ipbus-firmware:tests/rams -t top_sim.dep
+    - cd proj/rams_tb_sim
+    - ipbb sim setup-simlib
+    - ipbb sim ipcores
+    - ipbb sim fli
+    - ipbb sim make-project
+    - ./vsim -c work.top -gIP_ADDR='X"c0a8c902"' -do 'run 1ms' -do 'quit'

@@ -74,7 +74,7 @@ def ram_writeandreadback(ram_node):
 # ----------------------------------------------------------
 
 
-reladdrpath = [os.pardir, os.pardir, 'components', 'ipbus_util', 'addr_table', 'tb_rams.xml']
+reladdrpath = [os.pardir, os.pardir, 'components', 'ipbus_util', 'addr_table', 'rams_tb.xml']
 addrtabpath = 'file://'+os.path.normpath(os.path.join(os.path.abspath(os.path.dirname(__file__)), *reladdrpath ))
 
 device = uhal.getDevice('SIM', 'ipbusudp-2.0://192.168.201.2:50001', addrtabpath)
