@@ -240,7 +240,7 @@ run_sim:vivado2017.4:modelsim10.6c:
     - xilinx-tools
   stage: quick_checks
   variables:
-    VIVADO_VERSION: "2017.4"
+    VIVADO_VERSION: "2018.2"
     IPBB_SIMLIB_BASE: /scratch/xilinx-simlibs/modelsim_10.6c
   script:
     - sudo openvpn --mktun --dev tap0
