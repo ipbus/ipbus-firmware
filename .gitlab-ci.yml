@@ -42,8 +42,6 @@ github_commit_status:midway:success:
 github_commit_status:end:failure:
   <<: *template_github_commit_status
   stage: final_report
-  only:
-    - /^pull-requests
   when: on_failure
   script:
     - "curl -H \"Authorization: token ${GITHUB_API_TOKEN}\" --data '{\"state\" : \"failure\", \"target_url\" : \"'\"${CI_PROJECT_URL}\"'/pipelines/'\"${CI_PIPELINE_ID}\"'\", \"description\" : \"Jobs have failed in CI pipeline\", \"context\" : \"gitlab-ci\"}' ${GITHUB_REPO_API_URL}/statuses/${CI_COMMIT_SHA}"
@@ -118,6 +116,7 @@ quick_check:enclustra_ax3_pm3_a35__2017.4:
   variables:
     VIVADO_VERSION: "2017.4"
     PROJ: enclustra_ax3_pm3_a35
+
 quick_check:enclustra_ax3_pm3_a35__2018.2:
   <<: *template_vivado_quick_check
   variables:
