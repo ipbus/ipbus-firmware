@@ -276,7 +276,7 @@ run_rams_tb_sim:vivado2017.4:modelsim10.6c:
     - ipbb init work_area
     - cd work_area
     - ln -s ${CI_PROJECT_DIR} src/ipbus-firmware
-    - ipbb proj create vivado rams_tb_sim ipbus-firmware:tests/rams -t top_sim.dep
+    - ipbb proj create sim rams_tb_sim ipbus-firmware:tests/rams -t top_sim.dep
     - cd proj/rams_tb_sim
     - ipbb sim setup-simlib
     - ipbb sim ipcores
