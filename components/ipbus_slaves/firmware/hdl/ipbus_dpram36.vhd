@@ -63,33 +63,42 @@ end ipbus_dpram36;
 architecture rtl of ipbus_dpram36 is
 
 	type ram_array is array(2 ** ADDR_WIDTH - 1 downto 0) of std_logic_vector(17 downto 0);
-	shared variable ram_bh, ram_th: ram_array := (others => (others => '0'));
+	shared variable ram_bh: ram_array := (others => (others => '0'));
+	shared variable ram_th: ram_array := (others => (others => '0'));
+	--shared variable ram_bh, ram_th: ram_array := (others => (others => '0'));
 	signal sel, rsel: integer range 0 to 2 ** ADDR_WIDTH - 1 := 0;
 	signal ack: std_logic;
+	signal dsel: std_logic;
+	signal wea_b, wea_t: std_logic;
+	signal data: std_logic_vector(35 downto 0);
+	signal data_o: std_logic_vector(31 downto 0);
 
 begin
 
 	sel <= to_integer(unsigned(ipb_in.ipb_addr(ADDR_WIDTH - 1 downto 0)));
+	dsel <= ipb_in.ipb_addr(ADDR_WIDTH);
+	wea_b <= ipb_in.ipb_strobe and ipb_in.ipb_write and not dsel;
+	wea_t <= ipb_in.ipb_strobe and ipb_in.ipb_write and dsel;
 
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			if ipb_in.ipb_addr(ADDR_WIDTH) = '0' then
-				ipb_out.ipb_rdata <= X"000" & "00" & ram_bh(sel); -- Order of statements is important to infer read-first RAM!
-			else
-				ipb_out.ipb_rdata <= X"000" & "00" & ram_th(sel); -- Order of statements is important to infer read-first RAM!
-			end if;				
-			if ipb_in.ipb_strobe='1' and ipb_in.ipb_write='1' then
-				if ipb_in.ipb_addr(ADDR_WIDTH) = '0' then
-					ram_bh(sel) := ipb_in.ipb_wdata(17 downto 0);
-				else
-					ram_th(sel) := ipb_in.ipb_wdata(17 downto 0);
-				end if;
+
+			data <= ram_th(sel) & ram_bh(sel);
+			if wea_b = '1' then
+				ram_bh(sel) := ipb_in.ipb_wdata(17 downto 0);
 			end if;
+
+			if wea_t = '1' then
+				ram_th(sel) := ipb_in.ipb_wdata(17 downto 0);
+			end if;
+
 			ack <= ipb_in.ipb_strobe and not ack;
 		end if;
 	end process;
 	
+	ipb_out.ipb_rdata(17 downto 0) <= data(35 downto 18) when dsel = '1' else data(17 downto 0);
+	ipb_out.ipb_rdata(31 downto 18) <= (others => '0');
 	ipb_out.ipb_ack <= ack;
 	ipb_out.ipb_err <= '0';
 	

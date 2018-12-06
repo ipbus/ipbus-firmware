@@ -57,7 +57,7 @@ echo "#------------------------------------------------"
 echo "Building Project ${PROJ}"
 echo "#------------------------------------------------"
 if [[ "$PROJ" == "sim" ]]; then
-  ipbb proj create sim sim ipbus-firmware:boards/sim
+  ipbb proj create sim -t top_sim.dep sim ipbus-firmware:projects/example 
   ipbb sim -p ${PROJ} setup-simlib
   ipbb sim -p ${PROJ} ipcores
   ipbb sim -p ${PROJ} fli
@@ -74,13 +74,6 @@ if [[ "$PROJ" == "sim" ]]; then
   # Cleanup, send SIGINT to the vsimk process in the current process group
   pkill -SIGINT -g ${VSIM_PGRP} vsimk
   set +x
-else
-  ipbb proj create vivado -t top_${PROJ}.dep ${PROJ} ipbus-firmware:projects/example
-  ipbb vivado -p ${PROJ} make-project
-  ipbb vivado -p ${PROJ} check-syntax
-  # ipbb vivado -p ${PROJ} synth 
-  # ipbb vivado -p ${PROJ} impl 
-  # ipbb vivado -p ${PROJ} bitfile
 fi
 
 exit 0

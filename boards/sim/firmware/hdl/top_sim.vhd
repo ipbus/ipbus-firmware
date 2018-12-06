@@ -49,9 +49,9 @@ end top;
 
 architecture rtl of top is
 
-	signal clk_ipb, rst_ipb, nuke, soft_rst: std_logic;
-	signal ipb_out: ipb_wbus;
-	signal ipb_in: ipb_rbus;
+	signal clk_ipb, rst_ipb, clk_aux, rst_aux, nuke, soft_rst: std_logic;
+	signal ipb_w: ipb_wbus;
+	signal ipb_r: ipb_rbus;
 	
 begin
 
@@ -61,26 +61,27 @@ begin
 		port map(
 			clk_ipb_o => clk_ipb,
 			rst_ipb_o => rst_ipb,
+			clk_aux_o => clk_aux,
+			rst_aux_o => rst_aux,
 			nuke => nuke,
 			soft_rst => soft_rst,
 			mac_addr => MAC_ADDR,
 			ip_addr => IP_ADDR,
-			ipb_in => ipb_in,
-			ipb_out => ipb_out
+			ipb_in => ipb_r,
+			ipb_out => ipb_w
 		);
 		
-	--mac_addr <= X"020ddba1e780"; -- Careful here, arbitrary addresses do not always work
-	--ip_addr <= X"c0a8e780"; -- 192.168.231.128
-
 -- ipbus slaves live in the entity below, and can expose top-level ports
 -- The ipbus fabric is instantiated within.
 
-	slaves: entity work.ipbus_example
+	payload: entity work.payload
 		port map(
 			ipb_clk => clk_ipb,
 			ipb_rst => rst_ipb,
-			ipb_in => ipb_out,
-			ipb_out => ipb_in,
+			ipb_in => ipb_w,
+			ipb_out => ipb_r,
+			clk => clk_aux,
+			rst => rst_aux,
 			nuke => nuke,
 			soft_rst => soft_rst,
 			userled => open

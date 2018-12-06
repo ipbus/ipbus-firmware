@@ -62,9 +62,10 @@ architecture rtl of ipbus_ported_sdpram72 is
 
 	type ram_array is array(2 ** ADDR_WIDTH - 1 downto 0) of std_logic_vector(71 downto 0);
 	shared variable ram: ram_array := (others => (others => '0'));
-	signal sel: integer range 0 to 2 ** ADDR_WIDTH - 1 := 0;
-	signal rsel: integer range 0 to 2 ** ADDR_WIDTH - 1 := 0;
+	signal sel, rsel: integer range 0 to 2 ** ADDR_WIDTH - 1 := 0;
+	signal dsel : std_logic_vector(1 downto 0);
 	signal ptr: unsigned(ADDR_WIDTH + 1 downto 0);
+	signal data: std_logic_vector(71 downto 0);
 	signal data_o: std_logic_vector(31 downto 0);
 	signal rdata: std_logic_vector(17 downto 0);
 	signal v: std_logic;
@@ -74,13 +75,17 @@ begin
 	process(clk)
 	begin
 		if falling_edge(clk) then
+			-- reset ram pointer
 			if rst = '1' then
 				ptr <= (others => '0');
 			elsif ipb_in.ipb_strobe = '1' then
+				-- Update the ipbus address pointer if writing to the addr register (at 0)
 				if ipb_in.ipb_addr(0) = '0' then
 					if ipb_in.ipb_write = '1' then	
 						ptr <= unsigned(ipb_in.ipb_wdata(ADDR_WIDTH + 1 downto 0));
 					end if;
+
+				-- increment the pointer otherwise
 				else
 					ptr <= ptr + 1;
 				end if;
@@ -89,23 +94,32 @@ begin
 	 end process;
 	
 	sel <= to_integer(unsigned(ptr(ADDR_WIDTH + 1 downto 2)));
-	
-	with ptr(1 downto 0) select rdata <=
-		ram(sel)(71 downto 54) when "11",
-		ram(sel)(53 downto 36) when "10",
-		ram(sel)(35 downto 18) when "01",
-		ram(sel)(17 downto 0) when others;
-	
+		
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			data_o <= X"000" & "00" & rdata;
+			dsel <= std_logic_vector(ptr(1 downto 0));
+			data <= ram(sel);
 		end if;
 	end process;
-	
+
+	-- Pick the bitrange based on pointer	
+	with dsel select rdata <=
+		data(71 downto 54) when "11",
+		data(53 downto 36) when "10",
+		data(35 downto 18) when "01",
+		data(17 downto 0) when "00",
+		(others => '0') when others;
+
+	-- re-build the output 32b word
+	data_o <= X"000" & "00" & rdata;
+
+	-- valid ram operations are access to addr 1 (ram) and not write
 	v <= not ipb_in.ipb_addr(0) or not ipb_in.ipb_write;
 	
+	-- read only, ack read commands only
 	ipb_out.ipb_ack <= ipb_in.ipb_strobe and v;
+	-- read only, return error on write attempts
 	ipb_out.ipb_err <= ipb_in.ipb_strobe and not v;
 	
 	ipb_out.ipb_rdata <= std_logic_vector(to_unsigned(0, 32 - ADDR_WIDTH - 2)) & std_logic_vector(ptr)

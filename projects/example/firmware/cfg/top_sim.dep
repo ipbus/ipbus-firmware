@@ -23,8 +23,6 @@
 #
 #-------------------------------------------------------------------------------
 
-
-src top_sim.vhd
-include sim_infra.dep
+include -c boards/sim/ top_sim.dep
 include -c components/ipbus_util ipbus_example.dep
 src -c components/ipbus_core ipbus_package.vhd

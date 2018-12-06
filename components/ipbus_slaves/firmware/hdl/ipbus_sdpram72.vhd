@@ -68,6 +68,7 @@ architecture rtl of ipbus_sdpram72 is
 	shared variable ram: ram_array := (others => (others => '0'));
 	signal sel: integer range 0 to 2 ** ADDR_WIDTH - 3 := 0;
 	signal rsel: integer range 0 to 2 ** ADDR_WIDTH - 1 := 0;
+	signal data: std_logic_vector(71 downto 0);
 	signal rdata: std_logic_vector(17 downto 0);
 	signal ack: std_logic;
 
@@ -75,22 +76,24 @@ begin
 
 	sel <= to_integer(unsigned(ipb_in.ipb_addr(ADDR_WIDTH + 1 downto 2)));
 
-	with ipb_in.ipb_addr(1 downto 0) select rdata <=
-		ram(sel)(71 downto 54) when "11",
-		ram(sel)(53 downto 36) when "10",
-		ram(sel)(35 downto 18) when "01",
-		ral(sel)(17 downto 0) when others;
-
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			ipb_out.ipb_rdata <= X"000" & "00" & rdata;
+			data <= ram(sel);
 			ack <= ipb_in.ipb_strobe and not ack;
 		end if;
 	end process;
 	
+	-- Pick the bitrange based on the ipbus address	
+	with ipb_in.ipb_addr(1 downto 0) select rdata <=
+		data(71 downto 54) when "11",
+		data(53 downto 36) when "10",
+		data(35 downto 18) when "01",
+		data(17 downto 0) when others;
+
 	ipb_out.ipb_ack <= ack and not ipb_in.ipb_write;
 	ipb_out.ipb_err <= ack and ipb_in.ipb_write;
+	ipb_out.ipb_rdata <= X"000" & "00" & rdata;
 	
 	rsel <= to_integer(unsigned(addr));
 	

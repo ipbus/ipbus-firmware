@@ -1,0 +1,51 @@
+<node id="TOP">
+    <node id="csr" address="0x0" description="ctrl/stat register" fwinfo="endpoint;width=1">
+        <node id="ctrl" address="0x0">
+            <node id="rst" mask="0x1"/>
+            <node id="nuke" mask="0x2"/>
+            <node id="led" mask="0x4"/>
+        </node>
+        <node id="stat" address="0x1"/>
+    </node>
+
+    <node id="patt_gen" address="0x2" description="Pattern generator controls" fwinfo="endpoint;width=1">
+        <node id="ctrl" address="0x0">
+            <node id="fire" mask="0x1"/>
+            <node id="mode" mask="0x6"/>
+            <node id="word" mask="0xff000000"/>
+        </node>
+        <!-- <node id="stat" address="0x1"/> -->
+    </node>
+
+    <node id="reg" address="0x10" description="read-write register" fwinfo="endpoint;width=0"/>
+
+    <node id="ported_ram" address="0x12" description="1kword peephole RAM (ported)" fwinfo="endpoint;width=1">
+        <node id="addr" address="0x0"/>
+        <node id="data" mode="port" size="0x400" address="0x1"/>
+    </node>
+
+    <node id="ported_dpram" address="0x14" description="1kword dual-port RAM (ported)" fwinfo="endpoint;width=1">
+        <node id="addr" address="0x0"/>
+        <node id="data" mode="port" size="0x400" address="0x1"/>
+    </node>
+
+    <node id="ported_dpram36" address="0x16" description="1kword dual-port RAM36 (ported)" fwinfo="endpoint;width=1">
+        <node id="addr" address="0x0"/>
+        <node id="data" mode="port" size="0x800" address="0x1"/>
+    </node>
+
+    <node id="ported_dpram72" address="0x18" description="1kword dual-port RAM72 (ported)" fwinfo="endpoint;width=1">
+        <node id="addr" address="0x0"/>
+        <node id="data" mode="port" size="0x800" address="0x1"/>
+    </node>
+
+    <node id="ported_sdpram72" address="0x1a" description="1kword simple dual-port RAM72 (ported)" fwinfo="endpoint;width=1">
+        <node id="addr" address="0x0"/>
+        <node id="data" mode="port" size="0x800" address="0x1"/>
+    </node>
+
+    <node id="ram"     address="0x1000" mode="block" size="0x400" description="1kword RAM" fwinfo="endpoint;width=9"/>
+    <node id="dpram"   address="0x2000" mode="block" size="0x400" description="Dual port RAM" fwinfo="endpoint;width=9"/>
+    <node id="dpram36" address="0x3000" mode="block" size="0x800" description="Dual port RAM (36 bits wide)" fwinfo="endpoint;width=9"/> 
+    <node id="sdpram72" address="0x10000" mode="block" size="0x1000" description="Dual port RAM (72 bits wide)" fwinfo="endpoint;width=9"/> 
+</node>
