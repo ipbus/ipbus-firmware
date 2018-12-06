@@ -4,7 +4,7 @@ use ieee.numeric_std.all;
 use work.ipbus.all;
 use work.ipbus_reg_types.all;
 
-entity patt_gen is
+entity ram_pattern_generator is
     generic (
         ADDR_WIDTH: positive;
         DATA_WIDTH: positive
@@ -20,9 +20,9 @@ entity patt_gen is
         addr : out std_logic_vector(ADDR_WIDTH - 1 downto 0);
         q : out std_logic_vector(DATA_WIDTH - 1 downto 0)  
     );
-end patt_gen;
+end ram_pattern_generator;
 
-architecture rtl of patt_gen is
+architecture rtl of ram_pattern_generator is
 
     constant N_WORDS   : positive := DATA_WIDTH/8+1; -- +1 to be on the safe side wrt rounding
     constant N_WORDS_18B : positive := DATA_WIDTH/18+1; -- +1 to be on the safe side wrt rounding

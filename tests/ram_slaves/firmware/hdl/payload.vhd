@@ -24,10 +24,9 @@
 ---------------------------------------------------------------------------------
 
 
--- payload_extended_example
+-- payload_ram_tb
 --
--- selection of different IPBus slaves without actual function,
--- just for performance evaluation of the IPbus/uhal system
+-- Payload wrapper for the ipbus ram slaves testbench
 --
 -- Alessandro Thea, September 2018
 
@@ -55,7 +54,7 @@ architecture rtl of payload is
 
 begin
 
-    example: entity work.rams_tb
+    example: entity work.ram_slaves_testbench
         port map(
             ipb_clk => ipb_clk,
             ipb_rst => ipb_rst,

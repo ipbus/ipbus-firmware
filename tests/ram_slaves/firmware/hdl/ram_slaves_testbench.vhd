@@ -24,21 +24,19 @@
 ---------------------------------------------------------------------------------
 
 
--- rams_tb
+-- ram_slaves
 --
--- selection of different IPBus slaves without actual function,
--- just for performance evaluation of the IPbus/uhal system
---
--- Kristian Harder, March 2014
--- based on code by Dave Newbold, February 2011
+-- Test entity for the validation of ipbus ram slaves.
+-- Includes a 72b pattern generator and capture logic 
+-- to populate the rams from the payload clock domain.
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use work.ipbus.all;
 use work.ipbus_reg_types.all;
-use work.ipbus_decode_rams_tb.all;
+use work.ipbus_decode_ram_slaves_testbench.all;
 
-entity rams_tb is
+entity ram_slaves_testbench is
 	port(
 		ipb_clk: in std_logic;
 		ipb_rst: in std_logic;
@@ -51,9 +49,9 @@ entity rams_tb is
 		userled: out std_logic
 	);
 
-end rams_tb;
+end ram_slaves_testbench;
 
-architecture rtl of rams_tb is
+architecture rtl of ram_slaves_testbench is
 	constant ADDR_WIDTH : positive := 10;
 	constant PATT_DATA_WIDTH : positive := 72;
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
@@ -76,7 +74,7 @@ begin
     port map(
 		ipb_in => ipb_in,
 		ipb_out => ipb_out,
-		sel => ipbus_sel_rams_tb(ipb_in.ipb_addr),
+		sel => ipbus_sel_ram_slaves_testbench(ipb_in.ipb_addr),
 		ipb_to_slaves => ipbw,
 		ipb_from_slaves => ipbr
     );
@@ -102,7 +100,7 @@ begin
 
 
 -- Slave 0.1: pattern generator
-	patt_gen: entity work.patt_gen
+	patt_gen: entity work.ram_pattern_generator
 		generic map(
 			ADDR_WIDTH => ADDR_WIDTH,
 			DATA_WIDTH => PATT_DATA_WIDTH

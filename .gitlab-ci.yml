@@ -255,7 +255,7 @@ run_sim:vivado2017.4:modelsim10.6c:
     - ln -s ${CI_PROJECT_DIR} src/ipbus-firmware
     - /${CI_PROJECT_DIR}/work_area/src/ipbus-firmware/tests/ci/test-run-sim.sh sim
 
-run_rams_tb_sim:vivado2017.4:modelsim10.6c:
+run_ram_slaves_testbench_sim:vivado2017.4:modelsim10.6c:
   <<: *template_base
   tags:
     - docker
@@ -274,8 +274,8 @@ run_rams_tb_sim:vivado2017.4:modelsim10.6c:
     - ipbb init work_area
     - cd work_area
     - ln -s ${CI_PROJECT_DIR} src/ipbus-firmware
-    - ipbb proj create sim rams_tb_sim ipbus-firmware:tests/rams -t top_sim.dep
-    - cd proj/rams_tb_sim
+    - ipbb proj create sim ram_slvs_tb ipbus-firmware:tests/ram_slaves -t top_sim.dep
+    - cd proj/ram_slvs_tb
     - ipbb sim setup-simlib
     - ipbb sim ipcores
     - ipbb sim fli

@@ -11,11 +11,11 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use ieee.numeric_std.all;
 
-package ipbus_decode_rams_tb is
+package ipbus_decode_ram_slaves_testbench is
 
   constant IPBUS_SEL_WIDTH: positive := 4;
   subtype ipbus_sel_t is std_logic_vector(IPBUS_SEL_WIDTH - 1 downto 0);
-  function ipbus_sel_rams_tb(addr : in std_logic_vector(31 downto 0)) return ipbus_sel_t;
+  function ipbus_sel_ram_slaves_testbench(addr : in std_logic_vector(31 downto 0)) return ipbus_sel_t;
 
 -- START automatically  generated VHDL the Mon Nov 12 23:38:24 2018 
   constant N_SLV_CSR: integer := 0;
@@ -34,11 +34,11 @@ package ipbus_decode_rams_tb is
 -- END automatically generated VHDL
 
     
-end ipbus_decode_rams_tb;
+end ipbus_decode_ram_slaves_testbench;
 
-package body ipbus_decode_rams_tb is
+package body ipbus_decode_ram_slaves_testbench is
 
-  function ipbus_sel_rams_tb(addr : in std_logic_vector(31 downto 0)) return ipbus_sel_t is
+  function ipbus_sel_ram_slaves_testbench(addr : in std_logic_vector(31 downto 0)) return ipbus_sel_t is
     variable sel: ipbus_sel_t;
   begin
 
@@ -46,7 +46,7 @@ package body ipbus_decode_rams_tb is
     if    std_match(addr, "---------------0--00-------0000-") then
       sel := ipbus_sel_t(to_unsigned(N_SLV_CSR, IPBUS_SEL_WIDTH)); -- csr / base 0x00000000 / mask 0x0001301e
     elsif std_match(addr, "---------------0--00-------0001-") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_PATT_GEN, IPBUS_SEL_WIDTH)); -- patt_gen / base 0x00000002 / mask 0x0001301e
+      sel := ipbus_sel_t(to_unsigned(N_SLV_PATT_GEN, IPBUS_SEL_WIDTH)); -- ram_pattern_generator / base 0x00000002 / mask 0x0001301e
     elsif std_match(addr, "---------------0--00-------1000-") then
       sel := ipbus_sel_t(to_unsigned(N_SLV_REG, IPBUS_SEL_WIDTH)); -- reg / base 0x00000010 / mask 0x0001301e
     elsif std_match(addr, "---------------0--00-------1001-") then
@@ -75,7 +75,7 @@ package body ipbus_decode_rams_tb is
 
     return sel;
 
-  end function ipbus_sel_rams_tb;
+  end function ipbus_sel_ram_slaves_testbench;
 
-end ipbus_decode_rams_tb;
+end ipbus_decode_ram_slaves_testbench;
 
