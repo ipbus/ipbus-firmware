@@ -12,7 +12,6 @@ variables:
   IPBUS_DOCKER_REGISTRY: "gitlab-registry.cern.ch/ipbus/ipbus-docker"
 
 
-
 # -----------------------------------------------------------------------------
 # GitHub interface jobs
 .job_template: &template_github_commit_status
