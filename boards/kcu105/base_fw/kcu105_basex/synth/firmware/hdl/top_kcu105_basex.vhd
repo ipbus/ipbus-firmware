@@ -65,6 +65,9 @@ begin
 -- Infrastructure
 
 	infra: entity work.kcu105_basex_infra
+		generic map(
+			CLK_AUX_FREQ => 40.0
+		)
 		port map(
 			sysclk_p => sysclk_p,
 			sysclk_n => sysclk_n,
