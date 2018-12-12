@@ -46,7 +46,8 @@ entity ipbus_ctrs_ported is
 		N_CTRS: natural := 1;
 		CTR_WDS: positive := 1;
 		LIMIT: boolean := true;
-		RST_ON_READ: boolean := false
+		RST_ON_READ: boolean := false;
+		READ_ONLY: boolean := true
 	);
 	port(
 		ipb_clk: in std_logic;
