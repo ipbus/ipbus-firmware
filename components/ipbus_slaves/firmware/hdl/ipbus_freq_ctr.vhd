@@ -1,106 +1,111 @@
----------------------------------------------------------------------------------
---
---   Copyright 2017 - Rutherford Appleton Laboratory and University of Bristol
---
---   Licensed under the Apache License, Version 2.0 (the "License");
---   you may not use this file except in compliance with the License.
---   You may obtain a copy of the License at
---
---       http://www.apache.org/licenses/LICENSE-2.0
---
---   Unless required by applicable law or agreed to in writing, software
---   distributed under the License is distributed on an "AS IS" BASIS,
---   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
---   See the License for the specific language governing permissions and
---   limitations under the License.
---
---                                     - - -
---
---   Additional information about ipbus-firmare and the list of ipbus-firmware
---   contacts are available at
---
---       https://ipbus.web.cern.ch/ipbus
---
----------------------------------------------------------------------------------
-
-
 -- ipbus_freq_ctr
 --
--- Simple clock monitor (inspired by Greg's version)
--- Counts number of pulses on a number of incoming clocks in 64k cycles of ipbus clock
--- i.e. for ~32MHz ipb clock, deals with up to 500MHz.
--- Will not deal with very slow clocks (<10MHz) reliably.
+-- General clock frequency monitor
 --
--- Dave Newbold, June 2013
+-- Optimised to measure a large number of clocks, without requiring large resources
+-- in each local clock domain (e.g. for monitoring transceiver clocks)
+--
+-- Counts number of pulses of the (divided by 64) clock in 16M cycles of ipbus clock
+-- Should deal with clocks between 1MHz and ~320MHz
+--
+-- Dave Newbold, September 2013
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use ieee.numeric_std.all;
 use work.ipbus.all;
+use work.ipbus_reg_types.all;
+library unisim;
+use unisim.VComponents.all;
 
 entity ipbus_freq_ctr is
 	generic(
-		ADDR_WIDTH: natural := 0
+		N_CLK: natural := 1
 	);
 	port(
 		clk: in std_logic;
 		rst: in std_logic;
 		ipb_in: in ipb_wbus;
 		ipb_out: out ipb_rbus;
-		clkin: in std_logic_vector(2 ** addr_width - 1 downto 0)
+		clkdiv: in std_logic_vector(N_CLK - 1 downto 0)
 	);
+
+begin
+	
+	assert N_CLK <= 16
+		report "Too many clocks for freq_ctr"
+		severity failure;
 	
 end ipbus_freq_ctr;
 
 architecture rtl of ipbus_freq_ctr is
 
-	constant n_clk: natural := 2 ** ADDR_WIDTH;
-	signal ctr_s: unsigned(15 downto 0) := X"0000";
-	type ctr_array is array(n_clk - 1 downto 0) of unsigned(23 downto 0);
-	signal ctr: ctr_array := (others => X"000000");
-	signal samp, samp_i: ctr_array;
-	signal go: std_logic;
-	signal go_s, go_s2, go_s3: std_logic_vector(n_clk - 1 downto 0);
-	signal sel: integer range 0 to 2 ** ADDR_WIDTH := 0;
+	constant ADDR_WIDTH: integer := calc_width(N_CLK);
+	signal sel: integer range 0 to 2 ** ADDR_WIDTH - 1 := 0;
+	signal ctr, tctr, sctr: unsigned(23 downto 0) := X"000000";
+	signal stat, ctrl: ipb_reg_v(0 downto 0);
+	signal cd: std_logic_vector(2 ** ADDR_WIDTH - 1 downto 0) := (others => '0');
+	signal t_in, t, t_d, valid, svalid, cyc: std_logic;
 	
-	attribute KEEP: string;
-	attribute KEEP of go_s: signal is "TRUE"; -- Synchroniser not to be optimised into shreg
+	attribute SHREG_EXTRACT: string;
+	attribute SHREG_EXTRACT of t_in: signal is "no"; -- Synchroniser not to be optimised into shreg
 
 begin
 
-	process(clk)
+	reg: entity work.ipbus_ctrlreg_v
+		generic map(
+			N_CTRL => 1,
+			N_STAT => 1
+		)
+		port map(
+			clk => clk,
+			reset => rst,
+			ipbus_in => ipb_in,
+			ipbus_out => ipb_out,
+			d => stat,
+			q => ctrl
+		);
+		
+	cyc <= ipb_in.ipb_strobe and ipb_in.ipb_write and not ipb_in.ipb_addr(0);
+	sel <= to_integer(unsigned(ctrl(0)(ADDR_WIDTH - 1 downto 0))) when ADDR_WIDTH > 0 else 0;
+	
+	cd(N_CLK - 1 downto 0) <= clkdiv;
+	cd(2 ** ADDR_WIDTH - 1 downto N_CLK) <= (others => '0');
+	
+	process(clk) -- Synchroniser
 	begin
 		if rising_edge(clk) then
-			ctr_s <= ctr_s + 1;
-			if ctr_s = X"0010" then
-				samp_i <= samp; -- Samp has long settling time to avoid domain crossing problems
-			end if;
+			t_in <= cd(sel);
+			t <= t_in;
+			t_d <= t;
 		end if;
 	end process;
 	
-	go <= '1' when ctr_s = X"0000" else '0';
+	process(clk) -- Counters
+	begin
+		if rising_edge(clk) then
+		
+			ctr <= ctr + 1;
 
-	sel <= to_integer(unsigned(ipb_in.ipb_addr(ADDR_WIDTH - 1 downto 0))) when ADDR_WIDTH > 0 else 0;	
-	ipb_out.ipb_rdata <= X"00" & std_logic_vector(samp_i(sel));
-	ipb_out.ipb_ack <= ipb_in.ipb_strobe and not ipb_in.ipb_write;
-	ipb_out.ipb_err <= '0';
-
-	c_gen: for i in n_clk - 1 downto 0 generate
-		process(clkin(i))
-		begin
-			if rising_edge(clkin(i)) then
-				go_s(i) <= go;
-				go_s2(i) <= go_s(i);
-				go_s3(i) <= go_s2(i);
-				ctr(i) <= ctr(i) + 1;
-				if go_s2(i) = '1' and go_s3(i) = '0' then
-					samp(i) <= ctr(i);
-					ctr(i) <= X"000000";
-				else
-					ctr(i) <= ctr(i) + 1;
-				end if;
+			if ctr = X"000000" or (ctr(15 downto 0) = X"0000" and ctrl(0)(4) = '1') then
+				sctr <= tctr;
+				tctr <= X"000000";
+			elsif t = '1' and t_d = '0' then
+				tctr <= tctr + 1;
 			end if;
-		end process;
-	end generate;
 
+			if ctr = X"000000" then
+				svalid <= valid;
+				valid <= '1';
+			elsif cyc = '1' then
+				svalid <= '0';
+				valid <= '0';
+			end if;
+				
+		end if;
+	end process;
+	
+	stat(0) <= "0000000" & svalid & std_logic_vector(sctr) when ctrl(0)(4) = '0' else
+		"0000000" & svalid & std_logic_vector(sctr(15 downto 0)) & X"00";
+	
 end rtl;
