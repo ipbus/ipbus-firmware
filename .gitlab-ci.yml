@@ -166,6 +166,17 @@ quick_check:kcu105_basex__2018.2:
     VIVADO_VERSION: "2018.2"
     PROJ: kcu105_basex
 
+quick_check:zcu102_basex__2017.4:
+  <<: *template_vivado_quick_check
+  variables:
+    VIVADO_VERSION: "2017.4"
+    PROJ: zcu102_basex
+quick_check:zcu102_basex__2018.2:
+  <<: *template_vivado_quick_check
+  variables:
+    VIVADO_VERSION: "2018.2"
+    PROJ: zcu102_basex
+
 
 
 build:enclustra_ax3_pm3_a35__2017.4:
@@ -232,6 +243,21 @@ build:kcu105_basex__2018.2:
     VIVADO_VERSION: "2018.2"
   dependencies:
     - quick_check:kcu105_basex__2018.2
+
+build:zcu102_basex__2017.4:
+  <<: *template_vivado_build
+  variables:
+    VIVADO_VERSION: "2017.4"
+  dependencies:
+    - quick_check:zcu102_basex__2017.4
+build:zcu102_basex__2018.2:
+  <<: *template_vivado_build
+  variables:
+    VIVADO_VERSION: "2018.2"
+  dependencies:
+    - quick_check:zcu102_basex__2018.2
+
+
 
 run_sim:vivado2017.4:modelsim10.6c:
   <<: *template_base

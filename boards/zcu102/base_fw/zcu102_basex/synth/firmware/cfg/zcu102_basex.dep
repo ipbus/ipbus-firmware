@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 #
 #   Copyright 2017 - Rutherford Appleton Laboratory and University of Bristol
@@ -24,42 +23,9 @@
 #
 #-------------------------------------------------------------------------------
 
-
-
-
-SH_SOURCE=${BASH_SOURCE}
-IPBUS_PATH=$(cd $(dirname ${SH_SOURCE})/../.. && pwd)
-WORK_ROOT=$(cd ${IPBUS_PATH}/../.. && pwd)
-
-PROJECTS=(enclustra_ax3_pm3_a35 enclustra_ax3_pm3_a50 kc705_basex kc705_gmii kcu105_basex zcu102_basex)
-
-if (( $# != 1 )); then
-  echo "No project specified."
-  echo "Available projects:" $(printf "'%s' " "${PROJECTS[@]}")
-
-  exit -1
-fi
-PROJ=$1
-if [[ ! " ${PROJECTS[@]} " =~ " ${PROJ} " ]]; then
-  # whatever you want to do when arr doesn't contain value
-  echo "Project ${PROJ} not known."
-  echo "Available projects: ${PROJECTS[@]}"
-  exit -1
-fi
-
-# Stop on the first error
-set -e
-# set -x
-
-cd ${WORK_ROOT}
-rm -rf proj/${PROJ}
-echo "#------------------------------------------------"
-echo "Building Project ${PROJ}"
-echo "#------------------------------------------------"
-ipbb proj create vivado -t top_${PROJ}.dep ${PROJ} ipbus-firmware:projects/example
-ipbb vivado -p ${PROJ} make-project
-ipbb vivado -p ${PROJ} check-syntax
-
-
-
-exit 0
+setup settings_ku.tcl
+include zu9.dep
+src top_zcu102_basex.vhd
+include zcu102_basex_infra.dep
+src -c components/ipbus_core ipbus_package.vhd
+src --cd ../ucf zcu102_basex.tcl
