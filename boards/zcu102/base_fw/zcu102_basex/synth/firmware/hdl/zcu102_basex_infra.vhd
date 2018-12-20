@@ -66,7 +66,7 @@ end zcu102_basex_infra;
 
 architecture rtl of zcu102_basex_infra is
 
-	signal sysclk, clk125, clk_ipb, clk_ipb_i, locked, clk_locked, eth_locked, rst125, rst_ipb, rst_ipb_ctrl, rst_eth, onehz, pkt: std_logic;
+	signal sysclk, clk125, clk_ipb, clk_ipb_i, clk_aux, locked, clk_locked, eth_locked, rst125, rst_ipb, rst_ipb_ctrl, rst_eth, rst_aux, onehz, pkt: std_logic;
 	signal mac_tx_data, mac_rx_data: std_logic_vector(7 downto 0);
 	signal mac_tx_valid, mac_tx_last, mac_tx_error, mac_tx_ready, mac_rx_valid, mac_rx_last, mac_rx_error: std_logic;
 	signal led_p: std_logic_vector(0 downto 0);
@@ -87,6 +87,7 @@ begin
 			clki_fr => sysclk,
 			clki_125 => clk125,
 			clko_ipb => clk_ipb_i,
+			clko_aux => clk_aux,
 			eth_locked => eth_locked,
 			locked => clk_locked,
 			nuke => nuke,
@@ -95,12 +96,15 @@ begin
 			rsto_ipb => rst_ipb,
 			rsto_eth => rst_eth,
 			rsto_ipb_ctrl => rst_ipb_ctrl,
+			rsto_aux => rst_aux,
 			onehz => onehz
 		);
 
 	clk_ipb <= clk_ipb_i; -- Best to align delta delays on all clocks for simulation
 	clk_ipb_o <= clk_ipb_i;
 	rst_ipb_o <= rst_ipb;
+	clk_aux_o <= clk_aux;
+	rst_aux_o <= rst_aux;
 
 	locked <= clk_locked and eth_locked;
 	

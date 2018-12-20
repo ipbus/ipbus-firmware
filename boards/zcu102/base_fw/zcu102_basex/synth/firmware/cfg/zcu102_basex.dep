@@ -25,8 +25,7 @@
 
 setup settings_ku.tcl
 include zu9.dep
-src zcu102_basex.vhd
+src top_zcu102_basex.vhd
 include zcu102_basex_infra.dep
-include -c components/ipbus_util ipbus_example.dep
 src -c components/ipbus_core ipbus_package.vhd
 src --cd ../ucf zcu102_basex.tcl
