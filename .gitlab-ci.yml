@@ -60,7 +60,7 @@ github_commit_status:end:success:
 # -----------------------------------------------------------------------------
 # Job templates
 .job_template: &template_base
-  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-cc7:2018-10-17__ipbb0.3.5
+  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-cc7:2018-12-11__ipbb0.3.10
   before_script:
     - source /software/Xilinx/Vivado/${VIVADO_VERSION}/settings64.sh
 
@@ -269,7 +269,7 @@ run_sim:vivado2017.4:modelsim10.6c:
   stage: quick_checks
   variables:
     VIVADO_VERSION: "2018.2"
-    IPBB_SIMLIB_BASE: /scratch/xilinx-simlibs/modelsim_10.6c
+    IPBB_SIMLIB_BASE: /scratch/xilinx-simlibs
   script:
     - sudo openvpn --mktun --dev tap0
     - sudo /sbin/ifconfig tap0 up 192.168.201.1
@@ -291,7 +291,7 @@ run_ram_slaves_testbench_sim:vivado2017.4:modelsim10.6c:
   stage: quick_checks
   variables:
     VIVADO_VERSION: "2018.2"
-    IPBB_SIMLIB_BASE: /scratch/xilinx-simlibs/modelsim_10.6c
+    IPBB_SIMLIB_BASE: /scratch/xilinx-simlibs
   script:
     - sudo openvpn --mktun --dev tap0
     - sudo /sbin/ifconfig tap0 up 192.168.201.1
