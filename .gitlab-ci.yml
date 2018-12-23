@@ -60,7 +60,7 @@ github_commit_status:end:success:
 # -----------------------------------------------------------------------------
 # Job templates
 .job_template: &template_base
-  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-cc7:2018-12-11__ipbb0.3.10
+  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-cc7:master__ipbb0.3.11
   before_script:
     - source /software/Xilinx/Vivado/${VIVADO_VERSION}/settings64.sh
 
@@ -259,7 +259,7 @@ build:zcu102_basex__2018.2:
 
 
 
-run_sim:vivado2017.4:modelsim10.6c:
+run_sim:vivado2018.2:modelsim10.6c:
   <<: *template_base
   tags:
     - docker
@@ -281,7 +281,7 @@ run_sim:vivado2017.4:modelsim10.6c:
     - ln -s ${CI_PROJECT_DIR} src/ipbus-firmware
     - /${CI_PROJECT_DIR}/work_area/src/ipbus-firmware/tests/ci/test-run-sim.sh sim
 
-run_ram_slaves_testbench_sim:vivado2017.4:modelsim10.6c:
+run_ram_slaves_testbench_sim:vivado2018.2:modelsim10.6c:
   <<: *template_base
   tags:
     - docker
