@@ -30,6 +30,6 @@
 @device_speed = "-2"
 @boardname = "pc051a"
 
-ram_pattern_generatorsrc top_pc051a_sim.vhd
+src top_pc051a_sim.vhd
 include pc051a_infra_sim.dep
 src -c components/ipbus_core ipbus_package.vhd
