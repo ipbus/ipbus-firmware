@@ -24,12 +24,5 @@
 #-------------------------------------------------------------------------------
 
 
-@device_family = "artix7"
-@device_name = "xc7a200t"
-@device_package = "fbg484"
-@device_speed = "-2"
-@boardname = "pc051a"
+include -c boards/sim
 
-src top_pc051a_sim.vhd
-include pc051a_infra_sim.dep
-src -c components/ipbus_core ipbus_package.vhd
