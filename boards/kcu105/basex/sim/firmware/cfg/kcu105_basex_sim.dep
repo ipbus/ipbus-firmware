@@ -24,6 +24,6 @@
 #-------------------------------------------------------------------------------
 
 
-include -c boards/kcu105/base_fw/kcu105_basex/synth ku040.dep
+include -c boards/kcu105/basex/synth ku040.dep
 include -c boards/sim
 

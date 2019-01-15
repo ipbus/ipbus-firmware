@@ -23,6 +23,7 @@
 #
 #-------------------------------------------------------------------------------
 
-include -c boards/zcu102/base_fw/zcu102_basex/synth zu9.dep
+
+include -c boards/pc053a/synth a200.dep
 include -c boards/sim
 
