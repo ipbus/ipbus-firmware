@@ -24,8 +24,8 @@
 #-------------------------------------------------------------------------------
 
 
-setup -c boards/kc705/base_fw/common settings_v7.tcl
-include -c boards/kc705/base_fw/common k325.dep
+setup -c boards/kc705/common settings_v7.tcl
+include -c boards/kc705/common k325.dep
 src top_kc705_gmii.vhd
 include kc705_gmii_infra.dep
 src -c components/ipbus_core ipbus_package.vhd
