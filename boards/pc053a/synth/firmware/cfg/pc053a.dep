@@ -24,5 +24,10 @@
 #-------------------------------------------------------------------------------
 
 
-include -c boards/kc705/gmii/synth top.dep
-include -c components/ipbus_util ipbus_example.dep
+
+setup settings_v7.tcl
+include a200.dep
+src top_pc053a.vhd
+include pc053a_infra.dep
+src -c components/ipbus_core ipbus_package.vhd
+src --cd ../ucf pc053a.tcl

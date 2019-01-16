@@ -23,6 +23,8 @@
 #
 #-------------------------------------------------------------------------------
 
-
-include -c boards/kc705/gmii/synth top.dep
-include -c components/ipbus_util ipbus_example.dep
+@device_family = "artix7"
+@device_name = "xc7a200t"
+@device_package = "fbg484"
+@device_speed = "-2"
+@boardname = "pc053a"

@@ -24,5 +24,7 @@
 #-------------------------------------------------------------------------------
 
 
-include -c boards/kc705/gmii/synth top.dep
-include -c components/ipbus_util ipbus_example.dep
+include -c boards/glib_v3/common glib_v3.dep
+src ../ucf/basex.ucf
+include -c components/glib_infra glib_infra_basex.dep
+
