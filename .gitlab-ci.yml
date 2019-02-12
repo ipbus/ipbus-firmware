@@ -116,10 +116,10 @@ quick_check:enclustra_ax3_pm3_a35__2017.4:
     VIVADO_VERSION: "2017.4"
     PROJ: enclustra_ax3_pm3_a35
 
-quick_check:enclustra_ax3_pm3_a35__2018.2:
+quick_check:enclustra_ax3_pm3_a35__2018.3:
   <<: *template_vivado_quick_check
   variables:
-    VIVADO_VERSION: "2018.2"
+    VIVADO_VERSION: "2018.3"
     PROJ: enclustra_ax3_pm3_a35
 
 quick_check:enclustra_ax3_pm3_a50__2017.4:
@@ -127,10 +127,10 @@ quick_check:enclustra_ax3_pm3_a50__2017.4:
   variables:
     VIVADO_VERSION: "2017.4"
     PROJ: enclustra_ax3_pm3_a50
-quick_check:enclustra_ax3_pm3_a50__2018.2:
+quick_check:enclustra_ax3_pm3_a50__2018.3:
   <<: *template_vivado_quick_check
   variables:
-    VIVADO_VERSION: "2018.2"
+    VIVADO_VERSION: "2018.3"
     PROJ: enclustra_ax3_pm3_a50
 
 quick_check:kc705_basex__2017.4:
@@ -138,10 +138,10 @@ quick_check:kc705_basex__2017.4:
   variables:
     VIVADO_VERSION: "2017.4"
     PROJ: kc705_basex
-quick_check:kc705_basex__2018.2:
+quick_check:kc705_basex__2018.3:
   <<: *template_vivado_quick_check
   variables:
-    VIVADO_VERSION: "2018.2"
+    VIVADO_VERSION: "2018.3"
     PROJ: kc705_basex
 
 quick_check:kc705_gmii__2017.4:
@@ -149,10 +149,10 @@ quick_check:kc705_gmii__2017.4:
   variables:
     VIVADO_VERSION: "2017.4"
     PROJ: kc705_gmii
-quick_check:kc705_gmii__2018.2:
+quick_check:kc705_gmii__2018.3:
   <<: *template_vivado_quick_check
   variables:
-    VIVADO_VERSION: "2018.2"
+    VIVADO_VERSION: "2018.3"
     PROJ: kc705_gmii
 
 quick_check:kcu105_basex__2017.4:
@@ -160,10 +160,10 @@ quick_check:kcu105_basex__2017.4:
   variables:
     VIVADO_VERSION: "2017.4"
     PROJ: kcu105_basex
-quick_check:kcu105_basex__2018.2:
+quick_check:kcu105_basex__2018.3:
   <<: *template_vivado_quick_check
   variables:
-    VIVADO_VERSION: "2018.2"
+    VIVADO_VERSION: "2018.3"
     PROJ: kcu105_basex
 
 quick_check:zcu102_basex__2017.4:
@@ -171,10 +171,10 @@ quick_check:zcu102_basex__2017.4:
   variables:
     VIVADO_VERSION: "2017.4"
     PROJ: zcu102_basex
-quick_check:zcu102_basex__2018.2:
+quick_check:zcu102_basex__2018.3:
   <<: *template_vivado_quick_check
   variables:
-    VIVADO_VERSION: "2018.2"
+    VIVADO_VERSION: "2018.3"
     PROJ: zcu102_basex
 
 
@@ -185,12 +185,12 @@ build:enclustra_ax3_pm3_a35__2017.4:
     VIVADO_VERSION: "2017.4"
   dependencies:
     - quick_check:enclustra_ax3_pm3_a35__2017.4
-build:enclustra_ax3_pm3_a35__2018.2:
+build:enclustra_ax3_pm3_a35__2018.3:
   <<: *template_vivado_build
   variables:
-    VIVADO_VERSION: "2018.2"
+    VIVADO_VERSION: "2018.3"
   dependencies:
-    - quick_check:enclustra_ax3_pm3_a35__2018.2
+    - quick_check:enclustra_ax3_pm3_a35__2018.3
 
 build:enclustra_ax3_pm3_a50__2017.4:
   <<: *template_vivado_build
@@ -198,12 +198,12 @@ build:enclustra_ax3_pm3_a50__2017.4:
     VIVADO_VERSION: "2017.4"
   dependencies:
     - quick_check:enclustra_ax3_pm3_a50__2017.4
-build:enclustra_ax3_pm3_a50__2018.2:
+build:enclustra_ax3_pm3_a50__2018.3:
   <<: *template_vivado_build
   variables:
-    VIVADO_VERSION: "2018.2"
+    VIVADO_VERSION: "2018.3"
   dependencies:
-    - quick_check:enclustra_ax3_pm3_a50__2018.2
+    - quick_check:enclustra_ax3_pm3_a50__2018.3
 
 build:kc705_basex__2017.4:
   <<: *template_vivado_build
@@ -211,12 +211,12 @@ build:kc705_basex__2017.4:
     VIVADO_VERSION: "2017.4"
   dependencies:
     - quick_check:kc705_basex__2017.4
-build:kc705_basex__2018.2:
+build:kc705_basex__2018.3:
   <<: *template_vivado_build
   variables:
-    VIVADO_VERSION: "2018.2"
+    VIVADO_VERSION: "2018.3"
   dependencies:
-    - quick_check:kc705_basex__2018.2
+    - quick_check:kc705_basex__2018.3
 
 build:kc705_gmii__2017.4:
   <<: *template_vivado_build
@@ -224,12 +224,12 @@ build:kc705_gmii__2017.4:
     VIVADO_VERSION: "2017.4"
   dependencies:
     - quick_check:kc705_gmii__2017.4
-build:kc705_gmii__2018.2:
+build:kc705_gmii__2018.3:
   <<: *template_vivado_build
   variables:
-    VIVADO_VERSION: "2018.2"
+    VIVADO_VERSION: "2018.3"
   dependencies:
-    - quick_check:kc705_gmii__2018.2
+    - quick_check:kc705_gmii__2018.3
 
 build:kcu105_basex__2017.4:
   <<: *template_vivado_build
@@ -237,12 +237,12 @@ build:kcu105_basex__2017.4:
     VIVADO_VERSION: "2017.4"
   dependencies:
     - quick_check:kcu105_basex__2017.4
-build:kcu105_basex__2018.2:
+build:kcu105_basex__2018.3:
   <<: *template_vivado_build
   variables:
-    VIVADO_VERSION: "2018.2"
+    VIVADO_VERSION: "2018.3"
   dependencies:
-    - quick_check:kcu105_basex__2018.2
+    - quick_check:kcu105_basex__2018.3
 
 build:zcu102_basex__2017.4:
   <<: *template_vivado_build
@@ -250,16 +250,16 @@ build:zcu102_basex__2017.4:
     VIVADO_VERSION: "2017.4"
   dependencies:
     - quick_check:zcu102_basex__2017.4
-build:zcu102_basex__2018.2:
+build:zcu102_basex__2018.3:
   <<: *template_vivado_build
   variables:
-    VIVADO_VERSION: "2018.2"
+    VIVADO_VERSION: "2018.3"
   dependencies:
-    - quick_check:zcu102_basex__2018.2
+    - quick_check:zcu102_basex__2018.3
 
 
 
-run_sim:vivado2018.2:modelsim10.6c:
+run_sim:vivado2018.3:modelsim10.6c:
   <<: *template_base
   tags:
     - docker
@@ -268,7 +268,7 @@ run_sim:vivado2018.2:modelsim10.6c:
     - xilinx-tools
   stage: quick_checks
   variables:
-    VIVADO_VERSION: "2018.2"
+    VIVADO_VERSION: "2018.3"
     IPBB_SIMLIB_BASE: /scratch/xilinx-simlibs
   script:
     - sudo openvpn --mktun --dev tap0
@@ -281,7 +281,7 @@ run_sim:vivado2018.2:modelsim10.6c:
     - ln -s ${CI_PROJECT_DIR} src/ipbus-firmware
     - /${CI_PROJECT_DIR}/work_area/src/ipbus-firmware/tests/ci/test-run-sim.sh sim
 
-run_ram_slaves_testbench_sim:vivado2018.2:modelsim10.6c:
+run_ram_slaves_testbench_sim:vivado2018.3:modelsim10.6c:
   <<: *template_base
   tags:
     - docker
@@ -290,7 +290,7 @@ run_ram_slaves_testbench_sim:vivado2018.2:modelsim10.6c:
     - xilinx-tools
   stage: quick_checks
   variables:
-    VIVADO_VERSION: "2018.2"
+    VIVADO_VERSION: "2018.3"
     IPBB_SIMLIB_BASE: /scratch/xilinx-simlibs
   script:
     - sudo openvpn --mktun --dev tap0
