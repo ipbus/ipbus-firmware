@@ -11,7 +11,8 @@ set_property IOSTANDARD LVCMOS18 [get_ports pcie_sys_rst]
 set_property PACKAGE_PIN AE15 [get_ports pcie_sys_rst]
 set_false_path -from [get_ports pcie_sys_rst]
 
-set_property LOC PCIE_3_1_X0Y0 [get_cells infra/dma/xdma/inst/pcie3_ip_i/U0/pcie3_uscale_top_inst/pcie3_uscale_wrapper_inst/PCIE_3_1_inst]
+set_property PACKAGE_PIN AM2 [get_ports pcie_rx_p]
+set_property PACKAGE_PIN AM6 [get_ports pcie_tx_p]
 
 
 # EXTERNAL OSCILLATOR:

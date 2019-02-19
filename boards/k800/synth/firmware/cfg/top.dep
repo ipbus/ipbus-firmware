@@ -25,6 +25,7 @@
 
 
 setup settings_ku.tcl
+setup -f xdma_loc.tcl
 
 src top_k800.vhd
 include k800_infra.dep

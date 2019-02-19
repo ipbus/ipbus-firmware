@@ -25,6 +25,7 @@
 
 
 setup settings_vup.tcl
+setup -f xdma_loc.tcl
 
 src top_vcu118.vhd
 include vcu118_infra.dep
