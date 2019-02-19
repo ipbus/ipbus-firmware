@@ -1,2 +1,2 @@
-include -c boards/k800/base_fw/synth top_xdmaBypass.dep
+include -c boards/k800/synth top_xdmaBypass.dep
 include -c components/ipbus_util ipbus_example.dep
