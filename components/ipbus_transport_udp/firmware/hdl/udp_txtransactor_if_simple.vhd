@@ -72,7 +72,7 @@ pkt_id_block: process (mac_clk)
 	pkt_id_buf <= (Others => (Others => '0'));
       elsif ipbus_out_valid = '1' then
 -- Take byte ordering into account and make packet ID big endian...
-        if ipbus_out_hdr(31 downto 24) = x"20" then
+        if ipbus_out_hdr(31 downto 24) = x"30" then
 	  pkt_id_buf(to_integer(unsigned(tx_read_buffer))) <= ipbus_out_hdr(23 downto 8);
 	else
 	  pkt_id_buf(to_integer(unsigned(tx_read_buffer))) <= 
