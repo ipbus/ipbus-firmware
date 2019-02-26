@@ -114,9 +114,9 @@ header_block:  process (mac_clk)
         bufsize := to_unsigned((2**ADDRWIDTH) - 8, 16);
         nbuf := to_unsigned(2**BUFWIDTH, 16);
         next_pkt_id_int := to_unsigned(1, 16);
-        header <= x"200000F1" & x"0000" & 
+        header <= x"300000F1" & x"0000" &
 	std_logic_vector(bufsize) & x"0000" &
-	std_logic_vector(nbuf) & x"200001F0"
+	std_logic_vector(nbuf) & x"300001F0"
 -- pragma translate_off
         after 4 ns
 -- pragma translate_on
@@ -127,7 +127,7 @@ header_block:  process (mac_clk)
 	else
 	  next_pkt_id_int := next_pkt_id_int + 1;
 	end if;
-        header(31 downto 0) <= x"20" & std_logic_vector(next_pkt_id_int) & x"F0"
+        header(31 downto 0) <= x"30" & std_logic_vector(next_pkt_id_int) & x"F0"
 -- pragma translate_off
         after 4 ns
 -- pragma translate_on

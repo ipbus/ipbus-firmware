@@ -323,7 +323,7 @@ ipbus_mask: process(mac_clk)
   end process;
 
 -- UDP payload:
--- IPBus packet header x"20nnnnF0" or x"200000F0"
+-- IPBus packet header x"30nnnnF0" or x"300000F0"
 -- IPBus data...
 bigendian:  process (mac_clk)
   variable reliable_data: std_logic_vector(31 downto 0);
@@ -332,8 +332,8 @@ bigendian:  process (mac_clk)
   begin
     if rising_edge(mac_clk) then
       if rx_reset = '1' then
-        reliable_data := x"20" & next_pkt_id & x"F0";
-        unreliable_data := x"200000F0";
+        reliable_data := x"30" & next_pkt_id & x"F0";
+        unreliable_data := x"300000F0";
         pkt_drop_reliable_i := not enable_125;
         pkt_drop_unreliable := not enable_125;
       elsif mac_rx_valid = '1' then
@@ -365,7 +365,7 @@ bigendian:  process (mac_clk)
   end process;
 
 -- UDP payload:
--- IPBus packet header x"F0nnnn20" or x"F0000020"
+-- IPBus packet header x"F0nnnn30" or x"F0000030"
 -- IPBus data...
 littleendian:  process (mac_clk)
   variable reliable_data: std_logic_vector(31 downto 0);
@@ -375,8 +375,8 @@ littleendian:  process (mac_clk)
     if rising_edge(mac_clk) then
       if rx_reset = '1' then
         reliable_data := x"F0" & next_pkt_id(7 downto 0) &
-	next_pkt_id(15 downto 8)  & x"20";
-        unreliable_data := x"F0000020";
+	next_pkt_id(15 downto 8)  & x"30";
+        unreliable_data := x"F0000030";
         pkt_drop_reliable_i := not enable_125;
         pkt_drop_unreliable := not enable_125;
       elsif mac_rx_valid = '1' then
@@ -409,14 +409,14 @@ littleendian:  process (mac_clk)
 
 -- UDP status request:
 -- UDP LEN (72 = x"48")
--- IPBus packet header x"200000F1"
+-- IPBus packet header x"300000F1"
 status_request:  process (mac_clk)
   variable pkt_data: std_logic_vector(47 downto 0);
   variable pkt_drop: std_logic;
   begin
     if rising_edge(mac_clk) then
       if rx_reset = '1' then
-        pkt_data := x"0048200000F1";
+        pkt_data := x"0048300000F1";
         pkt_drop := not enable_125;
       elsif mac_rx_valid = '1' then
         if pkt_drop_ipbus_sig = '1' then
@@ -437,7 +437,7 @@ status_request:  process (mac_clk)
   end process;
 
 -- UDP resend request:
--- IPBus packet header x"20XXXXF2"
+-- IPBus packet header x"30XXXXF2"
 resend:  process (mac_clk)
   variable pkt_data: std_logic_vector(15 downto 0);
   variable pkt_mask: std_logic_vector(3 downto 0);
@@ -445,7 +445,7 @@ resend:  process (mac_clk)
   begin
     if rising_edge(mac_clk) then
       if rx_reset = '1' then
-        pkt_data := x"20F2";
+        pkt_data := x"30F2";
 	pkt_mask := "0110";
         pkt_drop := not enable_125;
       elsif mac_rx_valid = '1' then
