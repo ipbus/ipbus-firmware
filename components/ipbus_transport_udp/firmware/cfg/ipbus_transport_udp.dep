@@ -26,7 +26,6 @@
 
 # Dependencies for ipbus_core
 
-src ipbus_ctrl.vhd
 src udp_if_flat.vhd
 src udp_buffer_selector.vhd
 src udp_build_arp.vhd
