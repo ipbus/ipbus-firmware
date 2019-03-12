@@ -87,6 +87,6 @@ begin
 	
 	m_ipb_out.ipb_ack <= ack_del(latency);
 	m_ipb_out.ipb_err <= err_del(latency);	
-	s_ipb_out.ipb_strobe <= ipbus_in.ipb_strobe and not got_ack;
+	s_ipb_out.ipb_strobe <= m_ipb_in.ipb_strobe and not got_resp;
 	
 end rtl;
