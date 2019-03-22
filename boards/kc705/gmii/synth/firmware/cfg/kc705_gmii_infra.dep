@@ -25,7 +25,8 @@
 
 
 src kc705_gmii_infra.vhd
-src -c components/ipbus_util clocks_7s_extphy.vhd ipbus_clock_div.vhd led_stretcher.vhd
-include -c components/ipbus_core
+src -c components/ipbus_util clocks/clocks_7s_extphy.vhd ipbus_clock_div.vhd led_stretcher.vhd
+src -c components/ipbus_util masters/ipbus_ctrl.vhd
+include -c components/ipbus_transport_udp
 include -c components/ipbus_eth kc705_gmii.dep
 src -c components/ipbus_core ipbus_fabric_sel.vhd ipbus_package.vhd

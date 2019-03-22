@@ -27,9 +27,10 @@
 src glib_infra.vhd
 src ipbus_decode_glib_infra.vhd
 addrtab -t glib_infra.xml
-src -c components/ipbus_util clocks_v6_serdes_noxtal.vhd ipbus_clock_div.vhd led_stretcher.vhd
+src -c components/ipbus_util clocks/clocks_v6_serdes_noxtal.vhd ipbus_clock_div.vhd led_stretcher.vhd
 include -c components/ipbus_eth v6_sgmii.dep v6_basex.dep
 src i2c_eeprom_read.vhd
-include -c components/ipbus_core
+src -c components/ipbus_util masters/ipbus_ctrl.vhd
+include -c components/ipbus_transport_udp
 src -c components/ipbus_core ipbus_fabric_sel.vhd ipbus_trans_decl.vhd ipbus_package.vhd
 
