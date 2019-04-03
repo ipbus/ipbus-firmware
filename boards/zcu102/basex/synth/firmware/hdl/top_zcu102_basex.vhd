@@ -46,6 +46,7 @@ entity top is port(
 		eth_rx_n: in std_logic;
 		eth_tx_p: out std_logic; -- Ethernet MGT output
 		eth_tx_n: out std_logic;
+                sfp_enable: out std_logic;
 		leds: out std_logic_vector(7 downto 0); -- status LEDs
 		dip_sw: in std_logic_vector(3 downto 0) -- switches
 	);
@@ -89,6 +90,8 @@ begin
 		);
 		
 	leds(7 downto 2) <= "00000" & userled;
+        
+        sfp_enable <= '1';
 		
 	mac_addr <= X"020ddba1151" & dip_sw; -- Careful here, arbitrary addresses do not always work
 	ip_addr <= X"c0a8c81" & dip_sw; -- 192.168.200.16+n
