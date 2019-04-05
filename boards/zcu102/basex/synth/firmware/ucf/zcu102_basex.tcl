@@ -39,29 +39,26 @@ proc false_path {patt clk} {
 	}
 }
 
-# Ethernet RefClk (156MHz, scaled to 125 MHz later)
+# Eth clock: bank 230 MGT RefClk (156MHz, scaled to 125 MHz in the pcs_pma core)
+set_property PACKAGE_PIN C8 [get_ports eth_clk_p]
+set_property PACKAGE_PIN C7 [get_ports eth_clk_n]
 create_clock -period 6.4 -name eth_refclk [get_ports eth_clk_p]
 
 # System clock (125MHz)
-create_clock -period 8 -name sysclk [get_ports sysclk_p]
-
-set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks sysclk] -group [get_clocks -include_generated_clocks [get_clocks -filter {name =~ txoutclk*}]]
-
-# use the top left cage (SFP0) in the onboard quad SFP+ module. eth_tx_p on pin E4, bank 230
-set_property LOC GTHE4_CHANNEL_X1Y12 [get_cells -hier -filter {name=~infra/eth/*/*GTHE4_CHANNEL_PRIM_INST}]
-
-# MGT reference clock for bank 230
-set_property PACKAGE_PIN C8 [get_ports eth_clk_p]
-set_property PACKAGE_PIN C7 [get_ports eth_clk_n]
-
-# MGT reference clock for bank 129
-#set_property PACKAGE_PIN L27 [get_ports eth_clk_p]
-#set_property PACKAGE_PIN L28 [get_ports eth_clk_n]
-
 set_property IOSTANDARD LVDS_25 [get_ports {sysclk_*}]
 set_property PACKAGE_PIN G21 [get_ports sysclk_p]
 set_property PACKAGE_PIN F21 [get_ports sysclk_n]
+create_clock -period 8 -name sysclk [get_ports sysclk_p]
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks sysclk] -group [get_clocks -include_generated_clocks [get_clocks -filter {name =~ txoutclk*}]]
 
+# use the top right cage (SFP0) in the onboard quad SFP+ module. eth_tx_p on pin E4, bank 230
+set_property LOC GTHE4_CHANNEL_X1Y12 [get_cells -hier -filter {name=~infra/eth/*/*GTHE4_CHANNEL_PRIM_INST}]
+
+# SFP0 tx enable
+set_property PACKAGE_PIN A12 [get_ports sfp_enable]
+set_property IOSTANDARD LVCMOS25 [get_ports sfp_enable]
+
+# user LEDs
 set_property IOSTANDARD LVCMOS33 [get_ports {leds[*]}]
 set_property SLEW SLOW [get_ports {leds[*]}]
 set_property PACKAGE_PIN AG14 [get_ports {leds[0]}]
@@ -74,6 +71,7 @@ set_property PACKAGE_PIN AH14 [get_ports {leds[6]}]
 set_property PACKAGE_PIN AL12 [get_ports {leds[7]}]
 false_path {leds[*]} sysclk
 
+# user DIP switches
 set_property IOSTANDARD LVCMOS33 [get_ports {dip_sw[*]}]
 set_property PACKAGE_PIN AN14 [get_ports {dip_sw[0]}]
 set_property PACKAGE_PIN AP14 [get_ports {dip_sw[1]}]
