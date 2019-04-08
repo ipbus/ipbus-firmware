@@ -46,7 +46,7 @@ __attribute__((constructor)) static void cinit()
 	addr.sin_port = htons(IPPORT);
 	addr.sin_addr.s_addr = htonl(IPADDR); 
 	
-	if(bind(fd, (struct sockaddr *)&myaddr, sizeof(myaddr)) < 0) {
+	if(bind(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
 		perror("MYNAME: bind() failed");
 		mti_FatalError();		
 		return;
@@ -74,13 +74,13 @@ __attribute__((constructor)) static void cinit()
     rxnum = 0;
     txnum = 0;
     
-    mti_PrintFormatted("MYNAME: listening on %s:%d\n", inet_ntoa(myaddr.sin_addr), myaddr.sin_port);
+    mti_PrintFormatted("MYNAME: listening on %s:%d\n", inet_ntoa(addr.sin_addr), addr.sin_port);
 }
 
-__attribute__((destructor)) static void cdestruct()
+__attribute__((destructor)) static void cfini()
 {
-  free(rxbuffer);
-  free(txbuffer);
+  free(rxbuf);
+  free(txbuf);
   close(fd);
   mti_PrintFormatted("MYNAME: shut down\n");
 }
@@ -93,8 +93,8 @@ void get_pkt_data (int del_return,
 	static struct timeval tv;
 	int s;
 	struct sockaddr_in addr;
-	socklen_t addrlen = sizeof(remaddr);
-	uint_32t ip;
+	socklen_t addrlen = sizeof(addr);
+	uint32_t ip;
 	
 	if (rxlen == 0){
 		tv.tv_sec = 0;
@@ -121,23 +121,23 @@ void get_pkt_data (int del_return,
 				return;
 			}
 			ip = ntohl(addr.sin_addr.s_addr);
-			*(rxbuffer) = (ip >> 24) & 0xff;
-			*(rxbuffer + 1) = (ip >> 16) & 0xff;
-			*(rxbuffer + 2) = (ip >> 8) & 0xff;
-			*(rxbuffer + 3) = ip & 0xff;
-			*(rxbuffer + 4) = addr.sin_port;			
+			*(rxbuf) = (ip >> 24) & 0xff;
+			*(rxbuf + 1) = (ip >> 16) & 0xff;
+			*(rxbuf + 2) = (ip >> 8) & 0xff;
+			*(rxbuf + 3) = ip & 0xff;
+			*(rxbuf + 4) = addr.sin_port;			
 			rxidx = 0;
 			mti_PrintFormatted("MYNAME: received packet %d from %s:%d, length %d\n", rxnum, inet_ntoa(addr.sin_addr), addr.sin_port, rxlen );
 		}
 	}
 	
 	if(rxidx < rxlen){
-		*mac_data_out = *(rxbuffer + rxidx);
+		*mac_data_out = *(rxbuf + rxidx);
 		*mac_data_valid = 1;
 		rxidx++;
 	}
 	else{
-		mti_PrintFormatted("MYNAME: get_mac_data packet finished\n");
+		mti_PrintFormatted("MYNAME: get_mac_data packet %d finished\n", rxnum);
 		rxlen = 0;
 		*mac_data_out = 0;
 		*mac_data_valid = 0;
@@ -149,42 +149,45 @@ void get_pkt_data (int del_return,
 
 void store_pkt_data(int mac_data_in)
 {
-  /* Store an octet for the outgoing packet */
-  * ( txbuffer+txidx ) = ( unsigned char ) ( mac_data_in & 0xff );
-  txidx++;
-
-  if ( txidx==TAP_MTU )
-  {
-    mti_PrintFormatted ( "fli: put_mac_data data length exceeds MTU\n" );
-    mti_FatalError();
-  }
+	
+	*(txbuf + txidx) = (unsigned char)(mac_data_in & 0xff);
+	txidx++;
+	
+	if(txidx == BUFSZ){
+		mti_PrintFormatted("MYNAME: store_pkt_data buffer overflow\n" );
+		mti_FatalError();
+	}
 
   return;
 }
 
 void put_pkt()
 {
-  /* Send a packet */
-  int txlen;
-  txlen=write ( tun_fd, txbuffer, txidx );
-  
-  if ( txlen < 0 )
-  {
-  	  perror ( "Writing to interface" );
-  	  mti_FatalError();
-  	  return;
-  }
-  
-  if ( txlen!=txidx )
-  {
-    mti_PrintFormatted ( "fli: put_mac_data partial packet write error, length %d\n", txlen);
-    mti_FatalError();
-    return;
-  }
-  else
-  {
-    mti_PrintFormatted ( "fli: put_mac_data send packet of length %d\n", txidx );
-    txidx=0;
-  }
+	
+	struct sockaddr_in addr;
+	int txlen;
+	
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(*(txbuf + 4));
+	addr.sin_addr.s_addr = htonl((*(txbuf) << 24) + (*(txbuf + 1) << 16) + (*(txbuf + 2) << 8) + *(txbuf + 3));
+	
+	txlen = sendto(fd, txbuf + 5, txidx, 0, (struct sockaddr *)&addr, sizeof(addr));
+	
+	if (txlen < 0){
+		perror("Writing to interface");
+		mti_FatalError();
+		return;
+	}
+	
+	if (txlen != txidx){
+		mti_PrintFormatted("MYNAME: put_pkt send packet %d write error, length %d\n", txnum, txlen);
+		mti_FatalError();
+		return;
+	}
+	else{
+		mti_PrintFormatted("MYNAME: put_pkt send packet %d, length %d\n", txnum, txidx);
+		txidx = 0;
+		txnum++;
+	}
 }
 
