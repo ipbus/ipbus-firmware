@@ -24,9 +24,6 @@
 #-------------------------------------------------------------------------------
 
 
-src sim_infra.vhd
-src -c components/ipbus_util ../sim_hdl/clock_sim.vhd
-src -c components/ipbus_eth ../sim/eth_mac_sim.vhd
-src -c components/ipbus_util masters/ipbus_ctrl.vhd
-include -c components/ipbus_transport_udp
-include -c components/ipbus_core
+src top_sim_udp.vhd
+include sim_udp_infra.dep
+src -c components/ipbus_core ipbus_package.vhd

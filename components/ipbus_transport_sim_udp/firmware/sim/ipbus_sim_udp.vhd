@@ -55,8 +55,8 @@ entity ipbus_sim_udp is
 	port(
 		clk_ipb: in std_logic;
   		rst_ipb: in std_logic;
-		t_out: out ipbus_trans_in;
-		t_in: in ipbus_trans_out
+		trans_out: out ipbus_trans_in;
+		trans_in: in ipbus_trans_out
 	);  
   
 end ipbus_sim_udp;
@@ -108,7 +108,7 @@ begin
 		port map(
 			clk => clk_ipb,
 			addr => rxbuf_addr,
-			rda => t_out.rdata,
+			rda => trans_out.rdata,
 			wd => rxbuf_data,
 			wen => rx_valid
 		);
@@ -118,14 +118,14 @@ begin
 			clk => clk_ipb,
 			addr => txbuf_addr,
 			rda => txbuf_data,
-			wd => t_in.wdata,
-			wen => t_in.we
+			wd => trans_in.wdata,
+			wen => trans_in.we
 		);
 		
 -- Address lines
 
-	rxbuf_addr <= t_in.raddr(9 downto 0) when state = WAIT else rx_addr;
-	txbuf_addr <= t_in.waddr(9 downto 0) when state = WAIT else tx_addr;
+	rxbuf_addr <= trans_in.raddr(9 downto 0) when state = WAIT else rx_addr;
+	txbuf_addr <= trans_in.waddr(9 downto 0) when state = WAIT else tx_addr;
 	
 	process(clk_ipb)
 	begin
@@ -143,9 +143,7 @@ begin
 			end if;
 		end if;
 	end process;
-	
-	tx_done = '1' when tx_addr = tx_len else '0';
-	
+		
 -- State machine
 
 	process(clk_ipb)
@@ -169,7 +167,7 @@ begin
 				when ST_WAIT =>
 					if timeout = '1' then
 						state <= ST_IDLE;
-					elsif t_in.pkt_done = '1' then
+					elsif trans_in.pkt_done = '1' then
 						state <= ST_TXPKT;
 					end if;
 -- Transmitting packet
@@ -185,8 +183,8 @@ begin
 	
 -- Handshaking
 	
-	t_out.pkt_rdy <= '1' when state = ST_WAIT else '0';
-	t_out.busy <= '0';
+	trans_out.pkt_rdy <= '1' when state = ST_WAIT else '0';
+	trans_out.busy <= '0';
 
 -- Packet rx	
 
@@ -215,11 +213,11 @@ begin
 		variable data: integer;
 	begin
 		if rising_edge(clk_ipb) then
-			if txbuf_addr = (others => '0') and t_in.we = '1' then
-				tx_len <= unsigned(t_in.wdata(15 downto 0)) + unsigned(t_in.wdata(15 downto 0)) + 1;
+			if trans_in.waddr = (others => '0') and trans_in.we = '1' then
+				tx_len <= unsigned(trans_in.wdata(15 downto 0)) + unsigned(trans_in.wdata(15 downto 0)) + 1;
 			end if;
 			if state = ST_TXPKT then
-				if tx_done = '0' then
+				if tx_done = '0' or txbuf_addr = (others => '0') then
 					data := to_integer(unsigned(txbuf_data));
 					store_mac_data(mac_data_in => data);
 				else
@@ -228,6 +226,8 @@ begin
 			end if;
 		end if;
 	end process;
+	
+	tx_done = '1' when tx_addr = tx_len else '0';
 	
 -- Timeout
 

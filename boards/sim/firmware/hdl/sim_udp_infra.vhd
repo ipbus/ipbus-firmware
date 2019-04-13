@@ -25,14 +25,14 @@
 
 -- All board-specific stuff goes here.
 --
--- Dave Newbold, June 2013
+-- Dave Newbold, April 2019
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
 use work.ipbus.all;
 
-entity sim_infra is
+entity sim_udp_infra is
 	generic(
 		CLK_AUX_FREQ: real := 40.0
 	);
@@ -43,20 +43,18 @@ entity sim_infra is
 		rst_aux_o: out std_logic;
 		nuke: in std_logic; -- The signal of doom
 		soft_rst: in std_logic; -- The signal of lesser doom
-		mac_addr: in std_logic_vector(47 downto 0); -- MAC address
-		ip_addr: in std_logic_vector(31 downto 0); -- IP address
 		ipb_in: in ipb_rbus; -- ipbus
 		ipb_out: out ipb_wbus
 	);
 
-end sim_infra;
+end sim_udp_infra;
 
-architecture rtl of sim_infra is
+architecture rtl of sim_udp_infra is
 
-	signal clk125, clk_ipb, clk_ipb_i, rst, rst125, rst_ipb, rst_ipb_ctrl: std_logic;
-	signal mac_tx_data, mac_rx_data: std_logic_vector(7 downto 0);
-	signal mac_tx_valid, mac_tx_last, mac_tx_error, mac_tx_ready, mac_rx_valid, mac_rx_last, mac_rx_error: std_logic;
-	
+	signal clk_ipb, clk_ipb_i, rst, rsti: std_logic;
+	signal trans_in: ipbus_trans_in;
+	signal trans_out: ipbus_trans_out;	
+
 begin
 
 -- Clock generation for ipbus, ethernet, POR
@@ -66,65 +64,44 @@ begin
 			CLK_AUX_FREQ => CLK_AUX_FREQ
 		)
 		port map(
-			clko125 => clk125,
+			clko125 => open,
 			clko25 => clk_ipb_i,
 			clko_aux => clk_aux_o,
 			nuke => nuke,
 			soft_rst => soft_rst,
 			rsto => rst,
-			rsto_ctrl => rst_ipb_ctrl
+			rsto_ctrl => rsti
 		);
-		
-	rst125 <= rst_ipb_ctrl;
-	rst_ipb <= rst;
 
 	clk_ipb <= clk_ipb_i; -- Best to align delta delays on all clocks for simulation
 	clk_ipb_o <= clk_ipb_i;
 	rst_ipb_o <= rst;
 	rst_aux_o <= rst;
 	
---	Ethernet MAC core and PHY interface
+-- sim UDP transport
 
-	eth: entity work.eth_mac_sim
-		generic map(
-			MULTI_PACKET => true
-		)
+	udp: entity work.ipbus_sim_udp
 		port map(
-			clk => clk125,
-			rst => rst125,
-			tx_data => mac_tx_data,
-			tx_valid => mac_tx_valid,
-			tx_last => mac_tx_last,
-			tx_error => mac_tx_error,
-			tx_ready => mac_tx_ready,
-			rx_data => mac_rx_data,
-			rx_valid => mac_rx_valid,
-			rx_last => mac_rx_last,
-			rx_error => mac_rx_error
+			clk_ipb => clk_ipb,
+			rst_ipb => rsti,
+			trans_out => trans_in,
+			trans_in => trans_out
 		);
-	
--- ipbus control logic
 
-	ipbus: entity work.ipbus_ctrl
-		port map(
-			mac_clk => clk125,
-			rst_macclk => rst125,
-			ipb_clk => clk_ipb,
-			rst_ipb => rst_ipb_ctrl,
-			mac_rx_data => mac_rx_data,
-			mac_rx_valid => mac_rx_valid,
-			mac_rx_last => mac_rx_last,
-			mac_rx_error => mac_rx_error,
-			mac_tx_data => mac_tx_data,
-			mac_tx_valid => mac_tx_valid,
-			mac_tx_last => mac_tx_last,
-			mac_tx_error => mac_tx_error,
-			mac_tx_ready => mac_tx_ready,
+-- IPbus transactor
+
+	trans: entity work.transactor
+		port map (
+			clk => clk_ipb,
+			rst => rsti,
 			ipb_out => ipb_out,
 			ipb_in => ipb_in,
-			mac_addr => mac_addr,
-			ip_addr => ip_addr,
-			pkt => open
+			ipb_req => open,
+			ipb_grant => '1',
+			trans_in => trans_in,
+			trans_out => trans_out,
+			cfg_vector_in => (Others => '0'),
+			cfg_vector_out => open
 		);
 
 end rtl;
