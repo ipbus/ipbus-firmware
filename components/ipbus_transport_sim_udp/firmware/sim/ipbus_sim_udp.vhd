@@ -91,11 +91,10 @@ architecture behavioural of ipbus_sim_udp is
 	
 	constant TIMEOUT_VAL: integer := 32768;
 	
-	signal rxbuf_addr, txbuf_addr, rx_addr, tx_addr: unsigned(9 downto 0);
+	signal rxbuf_addr, txbuf_addr, rx_addr, tx_addr, tx_len: std_logic_vector(9 downto 0);
 	signal rxbuf_data, txbuf_data: std_logic_vector(31 downto 0);
 	signal timer: integer;
-	signal rx_valid, tx_done: std_logic;
-	signal tx_len: unsigned(15 downto 0);
+	signal rx_valid, tx_done, timeout: std_logic;
 	
 	type state_type is (ST_IDLE, ST_RXPKT, ST_WAIT, ST_TXPKT);
 	signal state: state_type;
@@ -108,7 +107,7 @@ begin
 		port map(
 			clk => clk_ipb,
 			addr => rxbuf_addr,
-			rda => trans_out.rdata,
+			rd => trans_out.rdata,
 			wd => rxbuf_data,
 			wen => rx_valid
 		);
@@ -117,15 +116,15 @@ begin
 		port map(
 			clk => clk_ipb,
 			addr => txbuf_addr,
-			rda => txbuf_data,
+			rd => txbuf_data,
 			wd => trans_in.wdata,
 			wen => trans_in.we
 		);
 		
 -- Address lines
 
-	rxbuf_addr <= trans_in.raddr(9 downto 0) when state = WAIT else rx_addr;
-	txbuf_addr <= trans_in.waddr(9 downto 0) when state = WAIT else tx_addr;
+	rxbuf_addr <= trans_in.raddr(9 downto 0) when state = ST_WAIT else rx_addr;
+	txbuf_addr <= trans_in.waddr(9 downto 0) when state = ST_WAIT else tx_addr;
 	
 	process(clk_ipb)
 	begin
@@ -197,7 +196,7 @@ begin
 			del := 1;
 		end if;
 		if rising_edge(clk_ipb) then
-			get_mac_data(del_return => del, mac_data_out => data, mac_data_valid => datav);
+			get_pkt_data(del_return => del, mac_data_out => data, mac_data_valid => datav);
 			rxbuf_data <= std_logic_vector(to_unsigned(data, 32));
 			if datav = 1 then
 				rx_valid <= '1';
@@ -213,21 +212,21 @@ begin
 		variable data: integer;
 	begin
 		if rising_edge(clk_ipb) then
-			if trans_in.waddr = (others => '0') and trans_in.we = '1' then
-				tx_len <= unsigned(trans_in.wdata(15 downto 0)) + unsigned(trans_in.wdata(15 downto 0)) + 1;
+			if trans_in.waddr = (trans_in.waddr'range => '0') and trans_in.we = '1' then
+				tx_len <= std_logic_vector(unsigned(trans_in.wdata(9 downto 0)) + unsigned(trans_in.wdata(9 downto 0)) + 1);
 			end if;
 			if state = ST_TXPKT then
-				if tx_done = '0' or txbuf_addr = (others => '0') then
+				if tx_done = '0' or txbuf_addr = (txbuf_addr'range => '0') then
 					data := to_integer(unsigned(txbuf_data));
-					store_mac_data(mac_data_in => data);
+					store_pkt_data(mac_data_in => data);
 				else
-					put_packet;
+					send_pkt;
 				end if;
 			end if;
 		end if;
 	end process;
 	
-	tx_done = '1' when tx_addr = tx_len else '0';
+	tx_done <= '1' when tx_addr = tx_len else '0';
 	
 -- Timeout
 
