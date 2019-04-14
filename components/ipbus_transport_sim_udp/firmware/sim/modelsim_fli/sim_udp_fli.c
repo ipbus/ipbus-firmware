@@ -18,10 +18,10 @@
 
 #include <mti.h>
 
-#define MYNAME sim_udp_fli
+#define MYNAME "sim_udp"
 #define IPADDR INADDR_ANY /* Always listen on 127.0.0.1:50001 for now */
 #define IPPORT 50001
-#define BUFSZ 512 /* Assuming 1500 octet packets, and UDP datagram smaller than this */
+#define BUFSZ 512 /* In 32b words; assuming 1500 octet packets, and datagram smaller than this */
 #define WAIT_USECS 50000 /* 50ms */
 
 static uint32_t *rxbuf, *txbuf;
@@ -35,10 +35,10 @@ __attribute__((constructor)) static void cinit()
 	
 	struct sockaddr_in addr;
 
-    mti_PrintFormatted ( "MYNAME: initialising\n" );
+    mti_PrintFormatted (MYNAME ": initialising\n");
     
-    if((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-		perror("MYNAME: socket() failed");
+    if((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0){
+		perror(MYNAME ": socket() failed");
 		mti_FatalError();		
 		return;
 	}
@@ -48,21 +48,21 @@ __attribute__((constructor)) static void cinit()
 	addr.sin_addr.s_addr = htonl(IPADDR); 
 	
 	if(bind(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-		perror("MYNAME: bind() failed");
+		perror(MYNAME ": bind() failed");
 		mti_FatalError();		
 		return;
 	}
 
     if(NULL == (rxbuf = (uint32_t*)malloc(BUFSZ)))
     {
-      perror ("MYNAME: rxbuf malloc() failed");
+      perror (MYNAME ": rxbuf malloc() failed");
       mti_FatalError();
       return;
     }
 
     if(NULL == (txbuf = (uint32_t*)malloc(BUFSZ)))
     {
-      perror ("MYNAME: txbuf malloc() failed");
+      perror (MYNAME ": txbuf malloc() failed");
       mti_FatalError();
       return;
     }
@@ -75,7 +75,7 @@ __attribute__((constructor)) static void cinit()
     rxnum = 0;
     txnum = 0;
     
-    mti_PrintFormatted("MYNAME: listening on %s:%d\n", inet_ntoa(addr.sin_addr), addr.sin_port);
+    mti_PrintFormatted(MYNAME ": listening on %s:%d\n", inet_ntoa(addr.sin_addr), addr.sin_port);
 }
 
 __attribute__((destructor)) static void cfini()
@@ -83,7 +83,7 @@ __attribute__((destructor)) static void cfini()
   free(rxbuf);
   free(txbuf);
   close(fd);
-  mti_PrintFormatted("MYNAME: shut down\n");
+  mti_PrintFormatted(MYNAME ": shut down\n");
 }
 
 void get_pkt_data (int del_return,
@@ -104,7 +104,7 @@ void get_pkt_data (int del_return,
 		
 		while((s = select(fd + 1, &fds, NULL, NULL, &tv)) == -1){
 			if(errno != EINTR){
-				perror("MYNAME: select() failed");
+				perror(MYNAME ": select() failed");
 				mti_FatalError();
 				return;
 			}
@@ -118,13 +118,13 @@ void get_pkt_data (int del_return,
 		else{
 			len = recvfrom(fd, buf, BUFSZ * 4, 0, (struct sockaddr *)&addr, &addrlen);
 			if(len < 0){
-				perror ( "Reading from interface" );
+				perror(MYNAME ": recvfrom() failed" );
 				mti_FatalError();
 				return;
 			}
-			mti_PrintFormatted("MYNAME: received packet %d from %s:%d, length %d\n", rxnum, inet_ntoa(addr.sin_addr), addr.sin_port, len );
+			mti_PrintFormatted(MYNAME ": received packet %d from %s:%d, length %d\n", rxnum, inet_ntoa(addr.sin_addr), addr.sin_port, len );
 			if(len % 4 != 0){
-				mti_PrintFormatted("MYNAME: bad length %d\n", len);
+				mti_PrintFormatted(MYNAME ": bad length %d\n", len);
 				mti_FatalError();
 				return;
 			}
@@ -146,7 +146,7 @@ void get_pkt_data (int del_return,
 		rxidx++;
 	}
 	else{
-		mti_PrintFormatted("MYNAME: get_mac_data packet %d finished\n", rxnum);
+		mti_PrintFormatted(MYNAME ": get_mac_data packet %d finished\n", rxnum);
 		rxlen = 0;
 		*mac_data_out = 0;
 		*mac_data_valid = 0;
@@ -163,7 +163,7 @@ void store_pkt_data(int mac_data_in)
 	txidx++;
 	
 	if(txidx == BUFSZ){
-		mti_PrintFormatted("MYNAME: store_pkt_data buffer overflow\n" );
+		mti_PrintFormatted(MYNAME ": store_pkt_data buffer overflow\n" );
 		mti_FatalError();
 	}
 
@@ -193,18 +193,18 @@ void send_pkt()
 	txlen = sendto(fd, buf, (txlen - 3) * 4, 0, (struct sockaddr *)&addr, sizeof(addr));
 	
 	if (txlen < 0){
-		perror("Writing to interface");
+		perror(MYNAME ": sendto() failed");
 		mti_FatalError();
 		return;
 	}
 	
 	if (txlen != txidx){
-		mti_PrintFormatted("MYNAME: send_pkt send packet %d write error, length sent %d\n", txnum, txlen);
+		mti_PrintFormatted(MYNAME ": send_pkt send packet %d write error, length sent %d\n", txnum, txlen);
 		mti_FatalError();
 		return;
 	}
 	else{
-		mti_PrintFormatted("MYNAME: send_pkt send packet %d, index %d, length %d\n", txnum, txbuf[2] & 0xffff, (txidx - 3) * 4);
+		mti_PrintFormatted(MYNAME ": send_pkt send packet %d, index %d, length %d\n", txnum, txbuf[2] & 0xffff, (txidx - 3) * 4);
 		txidx = 0;
 		txnum++;
 	}
