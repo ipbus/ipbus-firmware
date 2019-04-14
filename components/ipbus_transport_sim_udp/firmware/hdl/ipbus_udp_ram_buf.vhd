@@ -59,7 +59,7 @@ begin
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			rda <= ram(sel);
+			rd <= ram(sel);
 			if wen = '1' then
 				ram(sel) := wd;
 			end if;
