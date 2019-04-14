@@ -26,5 +26,5 @@
 
 src sim_udp_infra.vhd
 src -c components/ipbus_util ../sim_hdl/clock_sim.vhd
-src -c components/ipbus_transport_sim_udp ../sim/ipbus_sim_udp.vhd
+include -c components/ipbus_transport_sim_udp
 include -c components/ipbus_core
