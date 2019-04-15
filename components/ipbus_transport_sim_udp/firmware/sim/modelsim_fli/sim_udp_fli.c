@@ -75,7 +75,7 @@ __attribute__((constructor)) static void cinit()
     rxnum = 0;
     txnum = 0;
     
-    mti_PrintFormatted(MYNAME ": listening on %s:%d\n", inet_ntoa(addr.sin_addr), addr.sin_port);
+    mti_PrintFormatted(MYNAME ": listening on %s:%d\n", inet_ntoa(addr.sin_addr), IPPORT);
 }
 
 __attribute__((destructor)) static void cfini()
