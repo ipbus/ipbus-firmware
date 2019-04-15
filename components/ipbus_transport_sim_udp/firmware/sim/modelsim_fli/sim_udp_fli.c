@@ -75,7 +75,7 @@ __attribute__((constructor)) static void cinit()
     rxnum = 0;
     txnum = 0;
     
-    mti_PrintFormatted(MYNAME ": listening on %s:%d\n", inet_ntoa(addr.sin_addr), IPPORT);
+    mti_PrintFormatted(MYNAME ": listening on %s:%d, fd %d\n", inet_ntoa(addr.sin_addr), IPPORT, fd);
 }
 
 __attribute__((destructor)) static void cfini()
@@ -113,11 +113,11 @@ void get_pkt_data (int del_return,
 		if(s == 0){
 			*mac_data_out = 0;
 			*mac_data_valid = 0;
-			mti_PrintFormatted("no data");
+			mti_PrintFormatted("no data\n");
 			return;
 		}
 		else{
-			mti_PrintFormatted("data");
+			mti_PrintFormatted("data\n");
 			len = recvfrom(fd, buf, BUFSZ * 4, 0, (struct sockaddr *)&addr, &addrlen);
 			if(len < 0){
 				perror(MYNAME ": recvfrom() failed" );
