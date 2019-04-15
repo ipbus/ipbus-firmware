@@ -26,7 +26,6 @@
 
 static uint32_t *rxbuf, *txbuf;
 static int fd;
-fd_set fds;
 static int rxidx, txidx, rxlen;
 static uint16_t rxnum, txnum;
 
@@ -66,9 +65,6 @@ __attribute__((constructor)) static void cinit()
       mti_FatalError();
       return;
     }
-
-    FD_ZERO(&fds);
-    FD_SET(fd, &fds);
     
     txidx = 0;
     rxlen = 0;
@@ -92,6 +88,7 @@ void get_pkt_data (int del_return,
 {
 	
 	static struct timeval tv;
+	fd_set fds;
 	int s, i, len;
 	struct sockaddr_in addr;
 	socklen_t addrlen = sizeof(addr);
@@ -101,6 +98,8 @@ void get_pkt_data (int del_return,
 	if (rxlen == 0){
 		tv.tv_sec = 0;
 		tv.tv_usec = (del_return == 0) ? 0 : WAIT_USECS;
+		FD_ZERO(&fds);
+		FD_SET(fd, &fds);		
 		
 		while((s = select(fd + 1, &fds, NULL, NULL, &tv)) == -1){
 			if(errno != EINTR){
@@ -113,11 +112,9 @@ void get_pkt_data (int del_return,
 		if(s == 0){
 			*mac_data_out = 0;
 			*mac_data_valid = 0;
-			mti_PrintFormatted("no data\n");
 			return;
 		}
 		else{
-			mti_PrintFormatted("data\n");
 			len = recvfrom(fd, buf, BUFSZ * 4, 0, (struct sockaddr *)&addr, &addrlen);
 			if(len < 0){
 				perror(MYNAME ": recvfrom() failed" );
@@ -145,6 +142,7 @@ void get_pkt_data (int del_return,
 	if(rxidx < rxlen + 3){
 		*mac_data_out = *(rxbuf + rxidx);
 		*mac_data_valid = 1;
+		mti_PrintFormatted(MYNAME ": get_mac_data packet %d returning data for index %d\n", rxnum, rxidx);
 		rxidx++;
 	}
 	else{
