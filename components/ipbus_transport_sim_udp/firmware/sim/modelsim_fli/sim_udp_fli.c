@@ -113,9 +113,11 @@ void get_pkt_data (int del_return,
 		if(s == 0){
 			*mac_data_out = 0;
 			*mac_data_valid = 0;
+			mti_PrintFormatted("no data");
 			return;
 		}
 		else{
+			mti_PrintFormatted("data");
 			len = recvfrom(fd, buf, BUFSZ * 4, 0, (struct sockaddr *)&addr, &addrlen);
 			if(len < 0){
 				perror(MYNAME ": recvfrom() failed" );
