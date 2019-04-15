@@ -128,12 +128,15 @@ void get_pkt_data (int del_return,
 				return;
 			}
 
+			for(i = 0; i < len; i++){
+				mti_PrintFormatted("%04x: %02x\n", i, (int)buf[i]);
+			}
 			rxlen = len / 4;
 			*(rxbuf) = 0x20000 + rxlen; /* Packet header */
-			*(rxbuf + 1) = ntohl(addr.sin_addr.s_addr); /* Header word 0: return IP address */
-			*(rxbuf + 2) = (ntohs(addr.sin_port) << 16) + rxnum; /* Header word 1: return port and packet number */
+			*(rxbuf + 1) = addr.sin_addr.s_addr; /* Header word 0: return IP address */
+			*(rxbuf + 2) = (addr.sin_port << 16) + rxnum; /* Header word 1: return port and packet number */
 			for(i = 0; i < rxlen; i++){
-				*(rxbuf + i) = ntohl(buf[i * 4] << 24 + buf[i * 4 + 1] << 16 + buf[i * 4 + 2] << 8 + buf[i * 4 + 3]); /* Convert from big-endian network order to local order */
+				*(rxbuf + 3 + i) = ntohl((buf[i * 4] << 24) + (buf[i * 4 + 1] << 16) + (buf[i * 4 + 2] << 8) + buf[i * 4 + 3]); /* Convert from big-endian network order to local order */
 			}
 			rxidx = 0;
 		}
@@ -142,7 +145,7 @@ void get_pkt_data (int del_return,
 	if(rxidx < rxlen + 3){
 		*mac_data_out = *(rxbuf + rxidx);
 		*mac_data_valid = 1;
-		mti_PrintFormatted(MYNAME ": get_mac_data packet %d returning data for index %d\n", rxnum, rxidx);
+		mti_PrintFormatted(MYNAME ": get_mac_data packet %d returning data for index %d: %08x\n", rxnum, rxidx, *(rxbuf + rxidx));
 		rxidx++;
 	}
 	else{
@@ -179,8 +182,8 @@ void send_pkt()
 	unsigned char buf[BUFSZ * 4];
 	
 	addr.sin_family = AF_INET;
-	addr.sin_addr.s_addr = htonl(txbuf[1]);
-	addr.sin_port = htons(txbuf[2] >> 16);
+	addr.sin_addr.s_addr = txbuf[1];
+	addr.sin_port = txbuf[2] >> 16;
 	
 	for(i = 3; i < txidx; i++){
 		w = htonl(*(txbuf + i)); /* Convert from local order to big-endian network order */

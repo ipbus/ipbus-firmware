@@ -96,7 +96,7 @@ architecture behavioural of ipbus_sim_udp is
 	signal timer: integer;
 	signal rx_valid, tx_done, timeout: std_logic;
 	
-	type state_type is (ST_IDLE, ST_RXPKT, ST_WAIT, ST_TXPKT);
+	type state_type is (ST_IDLE, ST_WAIT_PKT, ST_RXPKT, ST_WAIT, ST_TXPKT);
 	signal state: state_type;
 
 begin
@@ -154,6 +154,9 @@ begin
 				case state is
 -- Starting state
 				when ST_IDLE =>
+					state <= ST_WAIT_PKT;
+-- Waiting for packet
+				when ST_WAIT_PKT =>
 					if rx_valid = '1' then
 						state <= ST_RXPKT;
 					end if;
@@ -197,7 +200,7 @@ begin
 		end if;
 		if rising_edge(clk_ipb) then
 			get_pkt_data(del_return => del, mac_data_out => data, mac_data_valid => datav);
-			rxbuf_data <= std_logic_vector(to_unsigned(data, 32));
+			rxbuf_data <= std_logic_vector(to_signed(data, 32));
 			if datav = 1 then
 				rx_valid <= '1';
 			else
