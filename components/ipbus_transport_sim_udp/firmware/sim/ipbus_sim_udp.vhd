@@ -95,9 +95,9 @@ architecture behavioural of ipbus_sim_udp is
 	signal tx_len: std_logic_vector(9 downto 0) := (others => '0');
 	signal rxbuf_data, txbuf_data: std_logic_vector(31 downto 0);
 	signal timer: integer;
-	signal rx_valid, tx_done, timeout, pkt_done_d: std_logic;
+	signal rx_valid, tx_done, timeout: std_logic;
 	
-	type state_type is (ST_IDLE, ST_WAIT_PKT, ST_RXPKT, ST_WAIT, ST_TXPKT);
+	type state_type is (ST_IDLE, ST_WAIT_PKT, ST_RXPKT, ST_RXDEL, ST_WAIT, ST_TXDEL, ST_TXPKT);
 	signal state: state_type;
 
 begin
@@ -124,7 +124,7 @@ begin
 		
 -- Address lines
 
-	rxbuf_addr <= trans_in.raddr(9 downto 0) when state = ST_WAIT else rx_addr;
+	rxbuf_addr <= trans_in.raddr(9 downto 0) when state = ST_WAIT or state = ST_RXDEL else rx_addr;
 	txbuf_addr <= trans_in.waddr(9 downto 0) when state = ST_WAIT else tx_addr;
 	
 	process(clk_ipb)
@@ -137,7 +137,7 @@ begin
 				if rx_valid = '1' then
 					rx_addr <= std_logic_vector(unsigned(rx_addr) + 1);
 				end if;
-				if state = ST_TXPKT then
+				if state = ST_TXPKT or state = ST_TXDEL then
 					tx_addr <= std_logic_vector(unsigned(tx_addr) + 1);
 				end if;
 			end if;
@@ -164,15 +164,21 @@ begin
 -- Receiving packet			
 				when ST_RXPKT =>
 					if rx_valid = '0' then
-						state <= ST_WAIT;
+						state <= ST_RXDEL;
 					end if;
+-- Wait for RAM
+				when ST_RXDEL =>
+					state <= ST_WAIT;
 -- Waiting for transactor
 				when ST_WAIT =>
 					if timeout = '1' then
 						state <= ST_IDLE;
 					elsif trans_in.pkt_done = '1' then
-						state <= ST_TXPKT;
+						state <= ST_TXDEL;
 					end if;
+-- Wait for RAM
+				when ST_TXDEL =>
+					state <= ST_TXPKT;
 -- Transmitting packet
 				when ST_TXPKT =>
 					if tx_done = '1' then
@@ -186,18 +192,7 @@ begin
 	
 -- Handshaking
 	
-	process(clk_ipb)
-	begin
-		if rising_edge(clk_ipb) then
-			if state = ST_WAIT then
-				trans_out.pkt_rdy <= '1';
-			else
-				trans_out.pkt_rdy <= '0';
-			end if;
-			pkt_done_d <= trans_in.pkt_done;
-		end if;
-	end process;
-	
+	trans_out.pkt_rdy <= '1' when state = ST_WAIT else '0';	
 	trans_out.busy <= '0';
 
 -- Packet rx	
@@ -211,12 +206,14 @@ begin
 			del := 1;
 		end if;
 		if rising_edge(clk_ipb) then
-			get_pkt_data(del_return => del, mac_data_out => data, mac_data_valid => datav);
-			rxbuf_data <= std_logic_vector(to_signed(data, 32));
-			if datav = 1 then
-				rx_valid <= '1';
-			else
-				rx_valid <= '0';
+			if state = ST_WAIT_PKT or state = ST_RXPKT then
+				get_pkt_data(del_return => del, mac_data_out => data, mac_data_valid => datav);
+				rxbuf_data <= std_logic_vector(to_signed(data, 32));
+				if datav = 1 then
+					rx_valid <= '1';
+				else
+					rx_valid <= '0';
+				end if;
 			end if;
 		end if;
 	end process;
@@ -232,10 +229,8 @@ begin
 			end if;
 			if state = ST_TXPKT then
 				if tx_done = '0' then
-					if pkt_done_d = '0' then
-						data := to_integer(signed(txbuf_data));
-						store_pkt_data(mac_data_in => data);
-					end if;
+					data := to_integer(signed(txbuf_data));
+					store_pkt_data(mac_data_in => data);
 				else
 					send_pkt;
 				end if;
