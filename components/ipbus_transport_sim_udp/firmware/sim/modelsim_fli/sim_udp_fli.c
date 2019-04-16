@@ -121,16 +121,16 @@ void get_pkt_data (int del_return,
 				mti_FatalError();
 				return;
 			}
-			mti_PrintFormatted(MYNAME ": received packet %d from %s:%d, length %d\n", rxnum, inet_ntoa(addr.sin_addr), addr.sin_port, len );
+			mti_PrintFormatted(MYNAME ": received packet %d from %s:%d, length %d\n", rxnum, inet_ntoa(addr.sin_addr), ntohs(addr.sin_port), len);
 			if(len % 4 != 0){
 				mti_PrintFormatted(MYNAME ": bad length %d\n", len);
 				mti_FatalError();
 				return;
 			}
 
-			for(i = 0; i < len; i++){
+/*			for(i = 0; i < len; i++){
 				mti_PrintFormatted("%04x: %02x\n", i, (int)buf[i]);
-			}
+			} */
 			rxlen = len / 4;
 			*(rxbuf) = 0x30000 + rxlen - 1; /* Packet header */
 			*(rxbuf + 1) = addr.sin_addr.s_addr; /* Header word 0: return IP address */
@@ -145,11 +145,11 @@ void get_pkt_data (int del_return,
 	if(rxidx < rxlen + 3){
 		*mac_data_out = *(rxbuf + rxidx);
 		*mac_data_valid = 1;
-		mti_PrintFormatted(MYNAME ": get_mac_data packet %d returning data for index %d: %08x\n", rxnum, rxidx, *(rxbuf + rxidx));
+/*		mti_PrintFormatted(MYNAME ": get_mac_data packet %d returning data for index %d: %08x\n", rxnum, rxidx, *(rxbuf + rxidx)); */
 		rxidx++;
 	}
 	else{
-		mti_PrintFormatted(MYNAME ": get_mac_data packet %d finished\n", rxnum);
+/*		mti_PrintFormatted(MYNAME ": get_mac_data packet %d finished\n", rxnum); */
 		rxlen = 0;
 		*mac_data_out = 0;
 		*mac_data_valid = 0;
@@ -163,7 +163,7 @@ void store_pkt_data(int mac_data_in)
 {
 	
 	*(txbuf + txidx) = (uint32_t)mac_data_in;
-	mti_PrintFormatted("Got data %d %08x\n", txidx, mac_data_in);
+/*	mti_PrintFormatted("Got data %d %08x\n", txidx, mac_data_in); */
 	txidx++;
 	
 	if(txidx == BUFSZ){
@@ -185,25 +185,23 @@ void send_pkt()
 	addr.sin_family = AF_INET;
 	addr.sin_addr.s_addr = txbuf[1];
 	addr.sin_port = txbuf[2] >> 16;
-	
-	printf("Called\n");
-	
-	mti_PrintFormatted(MYNAME ": sending packet %d to %s:%d\n", txnum, inet_ntoa(addr.sin_addr), addr.sin_port);
+		
+/*	mti_PrintFormatted(MYNAME ": sending packet %d to %s:%d\n", txnum, inet_ntoa(addr.sin_addr), ntohs(addr.sin_port)); */
 
 	for(i = 0; i < txidx - 3; i++){
 		w = htonl(*(txbuf + i + 3)); /* Convert from local order to big-endian network order */
-		mti_PrintFormatted("%d %08x %08x\n", i, *(txbuf + i + 3), w);
+/*		mti_PrintFormatted("%d %08x %08x\n", i, *(txbuf + i + 3), w); */
 		buf[i * 4] = w >> 24 & 0xff;
 		buf[i * 4 + 1] = w >> 16 & 0xff;
 		buf[i * 4 + 2] = w >> 8 & 0xff;
 		buf[i * 4 + 3] = w & 0xff;
 	}
 	
-	for(i = 0; i < (txidx - 3) * 4; i++){
+/*	for(i = 0; i < (txidx - 3) * 4; i++){
 		mti_PrintFormatted("%04x: %02x\n", i, (int)buf[i]);
-	}
+	} */
 		
-	mti_PrintFormatted("Sending %d\n", (txidx - 3) * 4);
+/*	mti_PrintFormatted("Sending %d\n", (txidx - 3) * 4); */
 	
 	txlen = sendto(fd, buf, (txidx - 3) * 4, 0, (struct sockaddr *)&addr, sizeof(addr));
 	
@@ -214,12 +212,12 @@ void send_pkt()
 	}
 	
 	if (txlen != (txidx - 3) * 4){
-		mti_PrintFormatted(MYNAME ": send_pkt send packet %d write error, length sent %d\n", txnum, txlen);
+		mti_PrintFormatted(MYNAME ": packet %d write error, length sent %d\n", txnum, txlen);
 		mti_FatalError();
 		return;
 	}
 	else{
-		mti_PrintFormatted(MYNAME ": send_pkt send packet %d, index %d, length %d\n", txnum, txbuf[2] & 0xffff, (txidx - 3) * 4);
+		mti_PrintFormatted(MYNAME ": sent packet %d to %s:%d, index %d, length %d\n", txnum, inet_ntoa(addr.sin_addr), ntohs(addr.sin_port), txbuf[2] & 0xffff, (txidx - 3) * 4);
 		txidx = 0;
 		txnum++;
 	}
