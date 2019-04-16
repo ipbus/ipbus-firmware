@@ -230,7 +230,7 @@ begin
 			end if;
 			if state = ST_TXPKT then
 				if tx_done = '0' or txbuf_addr = (txbuf_addr'range => '0') then
-					data := to_integer(unsigned(txbuf_data));
+					data := to_integer(signed(txbuf_data));
 					store_pkt_data(mac_data_in => data);
 				else
 					send_pkt;

@@ -162,7 +162,8 @@ void get_pkt_data (int del_return,
 void store_pkt_data(int mac_data_in)
 {
 	
-	*(txbuf + txidx) = (unsigned char)(mac_data_in & 0xff);
+	*(txbuf + txidx) = (uint32_t)mac_data_in;
+	mti_PrintFormatted("Got data %d %08x\n", txidx, mac_data_in);
 	txidx++;
 	
 	if(txidx == BUFSZ){
