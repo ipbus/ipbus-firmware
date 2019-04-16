@@ -91,7 +91,8 @@ architecture behavioural of ipbus_sim_udp is
 	
 	constant TIMEOUT_VAL: integer := 32768;
 	
-	signal rxbuf_addr, txbuf_addr, rx_addr, tx_addr, tx_len: std_logic_vector(9 downto 0);
+	signal rxbuf_addr, txbuf_addr, rx_addr, tx_addr: std_logic_vector(9 downto 0);
+	signal tx_len: std_logic_vector(9 downto 0) := (others => '0');
 	signal rxbuf_data, txbuf_data: std_logic_vector(31 downto 0);
 	signal timer: integer;
 	signal rx_valid, tx_done, timeout, pkt_done_d: std_logic;

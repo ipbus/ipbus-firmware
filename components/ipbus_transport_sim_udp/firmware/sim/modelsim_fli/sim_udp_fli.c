@@ -171,7 +171,7 @@ void store_pkt_data(int mac_data_in)
 		mti_FatalError();
 	}
 
-  return;
+	return;
 }
 
 void send_pkt()
@@ -214,12 +214,13 @@ void send_pkt()
 	if (txlen != (txidx - 3) * 4){
 		mti_PrintFormatted(MYNAME ": packet %d write error, length sent %d\n", txnum, txlen);
 		mti_FatalError();
-		return;
 	}
 	else{
 		mti_PrintFormatted(MYNAME ": sent packet %d to %s:%d, index %d, length %d\n", txnum, inet_ntoa(addr.sin_addr), ntohs(addr.sin_port), txbuf[2] & 0xffff, (txidx - 3) * 4);
 		txidx = 0;
 		txnum++;
 	}
+	
+	return;
 }
 
