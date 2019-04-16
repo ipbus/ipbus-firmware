@@ -186,6 +186,8 @@ void send_pkt()
 	addr.sin_addr.s_addr = txbuf[1];
 	addr.sin_port = txbuf[2] >> 16;
 	
+	mti_PrintFormatted(MYNAME ": sending packet %d to %s:%d\n", rxnum, inet_ntoa(addr.sin_addr), addr.sin_port);
+
 	for(i = 3; i < txidx; i++){
 		w = htonl(*(txbuf + i)); /* Convert from local order to big-endian network order */
 		buf[i * 4] = w >> 24 & 0xff;
@@ -194,6 +196,8 @@ void send_pkt()
 		buf[i * 4 + 3] = w & 0xff;
 	}
 		
+	mti_PrintFormatted("Sending %d\n", (txidx - 3) * 4);
+	
 	txlen = sendto(fd, buf, (txidx - 3) * 4, 0, (struct sockaddr *)&addr, sizeof(addr));
 	
 	if (txlen < 0){

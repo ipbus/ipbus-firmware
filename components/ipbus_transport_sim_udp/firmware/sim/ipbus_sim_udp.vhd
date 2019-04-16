@@ -94,7 +94,7 @@ architecture behavioural of ipbus_sim_udp is
 	signal rxbuf_addr, txbuf_addr, rx_addr, tx_addr, tx_len: std_logic_vector(9 downto 0);
 	signal rxbuf_data, txbuf_data: std_logic_vector(31 downto 0);
 	signal timer: integer;
-	signal rx_valid, tx_done, timeout: std_logic;
+	signal rx_valid, tx_done, timeout, pkt_done_d: std_logic;
 	
 	type state_type is (ST_IDLE, ST_WAIT_PKT, ST_RXPKT, ST_WAIT, ST_TXPKT);
 	signal state: state_type;
@@ -193,6 +193,7 @@ begin
 			else
 				trans_out.pkt_rdy <= '0';
 			end if;
+			pkt_done_d <= trans_in.pkt_done;
 		end if;
 	end process;
 	
@@ -229,18 +230,23 @@ begin
 				tx_len <= std_logic_vector(unsigned(trans_in.wdata(25 downto 16)) + unsigned(trans_in.wdata(9 downto 0)) + 1);
 			end if;
 			if state = ST_TXPKT then
-				if tx_done = '0' or txbuf_addr = (txbuf_addr'range => '0') then
-					data := to_integer(signed(txbuf_data));
-					store_pkt_data(mac_data_in => data);
+				if tx_done = '0' then
+					if pkt_done_d = '0' then
+						data := to_integer(signed(txbuf_data));
+						store_pkt_data(mac_data_in => data);
+					end if;
 				else
 					send_pkt;
 				end if;
 			end if;
+			if tx_addr = tx_len then
+				tx_done <= '1';
+			else
+				tx_done <= '0';
+			end if;
 		end if;
 	end process;
-	
-	tx_done <= '1' when tx_addr = tx_len else '0';
-	
+
 -- Timeout
 
 	process(clk_ipb)
