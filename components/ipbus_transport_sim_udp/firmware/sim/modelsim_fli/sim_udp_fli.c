@@ -147,11 +147,11 @@ void get_pkt_data (int del_return,
 	if(rxidx < rxlen + 3){
 		*mac_data_out = *(rxbuf + rxidx);
 		*mac_data_valid = 1;
-/*		mti_PrintFormatted(MYNAME ": get_mac_data packet %d returning data for index %d: %08x\n", rxnum, rxidx, *(rxbuf + rxidx)); */
+		mti_PrintFormatted(MYNAME ": get_mac_data packet %d returning data for index %d: %08x\n", rxnum, rxidx, *(rxbuf + rxidx));
 		rxidx++;
 	}
 	else{
-/*		mti_PrintFormatted(MYNAME ": get_mac_data packet %d finished\n", rxnum); */
+		mti_PrintFormatted(MYNAME ": get_mac_data packet %d finished\n", rxnum);
 		rxlen = 0;
 		*mac_data_out = 0;
 		*mac_data_valid = 0;
@@ -167,7 +167,7 @@ void store_pkt_data(int mac_data_in)
 	mti_PrintFormatted("store called %d %d\n", txnum, txidx);
 
 	*(txbuf + txidx) = (uint32_t)mac_data_in;
-/*	mti_PrintFormatted("Got data %d %08x\n", txidx, mac_data_in); */
+	mti_PrintFormatted("Got data %d %08x\n", txidx, mac_data_in);
 	txidx++;
 	
 	if(txidx == BUFSZ){
@@ -190,8 +190,14 @@ void send_pkt()
 	addr.sin_addr.s_addr = txbuf[1];
 	addr.sin_port = txbuf[2] >> 16;
 		
-/*	mti_PrintFormatted(MYNAME ": sending packet %d to %s:%d\n", txnum, inet_ntoa(addr.sin_addr), ntohs(addr.sin_port)); */
+	mti_PrintFormatted(MYNAME ": sending packet %d to %s:%d\n", txnum, inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));
 
+	if(txidx > BUFSZ - 3){
+		mti_PrintFormatted(MYNAME ": packet too long %d\n", txidx);
+		mti_FatalError();
+		return;
+	}
+	
 	for(i = 0; i < txidx - 3; i++){
 		w = htonl(*(txbuf + i + 3)); /* Convert from local order to big-endian network order */
 /*		mti_PrintFormatted("%d %08x %08x\n", i, *(txbuf + i + 3), w); */
@@ -205,7 +211,7 @@ void send_pkt()
 		mti_PrintFormatted("%04x: %02x\n", i, (int)buf[i]);
 	} */
 		
-/*	mti_PrintFormatted("Sending %d\n", (txidx - 3) * 4); */
+	mti_PrintFormatted("Sending %d\n", (txidx - 3) * 4);
 	
 	txlen = sendto(fd, buf, (txidx - 3) * 4, 0, (struct sockaddr *)&addr, sizeof(addr));
 	
