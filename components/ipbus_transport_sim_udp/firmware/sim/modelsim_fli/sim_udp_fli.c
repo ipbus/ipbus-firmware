@@ -95,6 +95,8 @@ void get_pkt_data (int del_return,
 	uint32_t ip;
 	unsigned char buf[BUFSZ * 4];
 	
+	mti_PrintFormatted("get called %d %d %d\n", rxnum, rxlen, rxidx);
+	
 	if (rxlen == 0){
 		tv.tv_sec = 0;
 		tv.tv_usec = (del_return == 0) ? 0 : WAIT_USECS;
@@ -162,6 +164,8 @@ void get_pkt_data (int del_return,
 void store_pkt_data(int mac_data_in)
 {
 	
+	mti_PrintFormatted("store called %d %d\n", txnum, txidx);
+
 	*(txbuf + txidx) = (uint32_t)mac_data_in;
 /*	mti_PrintFormatted("Got data %d %08x\n", txidx, mac_data_in); */
 	txidx++;
