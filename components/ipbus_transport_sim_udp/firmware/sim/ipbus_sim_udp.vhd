@@ -66,25 +66,25 @@ architecture behavioural of ipbus_sim_udp is
 	attribute FOREIGN: string;
 	
 	procedure get_pkt_data(
-	variable del_return: in integer;
-	variable mac_data_out, mac_data_valid: out integer)
-	is begin
-	report "ERROR: get_pkt_data can't get here";
+		variable del_return: in integer;
+		variable data, valid, last: out integer) is
+	begin
+		report "ERROR: get_pkt_data can't get here";
 	end;
 	
 	attribute FOREIGN of get_pkt_data : procedure is "get_pkt_data sim_udp_fli.so";
 	
 	procedure store_pkt_data(
-	variable mac_data_in: in integer)
-	is begin
-	report "ERROR: store_pkt_data can't get here";
+		variable mac_data_in: in integer) is
+	begin
+		report "ERROR: store_pkt_data can't get here";
 	end;
 	
 	attribute FOREIGN of store_pkt_data : procedure is "store_pkt_data sim_udp_fli.so";
 	
-	procedure send_pkt
-	is begin
-	report "ERROR: send_pkt can't get here";
+	procedure send_pkt is
+	begin
+		report "ERROR: send_pkt can't get here";
 	end;
 	
 	attribute FOREIGN of send_pkt : procedure is "send_pkt sim_udp_fli.so";
@@ -95,7 +95,7 @@ architecture behavioural of ipbus_sim_udp is
 	signal tx_len: std_logic_vector(9 downto 0) := (others => '0');
 	signal rxbuf_data, txbuf_data: std_logic_vector(31 downto 0);
 	signal timer: integer;
-	signal rx_valid, tx_done, timeout: std_logic;
+	signal rx_valid, rx_last, tx_done, timeout: std_logic;
 	
 	type state_type is (ST_IDLE, ST_WAIT_PKT, ST_RXPKT, ST_RXDEL, ST_WAIT, ST_TXDEL, ST_TXPKT);
 	signal state: state_type;
@@ -163,7 +163,7 @@ begin
 					end if;
 -- Receiving packet			
 				when ST_RXPKT =>
-					if rx_valid = '0' then
+					if rx_last = '1' then
 						state <= ST_RXDEL;
 					end if;
 -- Wait for RAM
@@ -198,7 +198,7 @@ begin
 -- Packet rx	
 
 	packet_rx: process(clk_ipb)
-		variable del, data, datav: integer;
+		variable del, data, valid, last: integer;
 	begin
 		if MULTI_PACKET then
 			del := 0;
@@ -206,14 +206,22 @@ begin
 			del := 1;
 		end if;
 		if rising_edge(clk_ipb) then
-			if state = ST_WAIT_PKT or state = ST_RXPKT then
-				get_pkt_data(del_return => del, mac_data_out => data, mac_data_valid => datav);
+			if state = ST_WAIT_PKT or (state = ST_RXPKT and rx_last = '0') then
+				get_pkt_data(del_return => del, data => data, valid => valid, last => last);
 				rxbuf_data <= std_logic_vector(to_signed(data, 32));
-				if datav = 1 then
+				if valid = 1 then
 					rx_valid <= '1';
 				else
 					rx_valid <= '0';
 				end if;
+				if last = 1 then
+					rx_last <= '1';
+				else
+					rx_last <= '0';
+				end if;
+			else
+				rx_valid <= '0';
+				rx_last <= '0';
 			end if;
 		end if;
 	end process;
@@ -228,20 +236,16 @@ begin
 				tx_len <= std_logic_vector(unsigned(trans_in.wdata(25 downto 16)) + unsigned(trans_in.wdata(9 downto 0)) + 1);
 			end if;
 			if state = ST_TXPKT then
-				if tx_done = '0' then
-					data := to_integer(signed(txbuf_data));
-					store_pkt_data(mac_data_in => data);
-				else
+				data := to_integer(signed(txbuf_data));
+				store_pkt_data(mac_data_in => data);
+				if tx_done = '1' then
 					send_pkt;
 				end if;
 			end if;
-			if tx_addr = tx_len then
-				tx_done <= '1';
-			else
-				tx_done <= '0';
-			end if;
 		end if;
 	end process;
+	
+	tx_done <= '1' when tx_addr = tx_len else '0';
 
 -- Timeout
 

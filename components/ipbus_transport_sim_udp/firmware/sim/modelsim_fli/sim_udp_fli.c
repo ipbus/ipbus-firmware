@@ -52,14 +52,14 @@ __attribute__((constructor)) static void cinit()
 		return;
 	}
 
-    if(NULL == (rxbuf = (uint32_t*)malloc(BUFSZ)))
+    if(NULL == (rxbuf = (uint32_t*)malloc(BUFSZ * 4)))
     {
       perror (MYNAME ": rxbuf malloc() failed");
       mti_FatalError();
       return;
     }
 
-    if(NULL == (txbuf = (uint32_t*)malloc(BUFSZ)))
+    if(NULL == (txbuf = (uint32_t*)malloc(BUFSZ * 4)))
     {
       perror (MYNAME ": txbuf malloc() failed");
       mti_FatalError();
@@ -76,6 +76,7 @@ __attribute__((constructor)) static void cinit()
 
 __attribute__((destructor)) static void cfini()
 {
+  mti_PrintFormatted(MYNAME ": shutting down\n");
   free(rxbuf);
   free(txbuf);
   close(fd);
@@ -83,8 +84,9 @@ __attribute__((destructor)) static void cfini()
 }
 
 void get_pkt_data (int del_return,
-                   int* mac_data_out,
-                   int* mac_data_valid )
+                   int* data,
+                   int* valid,
+                   int* last)
 {
 	
 	static struct timeval tv;
@@ -95,7 +97,7 @@ void get_pkt_data (int del_return,
 	uint32_t ip;
 	unsigned char buf[BUFSZ * 4];
 	
-	mti_PrintFormatted("get called %d %d %d\n", rxnum, rxlen, rxidx);
+/*	mti_PrintFormatted("get called %d %d %d\n", rxnum, rxlen, rxidx); */
 	
 	if (rxlen == 0){
 		tv.tv_sec = 0;
@@ -112,8 +114,9 @@ void get_pkt_data (int del_return,
 		}
 		
 		if(s == 0){
-			*mac_data_out = 0;
-			*mac_data_valid = 0;
+			*data = 0;
+			*valid = 0;
+			*last = 0;
 			return;
 		}
 		else{
@@ -134,6 +137,7 @@ void get_pkt_data (int del_return,
 				mti_PrintFormatted("%04x: %02x\n", i, (int)buf[i]);
 			} */
 			rxlen = len / 4;
+			mti_PrintFormatted("len %d rxlen %d\n", len, rxlen);
 			*(rxbuf) = 0x30000 + rxlen - 1; /* Packet header */
 			*(rxbuf + 1) = addr.sin_addr.s_addr; /* Header word 0: return IP address */
 			*(rxbuf + 2) = (addr.sin_port << 16) + rxnum; /* Header word 1: return port and packet number */
@@ -143,31 +147,31 @@ void get_pkt_data (int del_return,
 			rxidx = 0;
 		}
 	}
+
+	*data = *(rxbuf + rxidx);
+	*valid = 1;
+/*	mti_PrintFormatted(MYNAME ": get_pkt_data packet %d returning data for index %d: %08x\n", rxnum, rxidx, *(rxbuf + rxidx)); */
 	
-	if(rxidx < rxlen + 3){
-		*mac_data_out = *(rxbuf + rxidx);
-		*mac_data_valid = 1;
-		mti_PrintFormatted(MYNAME ": get_mac_data packet %d returning data for index %d: %08x\n", rxnum, rxidx, *(rxbuf + rxidx));
+	if(rxidx != rxlen + 2){
+		*last = 0;
 		rxidx++;
 	}
 	else{
-		mti_PrintFormatted(MYNAME ": get_mac_data packet %d finished\n", rxnum);
+		*last = 1;
+/*		mti_PrintFormatted(MYNAME ": get_pkt_data packet %d finished\n", rxnum); */	
 		rxlen = 0;
-		*mac_data_out = 0;
-		*mac_data_valid = 0;
 		rxnum++;
 	}
 	
-	return;
 }
 
 void store_pkt_data(int mac_data_in)
 {
 	
-	mti_PrintFormatted("store called %d %d\n", txnum, txidx);
+/*	mti_PrintFormatted("store called %d %d\n", txnum, txidx); */
 
 	*(txbuf + txidx) = (uint32_t)mac_data_in;
-	mti_PrintFormatted("Got data %d %08x\n", txidx, mac_data_in);
+/*	mti_PrintFormatted("Got data %d %08x\n", txidx, mac_data_in); */
 	txidx++;
 	
 	if(txidx == BUFSZ){
@@ -175,7 +179,6 @@ void store_pkt_data(int mac_data_in)
 		mti_FatalError();
 	}
 
-	return;
 }
 
 void send_pkt()
@@ -190,13 +193,15 @@ void send_pkt()
 	addr.sin_addr.s_addr = txbuf[1];
 	addr.sin_port = txbuf[2] >> 16;
 		
-	mti_PrintFormatted(MYNAME ": sending packet %d to %s:%d\n", txnum, inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));
+/*	mti_PrintFormatted(MYNAME ": sending packet %d to %s:%d\n", txnum, inet_ntoa(addr.sin_addr), ntohs(addr.sin_port)); */
 
-	if(txidx > BUFSZ - 3){
-		mti_PrintFormatted(MYNAME ": packet too long %d\n", txidx);
+	if(txidx > BUFSZ - 3 || txidx < 3){
+		mti_PrintFormatted(MYNAME ": bad packet length %d\n", txidx);
 		mti_FatalError();
 		return;
 	}
+	
+	mti_PrintFormatted("Sending %d\n", (txidx - 3) * 4);
 	
 	for(i = 0; i < txidx - 3; i++){
 		w = htonl(*(txbuf + i + 3)); /* Convert from local order to big-endian network order */
@@ -211,7 +216,6 @@ void send_pkt()
 		mti_PrintFormatted("%04x: %02x\n", i, (int)buf[i]);
 	} */
 		
-	mti_PrintFormatted("Sending %d\n", (txidx - 3) * 4);
 	
 	txlen = sendto(fd, buf, (txidx - 3) * 4, 0, (struct sockaddr *)&addr, sizeof(addr));
 	
@@ -231,6 +235,5 @@ void send_pkt()
 		txnum++;
 	}
 	
-	return;
 }
 
