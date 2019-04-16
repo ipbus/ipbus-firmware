@@ -186,14 +186,21 @@ void send_pkt()
 	addr.sin_addr.s_addr = txbuf[1];
 	addr.sin_port = txbuf[2] >> 16;
 	
-	mti_PrintFormatted(MYNAME ": sending packet %d to %s:%d\n", rxnum, inet_ntoa(addr.sin_addr), addr.sin_port);
+	printf("Called\n");
+	
+	mti_PrintFormatted(MYNAME ": sending packet %d to %s:%d\n", txnum, inet_ntoa(addr.sin_addr), addr.sin_port);
 
-	for(i = 3; i < txidx; i++){
-		w = htonl(*(txbuf + i)); /* Convert from local order to big-endian network order */
+	for(i = 0; i < txidx - 3; i++){
+		w = htonl(*(txbuf + i + 3)); /* Convert from local order to big-endian network order */
+		mti_PrintFormatted("%d %08x %08x\n", i, *(txbuf + i + 3), w);
 		buf[i * 4] = w >> 24 & 0xff;
 		buf[i * 4 + 1] = w >> 16 & 0xff;
 		buf[i * 4 + 2] = w >> 8 & 0xff;
 		buf[i * 4 + 3] = w & 0xff;
+	}
+	
+	for(i = 0; i < (txidx - 3) * 4; i++){
+		mti_PrintFormatted("%04x: %02x\n", i, (int)buf[i]);
 	}
 		
 	mti_PrintFormatted("Sending %d\n", (txidx - 3) * 4);
@@ -206,7 +213,7 @@ void send_pkt()
 		return;
 	}
 	
-	if (txlen != txidx){
+	if (txlen != (txidx - 3) * 4){
 		mti_PrintFormatted(MYNAME ": send_pkt send packet %d write error, length sent %d\n", txnum, txlen);
 		mti_FatalError();
 		return;
