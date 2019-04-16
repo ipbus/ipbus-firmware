@@ -185,7 +185,17 @@ begin
 	
 -- Handshaking
 	
-	trans_out.pkt_rdy <= '1' when state = ST_WAIT else '0';
+	process(clk_ipb)
+	begin
+		if rising_edge(clk_ipb) then
+			if state = ST_WAIT then
+				trans_out.pkt_rdy <= '1';
+			else
+				trans_out.pkt_rdy <= '0';
+			end if;
+		end if;
+	end process;
+	
 	trans_out.busy <= '0';
 
 -- Packet rx	
