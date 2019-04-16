@@ -226,7 +226,7 @@ begin
 	begin
 		if rising_edge(clk_ipb) then
 			if trans_in.waddr = (trans_in.waddr'range => '0') and trans_in.we = '1' then
-				tx_len <= std_logic_vector(unsigned(trans_in.wdata(9 downto 0)) + unsigned(trans_in.wdata(9 downto 0)) + 1);
+				tx_len <= std_logic_vector(unsigned(trans_in.wdata(25 downto 16)) + unsigned(trans_in.wdata(9 downto 0)) + 1);
 			end if;
 			if state = ST_TXPKT then
 				if tx_done = '0' or txbuf_addr = (txbuf_addr'range => '0') then

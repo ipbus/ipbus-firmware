@@ -132,7 +132,7 @@ void get_pkt_data (int del_return,
 				mti_PrintFormatted("%04x: %02x\n", i, (int)buf[i]);
 			}
 			rxlen = len / 4;
-			*(rxbuf) = 0x20000 + rxlen; /* Packet header */
+			*(rxbuf) = 0x30000 + rxlen - 1; /* Packet header */
 			*(rxbuf + 1) = addr.sin_addr.s_addr; /* Header word 0: return IP address */
 			*(rxbuf + 2) = (addr.sin_port << 16) + rxnum; /* Header word 1: return port and packet number */
 			for(i = 0; i < rxlen; i++){
@@ -192,8 +192,8 @@ void send_pkt()
 		buf[i * 4 + 2] = w >> 8 & 0xff;
 		buf[i * 4 + 3] = w & 0xff;
 	}
-	
-	txlen = sendto(fd, buf, (txlen - 3) * 4, 0, (struct sockaddr *)&addr, sizeof(addr));
+		
+	txlen = sendto(fd, buf, (txidx - 3) * 4, 0, (struct sockaddr *)&addr, sizeof(addr));
 	
 	if (txlen < 0){
 		perror(MYNAME ": sendto() failed");
