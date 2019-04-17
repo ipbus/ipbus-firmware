@@ -24,7 +24,7 @@
 ---------------------------------------------------------------------------------
 
 
--- Uses the FLI mechanism to send / receive UDP packets from uHAL.
+-- Uses the FLI mechanism to send / receive uHAL UDP packets.
 --
 -- There are two modes of operation:
 --
@@ -38,7 +38,7 @@
 -- and transmit simultaneously, and can queue multiple input packets. This
 -- will cause a large number of cycles to be simulated.
 --
--- Dave Newbold, July 2012
+-- Dave Newbold, April 2019
 --
 -- $Id$
 

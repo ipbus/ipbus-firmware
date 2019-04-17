@@ -96,9 +96,7 @@ void get_pkt_data (int del_return,
 	socklen_t addrlen = sizeof(addr);
 	uint32_t ip;
 	unsigned char buf[BUFSZ * 4];
-	
-/*	mti_PrintFormatted("get called %d %d %d\n", rxnum, rxlen, rxidx); */
-	
+		
 	if (rxlen == 0){
 		tv.tv_sec = 0;
 		tv.tv_usec = (del_return == 0) ? 0 : WAIT_USECS;
@@ -133,11 +131,7 @@ void get_pkt_data (int del_return,
 				return;
 			}
 
-/*			for(i = 0; i < len; i++){
-				mti_PrintFormatted("%04x: %02x\n", i, (int)buf[i]);
-			} */
 			rxlen = len / 4;
-			mti_PrintFormatted("len %d rxlen %d\n", len, rxlen);
 			*(rxbuf) = 0x30000 + rxlen - 1; /* Packet header */
 			*(rxbuf + 1) = addr.sin_addr.s_addr; /* Header word 0: return IP address */
 			*(rxbuf + 2) = (addr.sin_port << 16) + rxnum; /* Header word 1: return port and packet number */
@@ -150,7 +144,6 @@ void get_pkt_data (int del_return,
 
 	*data = *(rxbuf + rxidx);
 	*valid = 1;
-/*	mti_PrintFormatted(MYNAME ": get_pkt_data packet %d returning data for index %d: %08x\n", rxnum, rxidx, *(rxbuf + rxidx)); */
 	
 	if(rxidx != rxlen + 2){
 		*last = 0;
@@ -158,7 +151,6 @@ void get_pkt_data (int del_return,
 	}
 	else{
 		*last = 1;
-/*		mti_PrintFormatted(MYNAME ": get_pkt_data packet %d finished\n", rxnum); */	
 		rxlen = 0;
 		rxnum++;
 	}
@@ -168,10 +160,7 @@ void get_pkt_data (int del_return,
 void store_pkt_data(int mac_data_in)
 {
 	
-/*	mti_PrintFormatted("store called %d %d\n", txnum, txidx); */
-
 	*(txbuf + txidx) = (uint32_t)mac_data_in;
-/*	mti_PrintFormatted("Got data %d %08x\n", txidx, mac_data_in); */
 	txidx++;
 	
 	if(txidx == BUFSZ){
@@ -193,30 +182,20 @@ void send_pkt()
 	addr.sin_addr.s_addr = txbuf[1];
 	addr.sin_port = txbuf[2] >> 16;
 		
-/*	mti_PrintFormatted(MYNAME ": sending packet %d to %s:%d\n", txnum, inet_ntoa(addr.sin_addr), ntohs(addr.sin_port)); */
-
 	if(txidx > BUFSZ - 3 || txidx < 3){
 		mti_PrintFormatted(MYNAME ": bad packet length %d\n", txidx);
 		mti_FatalError();
 		return;
 	}
-	
-	mti_PrintFormatted("Sending %d\n", (txidx - 3) * 4);
-	
+		
 	for(i = 0; i < txidx - 3; i++){
 		w = htonl(*(txbuf + i + 3)); /* Convert from local order to big-endian network order */
-/*		mti_PrintFormatted("%d %08x %08x\n", i, *(txbuf + i + 3), w); */
 		buf[i * 4] = w >> 24 & 0xff;
 		buf[i * 4 + 1] = w >> 16 & 0xff;
 		buf[i * 4 + 2] = w >> 8 & 0xff;
 		buf[i * 4 + 3] = w & 0xff;
 	}
-	
-/*	for(i = 0; i < (txidx - 3) * 4; i++){
-		mti_PrintFormatted("%04x: %02x\n", i, (int)buf[i]);
-	} */
-		
-	
+
 	txlen = sendto(fd, buf, (txidx - 3) * 4, 0, (struct sockaddr *)&addr, sizeof(addr));
 	
 	if (txlen < 0){
