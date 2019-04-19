@@ -19,8 +19,8 @@
 #include <mti.h>
 
 #define MYNAME "sim_udp"
-#define IPADDR INADDR_ANY /* Always listen on 127.0.0.1:50001 for now */
-#define IPPORT 50001
+#define IP_ADDR INADDR_ANY /* Always listen on 127.0.0.1:50001 for now */
+// #define IP_PORT 50001
 #define BUFSZ 512 /* In 32b words; assuming 1500 octet packets, and datagram smaller than this */
 #define WAIT_USECS 50000 /* 50ms */
 
@@ -43,8 +43,8 @@ __attribute__((constructor)) static void cinit()
 	}
 	
 	addr.sin_family = AF_INET;
-	addr.sin_port = htons(IPPORT);
-	addr.sin_addr.s_addr = htonl(IPADDR); 
+	addr.sin_port = htons(IP_PORT);
+	addr.sin_addr.s_addr = htonl(IP_ADDR); 
 	
 	if(bind(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
 		perror(MYNAME ": bind() failed");
@@ -71,7 +71,7 @@ __attribute__((constructor)) static void cinit()
     rxnum = 0;
     txnum = 0;
     
-    mti_PrintFormatted(MYNAME ": listening on %s:%d, fd %d\n", inet_ntoa(addr.sin_addr), IPPORT, fd);
+    mti_PrintFormatted(MYNAME ": listening on %s:%d, fd %d\n", inet_ntoa(addr.sin_addr), IP_PORT, fd);
 }
 
 __attribute__((destructor)) static void cfini()

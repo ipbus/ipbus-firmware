@@ -12,9 +12,10 @@ endif
 
 MODELSIM_ROOT:=$(shell cd $$(dirname $$(which ${SIMEXE}) )/.. && pwd)
 
+IP_PORT?="50001"
 sim_udp_fli.so: export MTI_VCO_MODE=64
 sim_udp_fli.so: sim_udp_fli.c
-	gcc -shared -fPIC -Wl,-Bsymbolic,--allow-shlib-undefined,--export-dynamic -I${MODELSIM_ROOT}/include/ -o $@ $<
+	gcc -shared -fPIC -Wl,-Bsymbolic,--allow-shlib-undefined,--export-dynamic -D IP_PORT=${IP_PORT} -I${MODELSIM_ROOT}/include/ -o $@ $<
 
 clean:
 	rm sim_udp_fli.so
