@@ -32,7 +32,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 use work.ipbus.all;
 
-entity sim_infra is
+entity sim_eth_infra is
 	generic(
 		CLK_AUX_FREQ: real := 40.0
 	);
@@ -49,9 +49,9 @@ entity sim_infra is
 		ipb_out: out ipb_wbus
 	);
 
-end sim_infra;
+end sim_eth_infra;
 
-architecture rtl of sim_infra is
+architecture rtl of sim_eth_infra is
 
 	signal clk125, clk_ipb, clk_ipb_i, rst, rst125, rst_ipb, rst_ipb_ctrl: std_logic;
 	signal mac_tx_data, mac_rx_data: std_logic_vector(7 downto 0);

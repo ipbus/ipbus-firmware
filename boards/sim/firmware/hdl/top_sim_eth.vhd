@@ -57,7 +57,7 @@ begin
 
 -- Infrastructure
 
-	infra: entity work.sim_infra
+	infra: entity work.sim_eth_infra
 		port map(
 			clk_ipb_o => clk_ipb,
 			rst_ipb_o => rst_ipb,
