@@ -26,11 +26,9 @@
 
 -- Top-level design for ipbus demo
 --
--- This version is for simulation purposes
+-- This version is for simulation, using UDP interface to Modelsim
 --
--- You must edit this file to set the IP and MAC addresses
---
--- Dave Newbold, 23/2/11
+-- Dave Newbold, April 2019
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -38,13 +36,6 @@ use IEEE.STD_LOGIC_1164.ALL;
 use work.ipbus.ALL;
 
 entity top is
-
--- Stand-alone design
-  generic(
-    MAC_ADDR : std_logic_vector(47 downto 0) := X"020ddba1e780";
-    IP_ADDR  : std_logic_vector(31 downto 0) := X"c0a8e780"
-    );
-  
 end top;
 
 architecture rtl of top is
@@ -57,7 +48,7 @@ begin
 
 -- Infrastructure
 
-	infra: entity work.sim_infra
+	infra: entity work.sim_udp_infra
 		port map(
 			clk_ipb_o => clk_ipb,
 			rst_ipb_o => rst_ipb,
@@ -65,8 +56,6 @@ begin
 			rst_aux_o => rst_aux,
 			nuke => nuke,
 			soft_rst => soft_rst,
-			mac_addr => MAC_ADDR,
-			ip_addr => IP_ADDR,
 			ipb_in => ipb_r,
 			ipb_out => ipb_w
 		);

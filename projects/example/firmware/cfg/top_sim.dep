@@ -23,6 +23,6 @@
 #
 #-------------------------------------------------------------------------------
 
-include -c boards/sim
+include -c boards/sim sim_eth.dep
 include -c components/ipbus_util ipbus_example.dep
 src -c components/ipbus_core ipbus_package.vhd
