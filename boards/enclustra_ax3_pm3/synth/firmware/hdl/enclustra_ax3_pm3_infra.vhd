@@ -37,7 +37,7 @@ use work.ipbus.all;
 
 entity enclustra_ax3_pm3_infra is
 	port(
-		sysclk: in std_logic; -- 50MHz board crystal clock
+		osc_clk: in std_logic; -- 50MHz board crystal clock
 		clk_ipb_o: out std_logic; -- IPbus clock
 		rst_ipb_o: out std_logic;
 		clk125_o: out std_logic;
@@ -74,7 +74,7 @@ begin
 
 	clocks: entity work.clocks_7s_extphy_se
 		port map(
-			sysclk => sysclk,
+			sysclk => osc_clk,
 			clko_125 => clk125,
 			clko_125_90 => clk125_90,
 			clko_200 => clk200,
