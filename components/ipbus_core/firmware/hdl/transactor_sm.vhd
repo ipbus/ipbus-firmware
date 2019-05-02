@@ -225,7 +225,7 @@ begin
 	begin
 		err <= X"0";
 		if state = ST_HDR then
-			if rx_data(31 downto 28) /= X"2" or rx_data(3 downto 0) /= X"f" then
+			if rx_data(31 downto 28) /= X"0" or rx_data(3 downto 0) /= X"f" then
 				err <= "0001";
 			end if;
 		elsif state = ST_BUS_CYCLE then
