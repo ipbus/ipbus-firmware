@@ -69,7 +69,7 @@ architecture rtl of ipbus_ported_dpram is
 	signal sel, rsel: integer range 0 to 2 ** ADDR_WIDTH - 1 := 0;
 	signal wcyc, wcyc_d: std_logic;
 	signal ptr: unsigned(ADDR_WIDTH - 1 downto 0);
-	signal data: std_logic_vector(DATA_WIDTH - 1 downto 0);
+	signal data: std_logic_vector(31 downto 0);
 	signal wea_l, wea_h: std_logic;
 
 begin
@@ -91,10 +91,14 @@ begin
 	
 	sel <= to_integer(ptr);
 	
+	zero_data: if DATA_WIDTH /= 32 generate
+		data(31 downto DATA_WIDTH) <= (others => '0');
+	end generate;
+
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			data <= ram(sel);
+			data(DATA_WIDTH - 1 downto 0) <= ram(sel);
 			if wcyc = '1' and ipb_in.ipb_addr(0) = '1' then
 				ram(sel) := ipb_in.ipb_wdata(DATA_WIDTH - 1 downto 0);
 			end if;
@@ -105,7 +109,7 @@ begin
 	ipb_out.ipb_ack <= ipb_in.ipb_strobe;
 	ipb_out.ipb_err <= '0';
 	ipb_out.ipb_rdata <= (31 - ADDR_WIDTH downto 0 => '0') & std_logic_vector(ptr) when ipb_in.ipb_addr(0)='0'
-		else (DATA_WIDTH - 1 downto 0 => data, others => '0');
+		else data;
 
 	rsel <= to_integer(unsigned(addr));
 	
