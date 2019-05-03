@@ -30,3 +30,4 @@ src top_kc705_basex.vhd
 include kc705_basex_infra.dep
 src -c components/ipbus_core ipbus_package.vhd
 src --cd ../ucf kc705_basex.tcl
+src -c components/ipbus_util --cd ../ucf clock_utils.tcl
