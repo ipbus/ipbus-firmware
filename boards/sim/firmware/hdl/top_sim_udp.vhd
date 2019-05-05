@@ -33,7 +33,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
-use work.ipbus.ALL;
+use work.ipbus_v3.ALL;
 
 entity top is
 end top;

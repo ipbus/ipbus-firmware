@@ -48,7 +48,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-use work.ipbus_trans_decl.all;
+use work.ipbus_v3_trans_decl.all;
 
 
 entity ipbus_transport_multibuffer_if is

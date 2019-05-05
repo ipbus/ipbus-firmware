@@ -34,26 +34,30 @@ use ieee.numeric_std.all;
 
 entity ipbus_transport_multibuffer_rx_dpram is
   generic (
-  	-- corresponds to 32b data
+    -- corresponds to 32b data
     ADDRWIDTH : natural
   );
   port (
-  	clka : in std_logic;
+    clka : in std_logic;
     wea : in std_logic;
     addra : in std_logic_vector(ADDRWIDTH - 2 downto 0);
     dia : in std_logic_vector(63 downto 0);
 
-  	clkb : in std_logic;
-  	addrb : in std_logic_vector(ADDRWIDTH - 1 downto 0);
-  	dob : out std_logic_vector(31 downto 0)
+    clkb : in std_logic;
+    addrb : in std_logic_vector(ADDRWIDTH - 1 downto 0);
+    dob : out std_logic_vector(63 downto 0)
   );
 end entity ipbus_transport_multibuffer_rx_dpram;
 
 
 architecture rtl of ipbus_transport_multibuffer_rx_dpram is
 
-  type ram_type is array (2**ADDRWIDTH - 1 downto 0) of std_logic_vector(31 downto 0);
-  signal ram : ram_type;
+  type ram_type is array (2**(ADDRWIDTH - 1) - 1 downto 0) of std_logic_vector(31 downto 0);
+  signal ram0, ram1 : ram_type;
+
+  signal raddr0, raddr1: unsigned(ADDRWIDTH - 2 downto 0);
+  signal rdata0, rdata1: std_logic_vector(31 downto 0);
+  signal addrb_d0: std_logic;
 
 begin
 
@@ -61,17 +65,30 @@ begin
   begin
     if rising_edge(clka) then
       if (wea = '1') then
-        ram(to_integer(unsigned(addra & '0'))) <= dia(31 downto 0);
-        ram(to_integer(unsigned(addra & '1'))) <= dia(63 downto 32);
+        ram0(to_integer(unsigned(addra))) <= dia(31 downto 0);
+        ram1(to_integer(unsigned(addra))) <= dia(63 downto 32);
       end if;
     end if;
   end process write;
 
+  raddr0 <= unsigned(addrb(ADDRWIDTH - 1 downto 1)) when addrb(0) = '0' else unsigned(addrb(ADDRWIDTH - 1 downto 1))+1;
+  raddr1 <= unsigned(addrb(ADDRWIDTH - 1 downto 1));
+  dob(31 downto 0) <= rdata0 when addrb_d0 = '0' else rdata1;
+  dob(63 downto 32) <= rdata1 when addrb_d0 = '0' else rdata0;
+
   read: process (clkb)
   begin
     if rising_edge(clkb) then
-      dob <= ram(to_integer(unsigned(addrb)));
+      rdata0 <= ram0(to_integer(raddr0));
+      rdata1 <= ram1(to_integer(raddr1));
     end if;
   end process read;
+
+  process (clkb)
+  begin
+    if rising_edge(clkb) then
+      addrb_d0 <= addrb(0);
+    end if;
+  end process;
 
 end architecture rtl;

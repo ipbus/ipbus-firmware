@@ -46,7 +46,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-use work.ipbus_trans_decl.all;
+use work.ipbus_v3_trans_decl.all;
 
 entity ipbus_sim_udp is
 	generic(
@@ -104,7 +104,7 @@ begin
 
 -- Buffers
 
-	rxbuf: entity work.ipbus_udp_ram_buf
+	rxbuf: entity work.ipbus_udp_ram_buf_rx
 		port map(
 			clk => clk_ipb,
 			addr => rxbuf_addr,
@@ -113,7 +113,7 @@ begin
 			wen => rx_valid
 		);
 	
-	txbuf: entity work.ipbus_udp_ram_buf
+	txbuf: entity work.ipbus_udp_ram_buf_tx
 		port map(
 			clk => clk_ipb,
 			addr => txbuf_addr,
@@ -232,7 +232,7 @@ begin
 		variable data: integer;
 	begin
 		if rising_edge(clk_ipb) then
-			if trans_in.waddr = (trans_in.waddr'range => '0') and trans_in.we = '1' then
+			if trans_in.waddr = (trans_in.waddr'range => '0') and trans_in.we(0) = '1' then
 				tx_len <= std_logic_vector(unsigned(trans_in.wdata(25 downto 16)) + unsigned(trans_in.wdata(9 downto 0)) + 1);
 			end if;
 			if state = ST_TXPKT then

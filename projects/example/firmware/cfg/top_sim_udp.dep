@@ -24,5 +24,5 @@
 #-------------------------------------------------------------------------------
 
 include -c boards/sim sim_udp.dep
-include -c components/ipbus_util ipbus_example.dep
-src -c components/ipbus_core ipbus_package.vhd
+include -c components/ipbus_util v3/ipbus_example.dep
+src -c components/ipbus_core v3/ipbus_package.vhd

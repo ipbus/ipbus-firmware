@@ -34,7 +34,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.ipbus_trans_decl.all;
+use work.ipbus_v3_trans_decl.all;
 use work.ipbus_axi_decl.all;
 
 

@@ -27,9 +27,9 @@
 # Dependencies for ipbus_core
 
 src v3/ipbus_trans_arb.vhd
-# src transactor.vhd
-# src transactor_if.vhd
-# src transactor_sm.vhd
-# src transactor_cfg.vhd
+src v3/ipbus_transactor.vhd
+src v3/ipbus_transactor_if.vhd
+src v3/ipbus_transactor_sm.vhd
+src transactor_cfg.vhd
 src v3/ipbus_package.vhd
 src v3/ipbus_trans_decl.vhd

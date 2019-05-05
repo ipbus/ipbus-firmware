@@ -26,5 +26,5 @@
 
 # Dependencies for ipbus_core
 
-src ../sim/ipbus_sim_udp.vhd ipbus_udp_ram_buf.vhd
-src -c components/ipbus_core ipbus_trans_decl.vhd
+src ../sim/ipbus_sim_udp.vhd ipbus_udp_ram_buf_rx.vhd ipbus_udp_ram_buf_tx.vhd
+src -c components/ipbus_core v3/ipbus_trans_decl.vhd
