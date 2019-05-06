@@ -42,17 +42,22 @@ library unisim;
 use unisim.VComponents.all;
 
 entity clocks_7s_extphy_Se is
+	generic (
+		CLK_AUX_DIVIDER: positive := 25
+		);
 	port(
 		sysclk: in std_logic;
 		clko_125: out std_logic;
 		clko_125_90: out std_logic;
 		clko_200: out std_logic;
 		clko_ipb: out std_logic; 
+		clko_aux: out std_logic;
 		locked: out std_logic;
 		nuke: in std_logic;
 		soft_rst: in std_logic;
 		rsto_125: out std_logic;
 		rsto_ipb: out std_logic;
+		rsto_aux: out std_logic;
 		rsto_ipb_ctrl: out std_logic;
 		onehz: out std_logic
 	);
@@ -61,10 +66,10 @@ end clocks_7s_extphy_se;
 
 architecture rtl of clocks_7s_extphy_se is
 	
-	signal dcm_locked, sysclk_u, sysclk_i, clk_ipb_i, clk_125_i, clk_125_90_i, clkfb, clk_ipb_b, clk_125_b, clk_200_i: std_logic;
+	signal dcm_locked, sysclk_u, sysclk_i, clk_ipb_i, clk_125_i, clk_125_90_i, clk_aux_i, clkfb, clk_ipb_b, clk_125_b, clk_aux_b, clk_200_i: std_logic;
 	signal d17, d17_d: std_logic;
 	signal nuke_i, nuke_d, nuke_d2: std_logic := '0';
-	signal rst, srst, rst_ipb, rst_125, rst_ipb_ctrl: std_logic := '1';
+	signal rst, srst, rst_ipb, rst_125, rst_aux, rst_ipb_ctrl: std_logic := '1';
 	signal rctr: unsigned(3 downto 0) := "0000";
 
 begin
@@ -103,6 +108,13 @@ begin
 		o => clko_200
 	);	
 	
+	bufgaux: BUFG port map(
+		i => clk_aux_i,
+		o => clk_aux_b
+	);
+
+	clko_aux <= clk_aux_b;
+
 	mmcm: MMCME2_BASE
 		generic map(
 			clkfbout_mult_f => 20.0,
@@ -111,6 +123,7 @@ begin
 			clkout2_phase => 90.0,
 			clkout3_divide => 32,
 			clkout4_divide => 5,
+			clkout5_divide => CLK_AUX_DIVIDER,
 			clkin1_period => 20.0
 		)
 		port map(
@@ -121,6 +134,7 @@ begin
 			clkout2 => clk_125_90_i,
 			clkout3 => clk_ipb_i,
 			clkout4 => clk_200_i,
+			clkout5 => clk_aux_i,
 			locked => dcm_locked,
 			rst => '0',
 			pwrdwn => '0'
@@ -178,5 +192,14 @@ begin
 	end process;
 	
 	rsto_125 <= rst_125;
+
+	process(clk_aux_b)
+	begin
+		if rising_edge(clk_aux_b) then
+			rst_aux <= rst;
+		end if;
+	end process;
+	
+	rsto_aux <= rst_aux;
 			
 end rtl;

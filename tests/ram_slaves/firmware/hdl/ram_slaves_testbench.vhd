@@ -80,9 +80,9 @@ begin
     );
 
 
--- Slave 0: id / rst reg
+-- CSR: id / rst reg
 
-	csr_slave0: entity work.ipbus_ctrlreg_v
+	csr: entity work.ipbus_ctrlreg_v
 		port map(
 			clk => ipb_clk,
 			reset => ipb_rst,
@@ -99,7 +99,7 @@ begin
 		userled <= ctrl(0)(2);
 
 
--- Slave 0.1: pattern generator
+-- Utility: pattern generator
 	patt_gen: entity work.ram_pattern_generator
 		generic map(
 			ADDR_WIDTH => ADDR_WIDTH,
@@ -118,9 +118,9 @@ begin
 	  	);
 
 
--- Slave 1: register
+-- Slave Register 1: Simple ipbus register
 
-	slave1: entity work.ipbus_reg_v
+	slave_reg_1: entity work.ipbus_reg_v
 		port map(
 			clk => ipb_clk,
 			reset => ipb_rst,
@@ -131,7 +131,7 @@ begin
 
 -- Slave Ported RAM 1: peephole RAM
 
-	pram_slave1: entity work.ipbus_peephole_ram
+	slave_pram_1: entity work.ipbus_peephole_ram
 		generic map(ADDR_WIDTH => ADDR_WIDTH)
 		port map(
 			clk => ipb_clk,
@@ -141,7 +141,7 @@ begin
 		);
 
 -- Slave Ported RAM 2: 1kword dual-port RAM
-	pram_slave2: entity work.ipbus_ported_dpram
+	slave_pram_2: entity work.ipbus_ported_dpram
 		generic map(ADDR_WIDTH => ADDR_WIDTH)
 		port map(
 			clk => ipb_clk,
@@ -156,7 +156,7 @@ begin
 		);
 
 --  Ported RAM slave 3: 1kword dual-port RAM
-	pram_slave3: entity work.ipbus_ported_dpram36
+	slave_pram_3: entity work.ipbus_ported_dpram36
 		generic map(ADDR_WIDTH => ADDR_WIDTH)
 		port map(
 			clk => ipb_clk,
@@ -171,7 +171,7 @@ begin
 		);
 
 	--  Ported RAM slave 4: 1kword dual-port RAM
-	pram_slave4: entity work.ipbus_ported_dpram72
+	slave_pram_4: entity work.ipbus_ported_dpram72
 		generic map(ADDR_WIDTH => ADDR_WIDTH)
 		port map(
 			clk => ipb_clk,
@@ -187,7 +187,7 @@ begin
 
 
 	--  Ported RAM slave 5: 1kword simple dual-port RAM
-	pram_slave5: entity work.ipbus_ported_sdpram72
+	slave_pram_5: entity work.ipbus_ported_sdpram72
 		generic map(ADDR_WIDTH => ADDR_WIDTH)
 		port map(
 			clk => ipb_clk,
@@ -202,7 +202,7 @@ begin
 		);
 
 -- RAM Slave 1: 1kword RAM
-	ram_slave1: entity work.ipbus_ram
+	slave_ram_1: entity work.ipbus_ram
 		generic map(ADDR_WIDTH => ADDR_WIDTH)
 		port map(
 			clk => ipb_clk,
@@ -213,7 +213,7 @@ begin
 
 
 -- RAM Slave 2: 1kB dual port RAM
-	ram_slave2: entity work.ipbus_dpram
+	slave_ram_2: entity work.ipbus_dpram
 		generic map(ADDR_WIDTH => ADDR_WIDTH)
 		port map(
 			clk => ipb_clk,
@@ -229,7 +229,7 @@ begin
 
 
 -- RAM Slave 3: 1kB dual port RAM 36
-	ram_slave3: entity work.ipbus_dpram36
+	slave_ram_3: entity work.ipbus_dpram36
 		generic map(ADDR_WIDTH => ADDR_WIDTH)
 		port map(
 			clk => ipb_clk,
@@ -244,7 +244,7 @@ begin
 		);
 
 -- RAM Slave 3: 1kB dual port RAM 36
-	ram_slave4: entity work.ipbus_sdpram72
+	slave_ram_4: entity work.ipbus_sdpram72
 		generic map(ADDR_WIDTH => ADDR_WIDTH)
 		port map(
 			clk => ipb_clk,
