@@ -25,10 +25,10 @@
 
 
 src payload.vhd
-src ram_slaves_testbench.vhd
+src ram_slaves_tester.vhd
 src -c components/ipbus_core ipbus_fabric_sel.vhd
 src ipbus_decode_ram_slaves_testbench.vhd
-addrtab -t ram_slaves_testbench.xml
+addrtab -t ram_slaves_tester.xml
 src ram_pattern_generator.vhd
 src -c components/ipbus_slaves ipbus_ported_dpram.vhd ipbus_ported_dpram36.vhd ipbus_ported_dpram72.vhd ipbus_ported_sdpram72.vhd
 src -c components/ipbus_slaves ipbus_dpram.vhd ipbus_dpram36.vhd ipbus_sdpram72.vhd

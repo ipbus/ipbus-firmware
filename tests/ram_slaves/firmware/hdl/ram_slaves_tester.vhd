@@ -36,7 +36,7 @@ use work.ipbus.all;
 use work.ipbus_reg_types.all;
 use work.ipbus_decode_ram_slaves_testbench.all;
 
-entity ram_slaves_testbench is
+entity ram_slaves_tester is
 	port(
 		ipb_clk: in std_logic;
 		ipb_rst: in std_logic;
@@ -49,9 +49,9 @@ entity ram_slaves_testbench is
 		userled: out std_logic
 	);
 
-end ram_slaves_testbench;
+end ram_slaves_tester;
 
-architecture rtl of ram_slaves_testbench is
+architecture rtl of ram_slaves_tester is
 	constant ADDR_WIDTH : positive := 10;
 	constant PATT_DATA_WIDTH : positive := 72;
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
