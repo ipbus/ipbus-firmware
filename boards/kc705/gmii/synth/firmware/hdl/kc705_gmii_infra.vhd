@@ -36,6 +36,9 @@ use IEEE.STD_LOGIC_1164.ALL;
 use work.ipbus.all;
 
 entity kc705_gmii_infra is
+	generic (
+		CLK_AUX_FREQ: real := 40.0 -- Default: 40 MHz clock - LHC
+		);
 	port(
 		sysclk_p: in std_logic; -- 200MHz board crystal clock
 		sysclk_n: in std_logic;
@@ -76,6 +79,9 @@ begin
 --	DCM clock generation for internal bus, ethernet
 
 	clocks: entity work.clocks_7s_extphy
+		generic map(
+			CLK_AUX_FREQ => CLK_AUX_FREQ
+			)
 		port map(
 			sysclk_p => sysclk_p,
 			sysclk_n => sysclk_n,

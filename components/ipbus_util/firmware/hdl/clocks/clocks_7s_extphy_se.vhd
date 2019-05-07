@@ -41,10 +41,12 @@ use ieee.numeric_std.all;
 library unisim;
 use unisim.VComponents.all;
 
-entity clocks_7s_extphy_Se is
-	generic (
-		CLK_AUX_DIVIDER: positive := 25
-		);
+entity clocks_7s_extphy_se is
+	generic(
+		CLK_FR_FREQ: real := 50.0; 
+		CLK_VCO_FREQ: real := 1000.0; -- VCO freq 1000MHz
+		CLK_AUX_FREQ: real := 40.0 -- Aux Clock frequency
+	);
 	port(
 		sysclk: in std_logic;
 		clko_125: out std_logic;
@@ -117,14 +119,14 @@ begin
 
 	mmcm: MMCME2_BASE
 		generic map(
-			clkfbout_mult_f => 20.0,
-			clkout1_divide => 8,
-			clkout2_divide => 8,
+			clkin1_period => CLK_VCO_FREQ / CLK_FR_FREQ,
+			clkfbout_mult_f => CLK_VCO_FREQ / CLK_FR_FREQ,
+			clkout1_divide => integer(CLK_VCO_FREQ / 125.00), -- 125 MHz clock
+			clkout2_divide => integer(CLK_VCO_FREQ / 125.00), -- 125 MHz clock, 90 deg phase
 			clkout2_phase => 90.0,
-			clkout3_divide => 32,
-			clkout4_divide => 5,
-			clkout5_divide => CLK_AUX_DIVIDER,
-			clkin1_period => 20.0
+			clkout3_divide => integer(CLK_VCO_FREQ / 31.25),
+			clkout4_divide => integer(CLK_VCO_FREQ / 200.00),
+			clkout5_divide => integer(CLK_VCO_FREQ / CLK_AUX_FREQ)
 		)
 		port map(
 			clkin1 => sysclk_i,

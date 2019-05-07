@@ -37,7 +37,7 @@ use work.ipbus.all;
 
 entity enclustra_ax3_pm3_infra is
 	generic (
-		CLK_AUX_DIVIDER: positive := 25 -- Default: 40 MHz clock - LHC
+		CLK_AUX_FREQ: real := 40.0 -- Default: 40 MHz clock - LHC
 		);
 	port(
 		osc_clk: in std_logic; -- 50MHz board crystal clock
@@ -77,7 +77,7 @@ begin
 
 	clocks: entity work.clocks_7s_extphy_se
 		generic map(
-			CLK_AUX_DIVIDER => CLK_AUX_DIVIDER
+			CLK_AUX_FREQ => CLK_AUX_FREQ
 			)
 		port map(
 			sysclk => osc_clk,

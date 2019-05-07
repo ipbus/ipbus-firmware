@@ -37,7 +37,7 @@ use work.ipbus.all;
 
 entity kc705_basex_infra is
 	generic (
-		CLK_AUX_DIVIDER: positive := 25 -- Default: 40 MHz clock - LHC
+		CLK_AUX_FREQ: real := 40.0 -- Default: 40 MHz clock - LHC
 		);
 	port(
 		eth_clk_p: in std_logic; -- 125MHz MGT clock
@@ -75,7 +75,7 @@ begin
 
 	clocks: entity work.clocks_7s_serdes
 		generic map(
-			CLK_AUX_DIVIDER => CLK_AUX_DIVIDER
+			CLK_AUX_FREQ => CLK_AUX_FREQ
 			)
 		port map(
 			clki_fr => clk125_fr,

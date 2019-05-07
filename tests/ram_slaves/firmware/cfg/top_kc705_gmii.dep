@@ -24,10 +24,5 @@
 #-------------------------------------------------------------------------------
 
 
-setup -c boards/kc705/common settings_v7.tcl
-include -c boards/kc705/common k325.dep
-src top_kc705_gmii.vhd
-include kc705_gmii_infra.dep
-src -c components/ipbus_core ipbus_package.vhd
-src --cd ../ucf kc705_gmii.tcl
-src -c components/ipbus_util --cd ../ucf clock_utils.tcl
+include ram_slaves_tester.dep
+include -c boards/kc705/gmii/synth top.dep

@@ -39,7 +39,6 @@ set_property PACKAGE_PIN G7 [get_ports eth_clk_n]
 set_property LOC GTXE2_CHANNEL_X0Y10 [get_cells -hier -filter {name=~infra/eth/*/gtxe2_i}]
 
 
-
 # LED pin assignment
 set_property IOSTANDARD LVCMOS15 [get_ports {leds[*]}]
 set_property SLEW SLOW [get_ports {leds[*]}]

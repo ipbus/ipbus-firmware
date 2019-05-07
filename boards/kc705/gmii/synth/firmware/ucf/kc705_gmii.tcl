@@ -26,19 +26,6 @@
 
 set_property BITSTREAM.GENERAL.COMPRESS TRUE [current_design]
 
-proc false_path {patt clk} {
-    set p [get_ports -quiet $patt -filter {direction != out}]
-    if {[llength $p] != 0} {
-        set_input_delay 0 -clock [get_clocks $clk] [get_ports $patt -filter {direction != out}]
-        set_false_path -from [get_ports $patt -filter {direction != out}]
-    }
-    set p [get_ports -quiet $patt -filter {direction != in}]
-    if {[llength $p] != 0} {
-       	set_output_delay 0 -clock [get_clocks $clk] [get_ports $patt -filter {direction != in}]
-	    set_false_path -to [get_ports $patt -filter {direction != in}]
-	}
-}
-
 # System clock (200MHz)
 create_clock -period 5.000 -name sysclk [get_ports sysclk_p]
 
@@ -88,3 +75,16 @@ set_property PACKAGE_PIN T27 [get_ports {gmii_rxd[5]}]
 set_property PACKAGE_PIN T26 [get_ports {gmii_rxd[6]}]
 set_property PACKAGE_PIN T28 [get_ports {gmii_rxd[7]}]
 set_property PACKAGE_PIN L20 [get_ports {phy_rst}]
+
+
+# IPbus clock
+create_generated_clock -name ipbus_clk -source [get_pins infra/clocks/mmcm/CLKIN1] [get_pins infra/clocks/mmcm/CLKOUT3]
+
+# Other derived clocks
+create_generated_clock -name clk_aux -source [get_pins infra/clocks/mmcm/CLKIN1] [get_pins infra/clocks/mmcm/CLKOUT4]
+
+set_false_path -through [get_pins infra/clocks/rst_reg/Q]
+set_false_path -through [get_nets infra/clocks/nuke_i]
+
+
+set_clock_groups -asynchronous -group [get_clocks ipbus_clk] -group [get_clocks -include_generated_clocks [get_clocks clk_aux]]
