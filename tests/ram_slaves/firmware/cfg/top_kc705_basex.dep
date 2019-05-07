@@ -23,6 +23,6 @@
 #
 #-------------------------------------------------------------------------------
 
-include -c boards/sim sim_eth.dep
+
 include ram_slaves_tester.dep
-src -c components/ipbus_core ipbus_package.vhd
+include -c boards/kc705/basex/synth top.dep
