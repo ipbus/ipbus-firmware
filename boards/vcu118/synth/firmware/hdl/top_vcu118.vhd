@@ -35,7 +35,7 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
 
-use work.ipbus.all;
+use work.ipbus_v3.all;
 
 library UNISIM;
 use UNISIM.VComponents.all;
@@ -101,7 +101,7 @@ begin
 -- ipbus slaves live in the entity below, and can expose top-level ports.
 -- The ipbus fabric is instantiated within.
 
-  slaves: entity work.ipbus_example
+  slaves: entity work.ipbus_v3_example
     port map(
       ipb_clk => ipb_clk,
       ipb_rst => ipb_rst,

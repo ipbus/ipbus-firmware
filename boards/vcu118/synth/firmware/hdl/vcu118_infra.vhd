@@ -34,8 +34,8 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-use work.ipbus.all;
-use work.ipbus_trans_decl.all;
+use work.ipbus_v3.all;
+use work.ipbus_v3_trans_decl.all;
 use work.ipbus_axi_decl.all;
 
 library UNISIM;
@@ -164,7 +164,7 @@ begin
     );
 
 
-  ipbus_transactor: entity work.transactor
+  ipbus_transactor: entity work.ipbus_transactor
     port map (
       clk => clk_ipb,
       rst => rst_ipb_ctrl,
