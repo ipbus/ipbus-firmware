@@ -73,7 +73,8 @@ begin
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			ipb_out.ipb_rdata <= (31 - DATA_WIDTH downto 0 => '0') & ram(sel); -- Order of statements is important to infer read-first RAM!
+
+			ipb_out.ipb_rdata <= std_logic_vector(to_unsigned(0, 32 - DATA_WIDTH)) & ram(sel); -- Order of statements is important to infer read-first RAM!
 			if ipb_in.ipb_strobe='1' and ipb_in.ipb_write='1' then
 				ram(sel) := ipb_in.ipb_wdata(DATA_WIDTH - 1 downto 0);
 			end if;

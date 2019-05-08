@@ -105,8 +105,8 @@ begin
 	ipb_out.ipb_ack <= ipb_in.ipb_strobe;
 	ipb_out.ipb_err <= '0';
 	ipb_out.ipb_rdata <= (31 - ADDR_WIDTH downto 0 => '0') & std_logic_vector(ptr) when ipb_in.ipb_addr(0)='0'
-		else (31 - DATA_WIDTH downto 0 => '0') & data;
-	
+		else std_logic_vector(to_unsigned(0, 32 - DATA_WIDTH)) & data;
+
 	rsel <= to_integer(unsigned(addr));
 	
 	process(rclk)
