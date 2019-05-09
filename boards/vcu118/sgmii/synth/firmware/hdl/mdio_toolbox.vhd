@@ -19,12 +19,14 @@ package mdio_toolbox_package is
                                   regad : std_logic_vector(4 downto 0))
         return std_logic_vector;
 
+    function mdio_reg_read_mask return std_logic_vector;
+
     --- encode an extended register write (see data sheet of TI DP83867, section 8.6.12 "Extended Register Addressing" )
     -- note that it has to be transmitted from MSB to LSB
     function encode_mdio_extreg_write(phyad  : std_logic_vector(4 downto 0);
                                       extreg : std_logic_vector(15 downto 0);
                                       data   : std_logic_vector(15 downto 0))
-        return std_logic_vector
+        return std_logic_vector;
 
 end package mdio_toolbox_package;
 

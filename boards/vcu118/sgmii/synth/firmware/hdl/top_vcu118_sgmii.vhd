@@ -77,6 +77,8 @@ architecture rtl of top is
     signal ipb_out                                                     : ipb_wbus;
     signal ipb_in                                                      : ipb_rbus;
 
+    signal dleds : std_logic_vector(7 downto 0);
+
 begin
 
 -- Infrastructure
@@ -111,14 +113,17 @@ begin
             rst_aux_o     => rst_aux,
             nuke          => nuke,
             soft_rst      => soft_rst,
-            leds          => leds(1 downto 0),
+            --leds          => leds(1 downto 0),
+            debug_leds    => dleds,
             mac_addr      => mac_addr,
             ip_addr       => ip_addr,
             ipb_in        => ipb_in,
             ipb_out       => ipb_out
             );
 
-    leds(3 downto 2) <= '0' & userled;
+    --leds(3 downto 2) <= '0' & userled;
+    leds <= dleds;
+    --leds <= b"01010011";
 
 -- ipbus slaves live in the entity below, and can expose top-level ports.
 -- The ipbus fabric is instantiated within.

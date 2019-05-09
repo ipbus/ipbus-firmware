@@ -120,7 +120,7 @@ architecture rtl of eth_sgmii_lvds_vcu118 is
     end component;
 
     -- this is the SGMII adapter + transceiver using LVDS SelectIO ---
-    component sgmii_adapter_lvds_0
+    component gig_eth_pcs_pma_gmii_to_sgmii_bridge
         port (
             txp_0                  : out std_logic;
             txn_0                  : out std_logic;
@@ -206,8 +206,8 @@ architecture rtl of eth_sgmii_lvds_vcu118 is
     --- resets
     signal rst_delay_slr              : std_logic_vector(4 downto 0) := (others => '1');  -- reset delay shift-register
     signal sysrst, sysrst_n           : std_logic;  -- in to logic
-    signal rst125_sgmii               : std_logic;  -- out from SGMII
-    signal tx_axi_rstn, rx_axi_rstn   : std_logic;  -- in to MAC
+    signal rst125_sgmii, rst125_sgmii_n             : std_logic;  -- out from SGMII
+    --signal tx_axi_rstn, rx_axi_rstn   : std_logic;  -- in to MAC
     signal tx_reset_out, rx_reset_out : std_logic;  -- out from MAC
     --- locked
     signal rx_locked, tx_locked       : std_logic;
@@ -221,7 +221,7 @@ architecture rtl of eth_sgmii_lvds_vcu118 is
     signal sgmii_status_vector      : std_logic_vector(15 downto 0);
 
     -- mdio controls and status
-    signal phy_cfg_done, phy_cfg_done_d, phy_clkcfg_done, phy_poll_done                        : std_logic := '0';
+    signal phy_cfg_done, phy_cfg_done_d, phy_cfg_not_done, phy_clkcfg_done, phy_poll_done                        : std_logic := '0';
     signal phy_status_reg1, phy_status_reg2, phy_status_reg3, phy_status_reg4, phy_status_reg5 : std_logic_vector(15 downto 0);
 
 begin
@@ -257,6 +257,23 @@ begin
         end if;
     end process;
 
+
+    -- Auto negotiator.
+    -- 2 clock-cycle (?) high on the rising edge of phy_cfg_done.
+    process(clk125_fr)
+    begin
+        if rising_edge(clk125_fr) then
+            phy_cfg_done_d <= phy_cfg_done;
+            if phy_cfg_done_d = '0' and phy_cfg_done = '1' then
+                an_restart   <= '1';
+                an_restart_d <= '1';
+            else
+                an_restart   <= an_restart_d;
+                an_restart_d <= '0';
+            end if;
+        end if;
+    end process;
+
     -- Reset to PHY, active low. The first to be release after 2s
     phy_resetb <= not rst_delay_slr(3);
 
@@ -264,16 +281,21 @@ begin
     sysrst   <= rst_delay_slr(0);       -- high until reset slr is flushed
     sysrst_n <= not sysrst;  -- as the previous, but negated because the temac like it so
 
-    tx_axi_rstn <= not rst125_sgmii;
-    rx_axi_rstn <= not rst125_sgmii;
+    -- Reset to TEMAC tx and rx domains, derived from the reset output of the SGMII block
+    --tx_axi_rstn <= not rst125_sgmii;
+    --rx_axi_rstn <= not rst125_sgmii;
+    --
+    rst125_sgmii_n <= not rst125_sgmii;
+    -- Reset to temac clients (outgoing)
     rst_o       <= tx_reset_out or rx_reset_out;
+
 
     mac : temac_gbe_v9_0
         port map(
-            gtx_clk                 => clk125_fr,
+            gtx_clk                 => clk125_sgmii,
             glbl_rstn               => sysrst_n,
-            rx_axi_rstn             => rx_axi_rstn,
-            tx_axi_rstn             => tx_axi_rstn,
+            rx_axi_rstn             => rst125_sgmii_n,
+            tx_axi_rstn             => rst125_sgmii_n,
             rx_statistics_vector    => open,
             rx_statistics_valid     => open,
             rx_mac_aclk             => open,
@@ -304,7 +326,7 @@ begin
             tx_configuration_vector => X"0000_0000_0000_0000_0012"
             );
 
-    sgmii : sgmii_adapter_lvds_0
+    sgmii : gig_eth_pcs_pma_gmii_to_sgmii_bridge
         port map (
             refclk625_p            => sgmii_clk_p,
             refclk625_n            => sgmii_clk_n,
@@ -329,8 +351,8 @@ begin
             speed_is_10_100_0      => '0',
             speed_is_100_0         => '0',
             status_vector_0        => sgmii_status_vector,
-            configuration_vector_0 => (4 => '1', 3 => not(phy_clkcfg_done), others => '0'),
-            clk125_out             => clk_eth,
+            configuration_vector_0 => (4 => '1', 3 => phy_cfg_not_done, others => '0'),
+            clk125_out             => clk125_sgmii,
             rst_125_out            => rst125_sgmii,
             rx_locked              => rx_locked,
             tx_locked              => tx_locked,
@@ -357,7 +379,7 @@ begin
             rx_vtc_rdy_3           => '1',
             tx_vtc_rdy_3           => '1',
             -- input reset
-            reset                  => not (phy_clkcfg_done)
+            reset                  => phy_cfg_not_done -- hold the bridge in reset until PHY is up and happy
             );
 
     clk_eth <= clk125_sgmii;
@@ -365,7 +387,7 @@ begin
 
     phy_cfgrt : entity work.phy_mdio_configurator_vcu118
         port map (
-            clk125_fr   => clk125_fr,
+            clk125      => clk125_fr,
             mdc         => clk2mhz,
             rst         => sysrst,
             done        => phy_cfg_done,
@@ -380,19 +402,9 @@ begin
             status_reg5 => phy_status_reg5,
             phy_mdio    => phy_mdio);
 
-    auto_reneg : process(clk125_fr)
-    begin
-        if rising_edge(clk125_fr) then
-            phy_cfg_done_d <= phy_cfg_done;
-            if phy_cfg_done_d = '0' and phy_cfg_done = '1' then
-                an_restart   <= '1';
-                an_restart_d <= '1';
-            else
-                an_restart   <= an_restart_d;
-                an_restart_d <= '0';
-            end if;
-        end if;
-    end process;
+    -- Needed by sgmii ports
+    phy_cfg_not_done <= not(phy_clkcfg_done);
+
 
     set_leds : process(clk125_fr)
     begin
@@ -401,7 +413,7 @@ begin
                 when "000" =>
                     debug_leds(0) <= onehz;
                     debug_leds(1) <= phy_cfg_done;
-                    debug_leds(2) <= rx_locked and rx_locked;
+                    debug_leds(2) <= rx_locked and tx_locked;
                     debug_leds(3) <= not (tx_reset_out or rx_reset_out);
                     debug_leds(4) <= sgmii_status_vector(0) and sgmii_status_vector(1) and sgmii_status_vector(7);
                     debug_leds(5) <= sgmii_status_vector(3);
@@ -410,7 +422,7 @@ begin
                 when "001" =>
                     debug_leds(0) <= phy_clkcfg_done;
                     debug_leds(1) <= phy_cfg_done;
-                    debug_leds(2) <= rx_locked and rx_locked;
+                    debug_leds(2) <= rx_locked and tx_locked;
                     debug_leds(3) <= rst125_sgmii;
                     debug_leds(4) <= not (tx_reset_out or rx_reset_out);
                     debug_leds(5) <= sgmii_status_vector(0) and sgmii_status_vector(1) and sgmii_status_vector(7);

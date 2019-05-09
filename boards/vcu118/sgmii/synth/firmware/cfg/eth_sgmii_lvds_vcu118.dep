@@ -26,8 +26,8 @@
 
 # Dependencies for the ethernet sgmii gubbins for usp
 
-src vcu118_eth.vhd
-src vcu118_eth_mdio.vhd
+src eth_sgmii_lvds_vcu118.vhd
+src phy_mdio_configurator_vcu118.vhd
 src mdio_toolbox.vhd
 src -c ipbus-firmware:components/ipbus_eth ../cgn/temac_gbe_v9_0.xci
-src ../cgn/sgmii_adapter_lvds_0.xci
+src ../cgn/gig_eth_pcs_pma_gmii_to_sgmii_bridge.xci

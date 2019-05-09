@@ -1,9 +1,9 @@
 <node id="TOP">
     <node id="csr" address="0x0" description="ctrl/stat register" fwinfo="endpoint;width=1">
         <node id="ctrl" address="0x0">
-            <node id="rst" mask="0x0"/>
-            <node id="nuke" mask="0x1"/>
-            <node id="led" mask="0x2"/>
+            <node id="rst" mask="0x1"/>
+            <node id="nuke" mask="0x2"/>
+            <node id="led" mask="0x3"/>
         </node>
         <node id="stat" address="0x1"/>
     </node>

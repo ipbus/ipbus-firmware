@@ -144,11 +144,11 @@ begin
     eth : entity work.eth_sgmii_lvds_vcu118
         port map(
             -- free running 125 MHz clk
-            clk125                 => osc_clk_125,
+            clk125_fr              => osc_clk_125,
             -- reset in
             rst                    => rst_phy,
             -- reset out
-            rst_clients            => rst_eth,
+            rst_o                  => rst_eth,
             -- status
             locked                 => eth_locked,
             debug_leds(7 downto 0) => debug_leds(7 downto 0),
