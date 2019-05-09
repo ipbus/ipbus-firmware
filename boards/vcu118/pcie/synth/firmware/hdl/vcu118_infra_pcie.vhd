@@ -42,7 +42,7 @@ library UNISIM;
 use UNISIM.VComponents.all;
 
 
-entity vcu118_infra is
+entity vcu118_infra_pcie is
   port (
       -- PCIe clock and reset (active low)
       pcie_sys_clk_p : in std_logic;
@@ -68,10 +68,10 @@ entity vcu118_infra is
       ipb_in  : in ipb_rbus;
       ipb_out : out ipb_wbus
   );
-end vcu118_infra;
+end vcu118_infra_pcie;
 
 
-architecture rtl of vcu118_infra is
+architecture rtl of vcu118_infra_pcie is
 
   signal clk_osc, clk_ipb, clk_ipb_i : std_logic;
   signal locked, clk_locked, pcie_user_lnk_up, rst125, rst_ipb, rst_ipb_ctrl, rst_axi, onehz : std_logic;

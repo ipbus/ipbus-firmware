@@ -43,7 +43,7 @@ use unisim.VComponents.all;
 
 entity clocks_7s_extphy_se is
 	generic(
-		CLK_FR_FREQ: real := 50.0; 
+		CLK_FR_FREQ: real := 50.0; -- free-running clock frequency
 		CLK_VCO_FREQ: real := 1000.0; -- VCO freq 1000MHz
 		CLK_AUX_FREQ: real := 40.0 -- Aux Clock frequency
 	);

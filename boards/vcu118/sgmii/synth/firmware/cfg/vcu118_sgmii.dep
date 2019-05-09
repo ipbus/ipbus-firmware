@@ -24,11 +24,10 @@
 #-------------------------------------------------------------------------------
 
 
-setup settings_vup.tcl
-setup -f xdma_loc.tcl
+# Dependencies for the ethernet sgmii gubbins for usp
 
-src top_vcu118_pcie.vhd
-include vcu118_infra_pcie.dep
-src -c components/ipbus_core ipbus_package.vhd
-src --cd ../ucf vcu118_pcie.tcl
-src -c components/ipbus_util --cd ../ucf clock_utils.tcl
+src vcu118_eth.vhd
+src vcu118_eth_mdio.vhd
+src mdio_toolbox.vhd
+src -c ipbus-firmware:components/ipbus_eth ../cgn/temac_gbe_v9_0.xci
+src ../cgn/sgmii_adapter_lvds_0.xci

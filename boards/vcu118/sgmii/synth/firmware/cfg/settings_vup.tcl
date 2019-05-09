@@ -24,11 +24,9 @@
 #-------------------------------------------------------------------------------
 
 
-setup settings_vup.tcl
-setup -f xdma_loc.tcl
+set obj [get_projects top]
+set_property "default_lib" "xil_defaultlib" $obj
+set_property "simulator_language" "Mixed" $obj
+set_property "source_mgmt_mode" "DisplayOnly" $obj
+set_property "target_language" "VHDL" $obj
 
-src top_vcu118_pcie.vhd
-include vcu118_infra_pcie.dep
-src -c components/ipbus_core ipbus_package.vhd
-src --cd ../ucf vcu118_pcie.tcl
-src -c components/ipbus_util --cd ../ucf clock_utils.tcl

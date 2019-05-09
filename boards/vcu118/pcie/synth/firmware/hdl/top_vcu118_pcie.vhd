@@ -76,7 +76,7 @@ begin
 
 -- Infrastructure
 
-  infra: entity work.vcu118_infra
+  infra: entity work.vcu118_infra_pcie
     port map(
       pcie_sys_clk_p => pcie_sys_clk_p,
       pcie_sys_clk_n => pcie_sys_clk_n,
@@ -101,16 +101,17 @@ begin
 -- ipbus slaves live in the entity below, and can expose top-level ports.
 -- The ipbus fabric is instantiated within.
 
-  slaves: entity work.ipbus_example
+  payload: entity work.payload
     port map(
-      ipb_clk => ipb_clk,
-      ipb_rst => ipb_rst,
+      ipb_clk => clk_ipb,
+      ipb_rst => rst_ipb,
       ipb_in => ipb_out,
       ipb_out => ipb_in,
+      clk => clk_aux,
+      rst => rst_aux,
       nuke => nuke,
       soft_rst => soft_rst,
       userled => userled
-      );
-
+    );
 
 end rtl;
