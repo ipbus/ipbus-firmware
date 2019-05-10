@@ -55,7 +55,7 @@ entity eth_sgmii_lvds_vcu118 is
         phy_mdio    : inout std_logic;  -- control line to program the PHY chip
         phy_mdc     : out   std_logic;  -- clock line (must be < 2.5 MHz)
         -- 125 MHz clocks
-        clk_eth     : out   std_logic;  -- 125 MHz from ethernet
+        clk125_eth     : out   std_logic;  -- 125 MHz from ethernet
         -- input free-running clock
         clk125_fr   : in    std_logic;
         -- connection control and status (to logic)
@@ -205,9 +205,8 @@ architecture rtl of eth_sgmii_lvds_vcu118 is
     signal onehz, onehz_d, onehz_re   : std_logic                    := '0';  -- slow generated clocks
     --- resets
     signal rst_delay_slr              : std_logic_vector(4 downto 0) := (others => '1');  -- reset delay shift-register
-    signal sysrst, sysrst_n           : std_logic;  -- in to logic
+    signal rst_i, rst_i_n           : std_logic;  -- in to logic
     signal rst125_sgmii, rst125_sgmii_n             : std_logic;  -- out from SGMII
-    --signal tx_axi_rstn, rx_axi_rstn   : std_logic;  -- in to MAC
     signal tx_reset_out, rx_reset_out : std_logic;  -- out from MAC
     --- locked
     signal rx_locked, tx_locked       : std_logic;
@@ -278,13 +277,9 @@ begin
     phy_resetb <= not rst_delay_slr(3);
 
     -- Reset to PHY config module and temac
-    sysrst   <= rst_delay_slr(0);       -- high until reset slr is flushed
-    sysrst_n <= not sysrst;  -- as the previous, but negated because the temac like it so
+    rst_i   <= rst_delay_slr(0);       -- high until reset slr is flushed
+    rst_i_n <= not rst_i;  -- as the previous, but negated because the temac like it so
 
-    -- Reset to TEMAC tx and rx domains, derived from the reset output of the SGMII block
-    --tx_axi_rstn <= not rst125_sgmii;
-    --rx_axi_rstn <= not rst125_sgmii;
-    --
     rst125_sgmii_n <= not rst125_sgmii;
     -- Reset to temac clients (outgoing)
     rst_o       <= tx_reset_out or rx_reset_out;
@@ -293,7 +288,7 @@ begin
     mac : temac_gbe_v9_0
         port map(
             gtx_clk                 => clk125_sgmii,
-            glbl_rstn               => sysrst_n,
+            glbl_rstn               => rst_i_n,
             rx_axi_rstn             => rst125_sgmii_n,
             tx_axi_rstn             => rst125_sgmii_n,
             rx_statistics_vector    => open,
@@ -382,14 +377,14 @@ begin
             reset                  => phy_cfg_not_done -- hold the bridge in reset until PHY is up and happy
             );
 
-    clk_eth <= clk125_sgmii;
+    clk125_eth <= clk125_sgmii;
     locked  <= rx_locked and tx_locked;
 
     phy_cfgrt : entity work.phy_mdio_configurator_vcu118
         port map (
             clk125      => clk125_fr,
             mdc         => clk2mhz,
-            rst         => sysrst,
+            rst         => rst_i,
             done        => phy_cfg_done,
             clkdone     => phy_clkcfg_done,
             poll_enable => '1',
@@ -405,6 +400,21 @@ begin
     -- Needed by sgmii ports
     phy_cfg_not_done <= not(phy_clkcfg_done);
 
+    -- sgmii_status_vector: 1G/2.5G Ethernet PCS/PMA or SGMII v16.0 Status registers
+    -- From Table 2-41, page 64 of
+    -- https://www.xilinx.com/support/documentation/ip_documentation/gig_ethernet_pcs_pma/v16_0/pg047-gig-eth-pcs-pma.pdf
+    -- 0: Link Status
+    -- 1: Link Synchronisation
+    -- 2: RUDI(/C/)
+    -- 3: RUDI(/I/)
+    -- 4: RUDI(INVALID)
+    -- 5: RXDISPERR
+    -- 6: RXNOTINTABLE
+    -- 7: PHY Link Status
+    
+    -- PHY status registers
+    -- 
+    -- https://www.ti.com/lit/gpn/DP83867E
 
     set_leds : process(clk125_fr)
     begin

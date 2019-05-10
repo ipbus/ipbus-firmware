@@ -47,13 +47,16 @@ architecture behavioral of phy_mdio_configurator_vcu118 is
     signal mdio_data_addr : unsigned(10 downto 0) := (others => '0');
     signal mdio_clkdone   : std_logic             := '0';
 
+
+    -- Status registers
+    -- From https://www.ti.com/lit/gpn/DP83867E
     constant MDIO_POLL_LENGTH : integer := 320;
     signal mdio_poll_data     : std_logic_vector(0 to MDIO_POLL_LENGTH-1) :=
-        encode_mdio_reg_read(VCU118_PHYADD, b"00001") &  -- basic mode status register
-        encode_mdio_reg_read(VCU118_PHYADD, b"01010") &  -- status register 1
-        encode_mdio_reg_read(VCU118_PHYADD, b"00101") &  -- Auto-Negotiation Link Partner Ability Register
-        encode_mdio_reg_read(VCU118_PHYADD, b"10001") &  -- PHY Status Register 
-        encode_mdio_reg_read(VCU118_PHYADD, b"10101");   -- error counter
+        encode_mdio_reg_read(VCU118_PHYADD, b"00001") &  -- 0x0001 Basic mode status register (Table 11.)
+        encode_mdio_reg_read(VCU118_PHYADD, b"01010") &  -- 0x000A Status register 1 (Table 20.)
+        encode_mdio_reg_read(VCU118_PHYADD, b"00101") &  -- 0x0005 Auto-Negotiation Link Partner Ability Register (Table 15.)
+        encode_mdio_reg_read(VCU118_PHYADD, b"10001") &  -- 0x0011 PHY Status Register  (Table 25)
+        encode_mdio_reg_read(VCU118_PHYADD, b"10101");   -- 0x0015 Error counter (Table 29)
     signal mdio_poll_mask : std_logic_vector(0 to MDIO_POLL_LENGTH-1) := mdio_reg_read_mask &
                                                                          mdio_reg_read_mask &
                                                                          mdio_reg_read_mask &
@@ -78,8 +81,13 @@ begin
         if rising_edge(clk125) then
             mdc_del <= mdc;
             if mdc = '1' and mdc_del = '0' then
-                if rst = '0' then
-                    if mdio_data_addr(10) = '0' then
+                if rst = '1' then
+                    mdio_data_addr <= (others => '0');
+                    mdio_t         <= '1';      -- read/dont-care
+                    mdio_clkdone   <= '0';
+                else
+                    -- post reset PHY configuration, 
+                    if mdio_data_addr(10) = '0' then -- from 0 to 2**10-1
                         mdio_t         <= '0';  -- write
                         mdio_o         <= mdio_data(to_integer(mdio_data_addr(9 downto 0)));
                         mdio_data_addr <= mdio_data_addr + 1;
@@ -87,6 +95,7 @@ begin
                         if mdio_data_addr(8) = '1' then
                             mdio_clkdone <= '1';
                         end if;
+                    -- Poll PHY registers
                     else
                         if mdio_poll_last /= poll_clk then
                             mdio_poll_addr <= (others => '0');
@@ -108,10 +117,6 @@ begin
                             mdio_t <= '1';      -- read/dont-care
                         end if;
                     end if;
-                else
-                    mdio_data_addr <= (others => '0');
-                    mdio_t         <= '1';      -- read/dont-care
-                    mdio_clkdone   <= '0';
                 end if;
             end if;
         end if;
