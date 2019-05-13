@@ -4,6 +4,7 @@ stages:
   - quick_checks
   - midway_report
   - builds
+  - publish
   - final_report
 
 
@@ -94,6 +95,7 @@ github_commit_status:end:success:
   stage: builds
   only:
     - /^pull-requests.[0-9]+$/
+    - master
     - web
   script:
     - cd work_area/proj/${CI_JOB_NAME#build:}
@@ -101,10 +103,18 @@ github_commit_status:end:success:
     - ipbb vivado impl
     - ipbb vivado bitfile
     - ipbb vivado package
+  after_script:
+    - export PROJ_NAME=${CI_JOB_NAME#build:}
+    - export ARTIFACT_DIR=build_results/${PROJ_NAME%__${VIVADO_VERSION}}/vivado${VIVADO_VERSION}/
+    - mkdir -p ${ARTIFACT_DIR}/logs
+    - cp -v work_area/proj/${PROJ_NAME}/package/*.tgz ${ARTIFACT_DIR}/ 2>/dev/null || true
+    - cp -v work_area/proj/${PROJ_NAME}/*.log ${ARTIFACT_DIR}/logs 2>/dev/null || true
+    - cp -v work_area/proj/${PROJ_NAME}/*.jou ${ARTIFACT_DIR}/logs 2>/dev/null || true
   artifacts:
-    when: on_success
+    when: always
+    name: "${CI_JOB_NAME#build:}-on-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHA:0:8}"
     paths:
-      - work_area/proj/*/package/*.tgz
+      - build_results
     expire_in: 2 weeks
 # -----------------------------------------------------------------------------
 
@@ -328,3 +338,29 @@ run_ram_slaves_testbench_sim:vivado2018.3:modelsim10.6c:
     - ipbb sim fli
     - ipbb sim make-project
     - ./vsim -c work.top -gIP_ADDR='X"c0a8c902"' -do 'run 1ms' -do 'quit'
+
+
+save_build_results:
+  stage: publish
+  image: gitlab-registry.cern.ch/ci-tools/ci-web-deployer:latest
+  only:
+    - /^pull-requests.[0-9]+$/
+    - master
+    - web
+  variables:
+    CI_OUTPUT_DIR: "build_results/"
+    OUTPUT_ROOT_DIR: "/eos/user/i/ipbusci/fw-gitlab-ci"
+  before_script:
+    - yum -y install openssh-clients
+    - export EOS_PATH=${OUTPUT_ROOT_DIR}/commits/${CI_COMMIT_TAG:-${CI_COMMIT_SHA}}/pipeline${CI_PIPELINE_ID}
+    - if [ -n "${CI_COMMIT_TAG}" ]; then export EOS_PATH=${EOS_PATH/commits/tags} ; fi
+  script:
+    - env | grep -v PASSWORD | grep -v TOKEN | sort
+    - echo "${EOS_ACCOUNT_PASSWORD}" | kinit ${EOS_ACCOUNT_USERNAME}@CERN.CH
+    - klist
+    - ssh -F ${CI_PROJECT_DIR}/ci/ssh_config ${EOS_ACCOUNT_USERNAME}@lxplus "rm -rf ${EOS_PATH} && mkdir -p ${EOS_PATH}"
+    - ssh -F ${CI_PROJECT_DIR}/ci/ssh_config ${EOS_ACCOUNT_USERNAME}@lxplus "ln -sfnv ${EOS_PATH} `dirname ${EOS_PATH}`/latest"
+    - kdestroy
+    - ls -l ${CI_OUTPUT_DIR} ${CI_OUTPUT_DIR}/*
+    - ls -l ${CI_OUTPUT_DIR}/*/*
+    - deploy-eos
