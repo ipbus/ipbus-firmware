@@ -61,7 +61,7 @@ github_commit_status:end:success:
 # -----------------------------------------------------------------------------
 # Job templates
 .job_template: &template_base
-  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-cc7:master__ipbb-enhancement-45-fli-sim-udp-e8c12b19
+  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-cc7:2019-04-30__ipbb0.5.0
   before_script:
     - source /software/Xilinx/Vivado/${VIVADO_VERSION}/settings64.sh
 
