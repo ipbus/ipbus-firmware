@@ -187,6 +187,28 @@ quick_check:zcu102_basex__2018.3:
     VIVADO_VERSION: "2018.3"
     PROJ: zcu102_basex
 
+quick_check:k800__2017.4:
+  <<: *template_vivado_quick_check
+  variables:
+    VIVADO_VERSION: "2017.4"
+    PROJ: k800
+quick_check:k800__2018.3:
+  <<: *template_vivado_quick_check
+  variables:
+    VIVADO_VERSION: "2018.3"
+    PROJ: k800
+
+quick_check:vcu118__2017.4:
+  <<: *template_vivado_quick_check
+  variables:
+    VIVADO_VERSION: "2017.4"
+    PROJ: vcu118
+quick_check:vcu118__2018.3:
+  <<: *template_vivado_quick_check
+  variables:
+    VIVADO_VERSION: "2018.3"
+    PROJ: vcu118
+
 
 
 build:enclustra_ax3_pm3_a35__2017.4:
@@ -266,6 +288,32 @@ build:zcu102_basex__2018.3:
     VIVADO_VERSION: "2018.3"
   dependencies:
     - quick_check:zcu102_basex__2018.3
+
+build:k800__2017.4:
+  <<: *template_vivado_build
+  variables:
+    VIVADO_VERSION: "2017.4"
+  dependencies:
+    - quick_check:k800__2017.4
+build:k800__2018.3:
+  <<: *template_vivado_build
+  variables:
+    VIVADO_VERSION: "2018.3"
+  dependencies:
+    - quick_check:k800__2018.3
+
+build:vcu118__2017.4:
+  <<: *template_vivado_build
+  variables:
+    VIVADO_VERSION: "2017.4"
+  dependencies:
+    - quick_check:vcu118__2017.4
+build:vcu118__2018.3:
+  <<: *template_vivado_build
+  variables:
+    VIVADO_VERSION: "2018.3"
+  dependencies:
+    - quick_check:vcu118__2018.3
 
 
 
