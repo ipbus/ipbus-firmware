@@ -34,34 +34,50 @@ use ieee.numeric_std.all;
 
 entity ipbus_transport_multibuffer_tx_dpram is
   generic (
-  	-- corresponds to 32b data
-  	ADDRWIDTH : natural
+    -- corresponds to 32b data
+    ADDRWIDTH : natural
   );
   port (
-  	clka : in std_logic;
-  	wea : in std_logic;
-  	addra : in std_logic_vector(ADDRWIDTH - 1 downto 0);
-  	dia : in std_logic_vector(31 downto 0);
+    clka : in std_logic;
+    wea : in std_logic_vector(1 downto 0);
+    addra : in std_logic_vector(ADDRWIDTH - 1 downto 0);
+    dia : in std_logic_vector(63 downto 0);
 
-  	clkb : in std_logic;
-  	addrb : in std_logic_vector(ADDRWIDTH - 2 downto 0);
-  	dob : out std_logic_vector(63 downto 0)
+    clkb : in std_logic;
+    addrb : in std_logic_vector(ADDRWIDTH - 2 downto 0);
+    dob : out std_logic_vector(63 downto 0)
   );
 end entity ipbus_transport_multibuffer_tx_dpram;
 
 
 architecture rtl of ipbus_transport_multibuffer_tx_dpram is
 
-  type ram_type is array (2**ADDRWIDTH - 1 downto 0) of std_logic_vector(31 downto 0);
-  signal ram : ram_type;
+  type ram_type is array (2**(ADDRWIDTH - 1) - 1 downto 0) of std_logic_vector(31 downto 0);
+  signal ram0, ram1 : ram_type;
+
+  signal we0, we1 : std_logic;
+  signal waddr0, waddr1 : unsigned (ADDRWIDTH - 2 downto 0);
+  signal wdata0, wdata1 : std_logic_vector(31 downto 0);
 
 begin
+
+  we0 <= wea(0) when addra(0) = '0' else wea(1) and wea(0);
+  we1 <= wea(0) when addra(0) = '1' else wea(1) and wea(0);
+
+  waddr0 <= unsigned(addra(ADDRWIDTH - 1 downto 1)) when addra(0) = '0' else unsigned(addra(ADDRWIDTH - 1 downto 1)) + 1;
+  waddr1 <= unsigned(addra(ADDRWIDTH - 1 downto 1));
+
+  wdata0 <= dia(31 downto 0) when addra(0) = '0' else dia(63 downto 32);
+  wdata1 <= dia(63 downto 32) when addra(0) = '0' else dia(31 downto 0);
 
   write: process (clka)
   begin
     if rising_edge(clka) then
-      if (wea = '1') then
-        ram(to_integer(unsigned(addra))) <= dia;
+      if (we0 = '1') then
+        ram0(to_integer(waddr0)) <= wdata0;
+      end if;
+      if (we1 = '1') then
+        ram1(to_integer(waddr1)) <= wdata1;
       end if;
     end if;
   end process write;
@@ -69,8 +85,8 @@ begin
   read: process (clkb)
   begin
     if rising_edge(clkb) then
-      dob(31 downto 0) <= ram(to_integer(unsigned(addrb & '0')));
-      dob(63 downto 32) <= ram(to_integer(unsigned(addrb & '1')));
+      dob(31 downto 0) <= ram0(to_integer(unsigned(addrb)));
+      dob(63 downto 32) <= ram1(to_integer(unsigned(addrb)));
     end if;
   end process read;
 

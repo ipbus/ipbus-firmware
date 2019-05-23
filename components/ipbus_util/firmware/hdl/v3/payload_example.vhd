@@ -24,56 +24,46 @@
 ---------------------------------------------------------------------------------
 
 
--- Top-level design for ipbus demo
+-- payload_simple_example
 --
--- This version is for simulation, using UDP interface to Modelsim
+-- selection of different IPBus slaves without actual function,
+-- just for performance evaluation of the IPbus/uhal system
 --
--- Dave Newbold, April 2019
+-- Alessandro Thea, September 2018
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+use work.ipbus_v3.all;
 
-use work.ipbus_v3.ALL;
 
-entity top is
-end top;
+entity payload is
+    port(
+        ipb_clk: in std_logic;
+        ipb_rst: in std_logic;
+        ipb_in: in ipb_wbus;
+        ipb_out: out ipb_rbus;
+        clk: in std_logic;
+        rst: in std_logic;
+        nuke: out std_logic;
+        soft_rst: out std_logic;
+        userled: out std_logic
+    );
 
-architecture rtl of top is
+end payload;
 
-	signal clk_ipb, rst_ipb, clk_aux, rst_aux, nuke, soft_rst: std_logic;
-	signal ipb_w: ipb_wbus;
-	signal ipb_r: ipb_rbus;
-	
+architecture rtl of payload is
+
 begin
 
--- Infrastructure
-
-	infra: entity work.sim_udp_infra
-		port map(
-			clk_ipb_o => clk_ipb,
-			rst_ipb_o => rst_ipb,
-			clk_aux_o => clk_aux,
-			rst_aux_o => rst_aux,
-			nuke => nuke,
-			soft_rst => soft_rst,
-			ipb_in => ipb_r,
-			ipb_out => ipb_w
-		);
-		
--- ipbus slaves live in the entity below, and can expose top-level ports
--- The ipbus fabric is instantiated within.
-
-	payload: entity work.payload
-		port map(
-			ipb_clk => clk_ipb,
-			ipb_rst => rst_ipb,
-			ipb_in => ipb_w,
-			ipb_out => ipb_r,
-			clk => clk_aux,
-			rst => rst_aux,
-			nuke => nuke,
-			soft_rst => soft_rst,
-			userled => open
-		);
+    example: entity work.ipbus_v3_example
+        port map(
+            ipb_clk => ipb_clk,
+            ipb_rst => ipb_rst,
+            ipb_in => ipb_in,
+            ipb_out => ipb_out,
+            nuke => nuke,
+            soft_rst => soft_rst,
+            userled => userled
+        );
 
 end rtl;

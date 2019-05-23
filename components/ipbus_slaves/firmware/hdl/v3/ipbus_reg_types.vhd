@@ -24,56 +24,40 @@
 ---------------------------------------------------------------------------------
 
 
--- Top-level design for ipbus demo
---
--- This version is for simulation, using UDP interface to Modelsim
---
--- Dave Newbold, April 2019
-
 library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_1164.all;
 
-use work.ipbus_v3.ALL;
+package ipbus_v3_reg_types is
 
-entity top is
-end top;
+	type ipb_reg_v is array(natural range <>) of std_logic_vector(63 downto 0);
 
-architecture rtl of top is
+-- Useful functions - compile-time only
 
-	signal clk_ipb, rst_ipb, clk_aux, rst_aux, nuke, soft_rst: std_logic;
-	signal ipb_w: ipb_wbus;
-	signal ipb_r: ipb_rbus;
+	function calc_width(n: integer) return integer;
+	function integer_max(left, right: integer) return integer;
+
+end package ipbus_v3_reg_types;
+
+package body ipbus_v3_reg_types is
+
+	function calc_width(n: integer) return integer is
+	begin
+		for i in 0 to 31 loop
+			if(2 ** i >= n) then
+				return(i);
+			end if;
+		end loop;
+		return(0);
+	end function calc_width;
+
+	function integer_max(left, right: integer) return integer is
+  begin
+    if left > right then
+    	return left;
+    else
+    	return right;
+    end if;
+  end function integer_max;
 	
-begin
+end package body ipbus_v3_reg_types;
 
--- Infrastructure
-
-	infra: entity work.sim_udp_infra
-		port map(
-			clk_ipb_o => clk_ipb,
-			rst_ipb_o => rst_ipb,
-			clk_aux_o => clk_aux,
-			rst_aux_o => rst_aux,
-			nuke => nuke,
-			soft_rst => soft_rst,
-			ipb_in => ipb_r,
-			ipb_out => ipb_w
-		);
-		
--- ipbus slaves live in the entity below, and can expose top-level ports
--- The ipbus fabric is instantiated within.
-
-	payload: entity work.payload
-		port map(
-			ipb_clk => clk_ipb,
-			ipb_rst => rst_ipb,
-			ipb_in => ipb_w,
-			ipb_out => ipb_r,
-			clk => clk_aux,
-			rst => rst_aux,
-			nuke => nuke,
-			soft_rst => soft_rst,
-			userled => open
-		);
-
-end rtl;

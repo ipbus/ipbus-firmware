@@ -24,56 +24,43 @@
 ---------------------------------------------------------------------------------
 
 
--- Top-level design for ipbus demo
+-- ipbus_trans_decl
 --
--- This version is for simulation, using UDP interface to Modelsim
+-- Defines the types for interface between ipbus transactor and
+-- the memory buffers which hold input and output packets
 --
--- Dave Newbold, April 2019
+-- Dave Newbold, September 2012
+
 
 library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_1164.all;
 
-use work.ipbus_v3.ALL;
+package ipbus_v3_trans_decl is
 
-entity top is
-end top;
+	constant addr_width: positive := 12;
 
-architecture rtl of top is
-
-	signal clk_ipb, rst_ipb, clk_aux, rst_aux, nuke, soft_rst: std_logic;
-	signal ipb_w: ipb_wbus;
-	signal ipb_r: ipb_rbus;
+	-- Signals from buffer to transactor
 	
-begin
+	type ipbus_trans_in is
+		record
+			pkt_rdy: std_logic;
+			rdata: std_logic_vector(63 downto 0);
+			busy: std_logic;
+		end record;
 
--- Infrastructure
-
-	infra: entity work.sim_udp_infra
-		port map(
-			clk_ipb_o => clk_ipb,
-			rst_ipb_o => rst_ipb,
-			clk_aux_o => clk_aux,
-			rst_aux_o => rst_aux,
-			nuke => nuke,
-			soft_rst => soft_rst,
-			ipb_in => ipb_r,
-			ipb_out => ipb_w
-		);
+	type ipbus_trans_in_array is array(natural range <>) of ipbus_trans_in;
 		
--- ipbus slaves live in the entity below, and can expose top-level ports
--- The ipbus fabric is instantiated within.
+	-- Signals from transactor to buffer
+	
+	type ipbus_trans_out is
+		record
+			raddr: std_logic_vector(addr_width - 1 downto 0);
+			pkt_done: std_logic;
+			we: std_logic_vector(1 downto 0);
+			waddr: std_logic_vector(addr_width - 1 downto 0);
+			wdata: std_logic_vector(63 downto 0);
+		end record;
+  
+	type ipbus_trans_out_array is array(natural range <>) of ipbus_trans_out;  
 
-	payload: entity work.payload
-		port map(
-			ipb_clk => clk_ipb,
-			ipb_rst => rst_ipb,
-			ipb_in => ipb_w,
-			ipb_out => ipb_r,
-			clk => clk_aux,
-			rst => rst_aux,
-			nuke => nuke,
-			soft_rst => soft_rst,
-			userled => open
-		);
-
-end rtl;
+end ipbus_v3_trans_decl;

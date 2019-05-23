@@ -60,7 +60,7 @@ github_commit_status:end:success:
 # -----------------------------------------------------------------------------
 # Job templates
 .job_template: &template_base
-  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-cc7:2019-01-08__ipbb0.3.11
+  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-cc7:master__ipbb-enhancement-45-fli-sim-udp-e8c12b19
   before_script:
     - source /software/Xilinx/Vivado/${VIVADO_VERSION}/settings64.sh
 
@@ -258,6 +258,27 @@ build:zcu102_basex__2018.3:
     - quick_check:zcu102_basex__2018.3
 
 
+
+run_sim_udp:vivado2018.3:modelsim10.6c:
+  <<: *template_base
+  tags:
+    - docker
+    - docker-cap-net-admin
+    - docker-device-net-tun
+    - xilinx-tools
+  stage: quick_checks
+  variables:
+    VIVADO_VERSION: "2018.3"
+    IPBB_SIMLIB_BASE: /scratch/xilinx-simlibs
+  script:
+    - export PATH=/software/mentor/modelsim_10.6c/modeltech/bin:$PATH
+    - export PATH=/opt/cactus/bin/uhal/tests:$PATH
+    - export LD_LIBRARY_PATH=/opt/cactus/lib:$LD_LIBRARY_PATH
+
+    - ipbb init work_area
+    - cd work_area
+    - ln -s ${CI_PROJECT_DIR} src/ipbus-firmware
+    - /${CI_PROJECT_DIR}/work_area/src/ipbus-firmware/tests/ci/test-run-sim-udp.sh sim
 
 run_sim:vivado2018.3:modelsim10.6c:
   <<: *template_base

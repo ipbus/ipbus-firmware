@@ -24,15 +24,12 @@
 #-------------------------------------------------------------------------------
 
 
-@device_family = "KintexUltraScale"
-@device_name = "xcku115"
-@device_package = "-flva1517"
-@device_speed = "-2-i"
-@boardname = "htg_k800"
+# Dependencies for ipbus_core
 
-
-src k800_infra.vhd
-src -c components/ipbus_util clocks/clocks_us_serdes.vhd ipbus_clock_div.vhd led_stretcher.vhd
-include -c components/ipbus_pcie ipbus_pcie_xdma_us.dep
-include -c components/ipbus_transport_axi
-src -c components/ipbus_core v3/ipbus_fabric_sel.vhd v3/ipbus_package.vhd
+src v3/ipbus_trans_arb.vhd
+src v3/ipbus_transactor.vhd
+src v3/ipbus_transactor_if.vhd
+src v3/ipbus_transactor_sm.vhd
+src transactor_cfg.vhd
+src v3/ipbus_package.vhd
+src v3/ipbus_trans_decl.vhd

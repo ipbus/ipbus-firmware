@@ -30,8 +30,8 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
-use work.ipbus.all;
-use work.ipbus_trans_decl.all;
+use work.ipbus_v3.all;
+use work.ipbus_v3_trans_decl.all;
 
 entity sim_udp_infra is
 	generic(
@@ -91,7 +91,7 @@ begin
 
 -- IPbus transactor
 
-	trans: entity work.transactor
+	trans: entity work.ipbus_transactor
 		port map (
 			clk => clk_ipb,
 			rst => rsti,
