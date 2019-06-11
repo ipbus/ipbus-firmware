@@ -45,7 +45,12 @@ create_clock -period 6.4 -name eth_refclk [get_ports eth_clk_p]
 # System clock (125MHz)
 create_clock -period 8 -name sysclk [get_ports sysclk_p]
 
-set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks clk_aux_i] -group [get_clocks -include_generated_clocks I] -group [get_clocks -include_generated_clocks [get_clocks -filter {name =~ txoutclk*}]]
+# Clocks derived from system clock
+
+create_generated_clock -name clk_ipb -source [get_pins infra/clocks/mmcm/CLKIN1] [get_pins infra/clocks/mmcm/CLKOUT1]
+create_generated_clock -name clk_aux -source [get_pins infra/clocks/mmcm/CLKIN1] [get_pins infra/clocks/mmcm/CLKOUT2]
+
+set_clock_groups -asynchronous -group [get_clocks sysclk] -group [get_clocks -include_generated_clocks clk_aux] -group [get_clocks -include_generated_clocks clk_ipb] -group [get_clocks -include_generated_clocks [get_clocks -filter {name =~ txoutclk*}]]
                                                  
 set_property LOC GTHE3_CHANNEL_X0Y10 [get_cells -hier -filter {name=~infra/eth/*/*GTHE3_CHANNEL_PRIM_INST}]
 
