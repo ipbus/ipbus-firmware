@@ -26,19 +26,6 @@
 
 set_property BITSTREAM.GENERAL.COMPRESS TRUE [current_design]
 
-proc false_path {patt clk} {
-    set p [get_ports -quiet $patt -filter {direction != out}]
-    if {[llength $p] != 0} {
-        set_input_delay 0 -clock [get_clocks $clk] [get_ports $patt -filter {direction != out}]
-        set_false_path -from [get_ports $patt -filter {direction != out}]
-    }
-    set p [get_ports -quiet $patt -filter {direction != in}]
-    if {[llength $p] != 0} {
-       	set_output_delay 0 -clock [get_clocks $clk] [get_ports $patt -filter {direction != in}]
-	    set_false_path -to [get_ports $patt -filter {direction != in}]
-	}
-}
-
 # Eth clock: bank 230 MGT RefClk (156MHz, scaled to 125 MHz in the pcs_pma core)
 set_property PACKAGE_PIN C8 [get_ports eth_clk_p]
 set_property PACKAGE_PIN C7 [get_ports eth_clk_n]
@@ -49,13 +36,6 @@ set_property IOSTANDARD LVDS_25 [get_ports {sysclk_*}]
 set_property PACKAGE_PIN G21 [get_ports sysclk_p]
 set_property PACKAGE_PIN F21 [get_ports sysclk_n]
 create_clock -period 8 -name sysclk [get_ports sysclk_p]
-
-# Clocks derived from system clock
-
-create_generated_clock -name clk_ipb -source [get_pins infra/clocks/mmcm/CLKIN1] [get_pins infra/clocks/mmcm/CLKOUT1]
-create_generated_clock -name clk_aux -source [get_pins infra/clocks/mmcm/CLKIN1] [get_pins infra/clocks/mmcm/CLKOUT2]
-
-set_clock_groups -asynchronous -group [get_clocks sysclk] -group [get_clocks -include_generated_clocks clk_aux] -group [get_clocks -include_generated_clocks clk_ipb] -group [get_clocks -include_generated_clocks [get_clocks -filter {name =~ txoutclk*}]]
 
 # use the top right cage (SFP0) in the onboard quad SFP+ module. eth_tx_p on pin E4, bank 230
 set_property LOC GTHE4_CHANNEL_X1Y12 [get_cells -hier -filter {name=~infra/eth/*/*GTHE4_CHANNEL_PRIM_INST}]
@@ -84,3 +64,9 @@ set_property PACKAGE_PIN AP14 [get_ports {dip_sw[1]}]
 set_property PACKAGE_PIN AM14 [get_ports {dip_sw[2]}]
 set_property PACKAGE_PIN AN13 [get_ports {dip_sw[3]}]
 false_path {dip_sw[*]} sysclk
+
+# Clocks derived from system clock
+create_generated_clock -name ipbus_clk -source [get_pins infra/clocks/mmcm/CLKIN1] [get_pins infra/clocks/mmcm/CLKOUT1]
+create_generated_clock -name clk_aux -source [get_pins infra/clocks/mmcm/CLKIN1] [get_pins infra/clocks/mmcm/CLKOUT2]
+
+set_clock_groups -asynchronous -group [get_clocks sysclk] -group [get_clocks -include_generated_clocks clk_aux] -group [get_clocks -include_generated_clocks ipbus_clk] -group [get_clocks -include_generated_clocks [get_clocks -filter {name =~ txoutclk*}]]

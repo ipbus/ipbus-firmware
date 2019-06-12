@@ -28,7 +28,6 @@
 set_property CONFIG_VOLTAGE 1.8 [current_design]
 set_property CFGBVS GND [current_design]
 
-
 # PCIe
 create_clock -period 10.000 -name pcie_sys_clk [get_ports pcie_sys_clk_p]
 set_property PACKAGE_PIN AK10 [get_ports pcie_sys_clk_p]
