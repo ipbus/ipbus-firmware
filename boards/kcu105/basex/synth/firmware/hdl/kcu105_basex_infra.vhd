@@ -87,7 +87,6 @@ begin
 
 	clocks: entity work.clocks_us_serdes
 		generic map(
-			CLK_FR_FREQ => 156.25,
 			CLK_AUX_FREQ => CLK_AUX_FREQ
 		)
 		port map(
