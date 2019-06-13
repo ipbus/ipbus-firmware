@@ -24,5 +24,5 @@
 #-------------------------------------------------------------------------------
 
 
-include ram_slaves_tester.dep
-include -c boards/kc705/basex/synth kc705_basex.dep
+include -c boards/pc053a/synth pc053a.dep
+include -c components/ipbus_util ipbus_example.dep
