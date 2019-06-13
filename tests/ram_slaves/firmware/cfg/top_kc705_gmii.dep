@@ -25,4 +25,4 @@
 
 
 include ram_slaves_tester.dep
-include -c boards/kc705/gmii/synth top.dep
+include -c boards/kc705/gmii/synth kc705_gmii.dep
