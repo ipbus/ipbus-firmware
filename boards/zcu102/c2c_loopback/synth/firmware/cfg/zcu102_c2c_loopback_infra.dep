@@ -24,10 +24,10 @@
 #-------------------------------------------------------------------------------
 
 src c2c_m_infra.vhd c2c_m_ipb_wrapper.vhd
-?toolset=="Vivado"? src ../cgn/c2c_m_ipb/c2c_m_ipb.bd
+#?toolset=="Vivado"? src ../cgn/c2c_m_ipb/c2c_m_ipb.bd
 
 src c2c_s_infra.vhd c2c_s_ipb_wrapper.vhd
-?toolset=="Vivado"? src ../cgn/c2c_s_ipb/c2c_s_ipb.bd
+#?toolset=="Vivado"? src ../cgn/c2c_s_ipb/c2c_s_ipb.bd
 
 include -c components/ipbus_transport_axi
 include -c components/ipbus_core

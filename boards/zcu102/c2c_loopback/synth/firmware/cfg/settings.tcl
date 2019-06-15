@@ -29,3 +29,5 @@ set_property "default_lib" "xil_defaultlib" $obj
 set_property "simulator_language" "Mixed" $obj
 set_property "source_mgmt_mode" "DisplayOnly" $obj
 set_property "target_language" "VHDL" $obj
+
+set_property BOARD_PART xilinx.com:zcu102:part0:3.1 [current_project]

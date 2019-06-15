@@ -24,6 +24,7 @@
 #-------------------------------------------------------------------------------
 
 setup settings.tcl
+setup -f add_block_designs.tcl
 include zu9.dep
 
 src top_zcu102_zynq_ipb.vhd
