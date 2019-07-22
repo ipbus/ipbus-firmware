@@ -69,8 +69,8 @@ ENTITY UDP_if IS
 		mac_tx_ready: IN std_logic;
 		pkt_done_read: IN std_logic;
 		pkt_done_write: IN std_logic;
-		raddr: IN std_logic_vector(11 DOWNTO 0);
-		waddr: IN std_logic_vector(11 DOWNTO 0);
+		raddr: IN std_logic_vector(15 DOWNTO 0);
+		waddr: IN std_logic_vector(15 DOWNTO 0);
 		wdata: IN std_logic_vector(31 DOWNTO 0);
 		we: IN std_logic;
 		busy: OUT std_logic;

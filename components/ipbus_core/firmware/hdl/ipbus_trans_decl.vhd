@@ -37,7 +37,7 @@ use IEEE.STD_LOGIC_1164.all;
 
 package ipbus_trans_decl is
 
-	constant addr_width: positive := 12;
+	constant addr_width: positive := 16;
 
 	-- Signals from buffer to transactor
 	
