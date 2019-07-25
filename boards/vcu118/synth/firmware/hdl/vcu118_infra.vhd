@@ -78,7 +78,7 @@ architecture rtl of vcu118_infra is
 
   signal pcie_sys_rst_n_i : std_logic;
 
-  signal axi_ms: axi4mm_ms(araddr(15 downto 0), awaddr(15 downto 0), wdata(63 downto 0));
+  signal axi_ms: axi4mm_ms(araddr(63 downto 0), awaddr(63 downto 0), wdata(63 downto 0));
   signal axi_sm: axi4mm_sm(rdata(63 downto 0));
 
   signal ipb_pkt_done : std_logic;
