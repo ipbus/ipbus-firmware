@@ -28,7 +28,7 @@ entity pcie_xdma_axi_us_if is
 
     pcie_user_lnk_up: out std_logic;
 
-    axi_ms : out axi4mm_ms(araddr(15 downto 0), awaddr(15 downto 0), wdata(63 downto 0));
+    axi_ms : out axi4mm_ms(araddr(63 downto 0), awaddr(63 downto 0), wdata(63 downto 0));
     axi_sm : in axi4mm_sm(rdata(63 downto 0));
 
     -- User interrupts
@@ -51,13 +51,10 @@ architecture rtl of pcie_xdma_axi_us_if is
   signal usr_irq_req: std_logic_vector ( C_NUM_USR_IRQ - 1 downto 0 );
   signal usr_irq_ack: std_logic_vector ( C_NUM_USR_IRQ - 1 downto 0 );
 
-  signal xdma_axi_araddr: std_logic_vector(C_AXI_ADDR_WIDTH - 1 DOWNTO 0);
-  signal xdma_axi_awaddr: std_logic_vector(C_AXI_ADDR_WIDTH - 1 DOWNTO 0);
-
   signal msi_vector_width: std_logic_vector ( 2 downto 0 );
   signal msi_enable: std_logic;
 
-  signal axi_ms_i: axi4mm_ms(araddr(15 downto 0), awaddr(15 downto 0), wdata(C_AXI_DATA_WIDTH - 1 downto 0));
+  signal axi_ms_i: axi4mm_ms(araddr(63 downto 0), awaddr(63 downto 0), wdata(C_AXI_DATA_WIDTH - 1 downto 0));
 
   -- components
 
@@ -173,7 +170,7 @@ begin
       m_axi_rlast       => axi_sm.rlast,
       m_axi_rvalid      => axi_sm.rvalid,
       m_axi_awid        => axi_ms_i.awid,
-      m_axi_awaddr      => xdma_axi_awaddr,
+      m_axi_awaddr      => axi_ms_i.awaddr,
       m_axi_awlen       => axi_ms_i.awlen,
       m_axi_awsize      => axi_ms_i.awsize,
       m_axi_awburst     => axi_ms_i.awburst,
@@ -187,7 +184,7 @@ begin
       m_axi_wvalid      => axi_ms_i.wvalid,
       m_axi_bready      => axi_ms_i.bready,
       m_axi_arid        => axi_ms_i.arid,
-      m_axi_araddr      => xdma_axi_araddr,
+      m_axi_araddr      => axi_ms_i.araddr,
       m_axi_arlen       => axi_ms_i.arlen,
       m_axi_arsize      => axi_ms_i.arsize,
       m_axi_arburst     => axi_ms_i.arburst,
@@ -213,8 +210,6 @@ begin
       int_qpll1outclk_out    => open
     );
 
-  axi_ms_i.araddr <= xdma_axi_araddr(axi_ms.araddr'length - 1 downto 0);
-  axi_ms_i.awaddr <= xdma_axi_awaddr(axi_ms.awaddr'length - 1 downto 0);
   axi_ms <= axi_ms_i;
 
   irq_gen: entity work.pcie_int_gen_msix

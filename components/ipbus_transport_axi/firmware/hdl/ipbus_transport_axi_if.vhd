@@ -52,7 +52,7 @@ entity ipbus_transport_axi_if is
 		ipb_clk : in std_logic;
 		rst_ipb : in std_logic;
 
-		axi_in  : in axi4mm_ms(araddr(15 downto 0), awaddr(15 downto 0), wdata(63 downto 0));
+		axi_in  : in axi4mm_ms(araddr(63 downto 0), awaddr(63 downto 0), wdata(63 downto 0));
 		axi_out : out axi4mm_sm(rdata(63 downto 0));
 
 		pkt_done : out std_logic;
@@ -71,7 +71,7 @@ architecture rtl of ipbus_transport_axi_if is
 			s_axi_aclk : IN STD_LOGIC;
 			s_axi_aresetn : IN STD_LOGIC;
 			s_axi_awid : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
-			s_axi_awaddr : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+			s_axi_awaddr : IN STD_LOGIC_VECTOR(BUFWIDTH+ADDRWIDTH+2 DOWNTO 0);
 			s_axi_awlen : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
 			s_axi_awsize : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
 			s_axi_awburst : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
@@ -90,7 +90,7 @@ architecture rtl of ipbus_transport_axi_if is
 			s_axi_bvalid : OUT STD_LOGIC;
 			s_axi_bready : IN STD_LOGIC;
 			s_axi_arid : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
-			s_axi_araddr : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+			s_axi_araddr : IN STD_LOGIC_VECTOR(BUFWIDTH+ADDRWIDTH+2 DOWNTO 0);
 			s_axi_arlen : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
 			s_axi_arsize : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
 			s_axi_arburst : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
@@ -109,22 +109,20 @@ architecture rtl of ipbus_transport_axi_if is
 			bram_clk_a : OUT STD_LOGIC;
 			bram_en_a : OUT STD_LOGIC;
 			bram_we_a : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-			bram_addr_a : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+			bram_addr_a : OUT STD_LOGIC_VECTOR(BUFWIDTH+ADDRWIDTH+2 DOWNTO 0);
 			bram_wrdata_a : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
 			bram_rddata_a : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
 			bram_rst_b : OUT STD_LOGIC;
 			bram_clk_b : OUT STD_LOGIC;
 			bram_en_b : OUT STD_LOGIC;
 			bram_we_b : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-			bram_addr_b : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+			bram_addr_b : OUT STD_LOGIC_VECTOR(BUFWIDTH+ADDRWIDTH+2 DOWNTO 0);
 			bram_wrdata_b : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
 			bram_rddata_b : IN STD_LOGIC_VECTOR(63 DOWNTO 0)
 		);
 	END COMPONENT;
 
-	constant bram_addr_zero : std_logic_vector(15 downto 0) := (Others => '0');
-
-	signal bram_addr_a, bram_addr_b : std_logic_vector(15 downto 0);
+	signal bram_addr_a, bram_addr_b : std_logic_vector(BUFWIDTH+ADDRWIDTH+2 downto 0);
 	signal ram_wr_en, ram_we, ram_rd_en : std_logic;
 	signal ram_wr_we : std_logic_vector(7 downto 0);
 	signal ram_wr_data, ram_rd_data : std_logic_vector(63 downto 0);
@@ -138,7 +136,7 @@ begin
 
 			s_axi_aresetn    => axi_in.aresetn,
 			s_axi_awid       => axi_in.awid,
-			s_axi_awaddr     => axi_in.awaddr,
+			s_axi_awaddr     => axi_in.awaddr(BUFWIDTH+ADDRWIDTH+2 downto 0),
 			s_axi_awlen      => axi_in.awlen,
 			s_axi_awsize     => axi_in.awsize,
 			s_axi_awburst    => axi_in.awburst,
@@ -159,7 +157,7 @@ begin
 			s_axi_bvalid     => axi_out.bvalid,
 			s_axi_bready     => axi_in.bready,
 			s_axi_arid       => axi_in.arid,
-			s_axi_araddr     => axi_in.araddr,
+			s_axi_araddr     => axi_in.araddr(BUFWIDTH+ADDRWIDTH+2 downto 0),
 			s_axi_arlen      => axi_in.arlen,
 			s_axi_arsize     => axi_in.arsize,
 			s_axi_arburst    => axi_in.arburst,
