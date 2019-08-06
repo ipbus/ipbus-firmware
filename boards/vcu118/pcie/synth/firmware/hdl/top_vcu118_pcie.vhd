@@ -66,7 +66,7 @@ end top;
 
 architecture rtl of top is
 
-  signal ipb_clk, ipb_rst, nuke, soft_rst, userled: std_logic;
+  signal clk_ipb, rst_ipb, clk_aux, rst_aux, nuke, soft_rst, userled : std_logic;
   
   signal ipb_out: ipb_wbus;
   signal ipb_in: ipb_rbus;
@@ -87,8 +87,10 @@ begin
       pcie_tx_n      => pcie_tx_n,
       osc_clk_p      => osc_clk_p,
       osc_clk_n      => osc_clk_n,
-      ipb_clk        => ipb_clk,
-      ipb_rst        => ipb_rst,
+      clk_ipb_o     => clk_ipb,
+      rst_ipb_o     => rst_ipb,
+      clk_aux_o     => clk_aux,
+      rst_aux_o     => rst_aux,
       nuke           => nuke,
       soft_rst       => soft_rst,
       leds           => leds(1 downto 0),

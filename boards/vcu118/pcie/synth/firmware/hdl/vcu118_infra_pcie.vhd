@@ -57,8 +57,10 @@ entity vcu118_infra_pcie is
       osc_clk_p : in std_logic;
       osc_clk_n : in std_logic;
       -- IPbus clock and reset
-      ipb_clk : out std_logic;
-      ipb_rst : out std_logic;
+      clk_ipb_o : out   std_logic;
+      rst_ipb_o : out   std_logic;
+      clk_aux_o : out   std_logic;  -- 40MHz generated clock
+      rst_aux_o : out   std_logic;
       -- The signals of doom and lesser doom
       nuke: in std_logic;
       soft_rst: in std_logic;
@@ -73,8 +75,8 @@ end vcu118_infra_pcie;
 
 architecture rtl of vcu118_infra_pcie is
 
-  signal clk_osc, clk_ipb, clk_ipb_i : std_logic;
-  signal locked, clk_locked, pcie_user_lnk_up, rst125, rst_ipb, rst_ipb_ctrl, rst_axi, onehz : std_logic;
+  signal clk_osc, clk_ipb, clk_ipb_i, clk_aux : std_logic;
+  signal locked, clk_locked, pcie_user_lnk_up, rst125, rst_ipb, rst_aux, rst_ipb_ctrl, rst_axi, onehz : std_logic;
 
   signal pcie_sys_rst_n_i : std_logic;
 
@@ -109,21 +111,24 @@ begin
       clki_fr => clk_osc,
       clki_125 => axi_ms.aclk,
       clko_ipb => clk_ipb_i,
+      clko_aux => clk_aux,
       eth_locked => pcie_user_lnk_up,
       locked => clk_locked,
       nuke => nuke,
       soft_rst => soft_rst,
       rsto_125 => rst125,
       rsto_ipb => rst_ipb,
+      rsto_aux => rst_aux,
       rsto_eth => rst_axi,
       rsto_ipb_ctrl => rst_ipb_ctrl,
       onehz => onehz
     );
 
   clk_ipb <= clk_ipb_i;
-  ipb_clk <= clk_ipb_i;
-  ipb_rst <= rst_ipb;
-
+  clk_ipb_o <= clk_ipb_i;
+  rst_ipb_o <= rst_ipb;
+  clk_aux_o <= clk_aux;
+  rst_aux_o <= rst_aux;
   locked <= clk_locked and pcie_user_lnk_up;
 
   -- TODO: Add equivalent of 'stretched' "pkt" signal from ku105 design
