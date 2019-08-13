@@ -36,8 +36,6 @@ create_clock -period 8.000 -name eth_refclk [get_ports eth_clk_p]
 # Ethernet monitor clock hack (62.5MHz)
 create_clock -period 16.000 -name clk_dc [get_pins infra/eth/dc_buf/O]
 
-set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks eth_refclk] -group [get_clocks -include_generated_clocks [get_clocks -filter {name =~ infra/eth/phy/*/RXOUTCLK}]] -group [get_clocks -include_generated_clocks [get_clocks -filter {name =~ infra/eth/phy/*/TXOUTCLK}]]
-
 # Area constraints
 create_pblock infra
 resize_pblock [get_pblocks infra] -add {CLOCKREGION_X1Y4:CLOCKREGION_X1Y4}
@@ -46,19 +44,6 @@ set_property PACKAGE_PIN F6 [get_ports eth_clk_p]
 set_property PACKAGE_PIN E6 [get_ports eth_clk_n]
 
 set_property LOC GTPE2_CHANNEL_X0Y4 [get_cells -hier -filter {name=~infra/eth/*/gtpe2_i}]
-
-proc false_path {patt clk} {
-    set p [get_ports -quiet $patt -filter {direction != out}]
-    if {[llength $p] != 0} {
-        set_input_delay 0 -clock [get_clocks $clk] [get_ports $patt -filter {direction != out}]
-        set_false_path -from [get_ports $patt -filter {direction != out}]
-    }
-    set p [get_ports -quiet $patt -filter {direction != in}]
-    if {[llength $p] != 0} {
-       	set_output_delay 0 -clock [get_clocks $clk] [get_ports $patt -filter {direction != in}]
-	    set_false_path -to [get_ports $patt -filter {direction != in}]
-	}
-}
 
 set_property IOSTANDARD LVCMOS33 [get_ports {sfp_*}]
 set_property PACKAGE_PIN W17 [get_ports {sfp_los}]
@@ -86,3 +71,10 @@ set_property PACKAGE_PIN D15 [get_ports {dip_sw[1]}]
 set_property PACKAGE_PIN E13 [get_ports {dip_sw[2]}]
 set_property PACKAGE_PIN E14 [get_ports {dip_sw[3]}]
 false_path {dip_sw[*]} eth_refclk
+
+
+# Clocks derived from system clock
+create_generated_clock -name ipbus_clk -source [get_pins infra/clocks/mmcm/CLKIN1] [get_pins infra/clocks/mmcm/CLKOUT1]
+create_generated_clock -name clk_aux -source [get_pins infra/clocks/mmcm/CLKIN1] [get_pins infra/clocks/mmcm/CLKOUT2]
+
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks eth_refclk] -group [get_clocks -include_generated_clocks clk_aux] -group [get_clocks -include_generated_clocks ipbus_clk] -group [get_clocks -include_generated_clocks [get_clocks -filter {name =~ infra/eth/phy/*/RXOUTCLK}]] -group [get_clocks -include_generated_clocks [get_clocks -filter {name =~ infra/eth/phy/*/TXOUTCLK}]]

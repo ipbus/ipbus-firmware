@@ -44,7 +44,7 @@
         <node id="data" mode="port" size="0x800" address="0x1"/>
     </node>
 
-    <node id="ram"     address="0x1000" mode="block" size="0x400" description="1kword RAM" fwinfo="endpoint;width=9"/>
+    <node id="ram"     address="0x1000" mode="block" size="0x400" description="1-kword RAM" fwinfo="endpoint;width=9"/>
     <node id="dpram"   address="0x2000" mode="block" size="0x400" description="Dual port RAM" fwinfo="endpoint;width=9"/>
     <node id="dpram36" address="0x3000" mode="block" size="0x800" description="Dual port RAM (36 bits wide)" fwinfo="endpoint;width=9"/> 
     <node id="sdpram72" address="0x10000" mode="block" size="0x1000" description="Dual port RAM (72 bits wide)" fwinfo="endpoint;width=9"/> 

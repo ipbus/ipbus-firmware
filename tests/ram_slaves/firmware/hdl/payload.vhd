@@ -54,7 +54,7 @@ architecture rtl of payload is
 
 begin
 
-    example: entity work.ram_slaves_testbench
+    rams_testbench: entity work.ram_slaves_tester
         port map(
             ipb_clk => ipb_clk,
             ipb_rst => ipb_rst,

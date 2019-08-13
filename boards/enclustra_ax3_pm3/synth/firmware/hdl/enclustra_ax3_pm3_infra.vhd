@@ -36,8 +36,11 @@ use IEEE.STD_LOGIC_1164.ALL;
 use work.ipbus.all;
 
 entity enclustra_ax3_pm3_infra is
+	generic (
+		CLK_AUX_FREQ: real := 40.0 -- Default: 40 MHz clock - LHC
+		);
 	port(
-		sysclk: in std_logic; -- 50MHz board crystal clock
+		osc_clk: in std_logic; -- 50MHz board crystal clock
 		clk_ipb_o: out std_logic; -- IPbus clock
 		rst_ipb_o: out std_logic;
 		clk125_o: out std_logic;
@@ -63,7 +66,7 @@ end enclustra_ax3_pm3_infra;
 
 architecture rtl of enclustra_ax3_pm3_infra is
 
-	signal clk125_fr, clk125, clk125_90, clk200, clk_ipb, clk_ipb_i, locked, rst125, rst_ipb, rst_ipb_ctrl, rst_eth, onehz, pkt: std_logic;
+	signal clk125_fr, clk125, clk125_90, clk200, clk_aux, clk_ipb, clk_ipb_i, locked, rst125, rst_aux, rst_ipb, rst_ipb_ctrl, rst_eth, onehz, pkt: std_logic;
 	signal mac_tx_data, mac_rx_data: std_logic_vector(7 downto 0);
 	signal mac_tx_valid, mac_tx_last, mac_tx_error, mac_tx_ready, mac_rx_valid, mac_rx_last, mac_rx_error: std_logic;
 	signal led_p: std_logic_vector(0 downto 0);
@@ -73,16 +76,21 @@ begin
 --	DCM clock generation for internal bus, ethernet
 
 	clocks: entity work.clocks_7s_extphy_se
+		generic map(
+			CLK_AUX_FREQ => CLK_AUX_FREQ
+			)
 		port map(
-			sysclk => sysclk,
+			sysclk => osc_clk,
 			clko_125 => clk125,
 			clko_125_90 => clk125_90,
 			clko_200 => clk200,
+			clko_aux => clk_aux,
 			clko_ipb => clk_ipb_i,
 			locked => locked,
 			nuke => nuke,
 			soft_rst => soft_rst,
 			rsto_125 => rst125,
+			rsto_aux => rst_aux,
 			rsto_ipb => rst_ipb,
 			rsto_ipb_ctrl => rst_ipb_ctrl,
 			onehz => onehz
@@ -93,7 +101,9 @@ begin
 	rst_ipb_o <= rst_ipb;
 	clk125_o <= clk125;	
 	rst125_o <= rst125;
-	
+	clk_aux_o <= clk_aux;	
+	rst_aux_o <= rst_aux;
+
 	stretch: entity work.led_stretcher
 		generic map(
 			WIDTH => 1

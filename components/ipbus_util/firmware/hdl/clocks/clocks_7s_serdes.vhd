@@ -38,11 +38,16 @@ library unisim;
 use unisim.VComponents.all;
 
 entity clocks_7s_serdes is
+	generic(
+		CLK_FR_FREQ: real := 125.0;
+		CLK_VCO_FREQ: real := 1000.0; -- VCO freq 1000MHz
+		CLK_AUX_FREQ: real := 40.0
+	);
 	port(
 		clki_fr: in std_logic; -- Input free-running clock (125MHz)
 		clki_125: in std_logic; -- Ethernet domain clk125
 		clko_ipb: out std_logic; -- ipbus domain clock (31MHz)
-		clko_p40: out std_logic; -- pseudo-40MHz clock
+		clko_aux: out std_logic; -- auxiliary clock
 		clko_200: out std_logic; -- 200MHz clock for idelayctrl
 		eth_locked: in std_logic; -- ethernet locked signal
 		locked: out std_logic; -- global locked signal
@@ -50,6 +55,7 @@ entity clocks_7s_serdes is
 		soft_rst: in std_logic; -- soft reset input
 		rsto_125: out std_logic; -- clk125 domain reset (held until ethernet locked)
 		rsto_ipb: out std_logic; -- ipbus domain reset
+		rsto_aux: out std_logic; -- clk_aux domain reset (held until ethernet locked)
 		rsto_eth: out std_logic; -- ethernet startup reset (required!)
 		rsto_ipb_ctrl: out std_logic; -- ipbus domain reset for controller
 		rsto_fr: out std_logic; -- free-running clock domain reset
@@ -61,10 +67,10 @@ end clocks_7s_serdes;
 architecture rtl of clocks_7s_serdes is
 	
 	signal dcm_locked, sysclk, clk_ipb_i, clk_ipb_b, clkfb, clk200: std_logic;
-	signal clk_p40_i, clk_p40_b: std_logic;
+	signal clk_aux_i, clk_aux_b: std_logic;
 	signal d17, d17_d: std_logic;
 	signal nuke_i, nuke_d, nuke_d2, eth_done: std_logic := '0';
-	signal rst, srst, rst_ipb, rst_125, rst_ipb_ctrl: std_logic := '1';
+	signal rst, srst, rst_ipb, rst_aux, rst_125, rst_ipb_ctrl: std_logic := '1';
 	signal rctr: unsigned(3 downto 0) := "0000";
 	
 begin
@@ -78,12 +84,12 @@ begin
 	
 	clko_ipb <= clk_ipb_b;
 	
-	bufgp40: BUFG port map(
-		i => clk_p40_i,
-		o => clk_p40_b
+	bufgaux: BUFG port map(
+		i => clk_aux_i,
+		o => clk_aux_b
 	);
 	
-	clko_p40 <= clk_p40_b;
+	clko_aux <= clk_aux_b;
 	
 	bufg200: BUFG port map(
 		i => clk200,
@@ -92,18 +98,18 @@ begin
 	
 	mmcm: MMCME2_BASE
 		generic map(
-			clkin1_period => 8.0,
-			clkfbout_mult_f => 8.0, -- VCO freq 1000MHz
-			clkout1_divide => 32,
-			clkout2_divide => 25,
-			clkout3_divide => 5
+			clkin1_period => CLK_VCO_FREQ / CLK_FR_FREQ,
+			clkfbout_mult_f => CLK_VCO_FREQ / CLK_FR_FREQ,
+			clkout1_divide => integer(CLK_VCO_FREQ / 31.25),
+			clkout2_divide => integer(CLK_VCO_FREQ / CLK_AUX_FREQ),
+			clkout3_divide => integer(CLK_VCO_FREQ / 200.00)
 		)
 		port map(
 			clkin1 => sysclk,
 			clkfbin => clkfb,
 			clkfbout => clkfb,
 			clkout1 => clk_ipb_i,
-			clkout2 => clk_p40_i,
+			clkout2 => clk_aux_i,
 			clkout3 => clk200, -- No BUFG needed here, goes to idelayctrl on local routing
 			locked => dcm_locked,
 			rst => '0',
@@ -156,6 +162,15 @@ begin
 	
 	rsto_ipb_ctrl <= rst_ipb_ctrl;
 	
+	process(clk_aux_b)
+	begin
+		if rising_edge(clk_aux_b) then
+			rst_aux <= rst;
+		end if;
+	end process;
+	
+	rsto_aux <= rst_aux;
+
 	process(clki_125)
 	begin
 		if rising_edge(clki_125) then

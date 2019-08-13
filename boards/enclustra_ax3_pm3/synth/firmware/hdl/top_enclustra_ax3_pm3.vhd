@@ -38,7 +38,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 use work.ipbus.ALL;
 
 entity top is port(
-		sysclk: in std_logic;
+		osc_clk: in std_logic;
 		leds: out std_logic_vector(3 downto 0); -- status LEDs
 		cfg: in std_logic_vector(3 downto 0); -- switches
 		rgmii_txd: out std_logic_vector(3 downto 0);
@@ -67,7 +67,7 @@ begin
 
 	infra: entity work.enclustra_ax3_pm3_infra
 		port map(
-			sysclk => sysclk,
+			osc_clk => osc_clk,
 			clk_ipb_o => clk_ipb,
 			rst_ipb_o => rst_ipb,
 			rst125_o => phy_rst_e,

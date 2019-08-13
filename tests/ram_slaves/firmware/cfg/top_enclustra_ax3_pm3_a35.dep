@@ -24,13 +24,7 @@
 #-------------------------------------------------------------------------------
 
 
-src payload.vhd
-src ram_slaves_testbench.vhd
-src -c components/ipbus_core ipbus_fabric_sel.vhd
-src ipbus_decode_ram_slaves_testbench.vhd
-addrtab -t ram_slaves_testbench.xml
-src ram_pattern_generator.vhd
-src -c components/ipbus_slaves ipbus_ported_dpram.vhd ipbus_ported_dpram36.vhd ipbus_ported_dpram72.vhd ipbus_ported_sdpram72.vhd
-src -c components/ipbus_slaves ipbus_dpram.vhd ipbus_dpram36.vhd ipbus_sdpram72.vhd
-src -c components/ipbus_slaves ipbus_reg_types.vhd ipbus_reg_v.vhd ipbus_ctrlreg_v.vhd ipbus_ram.vhd ipbus_peephole_ram.vhd
-src -c components/ipbus_slaves ipbus_reg_types.vhd
+src -c boards/enclustra_ax3_pm3/synth top_enclustra_ax3_pm3.vhd
+include ram_slaves_tester.dep
+include -c boards/enclustra_ax3_pm3/synth a35.dep
+include -c boards/enclustra_ax3_pm3/synth enclustra_ax3_pm3.dep

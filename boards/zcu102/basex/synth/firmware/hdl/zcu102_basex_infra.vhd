@@ -39,6 +39,9 @@ use unisim.VComponents.all;
 use work.ipbus.all;
 
 entity zcu102_basex_infra is
+	generic(
+		CLK_AUX_FREQ: real
+	);
 	port(
 		sysclk_p: in std_logic;
 		sysclk_n: in std_logic;
@@ -83,6 +86,9 @@ begin
 --	DCM clock generation for internal bus, ethernet
 
 	clocks: entity work.clocks_us_serdes
+		generic map(
+			CLK_AUX_FREQ => CLK_AUX_FREQ
+		)
 		port map(
 			clki_fr => sysclk,
 			clki_125 => clk125,

@@ -41,18 +41,25 @@ use ieee.numeric_std.all;
 library unisim;
 use unisim.VComponents.all;
 
-entity clocks_7s_extphy_Se is
+entity clocks_7s_extphy_se is
+	generic(
+		CLK_FR_FREQ: real := 50.0; 
+		CLK_VCO_FREQ: real := 1000.0; -- VCO freq 1000MHz
+		CLK_AUX_FREQ: real := 40.0 -- Aux Clock frequency
+	);
 	port(
 		sysclk: in std_logic;
 		clko_125: out std_logic;
 		clko_125_90: out std_logic;
 		clko_200: out std_logic;
 		clko_ipb: out std_logic; 
+		clko_aux: out std_logic;
 		locked: out std_logic;
 		nuke: in std_logic;
 		soft_rst: in std_logic;
 		rsto_125: out std_logic;
 		rsto_ipb: out std_logic;
+		rsto_aux: out std_logic;
 		rsto_ipb_ctrl: out std_logic;
 		onehz: out std_logic
 	);
@@ -61,10 +68,10 @@ end clocks_7s_extphy_se;
 
 architecture rtl of clocks_7s_extphy_se is
 	
-	signal dcm_locked, sysclk_u, sysclk_i, clk_ipb_i, clk_125_i, clk_125_90_i, clkfb, clk_ipb_b, clk_125_b, clk_200_i: std_logic;
+	signal dcm_locked, sysclk_u, sysclk_i, clk_ipb_i, clk_125_i, clk_125_90_i, clk_aux_i, clkfb, clk_ipb_b, clk_125_b, clk_aux_b, clk_200_i: std_logic;
 	signal d17, d17_d: std_logic;
 	signal nuke_i, nuke_d, nuke_d2: std_logic := '0';
-	signal rst, srst, rst_ipb, rst_125, rst_ipb_ctrl: std_logic := '1';
+	signal rst, srst, rst_ipb, rst_125, rst_aux, rst_ipb_ctrl: std_logic := '1';
 	signal rctr: unsigned(3 downto 0) := "0000";
 
 begin
@@ -103,15 +110,23 @@ begin
 		o => clko_200
 	);	
 	
+	bufgaux: BUFG port map(
+		i => clk_aux_i,
+		o => clk_aux_b
+	);
+
+	clko_aux <= clk_aux_b;
+
 	mmcm: MMCME2_BASE
 		generic map(
-			clkfbout_mult_f => 20.0,
-			clkout1_divide => 8,
-			clkout2_divide => 8,
+			clkin1_period => CLK_VCO_FREQ / CLK_FR_FREQ,
+			clkfbout_mult_f => CLK_VCO_FREQ / CLK_FR_FREQ,
+			clkout1_divide => integer(CLK_VCO_FREQ / 125.00), -- 125 MHz clock
+			clkout2_divide => integer(CLK_VCO_FREQ / 125.00), -- 125 MHz clock, 90 deg phase
 			clkout2_phase => 90.0,
-			clkout3_divide => 32,
-			clkout4_divide => 5,
-			clkin1_period => 20.0
+			clkout3_divide => integer(CLK_VCO_FREQ / 31.25),
+			clkout4_divide => integer(CLK_VCO_FREQ / 200.00),
+			clkout5_divide => integer(CLK_VCO_FREQ / CLK_AUX_FREQ)
 		)
 		port map(
 			clkin1 => sysclk_i,
@@ -121,6 +136,7 @@ begin
 			clkout2 => clk_125_90_i,
 			clkout3 => clk_ipb_i,
 			clkout4 => clk_200_i,
+			clkout5 => clk_aux_i,
 			locked => dcm_locked,
 			rst => '0',
 			pwrdwn => '0'
@@ -178,5 +194,14 @@ begin
 	end process;
 	
 	rsto_125 <= rst_125;
+
+	process(clk_aux_b)
+	begin
+		if rising_edge(clk_aux_b) then
+			rst_aux <= rst;
+		end if;
+	end process;
+	
+	rsto_aux <= rst_aux;
 			
 end rtl;

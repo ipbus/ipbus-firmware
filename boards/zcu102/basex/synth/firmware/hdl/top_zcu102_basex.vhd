@@ -46,7 +46,7 @@ entity top is port(
 		eth_rx_n: in std_logic;
 		eth_tx_p: out std_logic; -- Ethernet MGT output
 		eth_tx_n: out std_logic;
-                sfp_enable: out std_logic;
+        sfp_enable: out std_logic;
 		leds: out std_logic_vector(7 downto 0); -- status LEDs
 		dip_sw: in std_logic_vector(3 downto 0) -- switches
 	);
@@ -66,6 +66,9 @@ begin
 -- Infrastructure
 
 	infra: entity work.zcu102_basex_infra
+		generic map(
+			CLK_AUX_FREQ => 40.0
+		)
 		port map(
 			sysclk_p => sysclk_p,
 			sysclk_n => sysclk_n,
