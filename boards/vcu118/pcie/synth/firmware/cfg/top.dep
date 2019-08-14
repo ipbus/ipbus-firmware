@@ -27,8 +27,8 @@
 setup settings_vup.tcl
 setup -f xdma_loc.tcl
 
-src top_vcu118.vhd
-include vcu118_infra.dep
-include -c components/ipbus_util ipbus_example.dep
+src top_vcu118_pcie.vhd
+include vcu118_infra_pcie.dep
 src -c components/ipbus_core ipbus_package.vhd
-src --cd ../ucf vcu118.tcl
+src --cd ../ucf vcu118_pcie.tcl
+src -c components/ipbus_util --cd ../ucf clock_utils.tcl

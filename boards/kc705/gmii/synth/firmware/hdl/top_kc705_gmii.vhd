@@ -42,9 +42,13 @@ entity top is port(
 		sysclk_n: in std_logic;
 		leds: out std_logic_vector(3 downto 0); -- status LEDs
 		dip_sw: in std_logic_vector(3 downto 0); -- switches
-		gmii_gtx_clk, gmii_tx_en, gmii_tx_er: out std_logic;
+		gmii_gtx_clk: out std_logic;
+		gmii_tx_en: out std_logic;
+		gmii_tx_er: out std_logic;
 		gmii_txd: out std_logic_vector(7 downto 0);
-		gmii_rx_clk, gmii_rx_dv, gmii_rx_er: in std_logic;
+		gmii_rx_clk: in std_logic;
+		gmii_rx_dv: in std_logic;
+		gmii_rx_er: in std_logic;
 		gmii_rxd: in std_logic_vector(7 downto 0);
 		phy_rst: out std_logic
 	);

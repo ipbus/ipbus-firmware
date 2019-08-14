@@ -1,0 +1,33 @@
+#-------------------------------------------------------------------------------
+#
+#   Copyright 2017 - Rutherford Appleton Laboratory and University of Bristol
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+#                                     - - -
+#
+#   Additional information about ipbus-firmare and the list of ipbus-firmware
+#   contacts are available at
+#
+#       https://ipbus.web.cern.ch/ipbus
+#
+#-------------------------------------------------------------------------------
+
+
+# Dependencies for the ethernet sgmii gubbins for usp
+
+src eth_sgmii_lvds_vcu118.vhd
+src phy_mdio_configurator_vcu118.vhd
+src mdio_toolbox.vhd
+src -c ipbus-firmware:components/ipbus_eth ../cgn/temac_gbe_v9_0.xci
+src ../cgn/gig_eth_pcs_pma_gmii_to_sgmii_bridge.xci

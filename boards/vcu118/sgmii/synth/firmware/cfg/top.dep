@@ -24,5 +24,11 @@
 #-------------------------------------------------------------------------------
 
 
-include -c boards/vcu118/synth top.dep
-include -c components/ipbus_util ipbus_example.dep
+setup settings_vup.tcl
+
+src top_vcu118_sgmii.vhd
+include vcu118_infra_sgmii.dep
+src -c components/ipbus_core ipbus_package.vhd
+src --cd ../ucf vcu118_sgmii.tcl
+src --cd ../ucf eth.tcl
+src -c components/ipbus_util --cd ../ucf clock_utils.tcl

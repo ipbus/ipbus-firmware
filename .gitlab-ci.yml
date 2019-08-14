@@ -198,17 +198,27 @@ quick_check:k800__2018.3:
     VIVADO_VERSION: "2018.3"
     PROJ: k800
 
-quick_check:vcu118__2017.4:
+quick_check:vcu118_pcie__2017.4:
   <<: *template_vivado_quick_check
   variables:
     VIVADO_VERSION: "2017.4"
-    PROJ: vcu118
-quick_check:vcu118__2018.3:
+    PROJ: vcu118_pcie
+quick_check:vcu118_pcie__2018.3:
   <<: *template_vivado_quick_check
   variables:
     VIVADO_VERSION: "2018.3"
-    PROJ: vcu118
+    PROJ: vcu118_pcie
 
+quick_check:vcu118_sgmii__2017.4:
+  <<: *template_vivado_quick_check
+  variables:
+    VIVADO_VERSION: "2017.4"
+    PROJ: vcu118_sgmii
+quick_check:vcu118_sgmii__2018.3:
+  <<: *template_vivado_quick_check
+  variables:
+    VIVADO_VERSION: "2018.3"
+    PROJ: vcu118_sgmii
 
 
 build:enclustra_ax3_pm3_a35__2017.4:
@@ -302,19 +312,31 @@ build:k800__2018.3:
   dependencies:
     - quick_check:k800__2018.3
 
-build:vcu118__2017.4:
+build:vcu118_pcie__2017.4:
   <<: *template_vivado_build
   variables:
     VIVADO_VERSION: "2017.4"
   dependencies:
-    - quick_check:vcu118__2017.4
-build:vcu118__2018.3:
+    - quick_check:vcu118_pcie__2017.4
+build:vcu118_pcie__2018.3:
   <<: *template_vivado_build
   variables:
     VIVADO_VERSION: "2018.3"
   dependencies:
-    - quick_check:vcu118__2018.3
+    - quick_check:vcu118_pcie__2018.3
 
+build:vcu118_sgmii__2017.4:
+  <<: *template_vivado_build
+  variables:
+    VIVADO_VERSION: "2017.4"
+  dependencies:
+    - quick_check:vcu118_sgmii__2017.4
+build:vcu118_sgmii__2018.3:
+  <<: *template_vivado_build
+  variables:
+    VIVADO_VERSION: "2018.3"
+  dependencies:
+    - quick_check:vcu118_sgmii__2018.3
 
 
 run_sim_udp:vivado2018.3:modelsim10.6c:

@@ -66,7 +66,7 @@ end top;
 
 architecture rtl of top is
 
-  signal ipb_clk, ipb_rst, nuke, soft_rst, userled: std_logic;
+  signal clk_ipb, rst_ipb, clk_aux, rst_aux, nuke, soft_rst, userled : std_logic;
   
   signal ipb_out: ipb_wbus;
   signal ipb_in: ipb_rbus;
@@ -76,7 +76,7 @@ begin
 
 -- Infrastructure
 
-  infra: entity work.vcu118_infra
+  infra: entity work.vcu118_infra_pcie
     port map(
       pcie_sys_clk_p => pcie_sys_clk_p,
       pcie_sys_clk_n => pcie_sys_clk_n,
@@ -87,8 +87,10 @@ begin
       pcie_tx_n      => pcie_tx_n,
       osc_clk_p      => osc_clk_p,
       osc_clk_n      => osc_clk_n,
-      ipb_clk        => ipb_clk,
-      ipb_rst        => ipb_rst,
+      clk_ipb_o     => clk_ipb,
+      rst_ipb_o     => rst_ipb,
+      clk_aux_o     => clk_aux,
+      rst_aux_o     => rst_aux,
       nuke           => nuke,
       soft_rst       => soft_rst,
       leds           => leds(1 downto 0),
@@ -101,16 +103,17 @@ begin
 -- ipbus slaves live in the entity below, and can expose top-level ports.
 -- The ipbus fabric is instantiated within.
 
-  slaves: entity work.ipbus_example
+  payload: entity work.payload
     port map(
-      ipb_clk => ipb_clk,
-      ipb_rst => ipb_rst,
+      ipb_clk => clk_ipb,
+      ipb_rst => rst_ipb,
       ipb_in => ipb_out,
       ipb_out => ipb_in,
+      clk => clk_aux,
+      rst => rst_aux,
       nuke => nuke,
       soft_rst => soft_rst,
       userled => userled
-      );
-
+    );
 
 end rtl;
