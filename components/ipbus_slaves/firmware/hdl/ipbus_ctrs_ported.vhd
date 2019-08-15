@@ -72,7 +72,7 @@ architecture rtl of ipbus_ctrs_ported is
 	signal s_ipb_out: ipb_rbus;
 	signal d, qi: ipb_reg_v(N_CTRS * CTR_WDS - 1 downto 0);
 	signal dr: ipb_reg_v(0 downto 0);
-	signal rstb, stb: std_logic_vector(0 downto 0);
+	signal rstb, stb: std_logic_vector(N_CTRS * CTR_WDS - 1 downto 0);
 
 begin
 
@@ -151,8 +151,8 @@ begin
 			port map(
 				clk => ipb_clk,
 				rst => ipb_rst,
-				ipb_in => ipb_in,
-				ipb_out => ipb_out,
+				ipb_in => s_ipb_in,
+				ipb_out => s_ipb_out,
 				slv_clk => clk,
 				d => d,
 				rstb => rstb
@@ -173,8 +173,8 @@ begin
 			port map(
 				clk => ipb_clk,
 				rst => ipb_rst,
-				ipb_in => ipb_in,
-				ipb_out => ipb_out,
+				ipb_in => s_ipb_in,
+				ipb_out => s_ipb_out,
 				slv_clk => clk,
 				q => qi,
 				stb => stb,
