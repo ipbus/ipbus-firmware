@@ -129,7 +129,7 @@ begin
 				if ipb_in.ipb_write = '1' and ipb_in.ipb_addr(0) = '0' then
 					ptr <= unsigned(ipb_in.ipb_wdata(ptr'range));
 				elsif ipb_in.ipb_write = '0' and ipb_in.ipb_addr(0) = '1' and s_ipb_out.ipb_ack = '1' then
-					if ptr = to_unsigned(N_CTRS - 1, ptr'length) then
+					if ptr = to_unsigned(N_CTRS * CTR_WDS - 1, ptr'length) then
 						ptr <= (others => '0');
 					else
 						ptr <= ptr + 1;
