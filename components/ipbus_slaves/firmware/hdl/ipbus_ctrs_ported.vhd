@@ -120,9 +120,9 @@ begin
 		end if;
 	end process;
 	
-	process(clk)
+	process(ipb_clk)
 	begin
-		if rising_edge(clk) then
+		if rising_edge(ipb_clk) then
 			if rst = '1' then
 				ptr <= (others => '0');
 			elsif ipb_in.ipb_strobe = '1' then
@@ -184,7 +184,7 @@ begin
 			
 	end generate;
 	
-	s_ipb_in.ipb_addr <= (others => '0');
+	s_ipb_in.ipb_addr <= (31 downto ptr'length => '0') & std_logic_vector(ptr);
 	s_ipb_in.ipb_wdata <= (others => '0');
 	s_ipb_in.ipb_write <= '0';
 	s_ipb_in.ipb_strobe <= ipb_in.ipb_strobe and ipb_in.ipb_addr(0);
