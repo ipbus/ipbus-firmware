@@ -128,7 +128,7 @@ begin
 			elsif ipb_in.ipb_strobe = '1' then
 				if ipb_in.ipb_write = '1' and ipb_in.ipb_addr(0) = '0' then
 					ptr <= unsigned(ipb_in.ipb_wdata(ptr'range));
-				elsif ipb_in.ipb_write = '0' and ipb_in.ipb_addr(0) = '1' and s_ipb_out.ipb_ack = '1' then
+				elsif ipb_in.ipb_addr(0) = '1' and s_ipb_out.ipb_ack = '1' then
 					if ptr = to_unsigned(N_CTRS * CTR_WDS - 1, ptr'length) then
 						ptr <= (others => '0');
 					else
@@ -143,6 +143,8 @@ begin
 	
 	sgen: if READ_ONLY generate
 	
+		s_ipb_in.ipb_addr(ptr'length) <= '0';
+
 		sreg: entity work.ipbus_syncreg_v
 			generic map(
 				N_CTRL => 0,
@@ -165,6 +167,8 @@ begin
 	
 	nsgen: if not READ_ONLY generate
 	
+		s_ipb_in.ipb_addr(ptr'length) <= not s_ipb_in.ipb_write;
+
 		sreg: entity work.ipbus_syncreg_v
 			generic map(
 				N_CTRL => N_CTRS * CTR_WDS,
@@ -184,9 +188,10 @@ begin
 			
 	end generate;
 	
-	s_ipb_in.ipb_addr <= (31 downto ptr'length => '0') & std_logic_vector(ptr);
-	s_ipb_in.ipb_wdata <= (others => '0');
-	s_ipb_in.ipb_write <= '0';
+	s_ipb_in.ipb_addr(31 downto ptr'length+1) <= (others => '0');
+	s_ipb_in.ipb_addr(ptr'length - 1 downto 0) <= std_logic_vector(ptr);
+	s_ipb_in.ipb_wdata <= ipb_in.ipb_wdata;
+	s_ipb_in.ipb_write <= ipb_in.ipb_write and ipb_in.ipb_addr(0);
 	s_ipb_in.ipb_strobe <= ipb_in.ipb_strobe and ipb_in.ipb_addr(0);
 	
 	ipb_out.ipb_rdata <= (31 downto ptr'length => '0') & std_logic_vector(ptr) when ipb_in.ipb_addr(0) = '0' else s_ipb_out.ipb_rdata;
