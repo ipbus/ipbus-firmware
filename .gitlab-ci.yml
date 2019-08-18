@@ -409,6 +409,24 @@ run_ram_slaves_testbench_sim:vivado2018.3:modelsim10.6c:
     - ipbb sim make-project
     - ./vsim -c work.top -gIP_ADDR='X"c0a8c902"' -do 'run 1ms' -do 'quit'
 
+run_ctr_slaves_testbench_sim:vivado2018.3:modelsim10.6c:
+  <<: *template_base
+  tags:
+    - docker
+    - xilinx-tools
+  stage: quick_checks
+  variables:
+    VIVADO_VERSION: "2018.3"
+    IPBB_SIMLIB_BASE: /scratch/xilinx-simlibs
+  script:
+    - export PATH=/software/mentor/modelsim_10.6c/modeltech/bin:$PATH
+    - export LD_LIBRARY_PATH=/opt/cactus/lib:$LD_LIBRARY_PATH
+
+    - ipbb init work_area
+    - cd work_area
+    - ln -s ${CI_PROJECT_DIR} src/ipbus-firmware
+    - /${CI_PROJECT_DIR}/work_area/src/ipbus-firmware/tests/ci/test-run-sim-slave-counters.sh
+
 
 save_build_results:
   stage: publish
