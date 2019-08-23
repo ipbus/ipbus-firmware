@@ -23,7 +23,6 @@
 #
 #-------------------------------------------------------------------------------
 
+include -c boards/kc705/basex/synth kc705_basex.dep
+include ctr_slaves_tester.dep
 
-src top_sim_eth.vhd
-include sim_eth_infra.dep
-src -c components/ipbus_core ipbus_package.vhd

@@ -1,0 +1,81 @@
+<node id="TOP">
+	<node id="csr" address="0x0" description="control/status registers" fwinfo="endpoint;width=1">
+		<node id="ctrl" address="0x0">
+			<node id="rst" mask="0x1"/>
+			<node id="nuke" mask="0x2"/>
+			<node id="led" mask="0x4"/>
+		</node>
+	</node>
+
+	<node id="testctrl" address="0x8" description="Control registers for test functionality" fwinfo="endpoint;width=3">
+		<node id="mask" address="0x0" description="Mask of counters manipulated in test">
+			<node id="channel" mask="0xffff"/>
+			<node id="slave" mask="0xffff0000"/>
+		</node>
+		<node id="action" address="0x1">
+			<node id="type" mask="0x80000000"/>
+			<node id="wait" mask="0x70000000"/>
+			<node id="count" mask="0xfffffff"/>
+		</node>
+		<node id="start" address="0x2" mask="0x1"/>
+		<node id="active" address="0x4" mask="0x1"/>
+	</node>
+
+	<node id="ctrs" address="0x1000">
+		<node id="block">
+			<node id="small" fwinfo="endpoint;width=0">
+				<node id="ctrs" mode="block" size="1"/>
+			</node>
+			<node id="small_rw" address="0x2" fwinfo="endpoint;width=1">
+				<node id="refs" address="0x0" mode="block" size="1"/>
+				<node id="ctrs" address="0x1" mode="block" size="1"/>
+			</node>
+			<node id="large" address="0x8" fwinfo="endpoint;width=3">
+				<node id="ctrs" mode="block" size="5"/>
+			</node>
+			<node id="large_wide" address="0x10" fwinfo="endpoint;width=4">
+				<node id="ctrs" mode="block" size="10"/>
+			</node>
+			<node id="large_wide_wraps" address="0x20" fwinfo="endpoint;width=4">
+				<node id="ctrs" mode="block" size="10"/>
+			</node>
+			<node id="large_wide_readreset" address="0x30" fwinfo="endpoint;width=4">
+				<node id="ctrs" mode="block" size="10"/>
+			</node>
+			<node id="large_wide_readreset_rw" address="0x40" fwinfo="endpoint;width=5">
+				<node id="refs" mode="block" size="10"/>
+				<node id="ctrs" address="0x10" mode="block" size="10"/>
+			</node>
+		</node>
+		<node id="ported" address="0x100">
+			<node id="small"  fwinfo="endpoint;width=1">
+				<node id="addr" address="0x0"/>
+				<node id="ctrs" address="0x1" mode="port" size="1"/>
+			</node>
+			<node id="small_rw" address="0x2" fwinfo="endpoint;width=1">
+				<node id="addr" address="0x0"/>
+				<node id="ctrs" address="0x1" mode="port" size="1"/>
+			</node>
+			<node id="large" address="0x4" fwinfo="endpoint;width=1">
+				<node id="addr" address="0x0"/>
+				<node id="ctrs" address="0x1" mode="port" size="5"/>
+			</node>
+			<node id="large_wide" address="0x6" fwinfo="endpoint;width=1">
+				<node id="addr" address="0x0"/>
+				<node id="ctrs" address="0x1" mode="port" size="10"/>
+			</node>
+			<node id="large_wide_wraps" address="0xa" fwinfo="endpoint;width=1">
+				<node id="addr" address="0x0"/>
+				<node id="ctrs" address="0x1" mode="port" size="10"/>
+			</node>
+			<node id="large_wide_readreset" address="0xc" fwinfo="endpoint;width=1">
+				<node id="addr" address="0x0"/>
+				<node id="ctrs" address="0x1" mode="port" size="10"/>
+			</node>
+			<node id="large_wide_readreset_rw" address="0xe" fwinfo="endpoint;width=1">
+				<node id="addr" address="0x0"/>
+				<node id="ctrs" address="0x1" mode="port" size="10"/>
+			</node>
+		</node>
+	</node>
+</node>
