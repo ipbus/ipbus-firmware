@@ -74,8 +74,8 @@ if { [llength [get_ports {cfg[*]}]] > 0} {
 
 
 # Clock constraints
-set_false_path -through [get_pins infra/clocks/rst_reg/Q]
-set_false_path -through [get_nets infra/clocks/nuke_i]
+# set_false_path -through [get_pins infra/clocks/rst_reg/Q]
+# set_false_path -through [get_nets infra/clocks/nuke_i]
 
 # Ethernet clock
 create_generated_clock -name clk_125 -source [get_pins infra/clocks/mmcm/CLKIN1] [get_pins infra/clocks/mmcm/CLKOUT1]
