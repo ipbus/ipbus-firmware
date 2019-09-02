@@ -70,8 +70,8 @@ create_generated_clock -name ipbus_clk -source [get_pins infra/clocks/mmcm/CLKIN
 create_generated_clock -name clk_aux -source [get_pins infra/clocks/mmcm/CLKIN1] [get_pins infra/clocks/mmcm/CLKOUT2]
 create_generated_clock -name clk_200 -source [get_pins infra/clocks/mmcm/CLKIN1] [get_pins infra/clocks/mmcm/CLKOUT3]
 
-set_false_path -through [get_pins infra/clocks/rst_reg/Q]
-set_false_path -through [get_nets infra/clocks/nuke_i]
+# set_false_path -through [get_pins infra/clocks/rst_reg/Q]
+# set_false_path -through [get_nets infra/clocks/nuke_i]
 
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks eth_refclk] -group [get_clocks clk_dc] -group [get_clocks -include_generated_clocks [get_clocks -filter {name =~ infra/eth/phy/*/RXOUTCLK}]] -group [get_clocks -include_generated_clocks [get_clocks -filter {name =~ infra/eth/phy/*/TXOUTCLK}]]
 
