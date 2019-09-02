@@ -97,9 +97,9 @@ create_generated_clock -name ipbus_clk -source [get_pins infra/clocks/mmcm/CLKIN
 set_clock_groups -asynchronous -group [ get_clocks -include_generated_clocks osc_clk_300 ] -group [ get_clocks -include_generated_clocks osc_clk_125 ]  -group [ get_clocks -include_generated_clocks sgmii_clk_p ] 
 
 
-set_false_path -from [get_pins infra/clocks/nuke_i_reg/C] -to [get_pins infra/clocks/nuke_d_reg/D]
-set_false_path -from [get_pins infra/clocks/rst_reg/C] -to [get_pins infra/clocks/rst_ipb_ctrl_reg/D]
-set_false_path -from [get_pins infra/clocks/rst_reg/C] -to [get_pins infra/clocks/rst_ipb_reg/D]
+# set_false_path -from [get_pins infra/clocks/nuke_i_reg/C] -to [get_pins infra/clocks/nuke_d_reg/D]
+# set_false_path -from [get_pins infra/clocks/rst_reg/C] -to [get_pins infra/clocks/rst_ipb_ctrl_reg/D]
+# set_false_path -from [get_pins infra/clocks/rst_reg/C] -to [get_pins infra/clocks/rst_ipb_reg/D]
 
 false_path {leds[*]} osc_clk_300
 false_path {rst_in[*]} osc_clk_125
