@@ -176,9 +176,9 @@ begin
 	
 	rsto_fr <= rst;
 		
-	process(clk_aux_i)
+	process(clk_aux_b)
 	begin
-		if rising_edge(clk_aux_i) then
+		if rising_edge(clk_aux_b) then
 			rst_aux <= rst;
 		end if;
 	end process;
