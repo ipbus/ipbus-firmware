@@ -98,7 +98,7 @@ begin
 	
 	mmcm: MMCME3_BASE
 		generic map(
-			clkin1_period => CLK_VCO_FREQ / CLK_FR_FREQ,
+			clkin1_period => 1000.0 / CLK_FR_FREQ,
 			clkfbout_mult_f => CLK_VCO_FREQ / CLK_FR_FREQ,
 			clkout1_divide => integer(CLK_VCO_FREQ / 31.25),
 			clkout2_divide => integer(CLK_VCO_FREQ / CLK_AUX_FREQ),
