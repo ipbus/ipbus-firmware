@@ -101,7 +101,7 @@ begin
 	
 	mmcm: MMCME4_BASE
 		generic map(
-			clkin1_period => CLK_VCO_FREQ / CLK_FR_FREQ,
+			clkin1_period => 1000.0 / CLK_FR_FREQ,
 			clkfbout_mult_f => CLK_VCO_FREQ / CLK_FR_FREQ,
 			clkout1_divide => integer(CLK_VCO_FREQ / 31.25),
 			clkout2_divide => integer(CLK_VCO_FREQ / CLK_AUX_FREQ),
@@ -176,9 +176,9 @@ begin
 	
 	rsto_fr <= rst;
 		
-	process(clk_aux_i)
+	process(clk_aux_b)
 	begin
-		if rising_edge(clk_aux_i) then
+		if rising_edge(clk_aux_b) then
 			rst_aux <= rst;
 		end if;
 	end process;
