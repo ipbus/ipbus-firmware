@@ -1,0 +1,69 @@
+{
+   "ExpandedHierarchyInLayout":"",
+   "guistr":"# # String gsaved with Nlview 7.0.19  2019-03-26 bk=1.5019 VDI=41 GEI=35 GUI=JA:9.0 TLS
+#  -string -flagsOSRD
+preplace port gt_o -pg 1 -lvl 7 -x 2290 -y 230 -defaultsOSRD
+preplace port gt_i -pg 1 -lvl 0 -x 0 -y 230 -defaultsOSRD
+preplace port gt_clk -pg 1 -lvl 0 -x 0 -y 190 -defaultsOSRD
+preplace port ipb_axi -pg 1 -lvl 7 -x 2290 -y 720 -defaultsOSRD
+preplace port aclk -pg 1 -lvl 0 -x 0 -y 540 -defaultsOSRD
+preplace port aresetn -pg 1 -lvl 0 -x 0 -y 620 -defaultsOSRD
+preplace port ipb_clk_o -pg 1 -lvl 7 -x 2290 -y 850 -defaultsOSRD
+preplace portBus ipb_ic_rst_o -pg 1 -lvl 7 -x 2290 -y 910 -defaultsOSRD
+preplace portBus ipb_periph_rst_o -pg 1 -lvl 7 -x 2290 -y 1010 -defaultsOSRD
+preplace portBus gtx_stat_o -pg 1 -lvl 7 -x 2290 -y 130 -defaultsOSRD
+preplace portBus c2c_stat_o -pg 1 -lvl 7 -x 2290 -y 500 -defaultsOSRD
+preplace inst util_vector_logic_0 -pg 1 -lvl 6 -x 2120 -y 910 -defaultsOSRD
+preplace inst util_vector_logic_1 -pg 1 -lvl 6 -x 2120 -y 1010 -defaultsOSRD
+preplace inst axi_chip2chip_0 -pg 1 -lvl 3 -x 840 -y 430 -defaultsOSRD
+preplace inst axi_chip2chip_0_aurora64 -pg 1 -lvl 4 -x 1340 -y 230 -defaultsOSRD
+preplace inst axi_interconnect_0 -pg 1 -lvl 4 -x 1340 -y 720 -defaultsOSRD
+preplace inst c2c_stat -pg 1 -lvl 5 -x 1790 -y 640 -defaultsOSRD
+preplace inst clk_wiz_0 -pg 1 -lvl 2 -x 370 -y 910 -defaultsOSRD
+preplace inst proc_sys_reset_0 -pg 1 -lvl 2 -x 370 -y 640 -defaultsOSRD
+preplace inst proc_sys_reset_1 -pg 1 -lvl 5 -x 1790 -y 970 -defaultsOSRD
+preplace inst xlconcat_0 -pg 1 -lvl 5 -x 1790 -y 130 -defaultsOSRD
+preplace inst xlconcat_1 -pg 1 -lvl 5 -x 1790 -y 500 -defaultsOSRD
+preplace inst xlconcat_2 -pg 1 -lvl 6 -x 2120 -y 430 -defaultsOSRD
+preplace inst xlconstant_0 -pg 1 -lvl 1 -x 100 -y 900 -defaultsOSRD
+preplace inst xlconstant_1 -pg 1 -lvl 4 -x 1340 -y 950 -defaultsOSRD
+preplace netloc axi_chip2chip_0_aurora64_user_clk_out 1 2 3 620 260 1120J 470 1550
+preplace netloc axi_chip2chip_0_aurora64_channel_up 1 2 3 590 250 1070J 450 1570
+preplace netloc axi_chip2chip_0_aurora64_mmcm_not_locked_out 1 2 3 610 270 1100J 460 1560
+preplace netloc axi_chip2chip_0_aurora_pma_init_out 1 3 1 1110 270n
+preplace netloc axi_chip2chip_0_aurora_reset_pb 1 3 1 1090 250n
+preplace netloc m_aclk_0_1 1 0 5 NJ 540 180 740 560 590 1120 560 1560J
+preplace netloc proc_sys_reset_0_interconnect_aresetn 1 2 2 580 660 NJ
+preplace netloc aresetn_2 1 0 5 NJ 620 190 540 570J 580 1090 550 1580J
+preplace netloc xlconstant_0_dout 1 1 1 NJ 900
+preplace netloc clk_wiz_0_clk_out1 1 2 5 N 890 NJ 890 1580 850 NJ 850 NJ
+preplace netloc clk_wiz_0_locked 1 2 3 590 1010 NJ 1010 NJ
+preplace netloc proc_sys_reset_1_interconnect_aresetn 1 5 1 1970J 910n
+preplace netloc proc_sys_reset_1_peripheral_aresetn 1 5 1 NJ 1010
+preplace netloc util_vector_logic_0_Res 1 6 1 NJ 910
+preplace netloc util_vector_logic_1_Res 1 6 1 NJ 1010
+preplace netloc xlconstant_1_dout 1 4 1 NJ 950
+preplace netloc axi_chip2chip_0_aurora64_gt_pll_lock 1 4 1 1580 110n
+preplace netloc axi_chip2chip_0_aurora64_hard_err 1 4 1 1590 130n
+preplace netloc axi_chip2chip_0_aurora64_lane_up 1 4 1 1600 150n
+preplace netloc clk_wiz_0_clk_out2 1 2 2 550 280 1130
+preplace netloc xlconcat_0_dout 1 5 2 1970 130 NJ
+preplace netloc axi_chip2chip_0_axi_c2c_config_error_out 1 3 2 N 480 NJ
+preplace netloc axi_chip2chip_0_axi_c2c_link_status_out 1 3 2 N 500 NJ
+preplace netloc axi_chip2chip_0_axi_c2c_multi_bit_error_out 1 3 2 N 520 NJ
+preplace netloc xlconcat_1_dout 1 5 2 1970 500 NJ
+preplace netloc axi_chip2chip_0_aurora64_soft_err 1 4 1 1610 170n
+preplace netloc xlconcat_2_dout 1 5 2 NJ 650 2270
+preplace netloc axi_chip2chip_0_m_axi 1 3 1 1060 340n
+preplace netloc axi_chip2chip_0_aurora64_USER_DATA_M_AXIS_RX 1 2 3 600 10 NJ 10 1570
+preplace netloc axi_chip2chip_0_AXIS_TX 1 3 1 1080 170n
+preplace netloc axi_interconnect_0_M02_AXI 1 4 1 1600 620n
+preplace netloc axi_chip2chip_0_aurora64_GT_SERIAL_TX 1 4 3 NJ 230 NJ 230 NJ
+preplace netloc GT_SERIAL_RX_1 1 0 4 NJ 230 NJ 230 NJ 230 NJ
+preplace netloc GT_DIFF_REFCLK_1 1 0 4 NJ 190 NJ 190 NJ 190 NJ
+preplace netloc axi_interconnect_0_M01_AXI 1 4 3 NJ 720 NJ 720 NJ
+levelinfo -pg 1 0 100 370 840 1340 1790 2120 2290
+pagesize -pg 1 -db -bbox -sgen -110 0 2500 1070
+"
+}
+
