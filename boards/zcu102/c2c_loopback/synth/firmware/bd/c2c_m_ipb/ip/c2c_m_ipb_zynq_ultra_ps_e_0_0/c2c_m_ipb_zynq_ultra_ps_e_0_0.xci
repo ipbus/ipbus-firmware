@@ -3179,6 +3179,7 @@ _DMA;FFC80000;FFC9FFFF;1|LPD;CSU;FFCA0000;FFCAFFFF;0|LPD;CRL_APB;FF5E0000;FF85FF
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.PSU__CRF_APB__ACPU_CTRL__DIVISOR0" xilinx:valueSource="user"/>
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.PSU__CRF_APB__ACPU_CTRL__FREQMHZ" xilinx:valueSource="user"/>
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.PSU__CRF_APB__ACPU_CTRL__SRCSEL" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.PSU__CRF_APB__ACPU__FRAC_ENABLED" xilinx:valueSource="user"/>
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.PSU__CRF_APB__AFI0_REF_CTRL__ACT_FREQMHZ" xilinx:valueSource="user"/>
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.PSU__CRF_APB__AFI0_REF_CTRL__DIVISOR0" xilinx:valueSource="user"/>
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.PSU__CRF_APB__AFI0_REF_CTRL__FREQMHZ" xilinx:valueSource="user"/>
@@ -3572,6 +3573,7 @@ _DMA;FFC80000;FFC9FFFF;1|LPD;CSU;FFCA0000;FFCAFFFF;0|LPD;CRL_APB;FF5E0000;FF85FF
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.PSU__DDRC__EN_2ND_CLK" xilinx:valueSource="user"/>
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.PSU__DDRC__FGRM" xilinx:valueSource="user"/>
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.PSU__DDRC__FREQ_MHZ" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.PSU__DDRC__LPDDR3_DUALRANK_SDP" xilinx:valueSource="user"/>
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.PSU__DDRC__LPDDR3_T_REF_RANGE" xilinx:valueSource="user"/>
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.PSU__DDRC__LPDDR4_T_REF_RANGE" xilinx:valueSource="user"/>
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.PSU__DDRC__LP_ASR" xilinx:valueSource="user"/>
@@ -3867,6 +3869,7 @@ _DMA;FFC80000;FFC9FFFF;1|LPD;CSU;FFCA0000;FFCAFFFF;0|LPD;CRL_APB;FF5E0000;FF85FF
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.PSU__OCM_BANK1__POWER__ON" xilinx:valueSource="user"/>
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.PSU__OCM_BANK2__POWER__ON" xilinx:valueSource="user"/>
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.PSU__OCM_BANK3__POWER__ON" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.PSU__OVERRIDE_HPX_QOS" xilinx:valueSource="user"/>
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.PSU__OVERRIDE__BASIC_CLOCK" xilinx:valueSource="user"/>
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.PSU__PCIE__ACS_VIOLAION" xilinx:valueSource="user"/>
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.PSU__PCIE__ACS_VIOLATION" xilinx:valueSource="user"/>
@@ -4183,6 +4186,7 @@ _DMA;FFC80000;FFC9FFFF;1|LPD;CSU;FFCA0000;FFCAFFFF;0|LPD;CRL_APB;FF5E0000;FF85FF
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.UART1_BOARD_INTERFACE" xilinx:valueSource="user"/>
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.USB0_BOARD_INTERFACE" xilinx:valueSource="user"/>
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.USB1_BOARD_INTERFACE" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.preset" xilinx:valueSource="user"/>
           </xilinx:configElementInfos>
         </xilinx:componentInstanceExtensions>
       </spirit:vendorExtensions>
