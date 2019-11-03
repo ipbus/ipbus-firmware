@@ -197,6 +197,7 @@ proc create_root_design { parentCell } {
   # Create instance: axi_chip2chip_0, and set properties
   set axi_chip2chip_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_chip2chip:5.0 axi_chip2chip_0 ]
   set_property -dict [ list \
+   CONFIG.C_AURORA_WIDTH {1} \
    CONFIG.C_AXI_DATA_WIDTH {64} \
    CONFIG.C_AXI_STB_WIDTH {8} \
    CONFIG.C_EN_AXI_LINK_HNDLR {true} \
@@ -205,6 +206,7 @@ proc create_root_design { parentCell } {
    CONFIG.C_MASTER_FPGA {0} \
    CONFIG.C_M_AXI_ID_WIDTH {0} \
    CONFIG.C_M_AXI_WUSER_WIDTH {0} \
+   CONFIG.C_NUM_OF_IO {28} \
    CONFIG.C_SUPPORT_NARROWBURST {true} \
  ] $axi_chip2chip_0
 
@@ -243,22 +245,28 @@ proc create_root_design { parentCell } {
   set clk_wiz_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:clk_wiz:6.0 clk_wiz_0 ]
   set_property -dict [ list \
    CONFIG.CLKIN1_JITTER_PS {80.0} \
+   CONFIG.CLKOUT1_DRIVES {Buffer} \
    CONFIG.CLKOUT1_JITTER {152.375} \
    CONFIG.CLKOUT1_PHASE_ERROR {222.296} \
    CONFIG.CLKOUT1_REQUESTED_OUT_FREQ {31.24} \
+   CONFIG.CLKOUT2_DRIVES {Buffer} \
    CONFIG.CLKOUT2_JITTER {138.880} \
    CONFIG.CLKOUT2_PHASE_ERROR {222.296} \
    CONFIG.CLKOUT2_REQUESTED_OUT_FREQ {62.48} \
    CONFIG.CLKOUT2_USED {true} \
+   CONFIG.CLKOUT3_DRIVES {Buffer} \
+   CONFIG.CLKOUT4_DRIVES {Buffer} \
+   CONFIG.CLKOUT5_DRIVES {Buffer} \
+   CONFIG.CLKOUT6_DRIVES {Buffer} \
+   CONFIG.CLKOUT7_DRIVES {Buffer} \
    CONFIG.MMCM_CLKFBOUT_MULT_F {62.625} \
    CONFIG.MMCM_CLKIN1_PERIOD {8.001} \
-   CONFIG.MMCM_CLKIN2_PERIOD {10.000} \
    CONFIG.MMCM_CLKOUT0_DIVIDE_F {50.125} \
    CONFIG.MMCM_CLKOUT1_DIVIDE {25} \
    CONFIG.MMCM_DIVCLK_DIVIDE {5} \
    CONFIG.NUM_OUT_CLKS {2} \
-   CONFIG.OVERRIDE_MMCM {false} \
    CONFIG.PRIM_IN_FREQ {124.987} \
+   CONFIG.SECONDARY_SOURCE {Single_ended_clock_capable_pin} \
    CONFIG.USE_PHASE_ALIGNMENT {true} \
  ] $clk_wiz_0
 
