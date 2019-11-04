@@ -22,7 +22,7 @@ entity c2c_s_ipb_wrapper is
     ipb_periph_rst_o : out std_logic;
     
     ipb_irq_i        : in  std_logic;
-    ipb_axi_ms       : out axi4mm_ms(araddr(15 downto 0), awaddr(15 downto 0), wdata(63 downto 0));
+    ipb_axi_ms       : out axi4mm_ms(araddr(63 downto 0), awaddr(63 downto 0), wdata(63 downto 0));
     ipb_axi_sm       : in  axi4mm_sm(rdata(63 downto 0))
   );
 end c2c_s_ipb_wrapper; 
@@ -43,7 +43,7 @@ c2c_s_ipb_inst: entity work.c2c_s_ipb
      ipb_axi_rlast(0)    => ipb_axi_sm.rlast,
      ipb_axi_rvalid(0)   => ipb_axi_sm.rvalid,
 --   ipb_axi_awid        => ipb_axi_ms.awid,
-     ipb_axi_awaddr(15 downto 0) => ipb_axi_ms.awaddr, ipb_axi_awaddr(31 downto 16) => open,
+     ipb_axi_awaddr(15 downto 0) => ipb_axi_ms.awaddr(15 downto 0), ipb_axi_awaddr(31 downto 16) => open,
      ipb_axi_awlen       => ipb_axi_ms.awlen,
      ipb_axi_awsize      => ipb_axi_ms.awsize,
      ipb_axi_awburst     => ipb_axi_ms.awburst,
@@ -57,7 +57,7 @@ c2c_s_ipb_inst: entity work.c2c_s_ipb
      ipb_axi_wvalid(0)   => ipb_axi_ms.wvalid,
      ipb_axi_bready(0)   => ipb_axi_ms.bready,
  --  ipb_axi_arid        => ipb_axi_ms.arid,
-     ipb_axi_araddr(15 downto 0) => ipb_axi_ms.araddr, ipb_axi_araddr(31 downto 16) => open,
+     ipb_axi_araddr(15 downto 0) => ipb_axi_ms.araddr(15 downto 0), ipb_axi_araddr(31 downto 16) => open,
      ipb_axi_arlen       => ipb_axi_ms.arlen,
      ipb_axi_arsize      => ipb_axi_ms.arsize,
      ipb_axi_arburst     => ipb_axi_ms.arburst,
@@ -71,8 +71,8 @@ c2c_s_ipb_inst: entity work.c2c_s_ipb
 --   axirstn_o(0)        => ipb_axi_ms.aresetn,
      aclk                => aclk,
      aresetn             => aresetn,
-     c2c_stat_o          => c2c_stat_o,  
-     gtx_stat_o          => gtx_stat_o,  
+     c2c_stat_o          => c2c_stat_o,
+     gtx_stat_o          => gtx_stat_o,
                
      ipb_clk_o           => ipb_clk_o,
      ipb_ic_rst_o(0)     => ipb_ic_rst_o,
@@ -83,11 +83,14 @@ c2c_s_ipb_inst: entity work.c2c_s_ipb
      gt_i_rxn(0)         => gt_rxn,
      gt_i_rxp(0)         => gt_rxp,
      gt_o_txn(0)         => gt_txn,
-     gt_o_txp(0)         => gt_txp    
+     gt_o_txp(0)         => gt_txp
 
     );
     
     ipb_axi_ms.aclk <= aclk;
     ipb_axi_ms.aresetn <= aresetn;
-    
+
+    ipb_axi_ms.awaddr(63 downto 16) <= (others => '0');
+    ipb_axi_ms.araddr(63 downto 16) <= (others => '0');
+
 end STRUCTURE;

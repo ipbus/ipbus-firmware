@@ -24,6 +24,7 @@
 #-------------------------------------------------------------------------------
 
 setup settings.tcl
+setup -f bram_ctrl_addr_width.tcl
 setup -f add_block_designs.tcl
 include zu9.dep
 
