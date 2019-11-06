@@ -17,9 +17,9 @@ generic(
   port (
       aclk            : in  std_logic;
       aresetn         : in  std_logic;
-      c2c_stat_o      : out std_logic_vector(2 downto 0);  
-      gtx_stat_o      : out std_logic_vector(4 downto 0);  
-            --
+      c2c_stat_o      : out std_logic_vector(2 downto 0);
+      gtx_stat_o      : out std_logic_vector(4 downto 0);
+      --
       gt_clkn         : in  std_logic;
       gt_clkp         : in  std_logic;
       gt_rxn          : in  std_logic;
@@ -50,7 +50,6 @@ architecture rtl of zcu102_infra_c2c_loopback_slave is
     
     
 begin
-
 
 bd_inst: entity work.c2c_s_ipb_wrapper 
   port map (

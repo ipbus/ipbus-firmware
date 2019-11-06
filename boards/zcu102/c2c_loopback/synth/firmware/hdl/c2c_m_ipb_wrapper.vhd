@@ -6,8 +6,6 @@ use work.ipbus_axi_decl.all;
 entity c2c_m_ipb_wrapper is
   port (
     ext_rst          : in  std_logic;
-    dipsw            : in  std_logic_vector(7 downto 0);
-    leds             : out std_logic_vector(7 downto 0);
     
     gt_clkn          : in  std_logic;
     gt_clkp          : in  std_logic;
@@ -18,6 +16,9 @@ entity c2c_m_ipb_wrapper is
     
     aclk_o           : out std_logic;  
     aresetn_o        : out std_logic;  
+
+    c2c_aresetn      : in std_logic;
+    c2c_stat         : out std_logic_vector(9 downto 0);
         
     ipb_clk_o        : out std_logic;
     ipb_ic_rst_o     : out std_logic;
@@ -29,7 +30,7 @@ entity c2c_m_ipb_wrapper is
   );
 end c2c_m_ipb_wrapper;
 
-architecture STRUCTURE of c2c_m_ipb_wrapper is
+architecture rtl of c2c_m_ipb_wrapper is
 
   signal aclk           : std_logic;  
   signal aresetn        : std_logic;  
@@ -76,17 +77,17 @@ c2c_m_ipb_inst: entity work.c2c_m_ipb
      
      axiclk_o            => ipb_axi_ms.aclk,
      axirstn_o(0)        => ipb_axi_ms.aresetn,
-          
+
+     c2c_aresetn         => c2c_aresetn,
+     c2c_stat            => c2c_stat,
+
      ipb_clk_o           => ipb_clk_o,
      ipb_ic_rst_o(0)     => ipb_ic_rst_o,
      ipb_periph_rst_o(0) => ipb_periph_rst_o,
      
      irq_i(0)            => ipb_irq_i,
      ext_rst             => ext_rst,
-     
-     dipsw_tri_i         => dipsw,
-     leds_tri_o          => leds,
-     
+
      gt_clk_clk_n        => gt_clkn,
      gt_clk_clk_p        => gt_clkp,
      gt_i_rxn(0)         => gt_rxn,
@@ -105,4 +106,4 @@ c2c_m_ipb_inst: entity work.c2c_m_ipb
     ipb_axi_ms.awaddr(63 downto 16) <= (others => '0');
     ipb_axi_ms.araddr(63 downto 16) <= (others => '0');
     
-end STRUCTURE;
+end rtl;

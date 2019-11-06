@@ -44,8 +44,6 @@ architecture rtl of top is
   signal aclk           : std_logic;
   signal aresetn        : std_logic;
   
-  signal ipb_pkt_done   : std_logic;  
-  
 begin
 
   local_infra_inst: entity work.zcu102_infra_c2c_loopback_master
@@ -55,8 +53,6 @@ begin
       )
     port map(
       ext_rst    => ext_rst,
-      dipsw      => dipsw,
-      leds       => leds,
       --
       aclk_o     => aclk, 
       aresetn_o  => aresetn,
@@ -66,13 +62,15 @@ begin
       gt_rxn     => c2c_m_gt_rxn,
       gt_rxp     => c2c_m_gt_rxp,
       gt_txn     => c2c_m_gt_txn,
-      gt_txp     => c2c_m_gt_txp, 
+      gt_txp     => c2c_m_gt_txp,
+      --
+      c2c_aresetn => '1',
+      c2c_stat   => open,
       --
       ipb_clk    => local_ipb_clk,
       ipb_rst    => local_ipb_rst,
       ipb_in     => local_ipb_in,
-      ipb_out    => local_ipb_out,
-      ipb_done   => ipb_pkt_done
+      ipb_out    => local_ipb_out
       );
       
 
@@ -81,7 +79,8 @@ begin
       ipb_clk    => local_ipb_clk,
       ipb_rst    => local_ipb_rst,
       ipb_in     => local_ipb_out,
-      ipb_out    => local_ipb_in
+      ipb_out    => local_ipb_in,
+      userled    => leds(0)
       );
 
 
@@ -114,8 +113,10 @@ begin
       ipb_clk    => remote_ipb_clk,
       ipb_rst    => remote_ipb_rst,
       ipb_in     => remote_ipb_out,
-      ipb_out    => remote_ipb_in
+      ipb_out    => remote_ipb_in,
+      userled    => leds(1)
       );
-  
-      
+
+  leds(7 downto 2) <= (others => '0');
+
 end rtl;

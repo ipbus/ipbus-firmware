@@ -27,7 +27,7 @@ entity c2c_s_ipb_wrapper is
   );
 end c2c_s_ipb_wrapper; 
 
-architecture STRUCTURE of c2c_s_ipb_wrapper is
+architecture rtl of c2c_s_ipb_wrapper is
 begin
 c2c_s_ipb_inst: entity work.c2c_s_ipb
      port map (
@@ -93,4 +93,4 @@ c2c_s_ipb_inst: entity work.c2c_s_ipb
     ipb_axi_ms.awaddr(63 downto 16) <= (others => '0');
     ipb_axi_ms.araddr(63 downto 16) <= (others => '0');
 
-end STRUCTURE;
+end rtl;

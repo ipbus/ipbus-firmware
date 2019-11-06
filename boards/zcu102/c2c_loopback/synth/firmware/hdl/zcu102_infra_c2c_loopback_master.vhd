@@ -16,8 +16,6 @@ generic(
 );
   port (
       ext_rst   : in  std_logic;
-      dipsw     : in  std_logic_vector(7 downto 0);
-      leds      : out std_logic_vector(7 downto 0);
       
       aclk_o    : out std_logic;
       aresetn_o : out std_logic;
@@ -28,10 +26,12 @@ generic(
       gt_rxp    : in  std_logic;
       gt_txn    : out std_logic;
       gt_txp    : out std_logic;
-      
+
+      c2c_aresetn : in std_logic;
+      c2c_stat  : out std_logic_vector(9 downto 0);
+
       ipb_clk   : out std_logic;
       ipb_rst   : out std_logic;
-      ipb_done  : out std_logic;
       ipb_in    : in  ipb_rbus;
       ipb_out   : out ipb_wbus
   );
@@ -58,8 +58,6 @@ begin
 bd_inst: entity work.c2c_m_ipb_wrapper
   port map (
     ext_rst           => ext_rst,
-    leds              => leds,
-    dipsw             => dipsw,
     --
     aclk_o            => aclk_o,
     aresetn_o         => aresetn_o,
@@ -70,6 +68,9 @@ bd_inst: entity work.c2c_m_ipb_wrapper
     gt_rxp            => gt_rxp,
     gt_txn            => gt_txn,
     gt_txp            => gt_txp,
+    --
+    c2c_aresetn       => c2c_aresetn,
+    c2c_stat          => c2c_stat,
     --
     ipb_clk_o         => clk_ipb,
     ipb_ic_rst_o      => rst_ipb_ctrl,
@@ -110,6 +111,5 @@ bd_inst: entity work.c2c_m_ipb_wrapper
     
     ipb_clk  <= clk_ipb;
     ipb_rst  <= rst_ipb;
-    ipb_done <= ipb_pkt_done;
 
 end rtl;
