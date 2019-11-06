@@ -3,7 +3,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 use work.ipbus_axi_decl.all;
  
-entity z_ipb_full_wrapper is
+entity c2c_m_ipb_wrapper is
   port (
     ext_rst          : in  std_logic;
     dipsw            : in  std_logic_vector(7 downto 0);
@@ -27,9 +27,9 @@ entity z_ipb_full_wrapper is
     ipb_axi_ms       : out axi4mm_ms(araddr(63 downto 0), awaddr(63 downto 0), wdata(63 downto 0));
     ipb_axi_sm       : in  axi4mm_sm(rdata(63 downto 0))
   );
-end z_ipb_full_wrapper; 
+end c2c_m_ipb_wrapper;
 
-architecture STRUCTURE of z_ipb_full_wrapper is
+architecture STRUCTURE of c2c_m_ipb_wrapper is
 
   signal aclk           : std_logic;  
   signal aresetn        : std_logic;  

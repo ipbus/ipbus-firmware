@@ -24,7 +24,7 @@ entity top is
     c2c_s_gt_txp        : out std_logic
   );
 
-end top; 
+end top;
 
 architecture rtl of top is
   
@@ -48,7 +48,7 @@ architecture rtl of top is
   
 begin
 
-  local_infra_inst: entity work.zynq_infra_full
+  local_infra_inst: entity work.zcu102_infra_c2c_loopback_master
     generic map (
       BUFWIDTH   => 0, 
       ADDRWIDTH  => 11
@@ -85,7 +85,7 @@ begin
       );
 
 
-  remote_infra_inst: entity work.c2c_s_infra
+  remote_infra_inst: entity work.zcu102_infra_c2c_loopback_slave
     generic map (
       BUFWIDTH   => 0, 
       ADDRWIDTH  => 11

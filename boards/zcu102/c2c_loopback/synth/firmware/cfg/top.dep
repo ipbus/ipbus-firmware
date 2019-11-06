@@ -24,12 +24,13 @@
 #-------------------------------------------------------------------------------
 
 setup settings.tcl
+
 setup -f bram_ctrl_addr_width.tcl
 setup -f add_block_designs.tcl
 include zu9.dep
 
-src top_zcu102_zynq_ipb.vhd
+src top_zcu102_c2c_loopback.vhd
 include zcu102_c2c_loopback_infra.dep
 src -c components/ipbus_core ipbus_package.vhd
 
-src --cd ../ucf zcu102_zynq_ipb.xdc
+src --cd ../ucf zcu102_c2c_loopback.xdc

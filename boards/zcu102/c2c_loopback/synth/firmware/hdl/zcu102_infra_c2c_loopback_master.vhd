@@ -9,33 +9,36 @@ use work.ipbus_axi_decl.all;
 library UNISIM;
 use UNISIM.VComponents.all;
 
-entity c2c_s_infra is 
+entity zcu102_infra_c2c_loopback_master is
 generic(
-      BUFWIDTH        : natural := 2;
-      ADDRWIDTH       : natural := 11
+      BUFWIDTH  : natural := 2;
+      ADDRWIDTH : natural := 11
 );
   port (
-      aclk            : in  std_logic;
-      aresetn         : in  std_logic;
-      c2c_stat_o      : out std_logic_vector(2 downto 0);  
-      gtx_stat_o      : out std_logic_vector(4 downto 0);  
-            --
-      gt_clkn         : in  std_logic;
-      gt_clkp         : in  std_logic;
-      gt_rxn          : in  std_logic;
-      gt_rxp          : in  std_logic;
-      gt_txn          : out std_logic;
-      gt_txp          : out std_logic;
-      --
-      ipb_clk         : out std_logic;
-      ipb_rst         : out std_logic;
-      ipb_in          : in  ipb_rbus;
-      ipb_out         : out ipb_wbus
+      ext_rst   : in  std_logic;
+      dipsw     : in  std_logic_vector(7 downto 0);
+      leds      : out std_logic_vector(7 downto 0);
+      
+      aclk_o    : out std_logic;
+      aresetn_o : out std_logic;
+      
+      gt_clkn   : in  std_logic;
+      gt_clkp   : in  std_logic;
+      gt_rxn    : in  std_logic;
+      gt_rxp    : in  std_logic;
+      gt_txn    : out std_logic;
+      gt_txp    : out std_logic;
+      
+      ipb_clk   : out std_logic;
+      ipb_rst   : out std_logic;
+      ipb_done  : out std_logic;
+      ipb_in    : in  ipb_rbus;
+      ipb_out   : out ipb_wbus
   );
-end c2c_s_infra;
+end zcu102_infra_c2c_loopback_master;
  
 
-architecture rtl of c2c_s_infra is
+architecture rtl of zcu102_infra_c2c_loopback_master is
 
   signal clk_ipb      : std_logic;
   signal rst_ipb      : std_logic;
@@ -52,19 +55,21 @@ architecture rtl of c2c_s_infra is
 begin
 
 
-bd_inst: entity work.c2c_s_ipb_wrapper 
+bd_inst: entity work.c2c_m_ipb_wrapper
   port map (
-    aclk              => aclk,
-    aresetn           => aresetn,
-    c2c_stat_o        => c2c_stat_o,
-    gtx_stat_o        => gtx_stat_o,
+    ext_rst           => ext_rst,
+    leds              => leds,
+    dipsw             => dipsw,
+    --
+    aclk_o            => aclk_o,
+    aresetn_o         => aresetn_o,
     --
     gt_clkn           => gt_clkn,
     gt_clkp           => gt_clkp,
     gt_rxn            => gt_rxn,
     gt_rxp            => gt_rxp,
     gt_txn            => gt_txn,
-    gt_txp            => gt_txp,  
+    gt_txp            => gt_txp,
     --
     ipb_clk_o         => clk_ipb,
     ipb_ic_rst_o      => rst_ipb_ctrl,
@@ -75,8 +80,8 @@ bd_inst: entity work.c2c_s_ipb_wrapper
   );
   
   ipb_axi_inst: entity work.ipbus_transport_axi_if
-  	generic map (
-      BUFWIDTH        => BUFWIDTH, 
+    generic map (
+      BUFWIDTH        => BUFWIDTH,
       ADDRWIDTH       => ADDRWIDTH)
     port map (
       ipb_clk         => clk_ipb,
@@ -103,8 +108,8 @@ bd_inst: entity work.c2c_s_ipb_wrapper
       cfg_vector_out  => open
     );
     
-    ipb_clk <= clk_ipb;
-    ipb_rst <= rst_ipb;
-
+    ipb_clk  <= clk_ipb;
+    ipb_rst  <= rst_ipb;
+    ipb_done <= ipb_pkt_done;
 
 end rtl;
