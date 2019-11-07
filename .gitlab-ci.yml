@@ -187,6 +187,12 @@ quick_check:zcu102_basex__2018.3:
     VIVADO_VERSION: "2018.3"
     PROJ: zcu102_basex
 
+quick_check:zcu102_c2c_loopback__2019.1:
+  <<: *template_vivado_quick_check
+  variables:
+    VIVADO_VERSION: "2019.1"
+    PROJ: zcu102_c2c_loopback
+
 quick_check:k800__2017.4:
   <<: *template_vivado_quick_check
   variables:
@@ -298,6 +304,13 @@ build:zcu102_basex__2018.3:
     VIVADO_VERSION: "2018.3"
   dependencies:
     - quick_check:zcu102_basex__2018.3
+
+build:zcu102_c2c_loopback__2019.1:
+  <<: *template_vivado_build
+  variables:
+    VIVADO_VERSION: "2019.1"
+  dependencies:
+    - quick_check:zcu102_c2c_loopback__2019.1
 
 build:k800__2017.4:
   <<: *template_vivado_build
