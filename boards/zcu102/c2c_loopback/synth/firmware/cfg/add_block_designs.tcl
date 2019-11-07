@@ -1,10 +1,12 @@
 
 set script_path [ file dirname [ file normalize [ info script ] ] ]
 
-generate_target {synthesis implementation} [import_files ${script_path}/../bd/c2c_m_ipb/c2c_m_ipb.bd]
+set bd_files [list ${script_path}/../bd/c2c_m_ipb/c2c_m_ipb.bd ${script_path}/../bd/c2c_s_ipb/c2c_s_ipb.bd]
 
-set c2c_s_bd_file_path [import_files ${script_path}/../bd/c2c_s_ipb/c2c_s_ipb.bd]
-open_bd_design ${c2c_s_bd_file_path}
-reset_target {synthesis implementation} [get_files ${c2c_s_bd_file_path}]
-generate_target {synthesis implementation} [get_files ${c2c_s_bd_file_path}]
+foreach file_path ${bd_files} {
+  set bd_file_path [import_files ${file_path}]
+  open_bd_design ${bd_file_path}
+  reset_target {synthesis implementation} [get_files ${bd_file_path}]
+  generate_target {synthesis implementation} [get_files ${bd_file_path}]
+}
 
