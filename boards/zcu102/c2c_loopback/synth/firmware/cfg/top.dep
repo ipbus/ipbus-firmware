@@ -30,6 +30,7 @@ setup -f add_block_designs.tcl
 include zu9.dep
 
 src top_zcu102_c2c_loopback.vhd
+src -c ipbus-firmware:components/ipbus_util ipbus_cdc_reg.vhd
 include zcu102_c2c_loopback_infra.dep
 src -c components/ipbus_core ipbus_package.vhd
 

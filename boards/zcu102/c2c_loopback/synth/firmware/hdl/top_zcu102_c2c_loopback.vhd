@@ -43,7 +43,15 @@ architecture rtl of top is
   
   signal aclk           : std_logic;
   signal aresetn        : std_logic;
+
+  signal ipb_soft_rst   : std_logic;
+  signal c2c_areset     : std_logic;
+  signal c2c_aresetn    : std_logic;
   
+  signal c2c_master_stat_axiclk, c2c_master_stat_ipbclk : std_logic_vector(9 downto 0);
+  signal c2c_slave_stat_axiclk, c2c_slave_stat_ipbclk : std_logic_vector(7 downto 0);
+
+
 begin
 
   local_infra_inst: entity work.zcu102_infra_c2c_loopback_master
@@ -64,7 +72,7 @@ begin
       gt_txn     => c2c_m_gt_txn,
       gt_txp     => c2c_m_gt_txp,
       --
-      c2c_aresetn => '1',
+      c2c_aresetn => c2c_aresetn,
       c2c_stat   => open,
       --
       ipb_clk    => local_ipb_clk,
@@ -80,7 +88,34 @@ begin
       ipb_rst    => local_ipb_rst,
       ipb_in     => local_ipb_out,
       ipb_out    => local_ipb_in,
-      userled    => leds(0)
+      userled    => leds(0),
+      status(7 downto 0)  => c2c_slave_stat_ipbclk,
+      status(17 downto 8) => c2c_master_stat_ipbclk,
+      status(19 downto 18) => "00",
+      status(31 downto 20) => X"abc"
+      );
+
+  c2c_reset_cdc: entity work.ipbus_cdc_reg
+    port map (
+      clk  => local_ipb_clk,
+      clks => aclk,
+      d(0) => ipb_soft_rst,
+      q(0) => c2c_areset
+      );
+
+  c2c_aresetn <= not c2c_areset;
+
+  c2c_stat_cdc: entity work.ipbus_cdc_reg
+    generic map (
+      N => 18
+      )
+    port map (
+      clk  => aclk,
+      clks => local_ipb_clk,
+      d(7 downto 0)  => c2c_slave_stat_axiclk,
+      d(17 downto 8) => c2c_master_stat_axiclk,
+      q(7 downto 0)  => c2c_slave_stat_ipbclk,
+      q(17 downto 8) => c2c_master_stat_ipbclk
       );
 
 
