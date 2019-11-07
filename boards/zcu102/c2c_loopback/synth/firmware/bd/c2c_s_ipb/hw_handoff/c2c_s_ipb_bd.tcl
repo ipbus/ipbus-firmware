@@ -230,17 +230,6 @@ proc create_root_design { parentCell } {
    CONFIG.NUM_MI {3} \
  ] $axi_interconnect_0
 
-  # Create instance: c2c_stat, and set properties
-  set c2c_stat [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_gpio:2.0 c2c_stat ]
-  set_property -dict [ list \
-   CONFIG.C_ALL_INPUTS {1} \
-   CONFIG.C_GPIO_WIDTH {8} \
-   CONFIG.C_IS_DUAL {0} \
-   CONFIG.GPIO2_BOARD_INTERFACE {Custom} \
-   CONFIG.GPIO_BOARD_INTERFACE {Custom} \
-   CONFIG.USE_BOARD_FLOW {true} \
- ] $c2c_stat
-
   # Create instance: clk_wiz_0, and set properties
   set clk_wiz_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:clk_wiz:6.0 clk_wiz_0 ]
   set_property -dict [ list \
@@ -302,14 +291,6 @@ proc create_root_design { parentCell } {
    CONFIG.NUM_PORTS {3} \
  ] $xlconcat_1
 
-  # Create instance: xlconcat_2, and set properties
-  set xlconcat_2 [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlconcat:2.1 xlconcat_2 ]
-  set_property -dict [ list \
-   CONFIG.IN0_WIDTH {5} \
-   CONFIG.IN1_WIDTH {3} \
-   CONFIG.NUM_PORTS {2} \
- ] $xlconcat_2
-
   # Create instance: xlconstant_0, and set properties
   set xlconstant_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlconstant:1.1 xlconstant_0 ]
   set_property -dict [ list \
@@ -330,10 +311,9 @@ proc create_root_design { parentCell } {
   connect_bd_intf_net -intf_net axi_chip2chip_0_aurora64_USER_DATA_M_AXIS_RX [get_bd_intf_pins axi_chip2chip_0/AXIS_RX] [get_bd_intf_pins axi_chip2chip_0_aurora64/USER_DATA_M_AXIS_RX]
   connect_bd_intf_net -intf_net axi_chip2chip_0_m_axi [get_bd_intf_pins axi_chip2chip_0/m_axi] [get_bd_intf_pins axi_interconnect_0/S00_AXI]
   connect_bd_intf_net -intf_net axi_interconnect_0_M01_AXI [get_bd_intf_ports ipb_axi] [get_bd_intf_pins axi_interconnect_0/M01_AXI]
-  connect_bd_intf_net -intf_net axi_interconnect_0_M02_AXI [get_bd_intf_pins axi_interconnect_0/M02_AXI] [get_bd_intf_pins c2c_stat/S_AXI]
 
   # Create port connections
-  connect_bd_net -net aresetn_2 [get_bd_ports aresetn] [get_bd_pins axi_interconnect_0/M00_ARESETN] [get_bd_pins axi_interconnect_0/M01_ARESETN] [get_bd_pins axi_interconnect_0/M02_ARESETN] [get_bd_pins axi_interconnect_0/S00_ARESETN] [get_bd_pins c2c_stat/s_axi_aresetn] [get_bd_pins proc_sys_reset_0/ext_reset_in]
+  connect_bd_net -net aresetn_2 [get_bd_ports aresetn] [get_bd_pins axi_interconnect_0/M00_ARESETN] [get_bd_pins axi_interconnect_0/M01_ARESETN] [get_bd_pins axi_interconnect_0/M02_ARESETN] [get_bd_pins axi_interconnect_0/S00_ARESETN] [get_bd_pins proc_sys_reset_0/ext_reset_in]
   connect_bd_net -net axi_chip2chip_0_aurora64_channel_up [get_bd_pins axi_chip2chip_0/axi_c2c_aurora_channel_up] [get_bd_pins axi_chip2chip_0_aurora64/channel_up] [get_bd_pins xlconcat_0/In0]
   connect_bd_net -net axi_chip2chip_0_aurora64_gt_pll_lock [get_bd_pins axi_chip2chip_0_aurora64/gt_pll_lock] [get_bd_pins xlconcat_0/In1]
   connect_bd_net -net axi_chip2chip_0_aurora64_hard_err [get_bd_pins axi_chip2chip_0_aurora64/hard_err] [get_bd_pins xlconcat_0/In2]
@@ -349,20 +329,18 @@ proc create_root_design { parentCell } {
   connect_bd_net -net clk_wiz_0_clk_out1 [get_bd_ports ipb_clk_o] [get_bd_pins clk_wiz_0/clk_out1] [get_bd_pins proc_sys_reset_1/slowest_sync_clk]
   connect_bd_net -net clk_wiz_0_clk_out2 [get_bd_pins axi_chip2chip_0/aurora_init_clk] [get_bd_pins axi_chip2chip_0_aurora64/init_clk] [get_bd_pins clk_wiz_0/clk_out2]
   connect_bd_net -net clk_wiz_0_locked [get_bd_pins clk_wiz_0/locked] [get_bd_pins proc_sys_reset_1/dcm_locked]
-  connect_bd_net -net m_aclk_0_1 [get_bd_ports aclk] [get_bd_pins axi_chip2chip_0/m_aclk] [get_bd_pins axi_interconnect_0/ACLK] [get_bd_pins axi_interconnect_0/M00_ACLK] [get_bd_pins axi_interconnect_0/M01_ACLK] [get_bd_pins axi_interconnect_0/M02_ACLK] [get_bd_pins axi_interconnect_0/S00_ACLK] [get_bd_pins c2c_stat/s_axi_aclk] [get_bd_pins clk_wiz_0/clk_in1] [get_bd_pins proc_sys_reset_0/slowest_sync_clk]
+  connect_bd_net -net m_aclk_0_1 [get_bd_ports aclk] [get_bd_pins axi_chip2chip_0/m_aclk] [get_bd_pins axi_interconnect_0/ACLK] [get_bd_pins axi_interconnect_0/M00_ACLK] [get_bd_pins axi_interconnect_0/M01_ACLK] [get_bd_pins axi_interconnect_0/M02_ACLK] [get_bd_pins axi_interconnect_0/S00_ACLK] [get_bd_pins clk_wiz_0/clk_in1] [get_bd_pins proc_sys_reset_0/slowest_sync_clk]
   connect_bd_net -net proc_sys_reset_0_interconnect_aresetn [get_bd_pins axi_chip2chip_0/m_aresetn] [get_bd_pins axi_interconnect_0/ARESETN] [get_bd_pins proc_sys_reset_0/interconnect_aresetn]
   connect_bd_net -net proc_sys_reset_1_interconnect_aresetn [get_bd_pins proc_sys_reset_1/interconnect_aresetn] [get_bd_pins util_vector_logic_0/Op1]
   connect_bd_net -net proc_sys_reset_1_peripheral_aresetn [get_bd_pins proc_sys_reset_1/peripheral_aresetn] [get_bd_pins util_vector_logic_1/Op1]
   connect_bd_net -net util_vector_logic_0_Res [get_bd_ports ipb_ic_rst_o] [get_bd_pins util_vector_logic_0/Res]
   connect_bd_net -net util_vector_logic_1_Res [get_bd_ports ipb_periph_rst_o] [get_bd_pins util_vector_logic_1/Res]
-  connect_bd_net -net xlconcat_0_dout [get_bd_ports gtx_stat_o] [get_bd_pins xlconcat_0/dout] [get_bd_pins xlconcat_2/In0]
-  connect_bd_net -net xlconcat_1_dout [get_bd_ports c2c_stat_o] [get_bd_pins xlconcat_1/dout] [get_bd_pins xlconcat_2/In1]
-  connect_bd_net -net xlconcat_2_dout [get_bd_pins c2c_stat/gpio_io_i] [get_bd_pins xlconcat_2/dout]
+  connect_bd_net -net xlconcat_0_dout [get_bd_ports gtx_stat_o] [get_bd_pins xlconcat_0/dout]
+  connect_bd_net -net xlconcat_1_dout [get_bd_ports c2c_stat_o] [get_bd_pins xlconcat_1/dout]
   connect_bd_net -net xlconstant_0_dout [get_bd_pins clk_wiz_0/reset] [get_bd_pins xlconstant_0/dout]
   connect_bd_net -net xlconstant_1_dout [get_bd_pins proc_sys_reset_1/ext_reset_in] [get_bd_pins xlconstant_1/dout]
 
   # Create address segments
-  create_bd_addr_seg -range 0x00001000 -offset 0xA1001000 [get_bd_addr_spaces axi_chip2chip_0/MAXI] [get_bd_addr_segs c2c_stat/S_AXI/Reg] SEG_c2c_stat_Reg
   create_bd_addr_seg -range 0x00010000 -offset 0xA1010000 [get_bd_addr_spaces axi_chip2chip_0/MAXI] [get_bd_addr_segs ipb_axi/Reg] SEG_ipb_axi_Reg
 
 
