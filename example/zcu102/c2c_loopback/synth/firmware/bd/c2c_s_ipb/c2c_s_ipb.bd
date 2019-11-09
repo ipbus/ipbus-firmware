@@ -5,13 +5,12 @@
       "device": "xczu9eg-ffvb1156-2-e",
       "name": "c2c_s_ipb",
       "synth_flow_mode": "Hierarchical",
-      "tool_version": "2019.1",
+      "tool_version": "2019.1.1",
       "validated": "true"
     },
     "design_tree": {
       "util_vector_logic_0": "",
       "util_vector_logic_1": "",
-      "axi_chip2chip_0": "",
       "axi_chip2chip_0_aurora64": "",
       "axi_interconnect_0": {
         "xbar": "",
@@ -26,7 +25,8 @@
       "xlconcat_1": "",
       "xlconstant_0": "",
       "xlconstant_1": "",
-      "clk_wiz_0": ""
+      "clk_wiz_0": "",
+      "axi_chip2chip_0": ""
     },
     "interface_ports": {
       "gt_o": {
@@ -290,39 +290,6 @@
           },
           "C_SIZE": {
             "value": "1"
-          }
-        }
-      },
-      "axi_chip2chip_0": {
-        "vlnv": "xilinx.com:ip:axi_chip2chip:5.0",
-        "xci_name": "c2c_s_ipb_axi_chip2chip_0_0",
-        "parameters": {
-          "C_AXI_DATA_WIDTH": {
-            "value": "64"
-          },
-          "C_AXI_STB_WIDTH": {
-            "value": "8"
-          },
-          "C_EN_AXI_LINK_HNDLR": {
-            "value": "true"
-          },
-          "C_INTERFACE_MODE": {
-            "value": "1"
-          },
-          "C_INTERFACE_TYPE": {
-            "value": "2"
-          },
-          "C_MASTER_FPGA": {
-            "value": "0"
-          },
-          "C_M_AXI_ID_WIDTH": {
-            "value": "0"
-          },
-          "C_M_AXI_WUSER_WIDTH": {
-            "value": "0"
-          },
-          "C_SUPPORT_NARROWBURST": {
-            "value": "true"
           }
         }
       },
@@ -698,16 +665,10 @@
           }
         },
         "interface_nets": {
-          "xbar_to_m02_couplers": {
+          "m00_couplers_to_axi_interconnect_0": {
             "interface_ports": [
-              "xbar/M02_AXI",
-              "m02_couplers/S_AXI"
-            ]
-          },
-          "s00_couplers_to_xbar": {
-            "interface_ports": [
-              "s00_couplers/M_AXI",
-              "xbar/S00_AXI"
+              "M00_AXI",
+              "m00_couplers/M_AXI"
             ]
           },
           "m01_couplers_to_axi_interconnect_0": {
@@ -722,10 +683,10 @@
               "m02_couplers/M_AXI"
             ]
           },
-          "xbar_to_m01_couplers": {
+          "xbar_to_m02_couplers": {
             "interface_ports": [
-              "xbar/M01_AXI",
-              "m01_couplers/S_AXI"
+              "xbar/M02_AXI",
+              "m02_couplers/S_AXI"
             ]
           },
           "axi_interconnect_0_to_s00_couplers": {
@@ -734,16 +695,22 @@
               "s00_couplers/S_AXI"
             ]
           },
+          "s00_couplers_to_xbar": {
+            "interface_ports": [
+              "s00_couplers/M_AXI",
+              "xbar/S00_AXI"
+            ]
+          },
+          "xbar_to_m01_couplers": {
+            "interface_ports": [
+              "xbar/M01_AXI",
+              "m01_couplers/S_AXI"
+            ]
+          },
           "xbar_to_m00_couplers": {
             "interface_ports": [
               "xbar/M00_AXI",
               "m00_couplers/S_AXI"
-            ]
-          },
-          "m00_couplers_to_axi_interconnect_0": {
-            "interface_ports": [
-              "M00_AXI",
-              "m00_couplers/M_AXI"
             ]
           }
         },
@@ -945,27 +912,42 @@
             "value": "true"
           }
         }
+      },
+      "axi_chip2chip_0": {
+        "vlnv": "xilinx.com:ip:axi_chip2chip:5.0",
+        "xci_name": "c2c_s_ipb_axi_chip2chip_0_0",
+        "parameters": {
+          "C_AXI_DATA_WIDTH": {
+            "value": "64"
+          },
+          "C_AXI_STB_WIDTH": {
+            "value": "8"
+          },
+          "C_EN_AXI_LINK_HNDLR": {
+            "value": "true"
+          },
+          "C_INTERFACE_MODE": {
+            "value": "1"
+          },
+          "C_INTERFACE_TYPE": {
+            "value": "2"
+          },
+          "C_MASTER_FPGA": {
+            "value": "0"
+          },
+          "C_M_AXI_ID_WIDTH": {
+            "value": "0"
+          },
+          "C_M_AXI_WUSER_WIDTH": {
+            "value": "0"
+          },
+          "C_SUPPORT_NARROWBURST": {
+            "value": "true"
+          }
+        }
       }
     },
     "interface_nets": {
-      "axi_chip2chip_0_AXIS_TX": {
-        "interface_ports": [
-          "axi_chip2chip_0/AXIS_TX",
-          "axi_chip2chip_0_aurora64/USER_DATA_S_AXIS_TX"
-        ]
-      },
-      "axi_chip2chip_0_aurora64_USER_DATA_M_AXIS_RX": {
-        "interface_ports": [
-          "axi_chip2chip_0/AXIS_RX",
-          "axi_chip2chip_0_aurora64/USER_DATA_M_AXIS_RX"
-        ]
-      },
-      "axi_chip2chip_0_m_axi": {
-        "interface_ports": [
-          "axi_chip2chip_0/m_axi",
-          "axi_interconnect_0/S00_AXI"
-        ]
-      },
       "GT_SERIAL_RX_1": {
         "interface_ports": [
           "gt_i",
@@ -978,16 +960,34 @@
           "axi_chip2chip_0_aurora64/GT_DIFF_REFCLK1"
         ]
       },
-      "axi_interconnect_0_M01_AXI": {
+      "axi_chip2chip_0_aurora64_USER_DATA_M_AXIS_RX": {
         "interface_ports": [
-          "ipb_axi",
-          "axi_interconnect_0/M01_AXI"
+          "axi_chip2chip_0/AXIS_RX",
+          "axi_chip2chip_0_aurora64/USER_DATA_M_AXIS_RX"
+        ]
+      },
+      "axi_chip2chip_0_AXIS_TX": {
+        "interface_ports": [
+          "axi_chip2chip_0/AXIS_TX",
+          "axi_chip2chip_0_aurora64/USER_DATA_S_AXIS_TX"
         ]
       },
       "axi_chip2chip_0_aurora64_GT_SERIAL_TX": {
         "interface_ports": [
           "gt_o",
           "axi_chip2chip_0_aurora64/GT_SERIAL_TX"
+        ]
+      },
+      "axi_interconnect_0_M01_AXI": {
+        "interface_ports": [
+          "ipb_axi",
+          "axi_interconnect_0/M01_AXI"
+        ]
+      },
+      "axi_chip2chip_0_m_axi": {
+        "interface_ports": [
+          "axi_chip2chip_0/m_axi",
+          "axi_interconnect_0/S00_AXI"
         ]
       }
     },
@@ -1001,8 +1001,8 @@
       "axi_chip2chip_0_aurora64_channel_up": {
         "ports": [
           "axi_chip2chip_0_aurora64/channel_up",
-          "axi_chip2chip_0/axi_c2c_aurora_channel_up",
-          "xlconcat_0/In0"
+          "xlconcat_0/In0",
+          "axi_chip2chip_0/axi_c2c_aurora_channel_up"
         ]
       },
       "axi_chip2chip_0_aurora64_mmcm_not_locked_out": {
@@ -1026,21 +1026,21 @@
       "m_aclk_0_1": {
         "ports": [
           "aclk",
-          "axi_chip2chip_0/m_aclk",
           "axi_interconnect_0/ACLK",
           "axi_interconnect_0/S00_ACLK",
           "axi_interconnect_0/M00_ACLK",
           "axi_interconnect_0/M01_ACLK",
           "axi_interconnect_0/M02_ACLK",
           "proc_sys_reset_0/slowest_sync_clk",
-          "clk_wiz_0/clk_in1"
+          "clk_wiz_0/clk_in1",
+          "axi_chip2chip_0/m_aclk"
         ]
       },
       "proc_sys_reset_0_interconnect_aresetn": {
         "ports": [
           "proc_sys_reset_0/interconnect_aresetn",
-          "axi_chip2chip_0/m_aresetn",
-          "axi_interconnect_0/ARESETN"
+          "axi_interconnect_0/ARESETN",
+          "axi_chip2chip_0/m_aresetn"
         ]
       },
       "aresetn_2": {
@@ -1117,8 +1117,8 @@
       "clk_wiz_0_clk_out2": {
         "ports": [
           "clk_wiz_0/clk_out2",
-          "axi_chip2chip_0/aurora_init_clk",
-          "axi_chip2chip_0_aurora64/init_clk"
+          "axi_chip2chip_0_aurora64/init_clk",
+          "axi_chip2chip_0/aurora_init_clk"
         ]
       },
       "xlconcat_0_dout": {
