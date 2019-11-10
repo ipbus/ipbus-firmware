@@ -73,7 +73,7 @@ begin
       gt_txp     => c2c_m_gt_txp,
       --
       c2c_aresetn => c2c_aresetn,
-      c2c_stat   => open,
+      c2c_stat   => c2c_master_stat_axiclk,
       --
       ipb_clk    => local_ipb_clk,
       ipb_rst    => local_ipb_rst,
@@ -127,8 +127,8 @@ begin
     port map(
       aclk       => aclk,
       aresetn    => aresetn,
-      c2c_stat_o => open, --leds(2 downto 0),
-      gtx_stat_o => open, --leds(7 downto 3),
+      c2c_stat_o => c2c_slave_stat_axiclk(2 downto 0), --leds(2 downto 0),
+      gtx_stat_o => c2c_slave_stat_axiclk(7 downto 3), --leds(7 downto 3),
             --
       gt_clkn    => c2c_s_gt_clkn,
       gt_clkp    => c2c_s_gt_clkp,
