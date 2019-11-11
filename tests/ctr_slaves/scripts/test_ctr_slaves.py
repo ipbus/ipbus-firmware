@@ -10,7 +10,9 @@ uhal.setLogLevelTo( uhal.LogLevel.NOTICE )
 
 @pytest.fixture
 def hw(pytestconfig):
-    return uhal.getDevice("hw", pytestconfig.getoption("client"), pytestconfig.getoption("addr"))
+    hwInterface = uhal.getDevice("hw", pytestconfig.getoption("client"), pytestconfig.getoption("addr"))
+    hwInterface.setTimeoutPeriod(10000)
+    return hwInterface
 
 
 def reset(csr_node):
