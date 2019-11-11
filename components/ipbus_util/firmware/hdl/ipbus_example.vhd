@@ -44,6 +44,7 @@ entity ipbus_example is
 		ipb_rst: in std_logic;
 		ipb_in: in ipb_wbus;
 		ipb_out: out ipb_rbus;
+		status: in std_logic_vector(31 downto 0) := X"abcdfedc";
 		nuke: out std_logic;
 		soft_rst: out std_logic;
 		userled: out std_logic
@@ -85,7 +86,7 @@ begin
 			q => ctrl
 		);
 		
-		stat(0) <= X"abcdfedc";
+		stat(0) <= status;
 		soft_rst <= ctrl(0)(0);
 		nuke <= ctrl(0)(1);
 		userled <= ctrl(0)(2);
