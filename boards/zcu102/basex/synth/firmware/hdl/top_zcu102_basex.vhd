@@ -33,34 +33,34 @@
 -- Dave Newbold, 24/10/16
 
 library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_1164.all;
 
-use work.ipbus.ALL;
+use work.ipbus.all;
 
 entity top is port(
-		sysclk_p: in std_logic;
-		sysclk_n: in std_logic;
-		eth_clk_p: in std_logic; -- 125MHz MGT clock
-		eth_clk_n: in std_logic;
-		eth_rx_p: in std_logic; -- Ethernet MGT input
-		eth_rx_n: in std_logic;
-		eth_tx_p: out std_logic; -- Ethernet MGT output
-		eth_tx_n: out std_logic;
-        sfp_enable: out std_logic;
-		leds: out std_logic_vector(7 downto 0); -- status LEDs
-		dip_sw: in std_logic_vector(3 downto 0) -- switches
-	);
+    sysclk_p   : in  std_logic;
+    sysclk_n   : in  std_logic;
+    eth_clk_p  : in  std_logic;                     -- 125MHz MGT clock
+    eth_clk_n  : in  std_logic;
+    eth_rx_p   : in  std_logic;                     -- Ethernet MGT input
+    eth_rx_n   : in  std_logic;
+    eth_tx_p   : out std_logic;                     -- Ethernet MGT output
+    eth_tx_n   : out std_logic;
+    sfp_enable : out std_logic;
+    leds       : out std_logic_vector(7 downto 0);  -- status LEDs
+    dip_sw     : in  std_logic_vector(3 downto 0)   -- switches
+    );
 
 end top;
 
 architecture rtl of top is
 
-	signal clk_ipb, rst_ipb, clk_aux, rst_aux, nuke, soft_rst, userled: std_logic;
-	signal mac_addr: std_logic_vector(47 downto 0);
-	signal ip_addr: std_logic_vector(31 downto 0);
-	signal ipb_out: ipb_wbus;
-	signal ipb_in: ipb_rbus;
-	
+    signal clk_ipb, rst_ipb, clk_aux, rst_aux, nuke, soft_rst, userled : std_logic;
+    signal mac_addr                                                    : std_logic_vector(47 downto 0);
+    signal ip_addr                                                     : std_logic_vector(31 downto 0);
+    signal ipb_out                                                     : ipb_wbus;
+    signal ipb_in                                                      : ipb_rbus;
+
 begin
 
 -- Infrastructure
@@ -103,17 +103,17 @@ begin
 -- ipbus slaves live in the entity below, and can expose top-level ports
 -- The ipbus fabric is instantiated within.
 
-	payload: entity work.payload
-		port map(
-			ipb_clk => clk_ipb,
-			ipb_rst => rst_ipb,
-			ipb_in => ipb_out,
-			ipb_out => ipb_in,
-			clk => clk_aux,
-			rst => rst_aux,
-			nuke => nuke,
-			soft_rst => soft_rst,
-			userled => userled
-		);
+    payload : entity work.payload
+        port map(
+            ipb_clk  => clk_ipb,
+            ipb_rst  => rst_ipb,
+            ipb_in   => ipb_out,
+            ipb_out  => ipb_in,
+            clk      => clk_aux,
+            rst      => rst_aux,
+            nuke     => nuke,
+            soft_rst => soft_rst,
+            userled  => userled
+            );
 
 end rtl;
