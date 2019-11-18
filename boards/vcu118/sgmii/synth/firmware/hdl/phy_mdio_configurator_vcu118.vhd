@@ -56,7 +56,7 @@ architecture behavioral of phy_mdio_configurator_vcu118 is
         encode_mdio_reg_read(VCU118_PHYADD, b"01010") &  -- 0x000A Status register 1 (Table 20.)
         encode_mdio_reg_read(VCU118_PHYADD, b"00101") &  -- 0x0005 Auto-Negotiation Link Partner Ability Register (Table 15.)
         encode_mdio_reg_read(VCU118_PHYADD, b"10001") &  -- 0x0011 PHY Status Register  (Table 25)
-        encode_mdio_reg_read(VCU118_PHYADD, b"10101");   -- 0x0015 Error counter (Table 29)
+        encode_mdio_reg_read(VCU118_PHYADD, b"10101");  -- 0x0015 Error counter (Table 29)
     signal mdio_poll_mask : std_logic_vector(0 to MDIO_POLL_LENGTH-1) := mdio_reg_read_mask &
                                                                          mdio_reg_read_mask &
                                                                          mdio_reg_read_mask &
@@ -83,12 +83,12 @@ begin
             if mdc = '1' and mdc_del = '0' then
                 if rst = '1' then
                     mdio_data_addr <= (others => '0');
-                    mdio_t         <= '1';      -- read/dont-care
+                    mdio_t         <= '1';            -- read/dont-care
                     mdio_clkdone   <= '0';
                 else
                     -- post reset PHY configuration, 
-                    if mdio_data_addr(10) = '0' then -- from 0 to 2**10-1
-                        mdio_t         <= '0';  -- write
+                    if mdio_data_addr(10) = '0' then  -- from 0 to 2**10-1
+                        mdio_t         <= '0';        -- write
                         mdio_o         <= mdio_data(to_integer(mdio_data_addr(9 downto 0)));
                         mdio_data_addr <= mdio_data_addr + 1;
                         mdio_poll_last <= poll_clk;
@@ -114,7 +114,7 @@ begin
                                 mdio_poll_done <= '1';
                             end if;
                         else
-                            mdio_t <= '1';      -- read/dont-care
+                            mdio_t <= '1';            -- read/dont-care
                         end if;
                     end if;
                 end if;
