@@ -65,6 +65,7 @@ set_property PACKAGE_PIN G31 [get_ports {leds[3]}]
 # Clock constraints
 create_generated_clock -name axi_clk [get_pins -hierarchical -filter {NAME =~infra/dma/xdma/*/phy_clk_i/bufg_gt_userclk/O}]
 create_generated_clock -name ipbus_clk -source [get_pins infra/clocks/mmcm/CLKIN1] [get_pins infra/clocks/mmcm/CLKOUT1]
+create_generated_clock -name clk_aux -source [get_pins infra/clocks/mmcm/CLKIN1] [get_pins infra/clocks/mmcm/CLKOUT2]
 
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks axi_clk] -group [get_clocks -include_generated_clocks osc_clk]
 set_clock_groups -asynchronous -group [get_clocks ipbus_clk] -group [get_clocks -include_generated_clocks [get_clocks clk_aux]]
