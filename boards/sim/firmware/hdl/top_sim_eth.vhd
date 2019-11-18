@@ -33,58 +33,58 @@
 -- Dave Newbold, 23/2/11
 
 library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_1164.all;
 
-use work.ipbus.ALL;
+use work.ipbus.all;
 
 entity top is
 
 -- Stand-alone design
-  generic(
-    MAC_ADDR : std_logic_vector(47 downto 0) := X"020ddba1e780";
-    IP_ADDR  : std_logic_vector(31 downto 0) := X"c0a8e780"
-    );
-  
+    generic(
+        MAC_ADDR : std_logic_vector(47 downto 0) := X"020ddba1e780";
+        IP_ADDR  : std_logic_vector(31 downto 0) := X"c0a8e780"
+        );
+
 end top;
 
 architecture rtl of top is
 
-	signal clk_ipb, rst_ipb, clk_aux, rst_aux, nuke, soft_rst: std_logic;
-	signal ipb_w: ipb_wbus;
-	signal ipb_r: ipb_rbus;
-	
+    signal clk_ipb, rst_ipb, clk_aux, rst_aux, nuke, soft_rst : std_logic;
+    signal ipb_w                                              : ipb_wbus;
+    signal ipb_r                                              : ipb_rbus;
+
 begin
 
 -- Infrastructure
 
-	infra: entity work.sim_eth_infra
-		port map(
-			clk_ipb_o => clk_ipb,
-			rst_ipb_o => rst_ipb,
-			clk_aux_o => clk_aux,
-			rst_aux_o => rst_aux,
-			nuke => nuke,
-			soft_rst => soft_rst,
-			mac_addr => MAC_ADDR,
-			ip_addr => IP_ADDR,
-			ipb_in => ipb_r,
-			ipb_out => ipb_w
-		);
-		
+    infra : entity work.sim_eth_infra
+        port map(
+            clk_ipb_o => clk_ipb,
+            rst_ipb_o => rst_ipb,
+            clk_aux_o => clk_aux,
+            rst_aux_o => rst_aux,
+            nuke      => nuke,
+            soft_rst  => soft_rst,
+            mac_addr  => MAC_ADDR,
+            ip_addr   => IP_ADDR,
+            ipb_in    => ipb_r,
+            ipb_out   => ipb_w
+            );
+
 -- ipbus slaves live in the entity below, and can expose top-level ports
 -- The ipbus fabric is instantiated within.
 
-	payload: entity work.payload
-		port map(
-			ipb_clk => clk_ipb,
-			ipb_rst => rst_ipb,
-			ipb_in => ipb_w,
-			ipb_out => ipb_r,
-			clk => clk_aux,
-			rst => rst_aux,
-			nuke => nuke,
-			soft_rst => soft_rst,
-			userled => open
-		);
+    payload : entity work.payload
+        port map(
+            ipb_clk  => clk_ipb,
+            ipb_rst  => rst_ipb,
+            ipb_in   => ipb_w,
+            ipb_out  => ipb_r,
+            clk      => clk_aux,
+            rst      => rst_aux,
+            nuke     => nuke,
+            soft_rst => soft_rst,
+            userled  => open
+            );
 
 end rtl;
