@@ -28,6 +28,5 @@ setup settings_ku.tcl
 
 src top_k800.vhd
 include k800_infra_xdmaBypass.dep
-include -c components/ipbus_util ipbus_example.dep
 src -c components/ipbus_core ipbus_package.vhd
 src --cd ../ucf k800.tcl

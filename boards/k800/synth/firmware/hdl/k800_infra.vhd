@@ -57,8 +57,11 @@ entity k800_infra is
       osc_clk_p : in std_logic;
       osc_clk_n : in std_logic;
       -- IPbus clock and reset
-      ipb_clk : out std_logic;
-      ipb_rst : out std_logic;
+      clk_ipb_o : out std_logic;
+      rst_ipb_o : out std_logic;
+      -- 40MHz generated clock
+      clk_aux_o: out std_logic; 
+      rst_aux_o: out std_logic;
       -- The signals of doom and lesser doom
       nuke: in std_logic;
       soft_rst: in std_logic;
@@ -73,8 +76,9 @@ end k800_infra;
 
 architecture rtl of k800_infra is
 
-  signal clk_osc, clk_ipb, clk_ipb_i : std_logic;
-  signal locked, clk_locked, pcie_user_lnk_up, rst125, rst_ipb, rst_ipb_ctrl, rst_axi, onehz : std_logic;
+  signal clk_osc, clk_ipb, clk_ipb_i, clk_aux : std_logic;
+  signal rst125, rst_ipb, rst_ipb_ctrl, rst_axi : std_logic;
+  signal locked, clk_locked, pcie_user_lnk_up, onehz : std_logic;
 
   signal pcie_sys_rst_n_i : std_logic;
 
@@ -103,12 +107,14 @@ begin
   --  DCM clock generation for internal bus, ethernet
   clocks: entity work.clocks_us_serdes
     generic map (
-      CLK_FR_FREQ => 200.0
+      CLK_FR_FREQ => 200.0,
+      CLK_AUX_FREQ => CLK_AUX_FREQ
     )
     port map (
       clki_fr => clk_osc,
       clki_125 => axi_ms.aclk,
       clko_ipb => clk_ipb_i,
+      clko_aux => clk_aux,
       eth_locked => pcie_user_lnk_up,
       locked => clk_locked,
       nuke => nuke,
@@ -117,12 +123,15 @@ begin
       rsto_ipb => rst_ipb,
       rsto_eth => rst_axi,
       rsto_ipb_ctrl => rst_ipb_ctrl,
+      rsto_aux => rst_aux,
       onehz => onehz
     );
 
   clk_ipb <= clk_ipb_i;
-  ipb_clk <= clk_ipb_i;
-  ipb_rst <= rst_ipb;
+  clk_ipb_o <= clk_ipb_i;
+  rst_ipb_o <= rst_ipb;
+  clk_aux_o <= clk_aux;
+  rst_aux_o <= rst_aux;
 
   locked <= clk_locked and pcie_user_lnk_up;
 
@@ -174,7 +183,7 @@ begin
       ipb_grant => '1',
       trans_in => trans_in,
       trans_out => trans_out,
-      cfg_vector_in => (Others => '0'),
+      cfg_vector_in => (others => '0'),
       cfg_vector_out => open
     );
 
