@@ -68,8 +68,7 @@ create_generated_clock -name ipbus_clk -source [get_pins infra/clocks/mmcm/CLKIN
 create_generated_clock -name clk_aux -source [get_pins infra/clocks/mmcm/CLKIN1] [get_pins infra/clocks/mmcm/CLKOUT2]
 
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks axi_clk] -group [get_clocks -include_generated_clocks osc_clk]
-set_clock_groups -asynchronous -group [get_clocks ipbus_clk] -group [get_clocks -include_generated_clocks [get_clocks clk_aux]]
 
-# set_false_path -from [get_pins infra/clocks/nuke_i_reg/C] -to [get_pins infra/clocks/nuke_d_reg/D]
-# set_false_path -from [get_pins infra/clocks/rst_reg/C] -to [get_pins infra/clocks/rst_ipb_ctrl_reg/D]
-# set_false_path -from [get_pins infra/clocks/rst_reg/C] -to [get_pins infra/clocks/rst_ipb_reg/D]
+# Declare the oscillator clock, ipbus clock and aux clock as unrelated
+set_clock_groups -asynchronous -group [get_clocks osc_clk] -group [get_clocks ipbus_clk] -group [get_clocks -include_generated_clocks [get_clocks clk_aux]]
+
