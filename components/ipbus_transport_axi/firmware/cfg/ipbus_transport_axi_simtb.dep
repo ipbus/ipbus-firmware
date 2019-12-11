@@ -23,16 +23,8 @@
 #
 #-------------------------------------------------------------------------------
 
+src ipbus_transport_ram_if_simtb.vhd
+include ipbus_transport_axi.dep
 
-src ipbus_transport_axi_if.vhd
-
-src ipbus_transport_ram_if.vhd
-src ipbus_transport_multibuffer_if.vhd
-src ipbus_transport_multibuffer_cdc.vhd
-src ipbus_transport_multibuffer_rx_dpram.vhd ipbus_transport_multibuffer_tx_dpram.vhd
-
-src ipbus_axi_decl.vhd
-
-?toolset=="Vivado"? src ../cgn/axi_bram_ctrl_0.xci
-
-include -c components/ipbus_core
+# The following is internally used by the ipbus_transport_ram_if_simtb.
+include -c components/ipbus_util ipbus_example.dep
