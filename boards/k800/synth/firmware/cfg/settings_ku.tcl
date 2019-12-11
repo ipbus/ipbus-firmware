@@ -29,3 +29,5 @@ set_property "simulator_language" "Mixed" [current_project]
 set_property "source_mgmt_mode" "DisplayOnly" [current_project]
 set_property "target_language" "VHDL" [current_project]
 
+set_property "steps.synth_design.args.flatten_hierarchy" "none" [get_runs synth_1]
+
