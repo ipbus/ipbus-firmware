@@ -26,7 +26,6 @@
 
 # Dependencies for ipbus_core
 
-src trans_arb.vhd
 src transactor.vhd
 src transactor_if.vhd
 src transactor_sm.vhd
