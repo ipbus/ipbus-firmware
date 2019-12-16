@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<node id="sysmon_usp_int_ref" fwinfo="endpoint; width=8">
+
+  <!-- NOTE: Since the lower nine bits of the address are passed
+       straigh to the DRP side of the sysmon, one should not
+       instantiate the IPBus sysmon entity below address 0x200. -->
+
+  <!-- More details about the actual register contents can be found in
+       Xilinx UG580. -->
+
+  <!-- Xilinx UG580 also says:
+       The ADC always produces a 16-bit conversion result, and the
+       full 16-bit result is stored in the 16-bit status
+       registers. The 10-bit transfer functions shown in this section
+       correspond to the 10 MSBs (most significant or left-most bits)
+       in the 16-bit status registers. The six LSBs can be used to
+       minimize quantization effects or improve resolution through
+       averaging or filtering.
+
+       This address table assumes that no external reference is
+       connected (which can be verified by looking at the reading of
+       vrefp) and only uses the top 10 bits. -->
+
+  <node id="temp"
+        description="FPGA die temperature. Conversion (for internal reference and 10 MSBs only): (ADC_code x 509.3140064 / 2^10) - 280.23087870 [C]."
+        address="0x00000000"
+        mask="0x0000ffc0" />
+
+  <node id="vccint"
+        description="VCCINT. Conversion (for internal reference and 10 MSBs only): (ADC_code / 2^10) * 3 [V]."
+        address="0x00000001"
+        mask="0x0000ffc0" />
+
+  <node id="vccaux"
+        description="VCCAUX. Conversion (for internal reference and 10 MSBs only): (ADC_code / 2^10) * 3 [V]."
+        address="0x00000002"
+        mask="0x0000ffc0" />
+
+  <!-- NOTE: At address 0x3 lives the VP/VN measurement, which is
+       disabled on the VHDL side. -->
+
+  <node id="vrefp"
+        description="VREFP. Conversion (for internal reference and 10 MSBs only): (ADC_code / 2^10) * 3 [V]."
+        address="0x00000004"
+        mask="0x0000ffc0" />
+
+  <node id="vrefn"
+        description="VREFN. Conversion (for internal reference and 10 MSBs only): (ADC_code / 2^10) * 3 [V]."
+        address="0x00000005"
+        mask="0x0000ffc0" />
+
+  <node id="vccbram"
+        description="VCCBRAM. Conversion (for internal reference and 10 MSBs only): (ADC_code / 2^10) * 3 [V]."
+        address="0x00000006"
+        mask="0x0000ffc0" />
+
+</node>
