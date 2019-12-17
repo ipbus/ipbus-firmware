@@ -26,7 +26,6 @@
 
 src zcu102_basex_infra.vhd
 src -c components/ipbus_util clocks/clocks_us_serdes.vhd ipbus_clock_div.vhd led_stretcher.vhd
-src -c components/ipbus_util masters/ipbus_ctrl.vhd
-include -c components/ipbus_transport_udp
+include -c components/ipbus_util ipbus_ctrl.dep
 include -c components/ipbus_eth zcu102_basex.dep
 src -c components/ipbus_core ipbus_fabric_sel.vhd ipbus_package.vhd
