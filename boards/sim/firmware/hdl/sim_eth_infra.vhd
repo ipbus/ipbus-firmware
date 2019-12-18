@@ -53,7 +53,7 @@ end sim_eth_infra;
 
 architecture rtl of sim_eth_infra is
 
-    signal clk125, clk_ipb, clk_ipb_i, rst, rst125, rst_ipb, rst_ipb_ctrl                                 : std_logic;
+    signal clk125, clk_ipb, clk_ipb_i, rst, rst125, rst_ipb, rst_ipb_ctrl, rst_aux                        : std_logic;
     signal mac_tx_data, mac_rx_data                                                                       : std_logic_vector(7 downto 0);
     signal mac_tx_valid, mac_tx_last, mac_tx_error, mac_tx_ready, mac_rx_valid, mac_rx_last, mac_rx_error : std_logic;
 
@@ -71,8 +71,9 @@ begin
             clko_aux  => clk_aux_o,
             nuke      => nuke,
             soft_rst  => soft_rst,
-            rsto      => rst,
-            rsto_ctrl => rst_ipb_ctrl
+            rsto_ipb  => rst_ipb,
+            rsto_ctrl => rst_ipb_ctrl,
+            rsto_aux  => rst_aux
             );
 
     rst125  <= rst_ipb_ctrl;
@@ -81,7 +82,7 @@ begin
     clk_ipb   <= clk_ipb_i;  -- Best to align delta delays on all clocks for simulation
     clk_ipb_o <= clk_ipb_i;
     rst_ipb_o <= rst;
-    rst_aux_o <= rst;
+    rst_aux_o <= rst_aux;
 
 --      Ethernet MAC core and PHY interface
 
