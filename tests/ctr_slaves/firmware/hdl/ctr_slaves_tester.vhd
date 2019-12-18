@@ -63,6 +63,7 @@ architecture rtl of ctr_slaves_tester is
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl, stat: ipb_reg_v(0 downto 0);
 	signal testctrl: ipb_reg_v(2 downto 0);
+	signal ctr_rst: std_logic;
 
 	signal incr, decr: std_logic;
 	signal increment, decrement: incdec_t;
@@ -105,7 +106,8 @@ begin
 	stat(0) <= X"abcdfedc";
 	soft_rst <= ctrl(0)(0);
 	nuke <= ctrl(0)(1);
-	userled <= ctrl(0)(2);
+	ctr_rst <= ctrl(0)(2) or rst;
+	userled <= ctrl(0)(4);
 
 
 -- Utility: registers controlling increment & decrement
@@ -147,7 +149,7 @@ begin
 	tester_fsm: process (clk)
 	begin
 		if rising_edge(clk) then
-			if rst = '1' then
+			if ctr_rst = '1' then
 				tester_active <= '0';
 			else
 				if tester_active = '0' and ctrl_start = '1' and ctrl_start_d = '0' then
@@ -203,7 +205,7 @@ begin
 			ipb_in => ipbw(N_SLV_CTRS_BLOCK_SMALL),
 			ipb_out => ipbr(N_SLV_CTRS_BLOCK_SMALL),
 			clk => clk,
-			rst => rst,
+			rst => ctr_rst,
 			inc => increment(0)(0 downto 0),
 			dec => decrement(0)(0 downto 0),
 			q => open
@@ -222,7 +224,7 @@ begin
 			ipb_in => ipbw(N_SLV_CTRS_BLOCK_SMALL_RW),
 			ipb_out => ipbr(N_SLV_CTRS_BLOCK_SMALL_RW),
 			clk => clk,
-			rst => rst,
+			rst => ctr_rst,
 			inc => increment(1)(0 downto 0),
 			dec => decrement(1)(0 downto 0),
 			q => open
@@ -241,7 +243,7 @@ begin
 			ipb_in => ipbw(N_SLV_CTRS_BLOCK_LARGE),
 			ipb_out => ipbr(N_SLV_CTRS_BLOCK_LARGE),
 			clk => clk,
-			rst => rst,
+			rst => ctr_rst,
 			inc => increment(2)(4 downto 0),
 			dec => decrement(2)(4 downto 0),
 			q => open
@@ -260,7 +262,7 @@ begin
 			ipb_in => ipbw(N_SLV_CTRS_BLOCK_LARGE_WIDE),
 			ipb_out => ipbr(N_SLV_CTRS_BLOCK_LARGE_WIDE),
 			clk => clk,
-			rst => rst,
+			rst => ctr_rst,
 			inc => increment(3)(4 downto 0),
 			dec => decrement(3)(4 downto 0),
 			q => open
@@ -280,7 +282,7 @@ begin
 			ipb_in => ipbw(N_SLV_CTRS_BLOCK_LARGE_WIDE_WRAPS),
 			ipb_out => ipbr(N_SLV_CTRS_BLOCK_LARGE_WIDE_WRAPS),
 			clk => clk,
-			rst => rst,
+			rst => ctr_rst,
 			inc => increment(4)(4 downto 0),
 			dec => decrement(4)(4 downto 0),
 			q => open
@@ -300,7 +302,7 @@ begin
 			ipb_in => ipbw(N_SLV_CTRS_BLOCK_LARGE_WIDE_READRESET),
 			ipb_out => ipbr(N_SLV_CTRS_BLOCK_LARGE_WIDE_READRESET),
 			clk => clk,
-			rst => rst,
+			rst => ctr_rst,
 			inc => increment(5)(4 downto 0),
 			dec => decrement(5)(4 downto 0),
 			q => open
@@ -321,7 +323,7 @@ begin
 			ipb_in => ipbw(N_SLV_CTRS_BLOCK_LARGE_WIDE_READRESET_RW),
 			ipb_out => ipbr(N_SLV_CTRS_BLOCK_LARGE_WIDE_READRESET_RW),
 			clk => clk,
-			rst => rst,
+			rst => ctr_rst,
 			inc => increment(6)(4 downto 0),
 			dec => decrement(6)(4 downto 0),
 			q => open
@@ -339,7 +341,7 @@ begin
 			ipb_in => ipbw(N_SLV_CTRS_PORTED_SMALL),
 			ipb_out => ipbr(N_SLV_CTRS_PORTED_SMALL),
 			clk => clk,
-			rst => rst,
+			rst => ctr_rst,
 			inc => increment(8)(0 downto 0),
 			dec => decrement(8)(0 downto 0),
 			q => open
@@ -358,7 +360,7 @@ begin
 			ipb_in => ipbw(N_SLV_CTRS_PORTED_SMALL_RW),
 			ipb_out => ipbr(N_SLV_CTRS_PORTED_SMALL_RW),
 			clk => clk,
-			rst => rst,
+			rst => ctr_rst,
 			inc => increment(9)(0 downto 0),
 			dec => decrement(9)(0 downto 0),
 			q => open
@@ -377,7 +379,7 @@ begin
 			ipb_in => ipbw(N_SLV_CTRS_PORTED_LARGE),
 			ipb_out => ipbr(N_SLV_CTRS_PORTED_LARGE),
 			clk => clk,
-			rst => rst,
+			rst => ctr_rst,
 			inc => increment(10)(4 downto 0),
 			dec => decrement(10)(4 downto 0),
 			q => open
@@ -396,7 +398,7 @@ begin
 			ipb_in => ipbw(N_SLV_CTRS_PORTED_LARGE_WIDE),
 			ipb_out => ipbr(N_SLV_CTRS_PORTED_LARGE_WIDE),
 			clk => clk,
-			rst => rst,
+			rst => ctr_rst,
 			inc => increment(11)(4 downto 0),
 			dec => decrement(11)(4 downto 0),
 			q => open
@@ -416,7 +418,7 @@ begin
 			ipb_in => ipbw(N_SLV_CTRS_PORTED_LARGE_WIDE_WRAPS),
 			ipb_out => ipbr(N_SLV_CTRS_PORTED_LARGE_WIDE_WRAPS),
 			clk => clk,
-			rst => rst,
+			rst => ctr_rst,
 			inc => increment(12)(4 downto 0),
 			dec => decrement(12)(4 downto 0),
 			q => open
@@ -436,7 +438,7 @@ begin
 			ipb_in => ipbw(N_SLV_CTRS_PORTED_LARGE_WIDE_READRESET),
 			ipb_out => ipbr(N_SLV_CTRS_PORTED_LARGE_WIDE_READRESET),
 			clk => clk,
-			rst => rst,
+			rst => ctr_rst,
 			inc => increment(13)(4 downto 0),
 			dec => decrement(13)(4 downto 0),
 			q => open
@@ -457,7 +459,7 @@ begin
 			ipb_in => ipbw(N_SLV_CTRS_PORTED_LARGE_WIDE_READRESET_RW),
 			ipb_out => ipbr(N_SLV_CTRS_PORTED_LARGE_WIDE_READRESET_RW),
 			clk => clk,
-			rst => rst,
+			rst => ctr_rst,
 			inc => increment(14)(4 downto 0),
 			dec => decrement(14)(4 downto 0),
 			q => open

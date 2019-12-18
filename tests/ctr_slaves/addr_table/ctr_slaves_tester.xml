@@ -5,7 +5,8 @@
 		<node id="ctrl" address="0x0">
 			<node id="rst" mask="0x1"/>
 			<node id="nuke" mask="0x2"/>
-			<node id="led" mask="0x4"/>
+			<node id="ctr_rst" mask="0x4"/>
+			<node id="led" mask="0x8"/>
 		</node>
 	</node>
 
