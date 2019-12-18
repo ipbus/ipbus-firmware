@@ -52,7 +52,7 @@ end sim_udp_infra;
 
 architecture rtl of sim_udp_infra is
 
-    signal clk_ipb, clk_ipb_i, rst, rsti : std_logic;
+    signal clk_ipb, clk_ipb_i, rst_ipb, rsti, rst_aux : std_logic;
     signal trans_in                      : ipbus_trans_in;
     signal trans_out                     : ipbus_trans_out;
 
@@ -70,14 +70,15 @@ begin
             clko_aux  => clk_aux_o,
             nuke      => nuke,
             soft_rst  => soft_rst,
-            rsto      => rst,
-            rsto_ctrl => rsti
+            rsto_ipb  => rst_ipb,
+            rsto_ctrl => rsti,
+            rsto_aux  => rst_aux
             );
 
     clk_ipb   <= clk_ipb_i;  -- Best to align delta delays on all clocks for simulation
     clk_ipb_o <= clk_ipb_i;
-    rst_ipb_o <= rst;
-    rst_aux_o <= rst;
+    rst_ipb_o <= rst_ipb;
+    rst_aux_o <= rst_aux;
 
 -- sim UDP transport
 
