@@ -32,6 +32,6 @@ addrtab -t ctr_slaves_tester.xml
 
 include -c components/ipbus_slaves ipbus_ctrs_ported.dep
 include -c components/ipbus_slaves ipbus_ctrs_v.dep
-include -c components/ipbus_slaves syncreg_v.dep
+include -c components/ipbus_slaves ipbus_syncreg_v.dep
 src -c components/ipbus_slaves ipbus_ctrlreg_v.vhd ipbus_reg_types.vhd
 src -c components/ipbus_core ipbus_package.vhd
