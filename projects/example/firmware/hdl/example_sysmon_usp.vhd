@@ -48,6 +48,15 @@ end payload;
 
 architecture rtl of payload is
 
+    -- Yeah.... Not pretty, but it makes it easier to create
+    -- a simple piece of example code.
+    signal nuke_i : std_logic;
+    signal soft_rst_i : std_logic;
+
+    attribute keep : string;
+    attribute keep of nuke_i : signal is "true";
+    attribute keep of soft_rst_i : signal is "true";
+    
 begin
 
     example: entity work.sysmon_usp
@@ -60,8 +69,10 @@ begin
             i2c_sda => '0'
         );
 
-    nuke <= '0';
-    soft_rst <= '0';
+    nuke_i <= '0';
+    nuke <= nuke_i;
+    soft_rst_i <= '0';
+    soft_rst <= soft_rst_i;
     userled <= '0';
 
 end rtl;
