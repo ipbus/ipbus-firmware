@@ -44,6 +44,8 @@ entity ipbus_example is
 		ipb_rst: in std_logic;
 		ipb_in: in ipb_wbus;
 		ipb_out: out ipb_rbus;
+		clk: in std_logic;
+		rst: in std_logic;
 		status: in std_logic_vector(31 downto 0) := X"abcdfedc";
 		nuke: out std_logic;
 		soft_rst: out std_logic;
@@ -122,6 +124,23 @@ begin
 			reset => ipb_rst,
 			ipbus_in => ipbw(N_SLV_PRAM),
 			ipbus_out => ipbr(N_SLV_PRAM)
+		);
+
+	sync_slave0: entity work.ipbus_syncreg_v
+		generic map(
+			N_STAT => 1,
+			N_CTRL => 1
+			)
+		port map(
+			clk => ipb_clk,
+			rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_SYNC_CSR),
+			ipb_out => ipbr(N_SLV_SYNC_CSR),
+			slv_clk => clk,
+			--d => (others => (others => '1')),
+			q => open,
+			stb => open,
+			rstb => open
 		);
 
 end rtl;

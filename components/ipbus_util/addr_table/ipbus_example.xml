@@ -13,4 +13,8 @@
         <node id="addr" address="0x0"/>
         <node id="data" mode="port" size="0x400" address="0x1"/>
     </node>
+    <node id="sync_csr" address="0x10000" description="ctrl/stat register" fwinfo="endpoint;width=1">
+        <node id="ctrl" address="0x0"/>
+        <node id="stat" address="0x1"/>
+    </node>
 </node>

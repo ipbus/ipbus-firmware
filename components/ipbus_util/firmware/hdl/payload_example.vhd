@@ -61,6 +61,8 @@ begin
             ipb_rst => ipb_rst,
             ipb_in => ipb_in,
             ipb_out => ipb_out,
+            clk => clk,
+            rst => rst,
             nuke => nuke,
             soft_rst => soft_rst,
             userled => userled
