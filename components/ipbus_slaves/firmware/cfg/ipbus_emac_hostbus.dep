@@ -24,6 +24,6 @@
 #-------------------------------------------------------------------------------
 
 
-src sysmon_v6.vhd
-include -c components/ipbus_slaves ipbus_drp_bridge.dep
+src ipbus_emac_hostbus.vhd
+src -c components/ipbus_eth emac_hostbus_decl.vhd
 src -c components/ipbus_core ipbus_package.vhd

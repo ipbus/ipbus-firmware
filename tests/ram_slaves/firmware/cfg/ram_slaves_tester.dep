@@ -32,5 +32,5 @@ addrtab -t ram_slaves_tester.xml
 src ram_pattern_generator.vhd
 src -c components/ipbus_slaves ipbus_ported_dpram.vhd ipbus_ported_dpram36.vhd ipbus_ported_dpram72.vhd ipbus_ported_sdpram72.vhd
 src -c components/ipbus_slaves ipbus_dpram.vhd ipbus_dpram36.vhd ipbus_sdpram72.vhd
-src -c components/ipbus_slaves ipbus_reg_types.vhd ipbus_reg_v.vhd ipbus_ctrlreg_v.vhd ipbus_ram.vhd ipbus_peephole_ram.vhd
-src -c components/ipbus_slaves ipbus_reg_types.vhd
+src -c components/ipbus_slaves ipbus_ram.vhd ipbus_peephole_ram.vhd
+include -c components/ipbus_slaves ipbus_reg_v.dep ipbus_ctrlreg_v.dep
