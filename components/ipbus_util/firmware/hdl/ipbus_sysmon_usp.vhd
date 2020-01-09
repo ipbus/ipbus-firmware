@@ -7,7 +7,7 @@ use unisim.vcomponents.all;
 use work.ipbus.all;
 use work.drp_decl.all;
 
-entity sysmon_us is
+entity ipbus_sysmon_usp is
 
   port (
     clk : in std_logic;
@@ -18,9 +18,9 @@ entity sysmon_us is
     i2c_sda : in std_logic
   );
 
-end sysmon_us;
+end ipbus_sysmon_usp;
 
-architecture rtl of sysmon_us is
+architecture rtl of ipbus_sysmon_usp is
 
   signal drp_m2s : drp_wbus;
   signal drp_s2m : drp_rbus;
@@ -37,7 +37,7 @@ begin
       drp_in => drp_s2m
     );
 
-  sysm : SYSMONE1
+  sysm : SYSMONE4
     port map (
       -- DRP interface.
       do => drp_s2m.data,

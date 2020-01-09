@@ -1,5 +1,5 @@
-src sysmon_usp.vhd
+src ipbus_sysmon_us.vhd
 src -c components/ipbus_slaves ipbus_drp_bridge.vhd drp_decl.vhd
 src -c components/ipbus_core ipbus_package.vhd
 
-addrtab sysmon_usp_int_ref.xml
+addrtab ipbus_sysmon_us_ext_ref.xml

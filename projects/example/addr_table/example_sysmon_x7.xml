@@ -3,7 +3,7 @@
   <!-- NOTE: Remember that the lower nine bits are sent straight to
        the sysmon. So keep this at an appropriate offset from 0x0. -->
   <node id="sysmon"
-        module="file://sysmon_x7.xml"
+        module="file://ipbus_sysmon_x7.xml"
         address="0x00010000" />
 
 </node>

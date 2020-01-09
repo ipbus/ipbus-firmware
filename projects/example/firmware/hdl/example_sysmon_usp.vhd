@@ -59,7 +59,7 @@ architecture rtl of payload is
     
 begin
 
-    example: entity work.sysmon_usp
+    example: entity work.ipbus_sysmon_usp
         port map(
             clk => ipb_clk,
             rst => ipb_rst,

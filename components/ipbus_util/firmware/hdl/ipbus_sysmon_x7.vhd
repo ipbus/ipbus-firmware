@@ -24,7 +24,7 @@
 ---------------------------------------------------------------------------------
 
 
--- sysmon_x7
+-- ipbus_sysmon_x7
 --
 -- Interface to the 7-series system monitor (which is technically called XADC)
 --
@@ -39,7 +39,7 @@ use unisim.VComponents.all;
 use work.ipbus.all;
 use work.drp_decl.all;
 
-entity sysmon_x7 is
+entity ipbus_sysmon_x7 is
 	port(
 		clk: in std_logic;
 		rst: in std_logic;
@@ -47,9 +47,9 @@ entity sysmon_x7 is
 		ipb_out: out ipb_rbus
 	);
 
-end sysmon_x7;
+end ipbus_sysmon_x7;
 
-architecture rtl of sysmon_x7 is
+architecture rtl of ipbus_sysmon_x7 is
 	
 	signal drp_m2s: drp_wbus;
 	signal drp_s2m: drp_rbus;

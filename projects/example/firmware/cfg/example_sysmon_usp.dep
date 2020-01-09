@@ -25,4 +25,4 @@
 
 
 src example_sysmon_usp.vhd
-include -c components/ipbus_util sysmon_usp_int_ref.dep
+include -c components/ipbus_util ipbus_sysmon_usp_int_ref.dep

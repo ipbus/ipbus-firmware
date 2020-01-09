@@ -24,7 +24,7 @@
 #-------------------------------------------------------------------------------
 
 
-src sysmon_x7.vhd
+src ipbus_sysmon_x7.vhd
 src -c components/ipbus_slaves ipbus_drp_bridge.vhd drp_decl.vhd
 src -c components/ipbus_core ipbus_package.vhd
-addrtab sysmon_x7.xml
+addrtab ipbus_sysmon_x7.xml
