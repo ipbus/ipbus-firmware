@@ -30,7 +30,7 @@ $ ipbb vivado package
 Now program the bit file into the FPGA.
 
 $ ipbb vivado gendecoders
-$cd ../../src/ipbus-firmware/projects/example/scripts/
+$ cd ../../src/ipbus-firmware/projects/example/scripts/
 $ cp ../../../../../proj/vcu118_sysmon/decoders/*.xml .
-$./example_sysmon.py 192.168.200.17 example_sysmon_usp.xml
+$ ./example_sysmon.py 192.168.200.17 example_sysmon_usp.xml
 
