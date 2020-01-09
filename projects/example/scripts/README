@@ -23,6 +23,9 @@ $ cd sysmon
 $ ipbb add git https://github.com/jhegeman/ipbus-firmware -b ipbus_issue144
 $ ipbb proj create vivado -t top_vcu118_sgmii_sysmon.dep vcu118_sysmon ipbus-firmware:projects/example
 $ cd proj/vcu118_sysmon/
+$ ipbb vivado make-project
+$ ipbb vivado synth -j4 impl -j 4
+$ ipbb vivado package
 
 Now program the bit file into the FPGA.
 
