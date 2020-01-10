@@ -1,0 +1,7 @@
+<node id="TOP">
+
+  <node id="device_dna"
+        module="file://ipbus_device_dna_usp.xml"
+        address="0x00010000" />
+
+</node>

@@ -1,0 +1,19 @@
+Instructions on building and running the 'device DNA' example design and script.
+
+- VCU118 with RJ45 Ethernet connection.
+$ ipbb init device_dna
+$ cd device_dna
+$ ipbb add git https://github.com/jhegeman/ipbus-firmware -b ipbus_issue151
+$ ipbb proj create vivado -t top_vcu118_sgmii_device_dna.dep vcu118_device_dna ipbus-firmware:projects/example
+$ cd proj/vcu118_device_dna/
+$ ipbb vivado make-project
+$ ipbb vivado synth -j4 impl -j 4
+$ ipbb vivado package
+
+Now program the bit file into the FPGA.
+
+$ ipbb vivado gendecoders
+$ cd ../../src/ipbus-firmware/projects/example/scripts/
+$ cp ../../../../../proj/vcu118_device_dna/decoders/*.xml .
+$ ./example_device_dna.py 192.168.200.17 example_device_dna_usp.xml
+
