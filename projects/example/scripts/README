@@ -17,3 +17,5 @@ $ cd ../../src/ipbus-firmware/projects/example/scripts/
 $ cp ../../../../../proj/vcu118_device_dna/decoders/*.xml .
 $ ./example_device_dna.py 192.168.200.17 example_device_dna_usp.xml
 
+The device DNA reported should be a 96-bit number similar to this:
+4002000001298e463d5102c5.
