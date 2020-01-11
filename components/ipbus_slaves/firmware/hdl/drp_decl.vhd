@@ -38,7 +38,7 @@ package drp_decl is
 -- The signals going from master to slaves
 	type drp_wbus is
   		record
-  			addr: std_logic_vector(8 downto 0);
+  			addr: std_logic_vector(15 downto 0);
       	data: std_logic_vector(15 downto 0);
       	en: std_logic;
       	we: std_logic;
