@@ -6,4 +6,8 @@
         module="file://ipbus_sysmon_usp_int_ref.xml"
         address="0x00010000" />
 
+  <node id="device_dna"
+        module="file://ipbus_device_dna_usp.xml"
+        address="0x00020000" />
+
 </node>

@@ -29,48 +29,47 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use work.ipbus.all;
---use work.ipbus_reg_types.all;
 
 entity payload is
-    port(
-        ipb_clk: in std_logic;
-        ipb_rst: in std_logic;
-        ipb_in: in ipb_wbus;
-        ipb_out: out ipb_rbus;
-        clk: in std_logic;
-        rst: in std_logic;
-        nuke: out std_logic;
-        soft_rst: out std_logic;
-        userled: out std_logic
-    );
+  port(
+    ipb_clk : in std_logic;
+    ipb_rst : in std_logic;
+    ipb_in : in ipb_wbus;
+    ipb_out : out ipb_rbus;
+    clk : in std_logic;
+    rst : in std_logic;
+    nuke : out std_logic;
+    soft_rst : out std_logic;
+    userled : out std_logic
+  );
 
 end payload;
 
 architecture rtl of payload is
 
-    -- Yeah.... Not pretty, but it makes it easier to create
-    -- a simple piece of example code.
-    signal nuke_i : std_logic;
-    signal soft_rst_i : std_logic;
+  -- Yeah.... Not pretty, but it makes it easier to create
+  -- a simple piece of example code.
+  signal nuke_i : std_logic;
+  signal soft_rst_i : std_logic;
 
-    attribute keep : string;
-    attribute keep of nuke_i : signal is "true";
-    attribute keep of soft_rst_i : signal is "true";
+  attribute keep : string;
+  attribute keep of nuke_i : signal is "true";
+  attribute keep of soft_rst_i : signal is "true";
 
 begin
 
-    example: entity work.ipbus_sysmon_x7
-        port map(
-            clk => ipb_clk,
-            rst => ipb_rst,
-            ipb_in => ipb_in,
-            ipb_out => ipb_out
-        );
+  example : entity work.ipbus_sysmon_x7
+    port map (
+      clk     => ipb_clk,
+      rst     => ipb_rst,
+      ipb_in  => ipb_in,
+      ipb_out => ipb_out
+    );
 
-    nuke_i <= '0';
-    nuke <= nuke_i;
-    soft_rst_i <= '0';
-    soft_rst <= soft_rst_i;
-    userled <= '0';
+  nuke_i     <= '0';
+  nuke       <= nuke_i;
+  soft_rst_i <= '0';
+  soft_rst   <= soft_rst_i;
+  userled    <= '0';
 
 end rtl;
