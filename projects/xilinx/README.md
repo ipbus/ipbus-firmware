@@ -16,7 +16,7 @@ Now program the bit file into the FPGA.
 
 ```
 $ cd ../../src/ipbus-firmware/projects/xilinx/scripts/
-$ cp ../../../../../proj/kc705_sysmon/package/src/addrtab/* .
+$ cp ../../../../../proj/example_kc705/package/src/addrtab/* .
 $ ./example_sysmon.py 192.168.200.16 ipbus_example_xilinx_x7.xml
 ```
 
@@ -36,7 +36,7 @@ Now program the bit file into the FPGA.
 
 ```
 $ cd ../../src/ipbus-firmware/projects/xilinx/scripts/
-$ cp ../../../../../proj/vcu118_sysmon/package/src/addrtab/* .
+$ cp ../../../../../proj/example_vcu118/package/src/addrtab/* .
 $ ./example_sysmon.py 192.168.200.17 ipbus_example_xilinx_usp.xml
 ```
 
