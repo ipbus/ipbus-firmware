@@ -2,8 +2,8 @@
 
 ## KC705 with RJ45 Ethernet connection.
 ```
-$ ipbb init sysmon
-$ cd sysmon
+$ ipbb init xilinx_example
+$ cd xilinx_example
 $ ipbb add git https://github.com/ipbus-firmware
 $ ipbb proj create vivado -t top_kc705_gmii.dep example_kc705 ipbus-firmware:projects/xilinx
 $ cd proj/example_kc705
@@ -22,8 +22,8 @@ $ ./example_sysmon.py 192.168.200.16 ipbus_example_xilinx_x7.xml
 
 ## VCU118 with RJ45 Ethernet connection.
 ```
-$ ipbb init sysmon
-$ cd sysmon
+$ ipbb init xilinx_example
+$ cd xilinx_example
 $ ipbb add git https://github.com/ipbus-firmware
 $ ipbb proj create vivado -t top_vcu118_sgmii.dep example_vcu118 ipbus-firmware:projects/xilinx
 $ cd proj/example_vcu118
