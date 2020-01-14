@@ -41,6 +41,7 @@ $ ./example_sysmon.py 192.168.200.17 ipbus_example_xilinx_usp.xml
 ```
 
 ## Expected output
+### SysMon
 The SysMon part of the output of the example script (for both
 examples) should show something like:
 
@@ -54,6 +55,10 @@ IPBus SysMon/XADC demo:
   vccbram:  0.85 V
 ```
 
+# Device DNA
 The device DNA part of the UltraScale(+) example should report a
 96-bit identifier that looks similar to this:
-4002000001298e463d5102c5.
+
+```IPBus UltraScale(+) device DNA demo:
+  Device DNA: 4002000001298e463d5102c5
+```
