@@ -59,6 +59,7 @@ IPBus SysMon/XADC demo:
 The device DNA part of the UltraScale(+) example should report a
 96-bit identifier that looks similar to this:
 
-```IPBus UltraScale(+) device DNA demo:
+```
+IPBus UltraScale(+) device DNA demo:
   Device DNA: 4002000001298e463d5102c5
 ```
