@@ -38,6 +38,7 @@ Now program the bit file into the FPGA.
 $ cd ../../src/ipbus-firmware/projects/xilinx/scripts/
 $ cp ../../../../../proj/example_vcu118/package/src/addrtab/* .
 $ ./example_sysmon.py 192.168.200.17 ipbus_example_xilinx_usp.xml
+$ ./example_device_dna.py 192.168.200.17 ipbus_example_xilinx_usp.xml
 ```
 
 ## Expected output
