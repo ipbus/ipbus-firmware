@@ -1,8 +1,8 @@
 ######################################################################
 
-src ipbus_device_dna_usp.vhd
-src device_dna_usp.vhd
+src ipbus_device_dna_us_usp.vhd
+src device_dna_us_usp.vhd
 
-addrtab ipbus_device_dna_usp.xml
+addrtab ipbus_device_dna_us_usp.xml
 
 ######################################################################

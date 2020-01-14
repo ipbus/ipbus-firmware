@@ -10,16 +10,16 @@ use ieee.numeric_std.all;
 use work.ipbus.all;
 --use work.ipbus_reg_types.all;
 
-entity ipbus_device_dna_usp is
+entity ipbus_device_dna_us_usp is
   port (
     clk : in std_logic;
     rst : in std_logic;
     ipb_in : in ipb_wbus;
     ipb_out : out ipb_rbus
   );
-end ipbus_device_dna_usp;
+end ipbus_device_dna_us_usp;
 
-architecture rtl of ipbus_device_dna_usp is
+architecture rtl of ipbus_device_dna_us_usp is
 
   signal dna_val : std_logic_vector(95 downto 0);
 

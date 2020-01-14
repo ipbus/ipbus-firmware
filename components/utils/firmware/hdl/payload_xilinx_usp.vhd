@@ -86,7 +86,7 @@ begin
       i2c_sda => '0'
     );
 
-  device_dna : entity work.ipbus_device_dna_usp
+  device_dna : entity work.ipbus_device_dna_us_usp
     port map (
       clk     => ipb_clk,
       rst     => ipb_rst,
