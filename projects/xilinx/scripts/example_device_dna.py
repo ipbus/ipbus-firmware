@@ -24,12 +24,12 @@ if __name__ == '__main__':
 
     print "IPBus UltraScale(+) device DNA demo:"
 
-    byte0 = hw.getNode("device_dna.byte0").read()
-    byte1 = hw.getNode("device_dna.byte1").read()
-    byte2 = hw.getNode("device_dna.byte2").read()
+    word0 = hw.getNode("device_dna.word0").read()
+    word1 = hw.getNode("device_dna.word1").read()
+    word2 = hw.getNode("device_dna.word2").read()
     hw.dispatch()
 
     msg_base = "  Device DNA: {0:08x}{1:08x}{2:08x}"
-    print msg_base.format(byte2, byte1, byte0)
+    print msg_base.format(word2, word1, word0)
 
 ######################################################################

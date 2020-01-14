@@ -4,8 +4,8 @@
 
   <!-- The Xilinx device DNA (for UltraScale and UltraScale+ devices)
        is a 96-bit value. -->
-  <node id="byte0" description="LSB" address="0x00000000" />
-  <node id="byte1" description="Middle byte" address="0x00000001" />
-  <node id="byte2" description="MSB" address="0x00000002" />
+  <node id="word0" description="LSW" address="0x00000000" />
+  <node id="word1" description="Middle word" address="0x00000001" />
+  <node id="word2" description="MSW" address="0x00000002" />
 
 </node>
