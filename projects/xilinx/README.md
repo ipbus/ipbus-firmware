@@ -55,7 +55,7 @@ IPBus SysMon/XADC demo:
   vccbram:  0.85 V
 ```
 
-# Device DNA
+### Device DNA
 The device DNA part of the UltraScale(+) example should report a
 96-bit identifier that looks similar to this:
 
