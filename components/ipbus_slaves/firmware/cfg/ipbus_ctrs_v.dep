@@ -25,4 +25,4 @@
 
 
 src ipbus_ctrs_v.vhd
-include syncreg_v.dep
+include ipbus_syncreg_v.dep

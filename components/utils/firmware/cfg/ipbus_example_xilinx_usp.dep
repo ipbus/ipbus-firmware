@@ -24,8 +24,9 @@
 #-------------------------------------------------------------------------------
 
 
-src pc053a_infra.vhd
-src -c components/ipbus_util clocks/clocks_7s_serdes.vhd ipbus_clock_div.vhd led_stretcher.vhd
-include -c components/ipbus_util ipbus_ctrl.dep
-include -c components/ipbus_eth artix_basex.dep
-src -c components/ipbus_core ipbus_fabric_sel.vhd ipbus_package.vhd
+src payload_xilinx_usp.vhd
+src ipbus_decode_ipbus_example_xilinx_usp.vhd
+src -c components/ipbus_slaves ipbus_reg_types.vhd
+include -c components/ipbus_util ipbus_sysmon_usp_int_ref.dep
+include -c components/ipbus_util ipbus_device_dna_us_usp.dep
+addrtab -t -c components/utils ipbus_example_xilinx_usp.xml

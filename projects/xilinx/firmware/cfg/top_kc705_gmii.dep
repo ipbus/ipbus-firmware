@@ -24,8 +24,5 @@
 #-------------------------------------------------------------------------------
 
 
-src pc053a_infra.vhd
-src -c components/ipbus_util clocks/clocks_7s_serdes.vhd ipbus_clock_div.vhd led_stretcher.vhd
-include -c components/ipbus_util ipbus_ctrl.dep
-include -c components/ipbus_eth artix_basex.dep
-src -c components/ipbus_core ipbus_fabric_sel.vhd ipbus_package.vhd
+include -c boards/kc705/gmii/synth kc705_gmii.dep
+include -c components/utils ipbus_example_xilinx_x7.dep

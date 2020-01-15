@@ -24,8 +24,7 @@
 #-------------------------------------------------------------------------------
 
 
-src pc053a_infra.vhd
-src -c components/ipbus_util clocks/clocks_7s_serdes.vhd ipbus_clock_div.vhd led_stretcher.vhd
-include -c components/ipbus_util ipbus_ctrl.dep
-include -c components/ipbus_eth artix_basex.dep
-src -c components/ipbus_core ipbus_fabric_sel.vhd ipbus_package.vhd
+src ipbus_sysmon_x7.vhd
+src -c components/ipbus_slaves ipbus_drp_bridge.vhd drp_decl.vhd
+src -c components/ipbus_core ipbus_package.vhd
+addrtab ipbus_sysmon_x7.xml
