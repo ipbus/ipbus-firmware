@@ -96,6 +96,7 @@ github_commit_status:end:success:
   only:
     - /^pull-requests.[0-9]+$/
     - master
+    - tags
     - web
   script:
     - cd work_area/proj/${CI_JOB_NAME#build:}
@@ -451,6 +452,7 @@ save_build_results:
   only:
     - /^pull-requests.[0-9]+$/
     - master
+    - tags
     - web
   variables:
     CI_OUTPUT_DIR: "build_results/"
