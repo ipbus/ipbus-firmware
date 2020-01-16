@@ -25,5 +25,5 @@
 
 
 include -c boards/pc053a/synth a200.dep
-include -c boards/sim
+include -c boards/sim sim_udp.dep
 
