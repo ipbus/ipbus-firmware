@@ -24,8 +24,6 @@
 #-------------------------------------------------------------------------------
 
 
-src ipbus_sysmon_us.vhd
-include -c components/ipbus_slaves ipbus_drp_bridge.dep
+src ipbus_reg_v.vhd
+src ipbus_reg_types.vhd
 src -c components/ipbus_core ipbus_package.vhd
-
-addrtab ipbus_sysmon_us_int_ref.xml
