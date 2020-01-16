@@ -34,26 +34,26 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 
 package drp_decl is
-  
+
 -- The signals going from master to slaves
 	type drp_wbus is
-  		record
-  			addr: std_logic_vector(8 downto 0);
-      	data: std_logic_vector(15 downto 0);
-      	en: std_logic;
-      	we: std_logic;
-    	end record;
+		record
+			addr: std_logic_vector(15 downto 0);
+			data: std_logic_vector(15 downto 0);
+			en: std_logic;
+			we: std_logic;
+		end record;
 
 	type drp_wbus_array is array(natural range <>) of drp_wbus;
 	
 	constant DRP_WBUS_NULL: drp_wbus := ((others => '0'), (others => '0'), '0', '0');
-	 
+	
 -- The signals going from slaves to master	 
 	type drp_rbus is
-    record
+		record
 			data: std_logic_vector(15 downto 0);
 			rdy: std_logic;
-    end record;
+		end record;
 
 	type drp_rbus_array is array(natural range <>) of drp_rbus;
 	

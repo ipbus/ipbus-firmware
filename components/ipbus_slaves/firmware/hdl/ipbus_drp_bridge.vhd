@@ -65,7 +65,7 @@ begin
 	stb <= ipb_in.ipb_strobe and not busy;
 	cyc <= stb and not stb_d;
 
-	drp_out.addr <= ipb_in.ipb_addr(8 downto 0);
+	drp_out.addr <= ipb_in.ipb_addr(15 downto 0);
 	drp_out.en <= cyc;
 	drp_out.data <= ipb_in.ipb_wdata(15 downto 0);
 	drp_out.we <= cyc and ipb_in.ipb_write;

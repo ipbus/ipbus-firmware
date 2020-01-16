@@ -51,13 +51,13 @@ package body ipbus_reg_types is
 	end function calc_width;
 
 	function integer_max(left, right: integer) return integer is
-  begin
-    if left > right then
-    	return left;
-    else
-    	return right;
-    end if;
-  end function integer_max;
+	begin
+		if left > right then
+			return left;
+		else
+			return right;
+		end if;
+	end function integer_max;
 	
 end package body ipbus_reg_types;
 
