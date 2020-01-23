@@ -1,0 +1,58 @@
+
+.template_base:
+  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-cc7:2019-09-17__ipbb0.5.2
+  before_script:
+    - source /software/Xilinx/Vivado/${VIVADO_VERSION}/settings64.sh
+
+
+.template_vivado_quick_check:
+  extends: .template_base
+  tags:
+    - docker
+    - xilinx-tools
+  stage: quick_checks
+  script:
+    - ipbb init work_area
+    - cd work_area
+    - ln -s ${CI_PROJECT_DIR} src/ipbus-firmware
+    - ipbb proj create vivado -t top_${PROJ}.dep ${CI_JOB_NAME#quick_check:} ipbus-firmware:projects/example
+    - cd proj/${CI_JOB_NAME#quick_check:}
+    - ipbb vivado make-project
+    - ipbb vivado check-syntax
+  artifacts:
+    when: on_success
+    paths:
+      - work_area
+    expire_in: 1 day
+
+
+.template_vivado_build:
+  extends: .template_base
+  tags:
+    - docker
+    - xilinx-tools
+  stage: builds
+  only:
+    - /^pull-requests.[0-9]+$/
+    - master
+    - tags
+    - web
+  script:
+    - cd work_area/proj/${CI_JOB_NAME#build:}
+    - ipbb vivado synth -j4
+    - ipbb vivado impl
+    - ipbb vivado bitfile
+    - ipbb vivado package
+  after_script:
+    - export PROJ_NAME=${CI_JOB_NAME#build:}
+    - export ARTIFACT_DIR=build_results/${PROJ_NAME%__${VIVADO_VERSION}}/vivado${VIVADO_VERSION}/
+    - mkdir -p ${ARTIFACT_DIR}/logs
+    - cp -v work_area/proj/${PROJ_NAME}/package/*.tgz ${ARTIFACT_DIR}/ 2>/dev/null || true
+    - cp -v work_area/proj/${PROJ_NAME}/*.log ${ARTIFACT_DIR}/logs 2>/dev/null || true
+    - cp -v work_area/proj/${PROJ_NAME}/*.jou ${ARTIFACT_DIR}/logs 2>/dev/null || true
+  artifacts:
+    when: always
+    name: "${CI_JOB_NAME#build:}-on-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHA:0:8}"
+    paths:
+      - build_results
+    expire_in: 2 weeks

@@ -1,0 +1,26 @@
+
+save_build_results:
+  stage: publish
+  image: gitlab-registry.cern.ch/ci-tools/ci-web-deployer:latest
+  only:
+    - /^pull-requests.[0-9]+$/
+    - master
+    - tags
+    - web
+  variables:
+    CI_OUTPUT_DIR: "build_results/"
+    OUTPUT_ROOT_DIR: "/eos/user/i/ipbusci/fw-gitlab-ci"
+  before_script:
+    - yum -y install openssh-clients
+    - export EOS_PATH=${OUTPUT_ROOT_DIR}/commits/${CI_COMMIT_TAG:-${CI_COMMIT_SHA}}/pipeline${CI_PIPELINE_ID}
+    - if [ -n "${CI_COMMIT_TAG}" ]; then export EOS_PATH=${EOS_PATH/commits/tags} ; fi
+  script:
+    - env | grep -v PASSWORD | grep -v TOKEN | sort
+    - echo "${EOS_ACCOUNT_PASSWORD}" | kinit ${EOS_ACCOUNT_USERNAME}@CERN.CH
+    - klist
+    - ssh -F ${CI_PROJECT_DIR}/ci/ssh_config ${EOS_ACCOUNT_USERNAME}@lxplus "rm -rf ${EOS_PATH} && mkdir -p ${EOS_PATH}"
+    - ssh -F ${CI_PROJECT_DIR}/ci/ssh_config ${EOS_ACCOUNT_USERNAME}@lxplus "ln -sfnv ${EOS_PATH} `dirname ${EOS_PATH}`/latest"
+    - kdestroy
+    - ls -l ${CI_OUTPUT_DIR} ${CI_OUTPUT_DIR}/*
+    - ls -l ${CI_OUTPUT_DIR}/*/*
+    - deploy-eos

@@ -1,0 +1,125 @@
+
+quick_check:enclustra_ax3_pm3_a35__2018.3:
+  extends: .template_vivado_quick_check
+  variables:
+    VIVADO_VERSION: "2018.3"
+    PROJ: enclustra_ax3_pm3_a35
+quick_check:enclustra_ax3_pm3_a35__2019.2:
+  extends: .template_vivado_quick_check
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ: enclustra_ax3_pm3_a35
+
+quick_check:enclustra_ax3_pm3_a50__2018.3:
+  extends: .template_vivado_quick_check
+  variables:
+    VIVADO_VERSION: "2018.3"
+    PROJ: enclustra_ax3_pm3_a50
+quick_check:enclustra_ax3_pm3_a50__2019.2:
+  extends: .template_vivado_quick_check
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ: enclustra_ax3_pm3_a50
+
+quick_check:kc705_basex__2018.3:
+  extends: .template_vivado_quick_check
+  variables:
+    VIVADO_VERSION: "2018.3"
+    PROJ: kc705_basex
+quick_check:kc705_basex__2019.2:
+  extends: .template_vivado_quick_check
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ: kc705_basex
+
+quick_check:kc705_gmii__2018.3:
+  extends: .template_vivado_quick_check
+  variables:
+    VIVADO_VERSION: "2018.3"
+    PROJ: kc705_gmii
+quick_check:kc705_gmii__2019.2:
+  extends: .template_vivado_quick_check
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ: kc705_gmii
+
+quick_check:kcu105_basex__2018.3:
+  extends: .template_vivado_quick_check
+  variables:
+    VIVADO_VERSION: "2018.3"
+    PROJ: kcu105_basex
+quick_check:kcu105_basex__2019.2:
+  extends: .template_vivado_quick_check
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ: kcu105_basex
+
+quick_check:zcu102_basex__2018.3:
+  extends: .template_vivado_quick_check
+  variables:
+    VIVADO_VERSION: "2018.3"
+    PROJ: zcu102_basex
+quick_check:zcu102_basex__2019.2:
+  extends: .template_vivado_quick_check
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ: zcu102_basex
+
+quick_check:zcu102_c2c_loopback__2019.1:
+  extends: .template_vivado_quick_check
+  variables:
+    VIVADO_VERSION: "2019.1"
+    PROJ: zcu102_c2c_loopback
+
+quick_check:k800__2018.3:
+  extends: .template_vivado_quick_check
+  variables:
+    VIVADO_VERSION: "2018.3"
+    PROJ: k800
+quick_check:k800__2019.2:
+  extends: .template_vivado_quick_check
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ: k800
+
+quick_check:vcu118_pcie__2018.3:
+  extends: .template_vivado_quick_check
+  variables:
+    VIVADO_VERSION: "2018.3"
+    PROJ: vcu118_pcie
+quick_check:vcu118_pcie__2019.2:
+  extends: .template_vivado_quick_check
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ: vcu118_pcie
+
+quick_check:vcu118_sgmii__2018.3:
+  extends: .template_vivado_quick_check
+  variables:
+    VIVADO_VERSION: "2018.3"
+    PROJ: vcu118_sgmii
+quick_check:vcu118_sgmii__2019.2:
+  extends: .template_vivado_quick_check
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ: vcu118_sgmii
+
+
+check-depfiles:
+  extends: .template_base
+  tags:
+    - docker
+    - xilinx-tools
+  stage: quick_checks
+  variables:
+    VIVADO_VERSION: "2019.2"
+  script:
+    - ipbb init work_area
+    - cd work_area
+    - ln -s ${CI_PROJECT_DIR} src/ipbus-firmware
+    - ./src/ipbus-firmware/tests/ci/check-dep-files.sh
+  artifacts:
+    when: on_success
+    paths:
+      - work_area
+    expire_in: 1 day
