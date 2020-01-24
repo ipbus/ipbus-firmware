@@ -1,0 +1,95 @@
+
+run_sim_udp:vivado2018.3:modelsim10.6c:
+  extends: .template_base
+  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-cc7:2019-04-30__ipbb0.5.0
+  tags:
+    - docker
+    - docker-cap-net-admin
+    - docker-device-net-tun
+    - xilinx-tools
+  stage: quick_checks
+  variables:
+    VIVADO_VERSION: "2018.3"
+    IPBB_SIMLIB_BASE: /scratch/xilinx-simlibs
+  script:
+    - export PATH=/software/mentor/modelsim_10.6c/modeltech/bin:$PATH
+    - export PATH=/opt/cactus/bin/uhal/tests:$PATH
+    - export LD_LIBRARY_PATH=/opt/cactus/lib:$LD_LIBRARY_PATH
+
+    - ipbb init work_area
+    - cd work_area
+    - ln -s ${CI_PROJECT_DIR} src/ipbus-firmware
+    - /${CI_PROJECT_DIR}/work_area/src/ipbus-firmware/tests/ci/test-run-sim-udp.sh sim
+
+
+run_sim:vivado2018.3:modelsim10.6c:
+  extends: .template_base
+  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-cc7:2019-04-30__ipbb0.5.0
+  tags:
+    - docker
+    - docker-cap-net-admin
+    - docker-device-net-tun
+    - xilinx-tools
+  stage: quick_checks
+  variables:
+    VIVADO_VERSION: "2018.3"
+    IPBB_SIMLIB_BASE: /scratch/xilinx-simlibs
+  script:
+    - sudo openvpn --mktun --dev tap0
+    - sudo /sbin/ifconfig tap0 up 192.168.201.1
+    - sudo chmod a+rw /dev/net/tun
+    - export PATH=/software/mentor/modelsim_10.6c/modeltech/bin:$PATH
+
+    - ipbb init work_area
+    - cd work_area
+    - ln -s ${CI_PROJECT_DIR} src/ipbus-firmware
+    - /${CI_PROJECT_DIR}/work_area/src/ipbus-firmware/tests/ci/test-run-sim.sh sim
+
+
+run_ram_slaves_testbench_sim:vivado2018.3:modelsim10.6c:
+  extends: .template_base
+  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-cc7:2019-04-30__ipbb0.5.0
+  tags:
+    - docker
+    - docker-cap-net-admin
+    - docker-device-net-tun
+    - xilinx-tools
+  stage: quick_checks
+  variables:
+    VIVADO_VERSION: "2018.3"
+    IPBB_SIMLIB_BASE: /scratch/xilinx-simlibs
+  script:
+    - sudo openvpn --mktun --dev tap0
+    - sudo /sbin/ifconfig tap0 up 192.168.201.1
+    - sudo chmod a+rw /dev/net/tun
+    - export PATH=/software/mentor/modelsim_10.6c/modeltech/bin:$PATH
+    - ipbb init work_area
+    - cd work_area
+    - ln -s ${CI_PROJECT_DIR} src/ipbus-firmware
+    - ipbb proj create sim ram_slvs_tb ipbus-firmware:tests/ram_slaves -t top_sim.dep
+    - cd proj/ram_slvs_tb
+    - ipbb sim setup-simlib
+    - ipbb sim ipcores
+    - ipbb sim fli
+    - ipbb sim make-project
+    - ./vsim -c work.top -gIP_ADDR='X"c0a8c902"' -do 'run 1ms' -do 'quit'
+
+
+run_ctr_slaves_testbench_sim:vivado2018.3:modelsim10.6c:
+  extends: .template_base
+  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-cc7:2019-04-30__ipbb0.5.0
+  tags:
+    - docker
+    - xilinx-tools
+  stage: quick_checks
+  variables:
+    VIVADO_VERSION: "2018.3"
+    IPBB_SIMLIB_BASE: /scratch/xilinx-simlibs
+  script:
+    - export PATH=/software/mentor/modelsim_10.6c/modeltech/bin:$PATH
+    - export LD_LIBRARY_PATH=/opt/cactus/lib:$LD_LIBRARY_PATH
+
+    - ipbb init work_area
+    - cd work_area
+    - ln -s ${CI_PROJECT_DIR} src/ipbus-firmware
+    - /${CI_PROJECT_DIR}/work_area/src/ipbus-firmware/tests/ci/test-run-sim-slave-counters.sh

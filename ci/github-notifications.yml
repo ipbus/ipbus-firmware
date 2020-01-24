@@ -1,0 +1,40 @@
+
+.template_github_commit_status:
+  image: cern/cc7-base:20170113
+  tags:
+    - docker
+  only:
+    - branches
+    - web
+  dependencies: []
+
+github_commit_status:start:
+  extends: .template_github_commit_status
+  stage: initial_report
+  when: always
+  script:
+    - "curl -H \"Authorization: token ${GITHUB_API_TOKEN}\" --data '{\"state\" : \"pending\", \"target_url\" : \"'\"${CI_PROJECT_URL}\"'/pipelines/'\"${CI_PIPELINE_ID}\"'\", \"description\" : \"CI pipeline has started\", \"context\" : \"gitlab-ci-quick\"}' ${GITHUB_REPO_API_URL}/statuses/${CI_COMMIT_SHA}"
+    - "if [[ $CI_COMMIT_REF_NAME =~ ^pull-requests/[0-9]+$ ]]; then curl -H \"Authorization: token ${GITHUB_API_TOKEN}\" --data '{\"state\" : \"pending\", \"target_url\" : \"'\"${CI_PROJECT_URL}\"'/pipelines/'\"${CI_PIPELINE_ID}\"'\", \"description\" : \"CI pipeline has started\", \"context\" : \"gitlab-ci\"}' ${GITHUB_REPO_API_URL}/statuses/${CI_COMMIT_SHA} ; fi"
+
+github_commit_status:midway:success:
+  extends: .template_github_commit_status
+  stage: midway_report
+  when: on_success
+  script:
+    - "curl -H \"Authorization: token ${GITHUB_API_TOKEN}\" --data '{\"state\" : \"success\", \"target_url\" : \"'\"${CI_PROJECT_URL}\"'/pipelines/'\"${CI_PIPELINE_ID}\"'\", \"description\" : \"CI quick jobs completed successfully!\", \"context\" : \"gitlab-ci-quick\"}' ${GITHUB_REPO_API_URL}/statuses/${CI_COMMIT_SHA}"
+
+github_commit_status:end:failure:
+  extends: .template_github_commit_status
+  stage: final_report
+  when: on_failure
+  script:
+    - "curl -H \"Authorization: token ${GITHUB_API_TOKEN}\" --data '{\"state\" : \"failure\", \"target_url\" : \"'\"${CI_PROJECT_URL}\"'/pipelines/'\"${CI_PIPELINE_ID}\"'\", \"description\" : \"Jobs have failed in CI pipeline\", \"context\" : \"gitlab-ci\"}' ${GITHUB_REPO_API_URL}/statuses/${CI_COMMIT_SHA}"
+
+github_commit_status:end:success:
+  extends: .template_github_commit_status
+  stage: final_report
+  only:
+    - /^pull-requests.*$/
+  when: on_success
+  script:
+    - "curl -H \"Authorization: token ${GITHUB_API_TOKEN}\" --data '{\"state\" : \"success\", \"target_url\" : \"'\"${CI_PROJECT_URL}\"'/pipelines/'\"${CI_PIPELINE_ID}\"'\", \"description\" : \"CI pipeline completed successfully!\", \"context\" : \"gitlab-ci\"}' ${GITHUB_REPO_API_URL}/statuses/${CI_COMMIT_SHA}"

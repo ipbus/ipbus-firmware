@@ -1,0 +1,125 @@
+
+build:enclustra_ax3_pm3_a35__2018.3:
+  extends: .template_vivado_build
+  variables:
+    VIVADO_VERSION: "2018.3"
+  dependencies:
+    - quick_check:enclustra_ax3_pm3_a35__2018.3
+build:enclustra_ax3_pm3_a35__2019.2:
+  extends: .template_vivado_build
+  variables:
+    VIVADO_VERSION: "2019.2"
+  dependencies:
+    - quick_check:enclustra_ax3_pm3_a35__2019.2
+
+build:enclustra_ax3_pm3_a50__2018.3:
+  extends: .template_vivado_build
+  variables:
+    VIVADO_VERSION: "2018.3"
+  dependencies:
+    - quick_check:enclustra_ax3_pm3_a50__2018.3
+build:enclustra_ax3_pm3_a50__2019.2:
+  extends: .template_vivado_build
+  variables:
+    VIVADO_VERSION: "2019.2"
+  dependencies:
+    - quick_check:enclustra_ax3_pm3_a50__2019.2
+
+build:kc705_basex__2018.3:
+  extends: .template_vivado_build
+  variables:
+    VIVADO_VERSION: "2018.3"
+  dependencies:
+    - quick_check:kc705_basex__2018.3
+build:kc705_basex__2019.2:
+  extends: .template_vivado_build
+  variables:
+    VIVADO_VERSION: "2019.2"
+  dependencies:
+    - quick_check:kc705_basex__2019.2
+
+build:kc705_gmii__2018.3:
+  extends: .template_vivado_build
+  variables:
+    VIVADO_VERSION: "2018.3"
+  dependencies:
+    - quick_check:kc705_gmii__2018.3
+build:kc705_gmii__2019.2:
+  extends: .template_vivado_build
+  variables:
+    VIVADO_VERSION: "2019.2"
+  dependencies:
+    - quick_check:kc705_gmii__2019.2
+
+build:kcu105_basex__2018.3:
+  extends: .template_vivado_build
+  variables:
+    VIVADO_VERSION: "2018.3"
+  dependencies:
+    - quick_check:kcu105_basex__2018.3
+build:kcu105_basex__2019.2:
+  extends: .template_vivado_build
+  variables:
+    VIVADO_VERSION: "2019.2"
+  dependencies:
+    - quick_check:kcu105_basex__2019.2
+
+build:zcu102_basex__2018.3:
+  extends: .template_vivado_build
+  variables:
+    VIVADO_VERSION: "2018.3"
+  dependencies:
+    - quick_check:zcu102_basex__2018.3
+build:zcu102_basex__2019.2:
+  extends: .template_vivado_build
+  variables:
+    VIVADO_VERSION: "2019.2"
+  dependencies:
+    - quick_check:zcu102_basex__2019.2
+
+build:zcu102_c2c_loopback__2019.1:
+  extends: .template_vivado_build
+  variables:
+    VIVADO_VERSION: "2019.1"
+  dependencies:
+    - quick_check:zcu102_c2c_loopback__2019.1
+
+build:k800__2018.3:
+  extends: .template_vivado_build
+  variables:
+    VIVADO_VERSION: "2018.3"
+  dependencies:
+    - quick_check:k800__2018.3
+build:k800__2019.2:
+  extends: .template_vivado_build
+  variables:
+    VIVADO_VERSION: "2019.2"
+  dependencies:
+    - quick_check:k800__2019.2
+
+build:vcu118_pcie__2018.3:
+  extends: .template_vivado_build
+  variables:
+    VIVADO_VERSION: "2018.3"
+  dependencies:
+    - quick_check:vcu118_pcie__2018.3
+build:vcu118_pcie__2019.2:
+  extends: .template_vivado_build
+  variables:
+    VIVADO_VERSION: "2019.2"
+  dependencies:
+    - quick_check:vcu118_pcie__2019.2
+
+build:vcu118_sgmii__2018.3:
+  extends: .template_vivado_build
+  variables:
+    VIVADO_VERSION: "2018.3"
+  dependencies:
+    - quick_check:vcu118_sgmii__2018.3
+build:vcu118_sgmii__2019.2:
+  extends: .template_vivado_build
+  variables:
+    VIVADO_VERSION: "2019.2"
+  dependencies:
+    - quick_check:vcu118_sgmii__2019.2
+

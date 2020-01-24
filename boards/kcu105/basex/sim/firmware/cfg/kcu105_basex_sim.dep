@@ -25,5 +25,5 @@
 
 
 include -c boards/kcu105/basex/synth ku040.dep
-include -c boards/sim
+include -c boards/sim sim_udp.dep
 
