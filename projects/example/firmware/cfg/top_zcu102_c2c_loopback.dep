@@ -24,5 +24,5 @@
 #-------------------------------------------------------------------------------
 
 
-include -c example/zcu102/c2c_loopback/synth top.dep
+include -c prototypes/zcu102/c2c_loopback/synth top.dep
 include -c components/ipbus_util ipbus_example.dep
