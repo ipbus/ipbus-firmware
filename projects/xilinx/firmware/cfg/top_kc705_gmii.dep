@@ -25,4 +25,4 @@
 
 
 include -c boards/kc705/gmii/synth kc705_gmii.dep
-include -c components/utils ipbus_example_xilinx_x7.dep
+include -c components/ipbus_util ipbus_example_xilinx_x7.dep

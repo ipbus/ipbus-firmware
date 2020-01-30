@@ -25,4 +25,4 @@
 
 
 include -c boards/vcu118/sgmii/synth top.dep
-include -c components/utils ipbus_example_xilinx_usp.dep
+include -c components/ipbus_util ipbus_example_xilinx_usp.dep
