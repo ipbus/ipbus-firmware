@@ -27,6 +27,6 @@
 src payload_xilinx_usp.vhd
 src ipbus_decode_ipbus_example_xilinx_usp.vhd
 src -c components/ipbus_slaves ipbus_reg_types.vhd
-include -c components/ipbus_util ipbus_sysmon_usp_int_ref.dep
-include -c components/ipbus_util ipbus_device_dna_us_usp.dep
-addrtab -t -c components/utils ipbus_example_xilinx_usp.xml
+include ipbus_sysmon_usp_int_ref.dep
+include ipbus_device_dna_us_usp.dep
+addrtab -t ipbus_example_xilinx_usp.xml
