@@ -34,15 +34,15 @@ use work.ipbus_decode_ipbus_example_xilinx_usp.all;
 
 entity payload is
   port (
-    ipb_clk: in std_logic;
-    ipb_rst: in std_logic;
-    ipb_in: in ipb_wbus;
-    ipb_out: out ipb_rbus;
-    clk: in std_logic;
-    rst: in std_logic;
-    nuke: out std_logic;
-    soft_rst: out std_logic;
-    userled: out std_logic
+    ipb_clk : in std_logic;
+    ipb_rst : in std_logic;
+    ipb_in : in ipb_wbus;
+    ipb_out : out ipb_rbus;
+    clk : in std_logic;
+    rst : in std_logic;
+    nuke : out std_logic;
+    soft_rst : out std_logic;
+    userled : out std_logic
   );
 
 end payload;

@@ -29,9 +29,11 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use work.ipbus.all;
+use work.ipbus_reg_types.all;
+use work.ipbus_decode_ipbus_example_xilinx_x7.all;
 
 entity payload is
-  port(
+  port (
     ipb_clk : in std_logic;
     ipb_rst : in std_logic;
     ipb_in : in ipb_wbus;
@@ -47,6 +49,9 @@ end payload;
 
 architecture rtl of payload is
 
+  signal ipbw : ipb_wbus_array(N_SLAVES - 1 downto 0);
+  signal ipbr : ipb_rbus_array(N_SLAVES - 1 downto 0);
+
   -- Yeah.... Not pretty, but it makes it easier to create
   -- a simple piece of example code.
   signal nuke_i : std_logic;
@@ -58,13 +63,42 @@ architecture rtl of payload is
 
 begin
 
-  example : entity work.ipbus_sysmon_x7
+  fabric : entity work.ipbus_fabric_sel
+    generic map (
+      NSLV      => N_SLAVES,
+      SEL_WIDTH => IPBUS_SEL_WIDTH
+    )
+    port map (
+      ipb_in          => ipb_in,
+      ipb_out         => ipb_out,
+      sel             => ipbus_sel_ipbus_example_xilinx_x7(ipb_in.ipb_addr),
+      ipb_to_slaves   => ipbw,
+      ipb_from_slaves => ipbr
+    );
+
+  sysmon : entity work.ipbus_sysmon_x7
     port map (
       clk     => ipb_clk,
       rst     => ipb_rst,
-      ipb_in  => ipb_in,
-      ipb_out => ipb_out
+      ipb_in  => ipbw(N_SLV_SYSMON),
+      ipb_out => ipbr(N_SLV_SYSMON)
     );
+
+  icap : entity work.ipbus_icap_x7
+    port map (
+      clk     => ipb_clk,
+      rst     => ipb_rst,
+      ipb_in  => ipbw(N_SLV_ICAP),
+      ipb_out => ipbr(N_SLV_ICAP)
+    );
+
+--  iprog : entity work.ipbus_iprog_x7
+--    port map (
+--      clk     => ipb_clk,
+--      rst     => ipb_rst,
+--      ipb_in  => ipbw(N_SLV_IPROG),
+--      ipb_out => ipbr(N_SLV_IPROG)
+--    );
 
   nuke_i     <= '0';
   nuke       <= nuke_i;
