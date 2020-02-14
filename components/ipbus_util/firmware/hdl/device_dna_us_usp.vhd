@@ -5,7 +5,7 @@
 --
 -- Details about the DNA_PORTE2 primitive itself can be found in UG974
 -- and UG570.
--- ======================================================================
+--======================================================================
 
 library ieee;
 use ieee.std_logic_1164.all;
