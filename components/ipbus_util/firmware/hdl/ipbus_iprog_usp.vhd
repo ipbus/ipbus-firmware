@@ -23,7 +23,7 @@ end ipbus_iprog_usp;
 
 architecture rtl of ipbus_iprog_usp is
 
-  signal ctrl : ipb_reg_v(2 downto 0);
+  signal ctrl : ipb_reg_v(1 downto 0);
 
   signal d17, d17_d : std_logic;
   signal base_address : std_logic_vector(31 downto 0);
@@ -49,8 +49,8 @@ begin
       reset     => rst,
       ipbus_in  => ipb_in,
       ipbus_out => ipb_out,
-      d         => ctrl,
-      q         => open
+      q         => ctrl,
+      d         => open
     );
 
   trigger <= ctrl(0)(0);
@@ -112,8 +112,8 @@ begin
       csib => icap_cs,
       rdwrb => icap_rw,
       i => icap_data,
-      prdone => open, -- 1-bit output: Indicates completion of Partial Reconfiguration
-      prerror => open -- 1-bit output: Indicates Error during Partial Reconfiguration
+      prdone => open,
+      prerror => open
     );
 
 end rtl;

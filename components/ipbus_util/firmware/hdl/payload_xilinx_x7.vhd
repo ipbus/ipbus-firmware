@@ -84,13 +84,13 @@ begin
       ipb_out => ipbr(N_SLV_SYSMON)
     );
 
-  icap : entity work.ipbus_icap_x7
-    port map (
-      clk     => ipb_clk,
-      rst     => ipb_rst,
-      ipb_in  => ipbw(N_SLV_ICAP),
-      ipb_out => ipbr(N_SLV_ICAP)
-    );
+  -- icap : entity work.ipbus_icap_x7
+  --   port map (
+  --     clk     => ipb_clk,
+  --     rst     => ipb_rst,
+  --     ipb_in  => ipbw(N_SLV_ICAP),
+  --     ipb_out => ipbr(N_SLV_ICAP)
+  --   );
 
  iprog : entity work.ipbus_iprog_x7
    port map (
