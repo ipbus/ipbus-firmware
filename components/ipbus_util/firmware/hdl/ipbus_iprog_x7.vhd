@@ -1,6 +1,6 @@
 --======================================================================
--- Details about the ICAPE3 primitive itself can be found in UG974 and
--- UG470/UG570.
+-- Details about the ICAPE2 primitive itself can be found in UG953 and
+-- UG470.
 --======================================================================
 
 library ieee;
@@ -23,7 +23,7 @@ end ipbus_iprog_x7;
 
 architecture rtl of ipbus_iprog_x7 is
 
-  signal ctrl : ipb_reg_v(2 downto 0);
+  signal ctrl : ipb_reg_v(1 downto 0);
 
   signal d17, d17_d : std_logic;
   signal base_address : std_logic_vector(31 downto 0);
@@ -35,6 +35,13 @@ architecture rtl of ipbus_iprog_x7 is
   signal icap_cs : std_logic;
   signal icap_rw : std_logic;
   signal icap_data : std_logic_vector(31 downto 0);
+
+  attribute mark_debug : string;
+  attribute mark_debug of trigger : signal is "true";
+  attribute mark_debug of trigger_reboot : signal is "true";
+  attribute mark_debug of request_reboot : signal is "true";
+  attribute mark_debug of request_reboot_d : signal is "true";
+  attribute mark_debug of base_address : signal is "true";
 
 begin
 
@@ -114,4 +121,4 @@ begin
 
 end rtl;
 
--- ======================================================================
+--======================================================================

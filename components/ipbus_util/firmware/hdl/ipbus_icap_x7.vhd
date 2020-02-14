@@ -1,6 +1,6 @@
 --======================================================================
--- Details about the ICAPE3 primitive itself can be found in UG974 and
--- UG470/UG570.
+-- Details about the ICAPE2 primitive itself can be found in UG953 and
+-- UG470.
 --======================================================================
 
 library ieee;
@@ -42,7 +42,6 @@ architecture rtl of ipbus_icap_x7 is
   signal icap_user_data_out : std_logic_vector(31 downto 0);
   signal icap_user_data_out_valid : std_logic;
 
-  signal icap_ready : std_logic;
   signal icap_cs : std_logic;
   signal icap_cs_icap : std_logic;
   signal icap_cs_iprog : std_logic;
@@ -164,7 +163,7 @@ begin
     );
 
   -- The ICAP primitive itself.
-  icape2_inst : ICAPE2
+  icape_inst : ICAPE2
     generic map (
       ICAP_WIDTH => "X32"
     )
@@ -188,4 +187,4 @@ begin
 
 end rtl;
 
--- ======================================================================
+--======================================================================

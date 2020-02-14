@@ -92,13 +92,13 @@ begin
       ipb_out => ipbr(N_SLV_ICAP)
     );
 
---  iprog : entity work.ipbus_iprog_x7
---    port map (
---      clk     => ipb_clk,
---      rst     => ipb_rst,
---      ipb_in  => ipbw(N_SLV_IPROG),
---      ipb_out => ipbr(N_SLV_IPROG)
---    );
+ iprog : entity work.ipbus_iprog_x7
+   port map (
+     clk     => ipb_clk,
+     rst     => ipb_rst,
+     ipb_in  => ipbw(N_SLV_IPROG),
+     ipb_out => ipbr(N_SLV_IPROG)
+   );
 
   nuke_i     <= '0';
   nuke       <= nuke_i;
