@@ -86,6 +86,22 @@ begin
       i2c_sda => '0'
     );
 
+  icap : entity work.ipbus_icap_usp
+    port map (
+      clk     => ipb_clk,
+      rst     => ipb_rst,
+      ipb_in  => ipbw(N_SLV_ICAP),
+      ipb_out => ipbr(N_SLV_ICAP)
+    );
+
+ iprog : entity work.ipbus_iprog_usp
+   port map (
+     clk     => ipb_clk,
+     rst     => ipb_rst,
+     ipb_in  => ipbw(N_SLV_IPROG),
+     ipb_out => ipbr(N_SLV_IPROG)
+   );
+
   device_dna : entity work.ipbus_device_dna_us_usp
     port map (
       clk     => ipb_clk,

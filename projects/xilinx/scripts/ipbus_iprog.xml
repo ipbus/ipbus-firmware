@@ -1,14 +1,8 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
-<node id="ipbus_icap" fwinfo="endpoint; width=3">
+<node id="ipbus_iprog" fwinfo="endpoint; width=1">
 
-  <node id="address" address="0x00000000" mask="0xffffffff" />
-  <node id="user_data_in" address="0x00000001" mask="0xffffffff" />
-  <!-- <node id="reconfigure" address="0x00000001" mask="0x00000001" /> -->
-  <node id="access_mode" address="0x00000002" mask="0x00000002" />
-  <node id="access_strobe" address="0x00000002" mask="0x00000004" />
-
-  <node id="user_data_out" address="0x00000004" mask="0xffffffff" />
-  <node id="user_data_out_valid" address="0x00000005" mask="0x00000001" />
+  <node id="reconfigure" address="0x00000000" mask="0x00000001" />
+  <node id="address" address="0x00000001" mask="0xffffffff" />
 
 </node>

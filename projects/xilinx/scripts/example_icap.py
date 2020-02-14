@@ -7,11 +7,13 @@ import uhal
 
 ######################################################################
 
-ICAP_ADDRESS_IDCODE = 0b01100
-ICAP_ADDRESS_STAT = 0b00111
-ICAP_ADDRESS_BOOTST = 0b10110
 ICAP_ADDRESS_AXSS = 0b01101
+ICAP_ADDRESS_BOOTST = 0b10110
 ICAP_ADDRESS_CMD = 0b00100
+ICAP_ADDRESS_CTL0 = 0b00101
+ICAP_ADDRESS_IDCODE = 0b01100
+ICAP_ADDRESS_MASK = 0b00110
+ICAP_ADDRESS_STAT = 0b00111
 
 ACCESS_MODE_READ = 0
 ACCESS_MODE_WRITE = 1
@@ -47,6 +49,12 @@ def icap_trigger_reconf(hw, base_address):
     hw.getNode("icap.access_strobe").write(0x1)
     hw.dispatch()
 
+def iprog_trigger_reconf(hw, base_address):
+    hw.getNode("iprog.address").write(base_address)
+    hw.getNode("iprog.reconfigure").write(0x0)
+    hw.getNode("iprog.reconfigure").write(0x1)
+    hw.dispatch()
+
 ######################################################################
 
 def get_user_confirmation(prompt=None, resp=False):
@@ -69,6 +77,20 @@ def get_user_confirmation(prompt=None, resp=False):
             return True
         if answer in ["n", "N"]:
             return False
+
+def get_user_choice(prompt=None, choices=["y", "n"]):
+    if prompt is None:
+        prompt = "Please choose from {0:s}: ".format(choices)
+
+    if not prompt.endswith(" "):
+        prompt += " "
+
+    while True:
+        answer = raw_input(prompt)
+        if answer not in choices:
+            print "Please enter a valid choice"
+            continue
+        return answer
 
 ######################################################################
 
@@ -120,7 +142,7 @@ if __name__ == '__main__':
     else:
         print "    Failed to read ICAP AXSS register"
 
-    # Write user access register.
+    # Write user access register. Just to show that we can.
     data = ~data & 0xffffffff
     print "    Writing 0x{0:08x} to ICAP AXSS register".format(data)
     icap_write(hw, ICAP_ADDRESS_AXSS, data)
@@ -137,6 +159,18 @@ if __name__ == '__main__':
     # Trigger a reconfiguration of the FPGA, from address zero.
     question = "Would you like to see a demo of the FPGA reloading too?"
     if get_user_confirmation(question):
-        icap_trigger_reconf(hw, 0x0)
+        choice = "Would you like to use the ICAP actor (1) or the IPROG actor (2)?"
+        which = get_user_choice(choice, ["1", "2"])
+        if which == "1":
+            # IPROG via ICAP.
+            icap_trigger_reconf(hw, 0x0)
+        else:
+            # Straight IPROG.
+            # NOTE: In this case we have to first select the bottom
+            # ICAP instance, since that is where the IPROG entity is
+            # connected.
+            icap_write(hw, ICAP_ADDRESS_MASK, 0x1 << 30)
+            icap_write(hw, ICAP_ADDRESS_CTL0, 0x1 << 30)
+            iprog_trigger_reconf(hw, 0x0)
 
 ######################################################################
