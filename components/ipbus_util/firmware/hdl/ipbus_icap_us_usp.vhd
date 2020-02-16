@@ -12,16 +12,16 @@ use unisim.vcomponents.all;
 use work.ipbus.all;
 use work.ipbus_reg_types.all;
 
-entity ipbus_icap_usp is
+entity ipbus_icap_us_usp is
   port (
     clk : in std_logic;
     rst : in std_logic;
     ipb_in : in ipb_wbus;
     ipb_out : out ipb_rbus
   );
-end ipbus_icap_usp;
+end ipbus_icap_us_usp;
 
-architecture rtl of ipbus_icap_usp is
+architecture rtl of ipbus_icap_us_usp is
 
   constant C_ACCESS_MODE_READ : std_logic_vector(1 downto 0) := "00";
   constant C_ACCESS_MODE_WRITE : std_logic_vector(1 downto 0) := "01";

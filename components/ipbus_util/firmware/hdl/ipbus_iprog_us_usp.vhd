@@ -12,16 +12,16 @@ use unisim.vcomponents.all;
 use work.ipbus.all;
 use work.ipbus_reg_types.all;
 
-entity ipbus_iprog_usp is
+entity ipbus_iprog_us_usp is
   port (
     clk : in std_logic;
     rst : in std_logic;
     ipb_in : in ipb_wbus;
     ipb_out : out ipb_rbus
   );
-end ipbus_iprog_usp;
+end ipbus_iprog_us_usp;
 
-architecture rtl of ipbus_iprog_usp is
+architecture rtl of ipbus_iprog_us_usp is
 
   signal ctrl : ipb_reg_v(1 downto 0);
 

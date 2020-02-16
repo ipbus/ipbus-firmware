@@ -10,16 +10,16 @@ use ieee.numeric_std.all;
 library unisim;
 use unisim.vcomponents.all;
 
-entity icap_usp is
+entity icap_us_usp is
   port (
     clk : in std_logic;
     rst : in std_logic;
     base_address : in std_logic_vector(31 downto 0);
     reconfigure : in std_logic
   );
-end icap_usp;
+end icap_us_usp;
 
-architecture rtl of icap_usp is
+architecture rtl of icap_us_usp is
 
   signal should_reconfigure : std_logic;
   constant C_MAX_STEP : integer := 8;

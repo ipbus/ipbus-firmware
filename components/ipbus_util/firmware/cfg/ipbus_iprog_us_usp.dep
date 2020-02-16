@@ -1,7 +1,6 @@
 ######################################################################
 
-src ipbus_icap_usp.vhd
-src icap_actor_access_register.vhd
+src ipbus_iprog_us_usp.vhd
 src icap_actor_iprog.vhd
 src icap_decl.vhd
 src icap_util.vhd
@@ -10,6 +9,6 @@ src edge_detector.vhd
 src -c components/ipbus_slaves ipbus_reg_types.vhd
 src -c components/ipbus_slaves ipbus_ctrlreg_v.vhd
 
-addrtab ipbus_icap.xml
+addrtab ipbus_iprog.xml
 
 ######################################################################
