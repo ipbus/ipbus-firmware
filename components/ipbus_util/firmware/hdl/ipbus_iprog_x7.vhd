@@ -36,13 +36,6 @@ architecture rtl of ipbus_iprog_x7 is
   signal icap_rw : std_logic;
   signal icap_data : std_logic_vector(31 downto 0);
 
-  attribute mark_debug : string;
-  attribute mark_debug of trigger : signal is "true";
-  attribute mark_debug of trigger_reboot : signal is "true";
-  attribute mark_debug of request_reboot : signal is "true";
-  attribute mark_debug of request_reboot_d : signal is "true";
-  attribute mark_debug of base_address : signal is "true";
-
 begin
 
   csr : entity work.ipbus_ctrlreg_v
