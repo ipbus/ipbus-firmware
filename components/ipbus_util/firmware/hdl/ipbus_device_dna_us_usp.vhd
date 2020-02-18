@@ -1,6 +1,6 @@
 --======================================================================
 -- IPbus wrapper for the Xilinx FPGA DNA primitive.
--- ======================================================================
+--======================================================================
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -8,7 +8,6 @@ use ieee.std_logic_unsigned.all;
 use ieee.numeric_std.all;
 
 use work.ipbus.all;
---use work.ipbus_reg_types.all;
 
 entity ipbus_device_dna_us_usp is
   port (
