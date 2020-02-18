@@ -30,4 +30,6 @@ src -c components/ipbus_slaves ipbus_reg_types.vhd
 include ipbus_sysmon_x7.dep
 include ipbus_icap_x7.dep
 include ipbus_iprog_x7.dep
+include -c components/ipbus_slaves ipbus_axi4lite_bridge.dep
+src -c components/ipbus_util --cd ../cgn axi_gpio_example.xci
 addrtab -t ipbus_example_xilinx_x7.xml

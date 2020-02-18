@@ -52,6 +52,29 @@ architecture rtl of payload is
   signal ipbw : ipb_wbus_array(N_SLAVES - 1 downto 0);
   signal ipbr : ipb_rbus_array(N_SLAVES - 1 downto 0);
 
+  signal m_axi_awready : std_logic;
+  signal m_axi_awvalid : std_logic;
+  signal m_axi_awaddr : std_logic_vector(31 downto 0);
+  signal m_axi_wready : std_logic;
+  signal m_axi_wvalid : std_logic;
+  signal m_axi_wdata : std_logic_vector(31 downto 0);
+  signal m_axi_wstrb : std_logic_vector(3 downto 0);
+  signal m_axi_bready : std_logic;
+  signal m_axi_bvalid : std_logic;
+  signal m_axi_bresp : std_logic_vector(1 downto 0);
+  signal s_axi_arready : std_logic;
+  signal s_axi_arvalid : std_logic;
+  signal s_axi_araddr : std_logic_vector(31 downto 0);
+  signal s_axi_rready : std_logic;
+  signal s_axi_rvalid : std_logic;
+  signal s_axi_rdata : std_logic_vector(31 downto 0);
+  signal s_axi_rresp : std_logic_vector(1 downto 0);
+
+  signal axi_stat : ipb_reg_v(0 downto 0);
+  signal axi_traffic_done : std_logic;
+  signal axi_traffic_status : std_logic_vector(31 downto 0);
+  signal axi_bridged_data : std_logic_vector(31 downto 0);
+
   -- Yeah.... Not pretty, but it makes it easier to create
   -- a simple piece of example code.
   signal nuke_i : std_logic;
@@ -76,6 +99,18 @@ begin
       ipb_from_slaves => ipbr
     );
 
+  --==========
+
+  device_dna : entity work.ipbus_device_dna_us_usp
+    port map (
+      clk     => ipb_clk,
+      rst     => ipb_rst,
+      ipb_in  => ipbw(N_SLV_DEVICE_DNA),
+      ipb_out => ipbr(N_SLV_DEVICE_DNA)
+    );
+
+  --==========
+
   sysmon : entity work.ipbus_sysmon_usp
     port map (
       clk     => ipb_clk,
@@ -86,6 +121,8 @@ begin
       i2c_sda => '0'
     );
 
+  --==========
+
   icap : entity work.ipbus_icap_us_usp
     port map (
       clk     => ipb_clk,
@@ -94,7 +131,9 @@ begin
       ipb_out => ipbr(N_SLV_ICAP)
     );
 
- iprog : entity work.ipbus_iprog_us_usp
+  --==========
+
+  iprog : entity work.ipbus_iprog_us_usp
    port map (
      clk     => ipb_clk,
      rst     => ipb_rst,
@@ -102,13 +141,80 @@ begin
      ipb_out => ipbr(N_SLV_IPROG)
    );
 
-  device_dna : entity work.ipbus_device_dna_us_usp
+  --==========
+
+  axi_bridge : entity work.ipbus_axi_bridge
     port map (
       clk     => ipb_clk,
       rst     => ipb_rst,
-      ipb_in  => ipbw(N_SLV_DEVICE_DNA),
-      ipb_out => ipbr(N_SLV_DEVICE_DNA)
+      ipb_in  => ipbw(N_SLV_AXI_BRIDGE),
+      ipb_out => ipbr(N_SLV_AXI_BRIDGE),
+
+      m_axi_clock   => ipb_clk,
+      m_axi_awaddr  => m_axi_awaddr,
+      m_axi_awprot  => open,
+      m_axi_awvalid => m_axi_awvalid,
+      m_axi_awready => m_axi_awready,
+      m_axi_wdata   => m_axi_wdata,
+      m_axi_wstrb   => m_axi_wstrb,
+      m_axi_size    => open,
+      m_axi_wvalid  => m_axi_wvalid,
+      m_axi_wready  => m_axi_wready,
+      m_axi_bresp   => m_axi_bresp,
+      m_axi_bvalid  => m_axi_bvalid,
+      m_axi_bready  => m_axi_bready,
+      m_axi_araddr  => s_axi_araddr,
+      m_axi_arvalid => s_axi_arvalid,
+      m_axi_arready => s_axi_arready,
+      m_axi_rdata   => s_axi_rdata,
+      m_axi_rvalid  => s_axi_rvalid,
+      m_axi_rready  => s_axi_rready,
+      m_axi_rresp   => s_axi_rresp
     );
+
+  -- We (ab)use an AXI GPIO interface to extract the results of our
+  -- AXI transaction in the form of a register for verification.
+  axi_gpio : entity work.axi_gpio_example
+    port map (
+      s_axi_aclk    => ipb_clk,
+      s_axi_aresetn => not ipb_rst,
+      s_axi_awaddr  => m_axi_awaddr(8 downto 0),
+      s_axi_awvalid => m_axi_awvalid,
+      s_axi_awready => m_axi_awready,
+      s_axi_wdata   => m_axi_wdata,
+      s_axi_wstrb   => m_axi_wstrb,
+      s_axi_wvalid  => m_axi_wvalid,
+      s_axi_wready  => m_axi_wready,
+      s_axi_bresp   => m_axi_bresp,
+      s_axi_bvalid  => m_axi_bvalid,
+      s_axi_bready  => m_axi_bready,
+      s_axi_araddr  => s_axi_araddr(8 downto 0),
+      s_axi_arvalid => s_axi_arvalid,
+      s_axi_arready => s_axi_arready,
+      s_axi_rdata   => s_axi_rdata,
+      s_axi_rresp   => s_axi_rresp,
+      s_axi_rvalid  => s_axi_rvalid,
+      s_axi_rready  => s_axi_rready,
+      gpio_io_o     => axi_bridged_data
+    );
+
+  axi_demo_readback_register : entity work.ipbus_ctrlreg_v
+    generic map (
+      N_CTRL => 0,
+      N_STAT => 1
+    )
+    port map (
+      clk => ipb_clk,
+      reset => ipb_rst,
+      ipbus_in => ipbw(N_SLV_AXI_READBACK_REG),
+      ipbus_out => ipbr(N_SLV_AXI_READBACK_REG),
+      d => axi_stat,
+      q => open
+    );
+
+  axi_stat(0) <= axi_bridged_data;
+
+  --==========
 
   nuke_i     <= '0';
   nuke       <= nuke_i;

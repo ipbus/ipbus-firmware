@@ -14,4 +14,14 @@
         module="file://ipbus_iprog.xml"
         address="0x00030000" />
 
+  <node id="axi_bridge"
+        module="file://ipbus_axi4lite_bridge.xml"
+        address="0x00040000" />
+
+  <node id="axi_readback_reg"
+        address="0x00041000"
+        fwinfo="endpoint;width=0">
+        <node id="word0" address="0x0" />
+  </node>
+
 </node>
