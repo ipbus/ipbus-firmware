@@ -25,7 +25,6 @@ entity ipbus_axi_bridge is
     -- AXI side.
     m_axi_clock : in std_logic;
     m_axi_awaddr : out std_logic_vector(31 downto 0);
-    m_axi_awprot : out std_logic_vector(2 downto 0);
     m_axi_awvalid : out std_logic;
     m_axi_awready : in std_logic;
     m_axi_wdata : out std_logic_vector(31 downto 0);
