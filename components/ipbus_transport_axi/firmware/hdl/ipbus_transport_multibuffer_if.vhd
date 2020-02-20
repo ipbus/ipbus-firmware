@@ -102,7 +102,9 @@ architecture rtl of ipbus_transport_multibuffer_if is
   signal state : state_type := FSM_RESET;
   signal next_state : state_type;
 
-  signal rx_ram_addra, rx_ram_addrb, tx_ram_addra, tx_ram_addrb : std_logic_vector(BUFWIDTH + ADDRWIDTH - 1 downto 0);
+  signal rx_ram_addra : std_logic_vector(BUFWIDTH + ADDRWIDTH - 2 downto 0);
+  signal rx_ram_addrb, tx_ram_addra : std_logic_vector(BUFWIDTH + ADDRWIDTH - 1 downto 0);
+  signal tx_ram_addrb : std_logic_vector(BUFWIDTH + ADDRWIDTH - 2 downto 0);
 
   signal rst_ramclk_i, pkt_done_ramclk, pkt_done_ramclk_d : std_logic;
 
