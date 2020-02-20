@@ -102,7 +102,9 @@ architecture rtl of ipbus_transport_multibuffer_if is
   signal state : state_type := FSM_RESET;
   signal next_state : state_type;
 
+  signal rx_ram_addra : std_logic_vector(BUFWIDTH + ADDRWIDTH - 2 downto 0);
   signal rx_ram_addrb, tx_ram_addra : std_logic_vector(BUFWIDTH + ADDRWIDTH - 1 downto 0);
+  signal tx_ram_addrb : std_logic_vector(BUFWIDTH + ADDRWIDTH - 2 downto 0);
 
   signal rst_ramclk_i, pkt_done_ramclk, pkt_done_ramclk_d : std_logic;
 
@@ -115,6 +117,7 @@ begin
 
   wr_buf_idx <= std_logic_vector(wr_buf_idx_i);
 
+  rx_ram_addra <= std_logic_vector(wr_buf_idx_i) & wr_addr;
   rx_ram_addrb <= std_logic_vector(buf_idx_transactor) & trans_out.raddr(ADDRWIDTH - 1 downto 0);
   rx_ram : entity work.ipbus_transport_multibuffer_rx_dpram
     generic map (
@@ -123,7 +126,7 @@ begin
     port map (
       clka => ram_clk,
       wea => wr_en,
-      addra => std_logic_vector(wr_buf_idx_i) & wr_addr,
+      addra => rx_ram_addra,
       dia => wr_data,
 
       clkb => ipb_clk,
@@ -176,6 +179,7 @@ begin
   ----------------
 
   tx_ram_addra <= std_logic_vector(buf_idx_transactor) & trans_out.waddr(ADDRWIDTH - 1 downto 0);
+  tx_ram_addrb <= rd_idx & rd_addr;
   tx_ram : entity work.ipbus_transport_multibuffer_tx_dpram
     generic map (
       ADDRWIDTH => ADDRWIDTH + BUFWIDTH
@@ -187,7 +191,7 @@ begin
       dia => trans_out.wdata,
 
       clkb => ram_clk,
-      addrb => rd_idx & rd_addr,
+      addrb => tx_ram_addrb,
       dob => rd_data
     );
 
