@@ -25,5 +25,9 @@
 
 
 src payload_xilinx_x7.vhd
+src ipbus_decode_ipbus_example_xilinx_x7.vhd
+src -c components/ipbus_slaves ipbus_reg_types.vhd
 include ipbus_sysmon_x7.dep
+include ipbus_icap_x7.dep
+include ipbus_iprog_x7.dep
 addrtab -t ipbus_example_xilinx_x7.xml

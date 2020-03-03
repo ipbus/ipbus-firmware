@@ -1,4 +1,4 @@
-# Instructions on building and running the SysMon example designs and scripts.
+# Instructions on building and running the various Xilinx-specific example designs and scripts.
 
 ## KC705 with RJ45 Ethernet connection.
 ```
@@ -18,6 +18,7 @@ Now program the bit file into the FPGA.
 $ cd ../../src/ipbus-firmware/projects/xilinx/scripts/
 $ cp ../../../../../proj/example_kc705/package/src/addrtab/* .
 $ ./example_sysmon.py 192.168.200.16 ipbus_example_xilinx_x7.xml
+$ ./example_icap.py 192.168.200.16 ipbus_example_xilinx_x7.xml
 ```
 
 ## VCU118 with RJ45 Ethernet connection.
@@ -42,6 +43,7 @@ $ ./example_device_dna.py 192.168.200.17 ipbus_example_xilinx_usp.xml
 ```
 
 ## Expected output
+
 ### SysMon
 The SysMon part of the output of the example script (for both
 examples) should show something like:
@@ -63,4 +65,24 @@ The device DNA part of the UltraScale(+) example should report a
 ```
 IPBus UltraScale(+) device DNA demo:
   Device DNA: 4002000001298e463d5102c5
+```
+
+### ICAP interface
+The ICAP interface should report output like the below example,
+followed by a question if a demonstration of the firmware
+reconfiguration is desired or not.
+
+```
+--------------------------------------------------
+IPBus ICAP interface demo
+--------------------------------------------------
+  Register reading:
+    IDCODE: 0x43651093
+    STAT  : 0x461078fc
+    BOOTST: 0x00000001
+    AXSS  : 0x00000000
+  Register writing:
+    Read ICAP AXSS register: 0x00000000
+    Writing 0xffffffff to ICAP AXSS register
+    Read ICAP AXSS register: 0xffffffff
 ```

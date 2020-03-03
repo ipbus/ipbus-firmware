@@ -34,15 +34,15 @@ use work.ipbus_decode_ipbus_example_xilinx_usp.all;
 
 entity payload is
   port (
-    ipb_clk: in std_logic;
-    ipb_rst: in std_logic;
-    ipb_in: in ipb_wbus;
-    ipb_out: out ipb_rbus;
-    clk: in std_logic;
-    rst: in std_logic;
-    nuke: out std_logic;
-    soft_rst: out std_logic;
-    userled: out std_logic
+    ipb_clk : in std_logic;
+    ipb_rst : in std_logic;
+    ipb_in : in ipb_wbus;
+    ipb_out : out ipb_rbus;
+    clk : in std_logic;
+    rst : in std_logic;
+    nuke : out std_logic;
+    soft_rst : out std_logic;
+    userled : out std_logic
   );
 
 end payload;
@@ -85,6 +85,22 @@ begin
       i2c_scl => '0',
       i2c_sda => '0'
     );
+
+  icap : entity work.ipbus_icap_us_usp
+    port map (
+      clk     => ipb_clk,
+      rst     => ipb_rst,
+      ipb_in  => ipbw(N_SLV_ICAP),
+      ipb_out => ipbr(N_SLV_ICAP)
+    );
+
+ iprog : entity work.ipbus_iprog_us_usp
+   port map (
+     clk     => ipb_clk,
+     rst     => ipb_rst,
+     ipb_in  => ipbw(N_SLV_IPROG),
+     ipb_out => ipbr(N_SLV_IPROG)
+   );
 
   device_dna : entity work.ipbus_device_dna_us_usp
     port map (
