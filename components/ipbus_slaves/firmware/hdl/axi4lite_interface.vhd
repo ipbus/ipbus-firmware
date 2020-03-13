@@ -75,6 +75,28 @@ architecture behavioral of axi4lite_interface is
   signal async_access_done    : std_logic;
   signal sync_access_done     : std_logic;
 
+  attribute mark_debug : string;
+  attribute mark_debug of s_axi_clock : signal is "true";
+  attribute mark_debug of s_axi_pm_tick : signal is "true";
+  attribute mark_debug of s_axi_awaddr : signal is "true";
+  attribute mark_debug of s_axi_awvalid : signal is "true";
+  attribute mark_debug of s_axi_awready : signal is "true";
+  attribute mark_debug of s_axi_wdata : signal is "true";
+  attribute mark_debug of s_axi_wstrb : signal is "true";
+  attribute mark_debug of s_axi_size : signal is "true";
+  attribute mark_debug of s_axi_wvalid : signal is "true";
+  attribute mark_debug of s_axi_wready : signal is "true";
+  attribute mark_debug of s_axi_bresp : signal is "true";
+  attribute mark_debug of s_axi_bvalid : signal is "true";
+  attribute mark_debug of s_axi_bready : signal is "true";
+  attribute mark_debug of s_axi_araddr : signal is "true";
+  attribute mark_debug of s_axi_arvalid : signal is "true";
+  attribute mark_debug of s_axi_arready : signal is "true";
+  attribute mark_debug of s_axi_rdata : signal is "true";
+  attribute mark_debug of s_axi_rresp : signal is "true";
+  attribute mark_debug of s_axi_rvalid : signal is "true";
+  attribute mark_debug of s_axi_rready : signal is "true";
+
 begin
 
   done : process(reset, usr_clock)
@@ -130,11 +152,19 @@ begin
         axi_add_reg <= usr_add;
         axi_dt_wr <= usr_dti;
         axi_be_rg <= usr_strb;
-        if usr_strb = "1111" then
-          axi_size_rg <= "010" ;
-        else
-          axi_size_rg <= "000" ;
-        end if;
+        case usr_strb is
+          when "1111" =>
+            axi_size_rg <= "010";
+          when "1100" | "0011" | "0110" | "1001" =>
+            axi_size_rg <= "001";
+          when others =>
+            axi_size_rg <= "000";
+        end case;
+        -- if usr_strb = "1111" then
+        --   axi_size_rg <= "010";
+        -- else
+        --   axi_size_rg <= "000";
+        -- end if;
       end if;
     end if;
   end process;
@@ -156,13 +186,13 @@ begin
     elsif rising_edge(s_axi_clock) then
       if resync_req_axi_write = '1' then
         wr_addw_rg <= '1';
-      elsif  s_axi_awready = '1' then
+      elsif s_axi_awready = '1' then
         wr_addw_rg <= '0';
       end if;
 
       if resync_req_axi_write = '1' then
         wr_dtw_rg <= '1';
-      elsif  s_axi_wready = '1' then
+      elsif s_axi_wready = '1' then
         wr_dtw_rg <= '0';
       end if;
 
@@ -188,16 +218,18 @@ begin
       wr_addr_rg <= '0';
       rd_req_reg <= '0';
       rd_done_rg <= '0';
+      axi_dt_rd <= (others => '0');
     elsif rising_edge(s_axi_clock) then
       if resync_req_axi_read = '1' then
         wr_addr_rg <= '1';
-      elsif  s_axi_arready = '1' then
+      elsif s_axi_arready = '1' then
         wr_addr_rg <= '0';
       end if;
 
       rd_done_rg <= '0';
       if resync_req_axi_read = '1' then
         rd_req_reg <= '1';
+        axi_dt_rd <= (others => '0');
       elsif fsm_state = state_axi_ack and s_axi_rvalid = '1' then
         axi_error_rd <= s_axi_rresp;
         rd_req_reg <= '0';
@@ -243,7 +275,7 @@ begin
           end if;
 
         when state_axi_read =>
-          if wr_addr_rg = '0'  then
+          if wr_addr_rg = '0' then
             fsm_state <= state_axi_ack;
           end if;
 
