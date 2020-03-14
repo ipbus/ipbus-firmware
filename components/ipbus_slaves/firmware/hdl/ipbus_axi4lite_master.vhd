@@ -69,13 +69,13 @@ architecture behavioral of ipbus_axi_bridge is
   signal axi_status  : std_logic_vector(31 downto 0);
   signal axi_done    : std_logic;
 
-  attribute mark_debug : string;
-  attribute mark_debug of access_mode : signal is "true";
-  attribute mark_debug of access_strobe : signal is "true";
-  attribute mark_debug of trigger_rq_rd : signal is "true";
-  attribute mark_debug of trigger_rq_wr : signal is "true";
-  attribute mark_debug of axi_status : signal is "true";
-  attribute mark_debug of axi_rtn_dto : signal is "true";
+  -- attribute mark_debug : string;
+  -- attribute mark_debug of access_mode : signal is "true";
+  -- attribute mark_debug of access_strobe : signal is "true";
+  -- attribute mark_debug of trigger_rq_rd : signal is "true";
+  -- attribute mark_debug of trigger_rq_wr : signal is "true";
+  -- attribute mark_debug of axi_status : signal is "true";
+  -- attribute mark_debug of axi_rtn_dto : signal is "true";
 
 begin
 

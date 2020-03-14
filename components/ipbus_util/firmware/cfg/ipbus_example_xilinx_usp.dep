@@ -31,6 +31,6 @@ include ipbus_device_dna_us_usp.dep
 include ipbus_sysmon_usp_int_ref.dep
 include ipbus_icap_us_usp.dep
 include ipbus_iprog_us_usp.dep
-include -c components/ipbus_slaves ipbus_axi4lite_bridge.dep
+include -c components/ipbus_slaves ipbus_axi4lite_master.dep
 src -c components/ipbus_util --cd ../cgn axi_gpio_example.xci
 addrtab -t ipbus_example_xilinx_usp.xml

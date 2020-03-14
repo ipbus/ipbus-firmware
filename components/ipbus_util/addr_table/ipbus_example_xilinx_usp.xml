@@ -18,8 +18,8 @@
         module="file://ipbus_iprog.xml"
         address="0x00030000" />
 
-  <node id="axi_bridge"
-        module="file://ipbus_axi4lite_bridge.xml"
+  <node id="axi_master"
+        module="file://ipbus_axi4lite_master.xml"
         address="0x00040000" />
 
   <node id="axi_readback_reg"

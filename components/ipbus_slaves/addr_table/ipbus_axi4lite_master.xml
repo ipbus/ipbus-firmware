@@ -1,4 +1,4 @@
-<node id="ipbus_axi4lite_bridge" fwinfo="endpoint;width=3">
+<node id="ipbus_axi4lite_master" fwinfo="endpoint;width=3">
 
   <node id="ctrl" address="0x00000000">
     <!-- Access mode: 0 = read, 1 = write. -->
