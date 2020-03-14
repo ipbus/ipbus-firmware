@@ -135,8 +135,8 @@ begin
     port map (
       clk     => ipb_clk,
       rst     => ipb_rst,
-      ipb_in  => ipbw(N_SLV_AXI_BRIDGE),
-      ipb_out => ipbr(N_SLV_AXI_BRIDGE),
+      ipb_in  => ipbw(N_SLV_AXI4LITE_MASTER),
+      ipb_out => ipbr(N_SLV_AXI4LITE_MASTER),
 
       m_axi_clock   => ipb_clk,
       m_axi_awaddr  => m_axi_awaddr,

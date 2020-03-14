@@ -50,7 +50,7 @@ architecture behavioral of ipbus_axi4lite_master is
   constant C_ACCESS_MODE_READ : std_logic := '0';
   constant C_ACCESS_MODE_WRITE : std_logic := '1';
 
-  signal ctrl : ipb_reg_v(2 downto 0);
+  signal ctrl : ipb_reg_v(3 downto 0);
   signal stat : ipb_reg_v(1 downto 0);
 
   signal access_mode : std_logic;
@@ -81,7 +81,7 @@ begin
 
   csr : entity work.ipbus_ctrlreg_v
     generic map (
-      N_CTRL => 3,
+      N_CTRL => 4,
       N_STAT => 2
     )
     port map (
@@ -93,12 +93,12 @@ begin
       d         => stat
     );
 
-  axi_rq_add <= ctrl(0);
-  axi_rq_dti <= ctrl(1);
-  axi_rq_strb <= ctrl(2)(3 downto 0);
-  axi_tick <= ctrl(2)(4);
-  access_mode <= ctrl(2)(5);
-  trigger <= ctrl(2)(6);
+  access_mode <= ctrl(0)(0);
+  trigger <= ctrl(0)(2);
+  axi_rq_add <= ctrl(1);
+  axi_rq_dti <= ctrl(2);
+  axi_rq_strb <= ctrl(3)(3 downto 0);
+  axi_tick <= ctrl(3)(4);
 
   stat(0) <= axi_status;
   stat(1) <= axi_rtn_dto;
