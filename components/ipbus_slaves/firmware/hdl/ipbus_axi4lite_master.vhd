@@ -1,5 +1,5 @@
 --======================================================================
--- ipbus_axi_bridge
+-- ipbus_axi4lite_master
 --
 -- Interfaces an IPbus master to a Xilinx AXI4-lite bus.
 --
@@ -14,7 +14,7 @@ use ieee.numeric_std.all;
 use work.ipbus.all;
 use work.ipbus_reg_types.all;
 
-entity ipbus_axi_bridge is
+entity ipbus_axi4lite_master is
   port (
     -- IPbus side.
     clk : in std_logic;
@@ -43,9 +43,9 @@ entity ipbus_axi_bridge is
     m_axi_rresp : in std_logic_vector(1 downto 0);
     m_axi_rready : out std_logic
   );
-end ipbus_axi_bridge;
+end ipbus_axi4lite_master;
 
-architecture behavioral of ipbus_axi_bridge is
+architecture behavioral of ipbus_axi4lite_master is
 
   constant C_ACCESS_MODE_READ : std_logic := '0';
   constant C_ACCESS_MODE_WRITE : std_logic := '1';

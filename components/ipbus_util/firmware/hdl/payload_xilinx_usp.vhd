@@ -143,7 +143,7 @@ begin
 
   --==========
 
-  axi_bridge : entity work.ipbus_axi_bridge
+  axi_bridge : entity work.ipbus_axi4lite_master
     port map (
       clk     => ipb_clk,
       rst     => ipb_rst,

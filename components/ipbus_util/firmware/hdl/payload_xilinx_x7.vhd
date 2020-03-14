@@ -131,7 +131,7 @@ begin
 
   --==========
 
-  axi_bridge : entity work.ipbus_axi_bridge
+  axi_bridge : entity work.ipbus_axi4lite_master
     port map (
       clk     => ipb_clk,
       rst     => ipb_rst,
@@ -140,7 +140,6 @@ begin
 
       m_axi_clock   => ipb_clk,
       m_axi_awaddr  => m_axi_awaddr,
-      m_axi_awprot  => open,
       m_axi_awvalid => m_axi_awvalid,
       m_axi_awready => m_axi_awready,
       m_axi_wdata   => m_axi_wdata,
