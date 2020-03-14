@@ -18,7 +18,7 @@
         module="file://ipbus_iprog.xml"
         address="0x00030000" />
 
-  <node id="axi_master"
+  <node id="axi4lite_master"
         module="file://ipbus_axi4lite_master.xml"
         address="0x00040000" />
 

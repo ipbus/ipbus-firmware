@@ -20,8 +20,7 @@
     <node id="fsm_state_write" address="0x00000000" mask="0x00000200" />
     <node id="fsm_state_read" address="0x00000000" mask="0x00000400" />
     <node id="fsm_state_ack" address="0x00000000" mask="0x00000800" />
+    <node id="data_out" address="0x00000001" mask="0xffffffff" />
   </node>
-
-  <node id="data_out" address="0x00000005" mask="0xffffffff" />
 
 </node>

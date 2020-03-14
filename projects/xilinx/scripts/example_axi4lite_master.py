@@ -14,28 +14,28 @@ ACCESS_MODE_WRITE = 1
 ######################################################################
 
 def axi_read(hw, register_address):
-    hw.getNode("axi_bridge.ctrl.address").write(register_address)
-    hw.getNode("axi_bridge.ctrl.data_strobe").write(0xf)
-    hw.getNode("axi_bridge.ctrl.access_mode").write(ACCESS_MODE_READ)
-    hw.getNode("axi_bridge.ctrl.access_strobe").write(0x0)
-    hw.getNode("axi_bridge.ctrl.access_strobe").write(0x1)
-    hw.getNode("axi_bridge.ctrl.access_strobe").write(0x0)
+    hw.getNode("axi4lite_master.ctrl.address").write(register_address)
+    hw.getNode("axi4lite_master.ctrl.data_strobe").write(0xf)
+    hw.getNode("axi4lite_master.ctrl.access_mode").write(ACCESS_MODE_READ)
+    hw.getNode("axi4lite_master.ctrl.access_strobe").write(0x0)
+    hw.getNode("axi4lite_master.ctrl.access_strobe").write(0x1)
+    hw.getNode("axi4lite_master.ctrl.access_strobe").write(0x0)
     hw.dispatch()
-    axi_data = hw.getNode("axi_bridge.status.data_out").read()
-    axi_data_valid = hw.getNode("axi_bridge.status.done").read()
+    axi_data = hw.getNode("axi4lite_master.status.data_out").read()
+    axi_data_valid = hw.getNode("axi4lite_master.status.done").read()
     hw.dispatch()
     data = axi_data.value()
     data_valid = axi_data_valid.value()
     return (data_valid, data)
 
 def axi_write(hw, register_address, data):
-    hw.getNode("axi_bridge.ctrl.address").write(register_address)
-    hw.getNode("axi_bridge.ctrl.data_strobe").write(0xf)
-    hw.getNode("axi_bridge.ctrl.data_in").write(rnd)
-    hw.getNode("axi_bridge.ctrl.access_mode").write(ACCESS_MODE_WRITE)
-    hw.getNode("axi_bridge.ctrl.access_strobe").write(0x0)
-    hw.getNode("axi_bridge.ctrl.access_strobe").write(0x1)
-    hw.getNode("axi_bridge.ctrl.access_strobe").write(0x0)
+    hw.getNode("axi4lite_master.ctrl.address").write(register_address)
+    hw.getNode("axi4lite_master.ctrl.data_strobe").write(0xf)
+    hw.getNode("axi4lite_master.ctrl.data_in").write(rnd)
+    hw.getNode("axi4lite_master.ctrl.access_mode").write(ACCESS_MODE_WRITE)
+    hw.getNode("axi4lite_master.ctrl.access_strobe").write(0x0)
+    hw.getNode("axi4lite_master.ctrl.access_strobe").write(0x1)
+    hw.getNode("axi4lite_master.ctrl.access_strobe").write(0x0)
     hw.dispatch()
 
 ######################################################################
@@ -55,7 +55,7 @@ if __name__ == '__main__':
     uhal.setLogLevelTo(uhal.LogLevel.WARNING)
     hw = uhal.getDevice("dummy", device_uri, address_table_uri)
 
-    reg_name_base = "axi_bridge."
+    reg_name_base = "axi4lite_master."
     regs = ["status",
             "status.done",
             "status.data_out"]
@@ -73,7 +73,7 @@ if __name__ == '__main__':
     # DEBUG DEBUG DEBUG end
 
     print "-" * 50
-    print "IPBus AXI4-Lite demo:"
+    print "IPBus AXI4-lite master demo:"
     print "-" * 50
 
     # Write a random number, and read it back from both sides of the
