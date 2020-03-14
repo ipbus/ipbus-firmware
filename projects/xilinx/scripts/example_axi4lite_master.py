@@ -62,14 +62,14 @@ if __name__ == '__main__':
     max_len = max([len(i) for i in regs])
 
     # DEBUG DEBUG DEBUG
-    for reg_name_spec in regs:
-        reg_name = reg_name_base + reg_name_spec
-        node = hw.getNode(reg_name)
-        val_raw = node.read()
-        hw.dispatch()
-        val = val_raw.value()
-        msg_base = "  {1:{0:d}s}: 0x{2:08x}"
-        print msg_base.format(max_len, reg_name_spec, val)
+    # for reg_name_spec in regs:
+    #     reg_name = reg_name_base + reg_name_spec
+    #     node = hw.getNode(reg_name)
+    #     val_raw = node.read()
+    #     hw.dispatch()
+    #     val = val_raw.value()
+    #     msg_base = "  {1:{0:d}s}: 0x{2:08x}"
+    #     print msg_base.format(max_len, reg_name_spec, val)
     # DEBUG DEBUG DEBUG end
 
     print "-" * 50
