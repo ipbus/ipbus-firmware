@@ -75,28 +75,6 @@ architecture behavioral of axi4lite_interface is
   signal async_access_done    : std_logic;
   signal sync_access_done     : std_logic;
 
-  attribute mark_debug : string;
-  attribute mark_debug of s_axi_clock : signal is "true";
-  attribute mark_debug of s_axi_pm_tick : signal is "true";
-  attribute mark_debug of s_axi_awaddr : signal is "true";
-  attribute mark_debug of s_axi_awvalid : signal is "true";
-  attribute mark_debug of s_axi_awready : signal is "true";
-  attribute mark_debug of s_axi_wdata : signal is "true";
-  attribute mark_debug of s_axi_wstrb : signal is "true";
-  attribute mark_debug of s_axi_size : signal is "true";
-  attribute mark_debug of s_axi_wvalid : signal is "true";
-  attribute mark_debug of s_axi_wready : signal is "true";
-  attribute mark_debug of s_axi_bresp : signal is "true";
-  attribute mark_debug of s_axi_bvalid : signal is "true";
-  attribute mark_debug of s_axi_bready : signal is "true";
-  attribute mark_debug of s_axi_araddr : signal is "true";
-  attribute mark_debug of s_axi_arvalid : signal is "true";
-  attribute mark_debug of s_axi_arready : signal is "true";
-  attribute mark_debug of s_axi_rdata : signal is "true";
-  attribute mark_debug of s_axi_rresp : signal is "true";
-  attribute mark_debug of s_axi_rvalid : signal is "true";
-  attribute mark_debug of s_axi_rready : signal is "true";
-
 begin
 
   done : process(reset, usr_clock)
