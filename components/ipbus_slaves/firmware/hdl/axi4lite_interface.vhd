@@ -90,12 +90,12 @@ begin
     end if;
   end process;
 
-  cdc_done : entity work.cdc_bit
+  cdc_done : entity work.ipbus_cdc_reg
     port map (
-      clk_src => s_axi_clock,
-      signal_in => async_access_done,
-      clk_dst => usr_clock,
-      signal_out => sync_access_done
+      clk => s_axi_clock,
+      d(0) => async_access_done,
+      clks => usr_clock,
+      q(0) => sync_access_done
     );
 
   cdc_reset : entity work.cdc_reset
@@ -105,20 +105,20 @@ begin
       reset_out => reset_axi
     );
 
-  cdc_read_req : entity work.cdc_bit
+  cdc_read_req : entity work.ipbus_cdc_reg
     port map (
-      clk_src => usr_clock,
-      signal_in => usr_rdreq,
-      clk_dst => s_axi_clock,
-      signal_out => resync_req_axi_read
+      clk => usr_clock,
+      d(0) => usr_rdreq,
+      clks => s_axi_clock,
+      q(0) => resync_req_axi_read
     );
 
-  cdc_write_req : entity work.cdc_bit
+  cdc_write_req : entity work.ipbus_cdc_reg
     port map (
-      clk_src => usr_clock,
-      signal_in => usr_wrreq,
-      clk_dst => s_axi_clock,
-      signal_out => resync_req_axi_write
+      clk => usr_clock,
+      d(0) => usr_wrreq,
+      clks => s_axi_clock,
+      q(0) => resync_req_axi_write
     );
 
   -- Static values for the size. Always four bytes to make up a 32-bit

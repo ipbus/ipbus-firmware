@@ -152,7 +152,6 @@ begin
 
       m_axi_clock   => ipb_clk,
       m_axi_awaddr  => m_axi_awaddr,
-      m_axi_awprot  => open,
       m_axi_awvalid => m_axi_awvalid,
       m_axi_awready => m_axi_awready,
       m_axi_wdata   => m_axi_wdata,
