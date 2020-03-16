@@ -1,4 +1,6 @@
-<node id="ipbus_axi4lite_master" fwinfo="endpoint;width=3">
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<node fwinfo="endpoint;width=3">
 
   <node id="ctrl" address="0x00000000" permission="rw">
       <!-- Access mode: 0 = read, 1 = write. -->

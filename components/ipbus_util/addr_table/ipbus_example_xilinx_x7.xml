@@ -1,4 +1,6 @@
-<node id="TOP">
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<node>
 
   <!-- NOTE: Remember that the lower nine bits are sent straight to
        the sysmon. So keep this at an appropriate offset from 0x0. -->

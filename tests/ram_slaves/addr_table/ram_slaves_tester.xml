@@ -1,4 +1,6 @@
-<node id="TOP">
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<node>
     <node id="csr" address="0x0" description="ctrl/stat register" fwinfo="endpoint;width=1">
         <node id="ctrl" address="0x0">
             <node id="rst" mask="0x1"/>

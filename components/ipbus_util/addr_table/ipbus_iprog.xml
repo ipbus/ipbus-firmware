@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
-<node id="ipbus_iprog" fwinfo="endpoint; width=1">
+<node fwinfo="endpoint; width=1">
 
   <node id="reconfigure" address="0x00000000" mask="0x00000001" />
   <node id="address" address="0x00000001" mask="0xffffffff" />

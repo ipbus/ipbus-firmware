@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
-<node id="sysmon_usp_int_ref" fwinfo="endpoint; width=8">
+<node fwinfo="endpoint; width=8">
 
   <!-- NOTE: Since the lower nine bits of the address are passed
        straigh to the DRP side of the sysmon, one should not

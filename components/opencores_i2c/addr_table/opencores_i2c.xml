@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
 <node description="I2C master controller" fwinfo="endpoint;width=3">
 	<node id="ps_lo" address="0x0" description="Prescale low byte"/>
 	<node id="ps_hi" address="0x1" description="Prescale low byte"/>
