@@ -1,6 +1,6 @@
 
 .template_base:
-  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-cc7:2019-09-17__ipbb0.5.2
+  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-cc7:2020-03-15__ipbb0.5.2_uhal2.7.2
   before_script:
     - source /software/Xilinx/Vivado/${VIVADO_VERSION}/settings64.sh
 
