@@ -1,3 +1,29 @@
+---------------------------------------------------------------------------------
+--
+--   Copyright 2017 - Rutherford Appleton Laboratory and University of Bristol
+--
+--   Licensed under the Apache License, Version 2.0 (the "License");
+--   you may not use this file except in compliance with the License.
+--   You may obtain a copy of the License at
+--
+--       http://www.apache.org/licenses/LICENSE-2.0
+--
+--   Unless required by applicable law or agreed to in writing, software
+--   distributed under the License is distributed on an "AS IS" BASIS,
+--   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+--   See the License for the specific language governing permissions and
+--   limitations under the License.
+--
+--                                     - - -
+--
+--   Additional information about ipbus-firmare and the list of ipbus-firmware
+--   contacts are available at
+--
+--       https://ipbus.web.cern.ch/ipbus
+--
+---------------------------------------------------------------------------------
+
+
 ----------------------------------------------------------------------------------
 -- University of Sussex, I. Xiotidis, A. Cerri
 -- Email: I.Xiotidis@sussex.ac.uk
@@ -29,7 +55,7 @@ library unisim;
 use unisim.VComponents.all;
 use work.emac_hostbus_decl.all;
 
-entity eth_vc707_sgmii is
+entity eth_7s_sgmii is
   port(
     gt_clkp, gt_clkn: in std_logic;
     gt_txp, gt_txn: out std_logic;
@@ -53,9 +79,9 @@ entity eth_vc707_sgmii is
     hostbus_out: out emac_hostbus_out
     );
 
-end eth_vc707_sgmii;
+end eth_7s_sgmii;
 
-architecture rtl of eth_us_1000basex is
+architecture rtl of eth_7s_sgmii is
     
   COMPONENT temac_gbe_v9_0
     PORT (
