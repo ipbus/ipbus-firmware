@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
-<node id="ipbus_icap" fwinfo="endpoint; width=3">
+<node fwinfo="endpoint; width=3">
 
   <node id="access_mode" address="0x00000000" mask="0x00000003" />
   <node id="access_strobe" address="0x00000000" mask="0x00000004" />

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
-<node id="ipbus_device_dna" fwinfo="endpoint; width=2">
+<node fwinfo="endpoint; width=2">
 
   <!-- The Xilinx device DNA (for UltraScale and UltraScale+ devices)
        is a 96-bit value. -->
