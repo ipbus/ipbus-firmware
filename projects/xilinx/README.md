@@ -19,6 +19,7 @@ $ cd ../../src/ipbus-firmware/projects/xilinx/scripts/
 $ cp ../../../../../proj/example_kc705/package/src/addrtab/* .
 $ ./example_sysmon.py 192.168.200.16 ipbus_example_xilinx_x7.xml
 $ ./example_icap.py 192.168.200.16 ipbus_example_xilinx_x7.xml
+$ ./example_axi4lite_master.py 192.168.200.16 ipbus_example_xilinx_x7.xml
 ```
 
 ## VCU118 with RJ45 Ethernet connection.
@@ -40,6 +41,7 @@ $ cd ../../src/ipbus-firmware/projects/xilinx/scripts/
 $ cp ../../../../../proj/example_vcu118/package/src/addrtab/* .
 $ ./example_sysmon.py 192.168.200.17 ipbus_example_xilinx_usp.xml
 $ ./example_device_dna.py 192.168.200.17 ipbus_example_xilinx_usp.xml
+$ ./example_axi4lite_master.py 192.168.200.17 ipbus_example_xilinx_usp.xml
 ```
 
 ## Expected output
@@ -85,4 +87,16 @@ IPBus ICAP interface demo
     Read ICAP AXSS register: 0x00000000
     Writing 0xffffffff to ICAP AXSS register
     Read ICAP AXSS register: 0xffffffff
+```
+
+### AXI4-lite master
+The AXI4-lite master example script should produce output like the
+below example. Both read-back values should match the written value,
+of course.
+
+```
+--------------------------------------------------
+IPBus AXI4-lite master demo:
+--------------------------------------------------
+  Wrote 0x00000031, read back 0x00000031 and 0x00000031
 ```

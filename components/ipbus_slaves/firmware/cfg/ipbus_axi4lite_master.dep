@@ -1,0 +1,5 @@
+src ipbus_axi4lite_master.vhd
+src axi4lite_interface.vhd
+src -c components/ipbus_util ipbus_cdc_reg.vhd
+src -c components/ipbus_util cdc_reset.vhd
+addrtab ipbus_axi4lite_master.xml
