@@ -24,7 +24,7 @@
 #-------------------------------------------------------------------------------
 
 
-src ipbus_freq_ctr.vhd ipbus_ctrlreg_v.vhd
+src freq_ctr_div.vhd ipbus_freq_ctr.vhd ipbus_ctrlreg_v.vhd
 addrtab ipbus_freq_ctr.xml
 src ipbus_reg_types.vhd
 src -c components/ipbus_core ipbus_package.vhd
