@@ -19,6 +19,7 @@
     - cd proj/${CI_JOB_NAME#quick_check:}
     - ipbb vivado make-project
     - ipbb vivado check-syntax
+    - ipbb vivado gendecoders -c
   artifacts:
     when: on_success
     paths:
