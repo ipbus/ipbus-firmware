@@ -1,7 +1,7 @@
 
 run_sim_udp:vivado2018.3:modelsim10.6c:
   extends: .template_base
-  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-cc7:2020-03-15__ipbb0.5.2_uhal2.7.2
+  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-cc7:2020-05-15__ipbb0.5.2_uhal2.7.4
   tags:
     - docker
     - docker-cap-net-admin
@@ -24,7 +24,7 @@ run_sim_udp:vivado2018.3:modelsim10.6c:
 
 run_sim:vivado2018.3:modelsim10.6c:
   extends: .template_base
-  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-cc7:2020-03-15__ipbb0.5.2_uhal2.7.2
+  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-cc7:2020-05-15__ipbb0.5.2_uhal2.7.4
   tags:
     - docker
     - docker-cap-net-admin
@@ -48,7 +48,7 @@ run_sim:vivado2018.3:modelsim10.6c:
 
 run_ram_slaves_testbench_sim:vivado2018.3:modelsim10.6c:
   extends: .template_base
-  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-cc7:2020-03-15__ipbb0.5.2_uhal2.7.2
+  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-cc7:2020-05-15__ipbb0.5.2_uhal2.7.4
   tags:
     - docker
     - docker-cap-net-admin
