@@ -2,7 +2,10 @@
 
 <node fwinfo="endpoint; width=3">
 
-  <node id="access_mode" address="0x00000000" mask="0x00000003" />
+  <node id="access_mode"
+        description="Master switch: 0 -> ICAP register read, 1 -> ICAP register write, 2 -> IPROG FPGA reconfiguration."
+        address="0x00000000"
+        mask="0x00000003" />
   <node id="access_strobe" address="0x00000000" mask="0x00000004" />
   <node id="address" address="0x00000001" mask="0xffffffff" />
   <node id="user_data_in" address="0x00000002" mask="0xffffffff" />
