@@ -25,6 +25,7 @@
 
 
 src enclustra_ax3_pm3_macprom_infra.vhd
+include -c components/neo430_wrapper neo430_wrapper.dep
 src -c components/ipbus_util clocks/clocks_7s_extphy_se.vhd ipbus_clock_div.vhd led_stretcher.vhd
 include -c components/ipbus_util ipbus_ctrl.dep
 include -c components/ipbus_eth artix_rgmii.dep
