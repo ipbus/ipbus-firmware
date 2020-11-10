@@ -23,7 +23,8 @@
 #
 #-------------------------------------------------------------------------------
 
-
-src ipbus_i2c_master_noz.vhd ipbus_i2c_master.vhd i2c_master_top.vhd i2c_master_registers.vhd i2c_master_byte_ctrl.vhd i2c_master_bit_ctrl.vhd
-addrtab opencores_i2c.xml
+setup settings_v7.tcl
+include enclustra_ax3_pm3_infra.dep
 src -c components/ipbus_core ipbus_package.vhd
+src --cd ../ucf enclustra_ax3_pm3.tcl
+src -c components/ipbus_util --cd ../ucf clock_utils.tcl

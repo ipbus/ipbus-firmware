@@ -24,6 +24,8 @@
 #-------------------------------------------------------------------------------
 
 
-src ipbus_i2c_master_noz.vhd ipbus_i2c_master.vhd i2c_master_top.vhd i2c_master_registers.vhd i2c_master_byte_ctrl.vhd i2c_master_bit_ctrl.vhd
-addrtab opencores_i2c.xml
-src -c components/ipbus_core ipbus_package.vhd
+src enclustra_ax3_pm3_macprom_infra.vhd
+src -c components/ipbus_util clocks/clocks_7s_extphy_se.vhd ipbus_clock_div.vhd led_stretcher.vhd
+include -c components/ipbus_util ipbus_ctrl.dep
+include -c components/ipbus_eth artix_rgmii.dep
+src -c components/ipbus_core ipbus_fabric_sel.vhd ipbus_package.vhd
