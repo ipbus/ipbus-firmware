@@ -87,8 +87,8 @@ begin  -- architecture rtl
       clk_i      => clk_i,              -- global clock, rising edge
       rst_i      => not rst_i,          -- global reset, async, high active
       -- gpio --
-      gpio_o             => s_pio,        -- status LEDs
-      gpio_i(7 downto 0) => UID_I2C_ADDR, -- address on I2C bus of PROM
+      gpio_o     => s_pio,        -- status LEDs
+      gpio_i     => x"00" & UID_I2C_ADDR, -- address on I2C bus of PROM
       
       -- serial com --
       uart_txd_o => uart_txd_o,         -- UART send data
