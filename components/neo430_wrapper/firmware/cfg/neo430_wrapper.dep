@@ -1,28 +1,28 @@
 
 src --vhdl2008 ipbus_neo430_wrapper.vhd
 
-src -c neo430: ../../rtl/top_templates/neo430_top_std_logic.vhd
-src -c neo430: ../../rtl/core/neo430_top.vhd
-src -c neo430: ../../rtl/core/neo430_twi.vhd
-src -c neo430: ../../rtl/core/neo430_package.vhd
-src -c neo430: ../../rtl/core/neo430_addr_gen.vhd
-src -c neo430: ../../rtl/core/neo430_alu.vhd
-# src -c neo430: ../../rtl/core/neo430_application_image.vhd
-src -c neo430: ../../rtl/core/neo430_bootloader_image.vhd
-src -c neo430: ../../rtl/core/neo430_boot_rom.vhd
-src -c neo430: ../../rtl/core/neo430_control.vhd
-src -c neo430: ../../rtl/core/neo430_cpu.vhd
-src -c neo430: ../../rtl/core/neo430_dmem.vhd
-src -c neo430: ../../rtl/core/neo430_gpio.vhd
-src -c neo430: ../../rtl/core/neo430_imem.vhd
-src -c neo430: ../../rtl/core/neo430_muldiv.vhd
-src -c neo430: ../../rtl/core/neo430_reg_file.vhd
-src -c neo430: ../../rtl/core/neo430_sysconfig.vhd
-src -c neo430: ../../rtl/core/neo430_timer.vhd
-src -c neo430: ../../rtl/core/neo430_uart.vhd
-src -c neo430: ../../rtl/core/neo430_wb_interface.vhd
-src -c neo430: ../../rtl/core/neo430_wdt.vhd
-src -c neo430: ../../rtl/core/neo430_freq_gen.vhd
+src -c neo430: --cd ../../../../rtl/top_templates   neo430_top_std_logic.vhd
+src -c neo430: --cd ../../../../rtl/core   neo430_top.vhd
+src -c neo430: --cd ../../../../rtl/core   neo430_twi.vhd
+src -c neo430: --cd ../../../../rtl/core   neo430_package.vhd
+src -c neo430: --cd ../../../../rtl/core   neo430_addr_gen.vhd
+src -c neo430: --cd ../../../../rtl/core   neo430_alu.vhd
+# src -c neo430: --cd ../../../../rtl/core   neo430_application_image.vhd
+src -c neo430: --cd ../../../../rtl/core   neo430_bootloader_image.vhd
+src -c neo430: --cd ../../../../rtl/core   neo430_boot_rom.vhd
+src -c neo430: --cd ../../../../rtl/core   neo430_control.vhd
+src -c neo430: --cd ../../../../rtl/core   neo430_cpu.vhd
+src -c neo430: --cd ../../../../rtl/core   neo430_dmem.vhd
+src -c neo430: --cd ../../../../rtl/core   neo430_gpio.vhd
+src -c neo430: --cd ../../../../rtl/core   neo430_imem.vhd
+src -c neo430: --cd ../../../../rtl/core   neo430_muldiv.vhd
+src -c neo430: --cd ../../../../rtl/core   neo430_reg_file.vhd
+src -c neo430: --cd ../../../../rtl/core   neo430_sysconfig.vhd
+src -c neo430: --cd ../../../../rtl/core   neo430_timer.vhd
+src -c neo430: --cd ../../../../rtl/core   neo430_uart.vhd
+src -c neo430: --cd ../../../../rtl/core   neo430_wb_interface.vhd
+src -c neo430: --cd ../../../../rtl/core   neo430_wdt.vhd
+src -c neo430: --cd ../../../../rtl/core   neo430_freq_gen.vhd
 
 
 # The output of the compilation of the C running on the NEO.
