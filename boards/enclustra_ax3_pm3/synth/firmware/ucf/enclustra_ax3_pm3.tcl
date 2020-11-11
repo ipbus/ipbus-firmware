@@ -72,6 +72,12 @@ if { [llength [get_ports {cfg[*]}]] > 0} {
   set_property PACKAGE_PIN H4 [get_ports {cfg[3]}]
 }
 
+# UART pins (not always used)
+if { [llength [get_ports {FTDI*}]] > 0} {
+set_property IOSTANDARD LVCMOS25 [get_port {FTDI_*}]
+set_property PACKAGE_PIN B2 [get_port {FTDI_RXD}]
+set_property PACKAGE_PIN B3 [get_port {FTDI_TXD}]
+}
 
 # Clock constraints
 set_false_path -through [get_pins infra/clocks/rst_reg/Q]
