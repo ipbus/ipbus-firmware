@@ -40,6 +40,37 @@
 // Configuration
 #define BAUD_RATE 19200
 
+uint64_t uid;
+uint32_t ipAddr;
+
+/* ------------------------------------------------------------
+ * Function to read EEPROM and set MAC,IP addresses
+ * ------------------------------------------------------------ */
+int setMacIP(void){
+
+  // first enable I2C brige
+  enable_i2c_bridge();
+
+  // set IPBus reset
+  neo430_wishbone_writeIPBusReset(true);
+
+  // Then read MAC address
+  uid = read_E24AA025E48T();
+  // and write to control lines
+  neo430_wishbone_writeMACAddr(uid);
+
+  // then read IP address
+  ipAddr = read_Prom();
+  // and write to control lines
+  neo430_wishbone_writeIPAddr(ipAddr);
+
+  // then release IPBus reset line
+  neo430_wishbone_writeIPBusReset(false);
+
+  return 0;
+}
+
+
 /* ------------------------------------------------------------
  * INFO Main function
  * ------------------------------------------------------------ */
@@ -47,15 +78,13 @@ int main(void) {
 
   uint16_t length = 0;
   uint16_t selection = 0;
-  uint64_t uid;
-  uint32_t ipAddr;
 
   // setup UART
   neo430_uart_setup(BAUD_RATE);
   //  USI_CT = (1<<USI_CT_EN);
  
   neo430_uart_br_print("\n-----------------------------------------\n"
-                          "- I2C Wishbone Explorer Terminal v0.11 -\n"
+                          "- I2C Wishbone Explorer Terminal v0.12 -\n"
                           "----------------------------------------\n\n");
 
   // check if WB unit was synthesized, exit if no WB is available
@@ -68,8 +97,12 @@ int main(void) {
   // set for 32 bit transfer
   //wb_config = 4;
 
+  // set up I2C pre-scale
   setup_i2c();
-       
+
+  // read EEPROM and write to IPBus IP and MAC addresses
+  setMacIP();
+    
   for (;;) {
 
     neo430_uart_br_print("\nEnter a command:> ");
@@ -137,25 +170,8 @@ int main(void) {
 
       case 6: // set MAC , IP address
 
-        // first enable I2C brige
-        enable_i2c_bridge();
-
-        // set IPBus reset
-        neo430_wishbone_writeIPBusReset(true);
-
-        // Then read MAC address
-        uid = read_E24AA025E48T();
-        // and write to control lines
-        neo430_wishbone_writeMACAddr(uid);
-
-        // then read IP address
-        ipAddr = read_Prom();
-        // and write to control lines
-        neo430_wishbone_writeIPAddr(ipAddr);
-
-        // then release IPBus reset line
-        neo430_wishbone_writeIPBusReset(false);
-
+	setMacIP();
+	
         break;
         
 

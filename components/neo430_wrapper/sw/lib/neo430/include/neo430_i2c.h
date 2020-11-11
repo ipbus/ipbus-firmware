@@ -68,11 +68,12 @@ void print_IP_address( uint32_t ipAddr);
 // I2C address of Crypto EEPROM on AX3
 #define MYSLAVE 0x64
 
+// Pass to neo430 over GPIO.
 // I2C address of UiD EEPROM on TLU
 // #define EEPROMADDRESS  0x50
 
 // I2C address of UiD EEPROM on timing FMC pc053
-#define EEPROMADDRESS  0x53
+// #define EEPROMADDRESS  0x53
 
 
 

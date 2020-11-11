@@ -37,7 +37,8 @@ use work.ipbus.all;
 
 entity enclustra_ax3_pm3_macprom_infra is
 	generic (
-		CLK_AUX_FREQ: real := 40.0 -- Default: 40 MHz clock - LHC
+          CLK_AUX_FREQ : real := 40.0 ; -- Default: 40 MHz clock - LHC
+          UID_I2C_ADDR : std_logic_vector(7 downto 0) := x"53" -- Address on I2C bus of E24AA025E
 		);
 	port(
 		osc_clk: in std_logic; -- 50MHz board crystal clock
@@ -126,8 +127,9 @@ begin
 -- Soft core to read MAC and IP address
 	soft_core_cpu: entity work.ipbus_neo430_wrapper
 		generic map(
-			CLOCK_SPEED =>  31250000 -- 31.25MHz IPBus clock
-			)
+                  CLOCK_SPEED =>  31250000, -- 31.25MHz IPBus clock
+                  UID_I2C_ADDR => UID_I2C_ADDR 
+                  )
 		port map(
 			clk_i => clk_ipb,	-- global clock, rising edge
 			rst_i => '0',		-- CPU reset. Active high. Async

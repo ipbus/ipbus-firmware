@@ -6,23 +6,24 @@ LIBRARY neo430;
 USE neo430.neo430_package.all;
 
 ENTITY ipbus_neo430_wrapper IS
-   GENERIC( 
-      CLOCK_SPEED : natural := 12000000
-   );
-   PORT( 
-      clk_i      : IN     std_logic;                      -- global clock, rising edge
-      rst_i      : IN     std_logic;                      -- global reset, async, active high
-      uart_txd_o : OUT    std_logic;                      -- UART from NEO to host
-      uart_rxd_i : IN     std_logic;                      -- from host to NEO UART
-      leds       : OUT    std_logic_vector (3 DOWNTO 0);  -- status LEDs
-      scl_o      : OUT    std_logic;                      -- I2C clock from NEO
-      scl_i      : IN     std_logic;                      -- the actual state of the line back to NEO
-      sda_o      : OUT    std_logic;                      -- I2C data from NEO
-      sda_i      : IN     std_logic;
-      ip_addr_o  : OUT    std_logic_vector(31 downto 0);  -- IP address to give to IPBus core
-      mac_addr_o : OUT    std_logic_vector(47 downto 0);  -- MAC address to give to IPBus core
-      ipbus_rst_o: OUT    std_logic                       -- Reset line to IPBus core
-   );
+  GENERIC( 
+    CLOCK_SPEED : natural := 12000000;
+    UID_I2C_ADDR : std_logic_vector(7 downto 0) := x"53" -- Address on I2C bus of E24AA025E
+    );
+  PORT( 
+    clk_i      : IN     std_logic;                      -- global clock, rising edge
+    rst_i      : IN     std_logic;                      -- global reset, async, active high
+    uart_txd_o : OUT    std_logic;                      -- UART from NEO to host
+    uart_rxd_i : IN     std_logic;                      -- from host to NEO UART
+    leds       : OUT    std_logic_vector (3 DOWNTO 0);  -- status LEDs
+    scl_o      : OUT    std_logic;                      -- I2C clock from NEO
+    scl_i      : IN     std_logic;                      -- the actual state of the line back to NEO
+    sda_o      : OUT    std_logic;                      -- I2C data from NEO
+    sda_i      : IN     std_logic;
+    ip_addr_o  : OUT    std_logic_vector(31 downto 0);  -- IP address to give to IPBus core
+    mac_addr_o : OUT    std_logic_vector(47 downto 0);  -- MAC address to give to IPBus core
+    ipbus_rst_o: OUT    std_logic                       -- Reset line to IPBus core
+    );
 
 -- Declarations
 
@@ -46,8 +47,8 @@ architecture rtl of ipbus_neo430_wrapper is
   signal s_i2c_addr : std_logic_vector(2 downto 0); -- need 3 bits for I2C master.
   signal s_ipmac_ni2c_flag : std_logic; -- high if addressing MAC/IP output. Low for I2C
   
-  attribute mark_debug : string; 
-  attribute mark_debug of  wb_adr_o_int , wb_dat_i_int , wb_dat_o_int , wb_stb_o_int , wb_ack_i_int , s_i2c_ack , s_mac_addr_ack , s_i2c_addr , s_ipmac_ni2c_flag : signal is "true";
+  --attribute mark_debug : string; 
+  --attribute mark_debug of  wb_adr_o_int , wb_dat_i_int , wb_dat_o_int , wb_stb_o_int , wb_ack_i_int , s_i2c_ack , s_mac_addr_ack , s_i2c_addr , s_ipmac_ni2c_flag : signal is "true";
 
 begin  -- architecture rtl
 
@@ -86,8 +87,8 @@ begin  -- architecture rtl
       clk_i      => clk_i,              -- global clock, rising edge
       rst_i      => not rst_i,          -- global reset, async, high active
       -- gpio --
-      gpio_o     => s_pio,              -- parallel output
-      gpio_i     => x"0000",            -- parallel input
+      gpio_o             => s_pio,        -- status LEDs
+      gpio_i(7 downto 0) => UID_I2C_ADDR, -- address on I2C bus of PROM
       
       -- serial com --
       uart_txd_o => uart_txd_o,         -- UART send data
@@ -98,16 +99,6 @@ begin  -- architecture rtl
       spi_mosi_o => open,               -- serial data line out
       spi_miso_i => '0',                -- serial data line in
       spi_cs_o   => open,               -- SPI CS 0..5
-      
-      -- 32-bit wishbone interface --
-      -- wb_adr_o   => s_addr,             -- address
-      -- wb_dat_i   => std_ulogic_vector(ipbus_rbus.ipb_rdata),  -- read data
-      -- wb_dat_o   => s_do,               -- write data
-      -- wb_we_o    => ipbus_wbus.ipb_write,                     -- read/write
-      -- wb_sel_o   => open,               -- byte enable
-      -- wb_stb_o   => ipbus_wbus.ipb_strobe,                    -- strobe
-      -- wb_cyc_o   => open,               -- valid cycle
-      -- wb_ack_i   => ipbus_rbus.ipb_ack,  -- transfer acknowledge
       
       -- 32-bit wishbone interface --
       wb_adr_o   => wb_adr_o_int,               -- address
@@ -151,52 +142,37 @@ begin  -- architecture rtl
     scl_padoen_o => scl_o,
     sda_pad_i => sda_i,
     sda_padoen_o => sda_o
-  );
+    );
 
   -- Multiplex Wishbone busses based on wb_addr(4). 0=I2C, 1=MAC/IP
   wb_ack_i_int <=             s_i2c_ack  when s_ipmac_ni2c_flag='0' else s_mac_addr_ack;
   wb_dat_i_int <= x"000000" & s_i2c_data when s_ipmac_ni2c_flag='0' else s_mac_addr_data;
 
+  cmp_mac_ip_output: entity work.wb_ip_mac_output
+    generic map (
+      dat_sz  => 32 -- wb_dat_i_int'length;
+      )
+    port map (
 
-  -- ipbus_wbus.ipb_addr  <= std_logic_vector("00" & s_addr(s_addr'left downto 2));  -- Convert the byte addresses from the Neo into Word addresses.
-  -- ipbus_wbus.ipb_wdata <= std_logic_vector(s_do);
-
-  -- cmp_i2c_iface : entity work.ipbus_i2c_master
-  --   port map(
-  --     clk     => clk_i,
-  --     rst     => '0',
-  --     ipb_in  => ipbus_wbus,
-  --     ipb_out => ipbus_rbus,
-  --     scl     => uid_scl,
-  --     sda_o   => s_sda,
-  --     sda_i   => uid_sda
-  --     );
-
-cmp_mac_ip_output: entity work.wb_ip_mac_output
-generic map (
-     dat_sz  => 32 -- wb_dat_i_int'length;
-)
-port map (
-
-     clk_i  => clk_i,
-     rst_i  => rst_i,
-     --
-     -- Wishbone Interface
-     --
-     dat_i  => wb_dat_o_int,  -- data into core
-     dat_o  => s_mac_addr_data, -- data out of core
-     adr_i  => wb_adr_o_int(5 downto 4), -- ......X. bits (5..4) of address
-     we_i   => wb_we_o_int, 
-     ack_o  => s_mac_addr_ack,  
-     err_o  => open,
-     stb_i  => wb_stb_o_int and s_ipmac_ni2c_flag,
-     --
-     -- IP , MAC addresses
-     --
-     ip_addr_o  => ip_addr_o  , -- IP address to give to IPBus core
-    mac_addr_o => mac_addr_o  ,-- MAC address to give to IPBus core
-    ipbus_rst_o => ipbus_rst_o  
-);
+      clk_i  => clk_i,
+      rst_i  => rst_i,
+      --
+      -- Wishbone Interface
+      --
+      dat_i  => wb_dat_o_int,  -- data into core
+      dat_o  => s_mac_addr_data, -- data out of core
+      adr_i  => wb_adr_o_int(5 downto 4), -- ......X. bits (5..4) of address
+      we_i   => wb_we_o_int, 
+      ack_o  => s_mac_addr_ack,  
+      err_o  => open,
+      stb_i  => wb_stb_o_int and s_ipmac_ni2c_flag,
+      --
+      -- IP , MAC addresses
+      --
+      ip_addr_o  => ip_addr_o  , -- IP address to give to IPBus core
+      mac_addr_o => mac_addr_o  ,-- MAC address to give to IPBus core
+      ipbus_rst_o => ipbus_rst_o  
+      );
 
 
 end architecture rtl;

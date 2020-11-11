@@ -9,6 +9,8 @@
 #include "../include/neo430.h"
 #include <../include/neo430_i2c.h>
 
+uint8_t eepromAddress;
+
 bool checkack(uint32_t delayVal) {
 
 #ifdef DEBUG
@@ -63,6 +65,11 @@ void setup_i2c(void) {
 
   neo430_uart_br_print("Setting up I2C core");
 
+  eepromAddress =  neo430_gpio_port_get() & 0xFF ;
+  neo430_uart_br_print("I2C address E24AA025E EEPROM = ");
+  neo430_uart_print_hex_byte( eepromAddress );
+  neo430_uart_br_print("\n");
+   
 // Disable core
   neo430_wishbone32_write8(ADDR_CTRL, 0);
 
@@ -285,14 +292,14 @@ int16_t  read_i2c_prom( uint8_t startAddress , uint8_t  wordsToRead, uint8_t buf
 #ifdef DEBUG
   neo430_uart_br_print(" read_i2c_prom: Write device ID: ");
 #endif
-  write_i2c_address( EEPROMADDRESS , 1 , buffer, mystop );
+  write_i2c_address( eepromAddress , 1 , buffer, mystop );
 
 #ifdef DEBUG
   neo430_uart_br_print("read_i2c_prom: Read EEPROM memory: ");
   zero_buffer(buffer , wordsToRead);
 #endif
 
-  read_i2c_address( EEPROMADDRESS , wordsToRead , buffer);
+  read_i2c_address( eepromAddress , wordsToRead , buffer);
 
 #ifdef DEBUG
   neo430_uart_br_print("Data from EEPROM\n");
@@ -379,10 +386,10 @@ int16_t write_Prom(){
   buffer[0] = PROMMEMORYADDR;
   
   for (uint8_t i=0; i< wordsToWrite; i++){
-    buffer[i+1] = (data >> (i*8)) & 0xFF ;    
+    buffer[wordsToWrite-i] = (data >> (i*8)) & 0xFF ;    
   }
 
-  status = write_i2c_address(EEPROMADDRESS , (wordsToWrite+1), buffer, mystop);
+  status = write_i2c_address(eepromAddress , (wordsToWrite+1), buffer, mystop);
 
   return status;
 
@@ -400,7 +407,7 @@ int16_t write_i2c_prom( uint8_t startAddress , uint8_t wordsToWrite, uint8_t buf
     buffer[i+1] = wordsToWrite;    
   }
 
-  status = write_i2c_address(EEPROMADDRESS , (wordsToWrite+1), buffer, mystop);
+  status = write_i2c_address(eepromAddress , (wordsToWrite+1), buffer, mystop);
 
   return status;
 }
