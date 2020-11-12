@@ -35,7 +35,8 @@ set_property PACKAGE_PIN P17 [get_ports osc_clk]
 
 
 # RGMII pin constraints
-set_property IOSTANDARD LVCMOS25 [get_ports {rgmii_* phy_rstn}]
+set_property IOSTANDARD LVCMOS25 [get_ports {phy_rstn}]
+set_property IOSTANDARD LVCMOS25 [get_ports {rgmii_*}]
 set_property PACKAGE_PIN R18 [get_ports {rgmii_txd[0]}]
 set_property PACKAGE_PIN T18 [get_ports {rgmii_txd[1]}]
 set_property PACKAGE_PIN U17 [get_ports {rgmii_txd[2]}]
@@ -74,7 +75,8 @@ if { [llength [get_ports {cfg[*]}]] > 0} {
 
 # UART pins (not always used)
 if { [llength [get_ports {FTDI*}]] > 0} {
-set_property IOSTANDARD LVCMOS25 [get_port {FTDI_*}]
+set_property IOSTANDARD LVCMOS33 [get_port {FTDI_RXD}]
+set_property IOSTANDARD LVCMOS33 [get_port {FTDI_TXD}]
 set_property PACKAGE_PIN B2 [get_port {FTDI_RXD}]
 set_property PACKAGE_PIN B3 [get_port {FTDI_TXD}]
 }
