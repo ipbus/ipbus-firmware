@@ -73,10 +73,14 @@ if { [llength [get_ports {cfg[*]}]] > 0} {
   set_property PACKAGE_PIN H4 [get_ports {cfg[3]}]
 }
 
-# UART pins (not always used)
+# UART pins (not always used). Unfortunately can either be 2V5 or 3V3. 
+# Depends on what VAUX is set to.
 if { [llength [get_ports {FTDI*}]] > 0} {
-set_property IOSTANDARD LVCMOS33 [get_port {FTDI_RXD}]
-set_property IOSTANDARD LVCMOS33 [get_port {FTDI_TXD}]
+    if { $FTDI_IO_VOLTAGE == 33} {
+        set_property IOSTANDARD LVCMOS33 [get_port {FTDI_*}]
+    } else {
+        set_property IOSTANDARD LVCMOS25 [get_port {FTDI_*}]
+    }
 set_property PACKAGE_PIN B2 [get_port {FTDI_RXD}]
 set_property PACKAGE_PIN B3 [get_port {FTDI_TXD}]
 }
