@@ -11,6 +11,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 -- 1 = MAC address(31:0)
 -- 2 = MAC address(47:32)
 -- 3 = bit-0 is the IPBus reset line.
+-- 4 = bit-0 is the use RARP line.
 
 entity wb_ip_mac_output is
 generic (

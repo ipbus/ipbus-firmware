@@ -5,9 +5,9 @@ Assumes that there is a [Microchip 24AA025E](https://www.microchip.com/wwwproduc
 Address of `24AA025E` on I2C bus given by the `UID_I2C_ADDR` generic.
 
 The MAC address is always read from the `24AA025E` unique ID area. This guarantees a unique ( and value ) 48-bit MAC address. 
-The MAC address can be read over a serial terminal connected to 
+The MAC address can be read from the PROM and displayed by typing a coomand over a serial terminal. 
 
-The IP address is read from the PROM and can be set by typing a command over a serial terminal. 19200 baud, 8N1.
+The IP address is read from the PROM and can be set by typing a command over a serial terminal. 
 
 Uses the [NEO430](https://github.com/stnolting/neo430/) soft core processor.
 
@@ -48,3 +48,30 @@ make clean
 make compile
 make install
 ```
+
+### Including neo430_wrapper in ipbb firmware build
+
+add neo430 source code from gitlab:
+
+```
+ipbb add git https://github.com/stnolting/neo430.git -b 0x0408
+```
+
+### Interface to soft core CPU
+
+Communicate with soft core using UART connected to `uart_txd_{i,o}` . 19200 baud, 8N1.
+
+Commands available:
+
+```
+ help     - show this text
+ enable   - enable I2C bridge on Enclustra
+ id       - Read Unique ID
+ write    - write IP addr to PROM
+ read     - read IP addr from PROM
+ writegpo - write GPO value to PROM
+ readgpo  - read GPO value from PROM
+ set      - read from E24AA025E48T UID and PROM area. Set MAC and IP address
+ reset    - reset CPU
+```
+
