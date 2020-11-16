@@ -1,5 +1,5 @@
 // #################################################################################################
-// #  < neo430_crc.h - CRC module helper functions >                                               #
+// #  < neo430_freq_gen.h - Frequency Generator helper functions >                                 #
 // # ********************************************************************************************* #
 // # BSD 3-Clause License                                                                          #
 // #                                                                                               #
@@ -32,18 +32,15 @@
 // # The NEO430 Processor - https://github.com/stnolting/neo430                                    #
 // #################################################################################################
 
-#ifndef neo430_crc_h
-#define neo430_crc_h
+#ifndef neo430_freq_gen_h
+#define neo430_freq_gen_h
 
 // prototypes
-uint16_t neo430_crc16(uint16_t start_val, uint16_t polynomial, uint8_t *data, uint16_t length);
-uint32_t neo430_crc32(uint32_t start_val, uint32_t polynomial, uint8_t *data, uint16_t length);
+void     neo430_freq_gen_enable_ch(uint16_t ch);                 // enable programmable frequency output channel ch
+void     neo430_freq_gen_disable_ch(uint16_t ch);                // disable programmable frequency output channel ch
+void     neo430_freq_gen_disable(void);                          // disable all outputs
+void     neo430_freq_gen_reset(void);                            // disable all outputs and reset device
+uint32_t neo430_freq_gen_set_freq(uint16_t ch, uint32_t frequency); // set programmable output frequency, returns actual output frequency
+void     neo430_freq_gen_set(uint16_t ch, uint16_t tuning_word, uint16_t prsc); // set HW configuration
 
-void neo430_crc16_set_start_value(uint16_t start_val);
-void neo430_crc32_set_start_value(uint32_t start_val);
-void neo430_crc16_set_polynomial(uint16_t poly);
-void neo430_crc32_set_polynomial(uint32_t poly);
-uint16_t neo430_crc16_iterate(uint8_t data);
-uint32_t neo430_crc32_iterate(uint8_t data);
-
-#endif // neo430_crc_h
+#endif // neo430_freq_gen_h

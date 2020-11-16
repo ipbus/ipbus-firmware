@@ -7,7 +7,7 @@ USE neo430.neo430_package.all;
 
 ENTITY ipbus_neo430_wrapper IS
   GENERIC( 
-    CLOCK_SPEED : natural := 12000000;
+    CLOCK_SPEED : natural := 31250000;
     UID_I2C_ADDR : std_logic_vector(7 downto 0) := x"53" -- Address on I2C bus of E24AA025E
     );
   PORT( 
@@ -20,6 +20,8 @@ ENTITY ipbus_neo430_wrapper IS
     scl_i      : IN     std_logic;                      -- the actual state of the line back to NEO
     sda_o      : OUT    std_logic;                      -- I2C data from NEO
     sda_i      : IN     std_logic;
+    gp_o       : OUT    std_logic_vector(11 downto 0);  -- General purpose output. Used in DUNE to define the endpoint ID
+    use_rarp_o : OUT    std_logic;                      -- If high then IPBus should use RARP, not fixed IP
     ip_addr_o  : OUT    std_logic_vector(31 downto 0);  -- IP address to give to IPBus core
     mac_addr_o : OUT    std_logic_vector(47 downto 0);  -- MAC address to give to IPBus core
     ipbus_rst_o: OUT    std_logic                       -- Reset line to IPBus core
@@ -87,7 +89,7 @@ begin  -- architecture rtl
       clk_i      => clk_i,              -- global clock, rising edge
       rst_i      => not rst_i,          -- global reset, async, high active
       -- gpio --
-      gpio_o     => s_pio,        -- status LEDs
+      gpio_o     => s_pio,        -- status LEDs, general purpose output
       gpio_i     => x"00" & UID_I2C_ADDR, -- address on I2C bus of PROM
       
       -- serial com --
@@ -122,7 +124,8 @@ begin  -- architecture rtl
       );
 
 
-  leds <= s_pio(3 downto 0);
+  leds <= s_pio(15 downto 12);
+  gp_o <= s_pio(11 downto 0);
 
   s_i2c_addr        <= wb_adr_o_int(4 downto 2); -- to cope with byte/word shift in NEO divide addresses by 4. 
   s_ipmac_ni2c_flag <= wb_adr_o_int(8); -- if bit 8 set then MAC/IP output
@@ -161,17 +164,18 @@ begin  -- architecture rtl
       --
       dat_i  => wb_dat_o_int,  -- data into core
       dat_o  => s_mac_addr_data, -- data out of core
-      adr_i  => wb_adr_o_int(5 downto 4), -- ......X. bits (5..4) of address
+      adr_i  => wb_adr_o_int(6 downto 4), -- ......X. bits (5..4) of address
       we_i   => wb_we_o_int, 
       ack_o  => s_mac_addr_ack,  
       err_o  => open,
       stb_i  => wb_stb_o_int and s_ipmac_ni2c_flag,
       --
-      -- IP , MAC addresses
+      -- IP , MAC addresses, RARP flag
       --
+      use_rarp_o => use_rarp_o , -- IF IPaddress set to ffffffff or 00000000 then set use_rarp_o flag. 
       ip_addr_o  => ip_addr_o  , -- IP address to give to IPBus core
       mac_addr_o => mac_addr_o  ,-- MAC address to give to IPBus core
-      ipbus_rst_o => ipbus_rst_o  
+      ipbus_rst_o => ipbus_rst_o  -- goes high while CPU is reading MAC, IP/RARP-flag from PROM.
       );
 
 

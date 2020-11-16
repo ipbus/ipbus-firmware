@@ -42,6 +42,8 @@
 
 uint64_t uid;
 uint32_t ipAddr;
+uint16_t gpo; // value to write to general purpose output
+bool useRARP;
 
 /* ------------------------------------------------------------
  * Function to read EEPROM and set MAC,IP addresses
@@ -56,6 +58,7 @@ int setMacIP(void){
 
   // Then read MAC address
   uid = read_E24AA025E48T();
+  uid = ( uid == 0 ) ? 0x020ddba11644 : uid; // if can't read UID, then set to dummy value.
   // and write to control lines
   neo430_wishbone_writeMACAddr(uid);
 
@@ -63,6 +66,14 @@ int setMacIP(void){
   ipAddr = read_Prom();
   // and write to control lines
   neo430_wishbone_writeIPAddr(ipAddr);
+
+  // if the IP address is set to 255.255.255.255 or 0.0.0.0 then use RARP
+  useRARP = ((ipAddr == 0xFFFFFFFF) || (ipAddr == 0)) ? true : false;
+  neo430_wishbone_writeRarpFlag(useRARP);
+
+  // then read the value to write to general purpose output (used for endpoint addr in DUNE)
+  //gpo = read_PromGPO();
+  //neo430_gpio_port_set(gpo);
 
   // then release IPBus reset line
   neo430_wishbone_writeIPBusReset(false);
@@ -83,13 +94,13 @@ int main(void) {
   neo430_uart_setup(BAUD_RATE);
   //  USI_CT = (1<<USI_CT_EN);
  
-  neo430_uart_br_print("\n-----------------------------------------\n"
-                          "- I2C Wishbone Explorer Terminal v0.12 -\n"
-                          "----------------------------------------\n\n");
+  neo430_uart_br_print("\n---------------------------------------\n"
+                          "- I2C Wishbone Explorer Terminal v0.13 -\n"
+                          "--------------------------------------\n\n");
 
   // check if WB unit was synthesized, exit if no WB is available
   if (!(SYS_FEATURES & (1<<SYS_WB32_EN))) {
-    neo430_uart_br_print("Error! No WB synthesized!");
+    neo430_uart_br_print("Error! No WB");
     return 1;
   }
 
@@ -126,23 +137,29 @@ int main(void) {
       selection = 4;
     if (!strcmp(command, "read"))
       selection = 5;
-    if (!strcmp(command, "set"))
+    if (!strcmp(command, "writegpo"))
       selection = 6;
-    if (!strcmp(command, "reset"))
+    if (!strcmp(command, "readgpo"))
       selection = 7;
+    if (!strcmp(command, "set"))
+      selection = 8;
+    if (!strcmp(command, "reset"))
+      selection = 9;
 
         // execute command
     switch(selection) {
 
       case 1: // print help menu
         neo430_uart_br_print("Available commands:\n"
-                      " help   - show this text\n"
-                      " enable - enable I2C bridge on Enclustra\n"
-                      " id     - Read from E24AA025E48T Unique ID\n"
-                      " write  - write to E24AA025E48T PROM area \n"
-                      " read   - read from E24AA025E48T PROM area \n"
-                      " set    - read from E24AA025E48T UID and PROM area. Set MAC and IP address\n"
-                      " reset  - reset CPU\n"
+                      " help     - show this text\n"
+                      " enable   - enable I2C bridge on Enclustra\n"
+                      " id       - Read Unique ID\n"
+                      " write    - write IP addr to PROM\n"
+                      " read     - read IP addr from PROM\n"
+                      " writegpo - write GPO value to PROM\n"
+                      " readgpo  - read GPO value from PROM\n"
+                      " set      - read from E24AA025E48T UID and PROM area. Set MAC and IP address\n"
+                      " reset    - reset CPU\n"
                       );
         break;
 
@@ -152,36 +169,38 @@ int main(void) {
         break;
 
       case 3: // read from Unique ID address
-	uid = read_E24AA025E48T();
-	neo430_uart_br_print("\nUID from E24AA025E48T = ");
-	neo430_uart_print_hex_dword((uid>>32) & 0xFFFFFFFF );
-  neo430_uart_print_hex_dword(uid & 0xFFFFFFFF );
-	neo430_uart_br_print("\n");
+	     uid = read_E24AA025E48T();
+       print_MAC_address(uid);
         break;
 
       case 4: // write to PROM
-	write_Prom();
+	     write_Prom();
         break;
 
       case 5: // read from PROM
-	 ipAddr = read_Prom();
-	 print_IP_address(ipAddr);
-	 break;
+	     ipAddr = read_Prom();
+	     print_IP_address(ipAddr);
+	     break;
 
-      case 6: // set MAC , IP address
+      case 6: // write General Purpose Output value to PROM
+        write_PromGPO();
+ 
+       case 7: // read GPO value from PROM
+        gpo = read_PromGPO();
+        print_GPO(gpo);
 
-	setMacIP();
-	
+      case 8: // set MAC , IP address , RARP flag
+	      setMacIP();
         break;
         
 
-      case 7: // restart
+      case 9: // restart
 	while ((UART_CT & (1<<UART_CT_TX_BUSY)) != 0); // wait for current UART transmission
         neo430_soft_reset();
         break;
 
       default: // invalid command
-        neo430_uart_br_print("Invalid command. Type 'help' for list.\n");
+        neo430_uart_br_print("bad cmd. 'help' for list.\n");
         break;
     }
     

@@ -26,7 +26,7 @@
 #include "neo430_wishbone.h"
 #include "neo430_wishbone_mac_ip.h"
 
-#define DEBUG 1
+// #define DEBUG 1
 
 /* ------------------------------------------------------------
  * INFO Read the 32-bit IP address
@@ -116,6 +116,40 @@ void neo430_wishbone_writeMACAddr(uint64_t macAddr) {
 
 }
 
+bool neo430_wishbone_readRarpFlag(void){
+
+  bool RarpFlagStatus;
+  uint32_t statusReg;
+
+  statusReg = neo430_wishbone32_read32(ADDR_RARP_FLAG);
+
+  RarpFlagStatus = statusReg ?  1 : 0;  
+
+#ifdef DEBUG
+  neo430_uart_br_print("\nRARP flag state (1-> use RARP) = ");
+  neo430_uart_print_hex_dword(statusReg);
+  neo430_uart_br_print("\n");
+#endif
+
+  return RarpFlagStatus;
+}
+
+void neo430_wishbone_writeRarpFlag(bool flagState){
+
+   uint32_t statusReg;
+   statusReg = flagState ? 0x00000001 : 0x00000000;
+
+#ifdef DEBUG
+  neo430_uart_br_print("\nSetting RARP flag state (1-> use RARP) = ");
+  neo430_uart_print_hex_dword(statusReg);
+  neo430_uart_br_print("\n");
+#endif
+
+  neo430_wishbone32_write32(ADDR_RARP_FLAG,statusReg);
+
+  return;
+}
+
 bool neo430_wishbone_readIPBusReset(void){
 
   bool ipbusResetStatus;
@@ -132,7 +166,7 @@ bool neo430_wishbone_readIPBusReset(void){
 #endif
 
   return ipbusResetStatus;
-};
+}
 
 void neo430_wishbone_writeIPBusReset(bool rstState){
 

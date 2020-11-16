@@ -24,6 +24,7 @@
 #-------------------------------------------------------------------------------
 
 setup settings_v7.tcl
+@vivado.mcsfile_options ="-size 64 -interface SPIx4" 
 include enclustra_ax3_pm3_macprom_infra.dep
 src -c components/ipbus_core ipbus_package.vhd
 src --cd ../ucf enclustra_ax3_pm3.tcl

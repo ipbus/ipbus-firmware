@@ -1,25 +1,35 @@
 // #################################################################################################
 // #  < neo430_timer.c - Timer helper functions >                                                  #
 // # ********************************************************************************************* #
-// # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
-// # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
+// # BSD 3-Clause License                                                                          #
 // #                                                                                               #
-// # This source file may be used and distributed without restriction provided that this copyright #
-// # statement is not removed from the file and that any derivative work contains the original     #
-// # copyright notice and the associated disclaimer.                                               #
+// # Copyright (c) 2020, Stephan Nolting. All rights reserved.                                     #
 // #                                                                                               #
-// # This source file is free software; you can redistribute it and/or modify it under the terms   #
-// # of the GNU Lesser General Public License as published by the Free Software Foundation,        #
-// # either version 3 of the License, or (at your option) any later version.                       #
+// # Redistribution and use in source and binary forms, with or without modification, are          #
+// # permitted provided that the following conditions are met:                                     #
 // #                                                                                               #
-// # This source is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;      #
-// # without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.     #
-// # See the GNU Lesser General Public License for more details.                                   #
+// # 1. Redistributions of source code must retain the above copyright notice, this list of        #
+// #    conditions and the following disclaimer.                                                   #
 // #                                                                                               #
-// # You should have received a copy of the GNU Lesser General Public License along with this      #
-// # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
+// # 2. Redistributions in binary form must reproduce the above copyright notice, this list of     #
+// #    conditions and the following disclaimer in the documentation and/or other materials        #
+// #    provided with the distribution.                                                            #
+// #                                                                                               #
+// # 3. Neither the name of the copyright holder nor the names of its contributors may be used to  #
+// #    endorse or promote products derived from this software without specific prior written      #
+// #    permission.                                                                                #
+// #                                                                                               #
+// # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS   #
+// # OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF               #
+// # MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE    #
+// # COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,     #
+// # EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE #
+// # GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED    #
+// # AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING     #
+// # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED  #
+// # OF THE POSSIBILITY OF SUCH DAMAGE.                                                            #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 10.12.2019 #
+// # The NEO430 Processor - https://github.com/stnolting/neo430                                    #
 // #################################################################################################
 
 #include "neo430.h"
@@ -36,37 +46,27 @@ void neo430_timer_enable(void) {
 
 
 /* ------------------------------------------------------------
- * INFO Dectivate Timer
+ * INFO Deactivate (and reset) Timer
  * ------------------------------------------------------------ */
 void neo430_timer_disable(void) {
 
-  TMR_CT &= ~(1<<TMR_CT_EN);
-}
-
-
-/* ------------------------------------------------------------
- * INFO Reset Timer
- * ------------------------------------------------------------ */
-void neo430_timer_reset(void) {
-
-  neo430_timer_disable();
-  neo430_timer_enable();
+  TMR_CT = 0;
 }
 
 
 /* ------------------------------------------------------------
  * INFO Start Timer
  * ------------------------------------------------------------ */
-void neo430_timer_start(void) {
+void neo430_timer_run(void) {
 
   TMR_CT |= (1<<TMR_CT_RUN);
 }
 
 
 /* ------------------------------------------------------------
- * INFO Stop Timer
+ * INFO Pause Timer
  * ------------------------------------------------------------ */
-void neo430_timer_stop(void) {
+void neo430_timer_pause(void) {
 
   TMR_CT &= ~(1<<TMR_CT_RUN);
 }
@@ -74,10 +74,10 @@ void neo430_timer_stop(void) {
 
 /* ------------------------------------------------------------
  * INFO Configure timer period
- * PARAM Timer frequency in Hz (1Hz ... F_CPU/2)
- * RETURN 0 if successful, !=0 if error
+ * PARAM Timer frequency in Hz (1 ... F_CPU/2), uint16_t pointer to store computed THRES value
+ * RETURN 0 if successful, 0xff if error
  * ------------------------------------------------------------ */
-uint8_t neo430_timer_config_period(uint32_t f_timer) {
+uint8_t neo430_timer_config_freq(uint32_t f_timer, uint16_t *thres) {
 
   uint32_t clock = CLOCKSPEED_32bit;
   uint32_t ticks = (clock / f_timer) >> 1; // divide by lowest prescaler (= f/2)
@@ -89,18 +89,22 @@ uint8_t neo430_timer_config_period(uint32_t f_timer) {
 
   // find prescaler
   while(prsc < 8) {
-    if (ticks <= 0x0000ffff)
+    if (ticks <= 0x0000ffff) {
       break;
+    }
     else {
-      if ((prsc == 2) || (prsc == 4))
+      if ((prsc == 2) || (prsc == 4)) {
         ticks >>= 3;
-      else
+      }
+      else {
         ticks >>= 1;
+      }
       prsc++;
     }
   }
 
   TMR_THRES = (uint16_t)ticks;
+  *thres = (uint16_t)ticks;
   TMR_CT &= ~(7<<TMR_CT_PRSC0); // clear prsc bits
   TMR_CT |= (prsc<<TMR_CT_PRSC0);
 

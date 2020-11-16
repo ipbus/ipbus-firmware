@@ -9,11 +9,15 @@
 #include "../include/neo430.h"
 #include <../include/neo430_i2c.h>
 
+#ifndef DEBUG
+#define DEBUG 0
+#endif
+
 uint8_t eepromAddress;
 
 bool checkack(uint32_t delayVal) {
 
-#ifdef DEBUG
+#if DEBUG > 1
 neo430_uart_br_print("\nChecking ACK\n");
 #endif
 
@@ -26,7 +30,7 @@ neo430_uart_br_print("\nChecking ACK\n");
     inprogress = (cmd_stat & INPROGRESS) > 0;
     ack = (cmd_stat & RECVDACK) == 0;
 
-#ifdef DEBUG
+#if DEBUG > 0
     neo430_uart_print_hex_byte( (uint8_t)ack );
 #endif
 
@@ -77,7 +81,7 @@ void setup_i2c(void) {
   neo430_wishbone32_write8(ADDR_PRESCALE_LOW , (prescale & 0x00ff) );
   neo430_wishbone32_write8(ADDR_PRESCALE_HIGH, (prescale & 0xff00) >> 8);
 
-#ifdef DEBUG
+#if DEBUG > 1
   uint8_t prescaleByte;
   prescaleByte = neo430_wishbone32_read8(ADDR_PRESCALE_LOW);
   neo430_uart_br_print("\nI2C prescale Low, High byte = ");
@@ -109,7 +113,7 @@ int16_t read_i2c_address(uint8_t addr , uint8_t n , uint8_t data[]) {
   uint8_t val;
   bool ack;
 
-#ifdef DEBUG
+#if DEBUG > 2
   neo430_uart_br_print("\nReading From I2C.\n");
 #endif
 
@@ -134,7 +138,7 @@ int16_t read_i2c_address(uint8_t addr , uint8_t n , uint8_t data[]) {
         }
       ack = checkack(DELAYVAL);
 
-#ifdef DEBUG
+#if DEBUG > 2
       neo430_uart_br_print("\nread_i2c_address: ACK = ");
       neo430_uart_print_hex_byte( (uint8_t) ack );
       neo430_uart_br_print("\n");
@@ -142,7 +146,7 @@ int16_t read_i2c_address(uint8_t addr , uint8_t n , uint8_t data[]) {
       
       val = neo430_wishbone32_read8(ADDR_DATA);
 
-#ifdef DEBUG
+#if DEBUG > 0
       neo430_uart_br_print("\nvalue = ");
       neo430_uart_print_hex_byte( val );
       neo430_uart_br_print("\n");
@@ -165,7 +169,7 @@ int16_t write_i2c_address(uint8_t addr , uint8_t nToWrite , uint8_t data[], bool
   addr &= 0x7f;
   addr = addr << 1;
 
-#ifdef DEBUG
+#if DEBUG > 2
   neo430_uart_br_print("\nWriting to I2C.\n");
 #endif
 
@@ -199,38 +203,22 @@ int16_t write_i2c_address(uint8_t addr , uint8_t nToWrite , uint8_t data[], bool
     }
 
   if (stop) {
-#ifdef DEBUG
+#if DEBUG > 2
     neo430_uart_br_print("\nwrite_i2c_address: Writing STOP\n");
 #endif
     neo430_wishbone32_write8(ADDR_CMD_STAT, STOPCMD);
   } else {
-#ifdef DEBUG
+#if DEBUG > 0
     neo430_uart_br_print("\nwrite_i2c_address: Returning, no STOP\n");
 #endif
   }
     return nwritten;
 }
 
-/*
-mystop=True
-   print "  Write RegDir to set I/O[7] to output:"
-   myslave= 0x21
-   mycmd= [0x01, 0x7F]
-   nwords= 1
-   master_I2C.write(myslave, mycmd, mystop)
-
-mystop=False
-   mycmd= [0x01]
-   master_I2C.write(myslave, mycmd, mystop)
-   res= master_I2C.read( myslave, nwords)
-   print "\tPost RegDir: ", res
-
-*/
 bool enable_i2c_bridge() {
 
   bool mystop;
   uint8_t I2CBRIDGE = 0x21;
-  uint8_t wordsToRead = 1;
   uint8_t wordsForAddress = 1;
   uint8_t wordsToWrite = 2;
 
@@ -238,30 +226,28 @@ bool enable_i2c_bridge() {
   buffer[0] = 0x01;
   buffer[1] = 0x7F;
   mystop = true;
-#ifdef DEBUG
+#if DEBUG > 2
    neo430_uart_br_print("\nWriting 0x01,0x7F to I2CBRIDGE. Stop = true:\n");
 #endif
   write_i2c_address(I2CBRIDGE , wordsToWrite , buffer, mystop );
 
   mystop=false;
   buffer[0] = 0x01;
-#ifdef DEBUG
+#if DEBUG > 2
    neo430_uart_br_print("\nWriting 0x01 to I2CBRIDGE. Stop = false:\n");
 #endif
   write_i2c_address(I2CBRIDGE , wordsForAddress , buffer, mystop );
-
-#ifdef DEBUG
   zero_buffer(buffer , sizeof(buffer));
-#endif
 
-#ifdef DEBUG
+#if DEBUG > 2
    neo430_uart_br_print("\nReading word from I2CBRIDGE:\n");
-#endif  
+   uint8_t wordsToRead = 1;
   read_i2c_address(I2CBRIDGE, wordsToRead , buffer);
 
   neo430_uart_br_print("Post RegDir: ");
   neo430_uart_print_hex_dword(buffer[0]);
   neo430_uart_br_print("\n");
+#endif 
 
   return true; // TODO: return a status, rather than True all the time...
  
@@ -289,19 +275,19 @@ int16_t  read_i2c_prom( uint8_t startAddress , uint8_t  wordsToRead, uint8_t buf
   bool mystop = false;
 
   buffer[0] = startAddress;
-#ifdef DEBUG
+#if DEBUG > 2
   neo430_uart_br_print(" read_i2c_prom: Write device ID: ");
 #endif
   write_i2c_address( eepromAddress , 1 , buffer, mystop );
 
-#ifdef DEBUG
+#if DEBUG > 2
   neo430_uart_br_print("read_i2c_prom: Read EEPROM memory: ");
   zero_buffer(buffer , wordsToRead);
 #endif
 
   read_i2c_address( eepromAddress , wordsToRead , buffer);
 
-#ifdef DEBUG
+#if DEBUG > 2
   neo430_uart_br_print("Data from EEPROM\n");
   for (uint8_t i=0; i< wordsToRead; i++){
     neo430_uart_br_print("\n");
@@ -318,11 +304,12 @@ int16_t  read_i2c_prom( uint8_t startAddress , uint8_t  wordsToRead, uint8_t buf
 void print_IP_address( uint32_t ipAddr){
 
 
-  neo430_uart_br_print("\nData from PROM = \n");
+  neo430_uart_br_print("\nIP address from PROM = \n");
   neo430_uart_print_hex_dword(ipAddr);
   neo430_uart_br_print("\n");
-  neo430_uart_br_print("\nIP Address = ");
 
+#if DEBUG > 1
+  neo430_uart_br_print("\nIP Address = ");
   for (uint8_t i = 3; i >= 0 && i<4; --i)
   {
     zero_buffer(buffer,4);
@@ -331,9 +318,31 @@ void print_IP_address( uint32_t ipAddr){
     neo430_uart_br_print(".");
   }
   neo430_uart_br_print( "\n"  );
+#endif
 
 }
 
+/* -------------------------------------*
+ *  Print 64 bit number as MAC address  *
+ * -------------------------------------*/
+void print_MAC_address( uint64_t uid){
+  neo430_uart_br_print("\nUID from E24AA025E48T = ");
+  neo430_uart_print_hex_qword(uid);
+  //neo430_uart_print_hex_dword((uid>>32) & 0xFFFFFFFF );
+  //neo430_uart_print_hex_dword(uid & 0xFFFFFFFF );
+  neo430_uart_br_print("\n");
+}
+
+ /* -------------------------------------*
+ *  Print 16 bit number as General Purpose Output value   *
+ * -------------------------------------*/
+void print_GPO( uint16_t gpo){
+
+  neo430_uart_br_print("\nGPO value from PROM = \n");
+  neo430_uart_print_hex_word(gpo);
+  neo430_uart_br_print("\n");
+
+}
 /* ---------------------------*
  *  Read UID from E24AA025E   *
  * ---------------------------*/
@@ -395,65 +404,48 @@ int16_t write_Prom(){
 
 }
 
-/*
-int16_t write_i2c_prom( uint8_t startAddress , uint8_t wordsToWrite, uint8_t buffer[] ){
+/* ---------------------------*
+ *  Read 2 bytes from E24AA025E   *
+ * ---------------------------*/
+uint16_t read_PromGPO() {
 
+  uint8_t wordsToRead = 2;
+  //  int16_t status;
+  uint16_t gpo ;
+
+  //status =  read_i2c_prom( startAddress , wordsToRead, buffer );
+  read_i2c_prom( PROMMEMORY_GPO_ADDR , wordsToRead, buffer );
+
+  gpo = ((uint16_t)buffer[1]) + ((uint16_t)buffer[0]<<8);
+
+  return gpo; // Returns 16-bit word read from PROM
+
+}
+
+
+int16_t write_PromGPO(){
+
+  uint8_t wordsToWrite = 2;
+ 
   int16_t status = 0;
   bool mystop = true;
 
-  buffer[0] = startAddress;
+  neo430_uart_br_print("Enter hexadecimal data to write to PROM: 0x");
+  neo430_uart_scan(command, 5,1); // 4 hex chars for address plus '\0'
+  uint16_t data = hex_str_to_uint16(command);
 
+  // Pack data to write into buffer
+  buffer[0] = PROMMEMORY_GPO_ADDR;
+  
   for (uint8_t i=0; i< wordsToWrite; i++){
-    buffer[i+1] = wordsToWrite;    
+    buffer[wordsToWrite-i] = (data >> (i*8)) & 0xFF ;    
   }
 
   status = write_i2c_address(eepromAddress , (wordsToWrite+1), buffer, mystop);
 
   return status;
+
 }
-*/
-
-/*
-def write(self, addr, data, stop=True):
-    """Write data to the device with the given address."""
-    # Start transfer with 7 bit address and write bit (0)
-    nwritten = -1
-    addr &= 0x7f
-    addr = addr << 1
-    startcmd = 0x1 << 7
-    stopcmd = 0x1 << 6
-    writecmd = 0x1 << 4
-    #Set transmit register (write operation, LSB=0)
-    self.data.write(addr)
-    #Set Command Register to 0x90 (write, start)
-    self.cmd_stat.write(I2CCore.startcmd | I2CCore.writecmd)
-    self.target.dispatch()
-    ack = self.delayorcheckack()
-    if not ack:
-        self.cmd_stat.write(I2CCore.stopcmd)
-        self.target.dispatch()
-        return nwritten
-    nwritten += 1
-    for val in data:
-        val &= 0xff
-        #Write slave memory address
-        self.data.write(val)
-        #Set Command Register to 0x10 (write)
-        self.cmd_stat.write(I2CCore.writecmd)
-        self.target.dispatch()
-        ack = self.delayorcheckack()
-        if not ack:
-            self.cmd_stat.write(I2CCore.stopcmd)
-            self.target.dispatch()
-            return nwritten
-        nwritten += 1
-    if stop:
-        self.cmd_stat.write(I2CCore.stopcmd)
-        self.target.dispatch()
-    return nwritten
-
-*/
-
 
 /* ------------------------------------------------------------
  * INFO Hex-char-string conversion function
@@ -476,6 +468,36 @@ uint32_t hex_str_to_uint32(char *buffer) {
       d = (uint32_t)((c - 'a') + 10);
     else if ((c >= 'A') && (c <= 'F'))
       d = (uint32_t)((c - 'A') + 10);
+    else
+      d = 0;
+
+    res = res + (d << (length*4));
+  }
+
+  return res;
+}
+
+/* ------------------------------------------------------------
+ * INFO Hex-char-string conversion function
+ * PARAM String with hex-chars (zero-terminated)
+ * not case-sensitive, non-hex chars are treated as '0'
+ * RETURN Conversion result (16-bit)
+ * ------------------------------------------------------------ */
+uint16_t hex_str_to_uint16(char *buffer) {
+
+  uint16_t length = strlen(buffer);
+  uint16_t res = 0, d = 0;
+  char c = 0;
+
+  while (length--) {
+    c = *buffer++;
+
+    if ((c >= '0') && (c <= '9'))
+      d = (uint16_t)(c - '0');
+    else if ((c >= 'a') && (c <= 'f'))
+      d = (uint16_t)((c - 'a') + 10);
+    else if ((c >= 'A') && (c <= 'F'))
+      d = (uint16_t)((c - 'A') + 10);
     else
       d = 0;
 

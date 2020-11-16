@@ -1,5 +1,5 @@
 // #################################################################################################
-// #  < neo430_crc.c - CRC module helper functions >                                               #
+// #  < neo430_freq_gen.c - Frequency Generator helper functions >                                 #
 // # ********************************************************************************************* #
 // # BSD 3-Clause License                                                                          #
 // #                                                                                               #
@@ -33,114 +33,173 @@
 // #################################################################################################
 
 #include "neo430.h"
-#include "neo430_crc.h"
+#include "neo430_freq_gen.h"
+
+// Private function prototypes
+static uint32_t neo430_freq_gen_nco_real_output(uint16_t tuning_word, uint16_t prsc_shift);
 
 
 /* ------------------------------------------------------------
- * INFO Compute CRC16 from buffer
- * PARAM start_val: Start value for CRC shift register
- * PARAM polynomial: 16-bit polynomial XOR mask
- * PARAM data: Pointer to BYTE input data array
- * PARAM length: Number of elements in input data array
- * RETURN CRC16 result
+ * INFO Enable programmable frequency output channel ch (0..2)
  * ------------------------------------------------------------ */
-uint16_t neo430_crc16(uint16_t start_val, uint16_t polynomial, uint8_t *data, uint16_t length) {
+void neo430_freq_gen_enable_ch(uint16_t ch) {
 
-  CRC_POLY_LO = polynomial;
-  CRC_RESX = start_val;
-
-  while(length) {
-    CRC_CRC16IN = (uint16_t)(*data++); // no wait required here
-    length--;
+  if (ch > 2) {
+    return;
   }
 
-  return CRC_RESX;
+  FREQ_GEN_CT |= (1 << (FREQ_GEN_CT_CH0_EN+ch));
 }
 
 
 /* ------------------------------------------------------------
- * INFO Compute CRC32 from buffer
- * PARAM start_val: Start value for CRC shift register
- * PARAM polynomial: 32-bit polynomial XOR mask
- * PARAM data: Pointer to BYTE input data array
- * PARAM length: Number of elements in input data array
- * RETURN CRC32 result
+ * INFO Disable programmable frequency output channel ch (0..2)
  * ------------------------------------------------------------ */
-uint32_t neo430_crc32(uint32_t start_val, uint32_t polynomial, uint8_t *data, uint16_t length) {
+void neo430_freq_gen_disable_ch(uint16_t ch) {
 
-  CRC_POLY32bit = polynomial;
-  CRC_R32bit = start_val;
-
-  while(length) {
-    CRC_CRC32IN = (uint16_t)(*data++); // no wait required here
-    length--;
+  if (ch > 2) {
+    return;
   }
 
-  return CRC_R32bit;
+  FREQ_GEN_CT &= ~(1 << (FREQ_GEN_CT_CH0_EN+ch));
 }
 
 
 /* ------------------------------------------------------------
- * INFO Initialize start value for CRC16
- * PARAM 16-bit CRC shift reg start value
+ * INFO Disable all programmable frequency outputs
  * ------------------------------------------------------------ */
-void neo430_crc16_set_start_value(uint16_t start_val) {
+void neo430_freq_gen_disable(void) {
 
-  CRC_RESX = start_val;
+  register uint16_t ct = FREQ_GEN_CT;
+  ct &= ~(1 << FREQ_GEN_CT_CH0_EN);
+  ct &= ~(1 << FREQ_GEN_CT_CH1_EN);
+  ct &= ~(1 << FREQ_GEN_CT_CH2_EN);
+  FREQ_GEN_CT = ct;
 }
 
 
 /* ------------------------------------------------------------
- * INFO Initialize start value for CRC32
- * PARAM 32-bit CRC shift reg start value
+ * INFO Disable all programmable frequency outputs and reset unit
  * ------------------------------------------------------------ */
-void neo430_crc32_set_start_value(uint32_t start_val) {
+void neo430_freq_gen_reset(void) {
 
-  CRC_R32bit = start_val;
+  FREQ_GEN_CT = 0;
 }
 
 
 /* ------------------------------------------------------------
- * INFO Set polynomial mask for CRC16
- * PARAM 16-bit CRC16 polynomial XOR mask
+ * INFO Set frequency programmable frequency output
+ * INFO f_out = ((f_cpu / nco_prsc) * tuning_word[15:0]) / 2^17
+ * WARNING Imprecise due to rounding/truncation errors!
+ * PARAM ch channel to configure (0..2)
+ * PARAM frequency: output frequency in Hz (no fractions possible here)
+ * RETURN the actual output frequency
  * ------------------------------------------------------------ */
-void neo430_crc16_set_polynomial(uint16_t poly) {
+uint32_t neo430_freq_gen_set_freq(uint16_t ch, uint32_t frequency) {
 
-  CRC_POLY_LO = poly;
+  // tuning_word = (f_out * 2^17) / (f_cpu / nco_prsc)
+
+  uint32_t f_cpu = CLOCKSPEED_32bit;
+
+  int16_t i;
+  uint16_t prsc_shift = 12; // start with highest prescaler (4096 => 12)
+
+  if (frequency > (f_cpu/4)) {
+    return 0;
+  }
+
+  uint64_t freq_tmp;
+  uint32_t freq_real;
+  uint32_t freq_diff;
+
+  uint32_t freq_diff_best = 0xffffffff; // max
+  uint16_t tuning_word_best = 0;
+  uint16_t prsc_best = 0;
+  uint32_t freq_real_best = 0;
+
+  // check all possible prescaler
+  for(i=7; i>=0; i--) {
+
+    freq_tmp = (uint64_t)frequency;
+    freq_tmp = freq_tmp << (17 + prsc_shift); // multiply via bit shifts
+    freq_tmp = freq_tmp / f_cpu;
+
+    uint16_t tuning_word = (uint16_t)(freq_tmp);
+
+    // add 1 to tuning word (for rounding issues)
+    freq_real = neo430_freq_gen_nco_real_output(tuning_word+1, prsc_shift);
+
+    freq_diff = freq_real - frequency;
+    if ((int32_t)freq_diff < 0) {
+      freq_diff = 0 - freq_diff;
+    }
+
+    // best result yet?
+    if (freq_diff < freq_diff_best) {
+      tuning_word_best = tuning_word;
+      prsc_best = i;
+      freq_diff_best = freq_diff;
+      freq_real_best = freq_real;
+    }
+
+    // compute next prescaler
+    if ((i == 5) || (i == 3)) {
+      prsc_shift = prsc_shift - 3;
+    }
+    else {
+      prsc_shift = prsc_shift - 1;
+    }
+  }
+
+
+  // set tuning word and prescaler
+  neo430_freq_gen_set(ch, tuning_word_best, prsc_best);
+
+  return freq_real_best;
 }
 
 
 /* ------------------------------------------------------------
- * INFO Set polynomial mask for CRC32
- * PARAM 32-bit CRC16 polynomial XOR mask
+ * INFO Compute actual NCO output frequency based on tuning word and prescaler
+ * RETURN the actual output frequency in Hz
  * ------------------------------------------------------------ */
-void neo430_crc32_set_polynomial(uint32_t poly) {
+static uint32_t neo430_freq_gen_nco_real_output(uint16_t tuning_word, uint16_t prsc_shift) {
 
-  CRC_POLY32bit = poly;
+  // f_out = ((f_cpu/nco_prsc) * tuning_word[15:0]) / 2^17
+
+  uint32_t f_cpu = CLOCKSPEED_32bit;
+  uint64_t f_out = (uint64_t)f_cpu;
+  f_out = f_out * tuning_word;
+  f_out = f_out >> (17 + prsc_shift); // divide by 2^17 * PRSC
+
+  return (uint32_t)f_out;
 }
 
 
 /* ------------------------------------------------------------
- * INFO Compute CRC16 for one new data byte
- * PARAM 8-bit data input
- * RETURN Current result of CRC16 shift reg
+ * INFO Set HW configuration
+ * PARAM ch channel 0,1,2
+ * PARAM 16-bit tuning word
+ * PARAM 3-bit prescaler selector (0,...,7)
  * ------------------------------------------------------------ */
-uint16_t neo430_crc16_iterate(uint8_t data) {
+void neo430_freq_gen_set(uint16_t ch, uint16_t tuning_word, uint16_t prsc) {
 
-  CRC_CRC16IN = (uint16_t)data;
-  asm volatile ("nop");
-  return CRC_RESX;
-}
-
-
-/* ------------------------------------------------------------
- * INFO Compute CRC32 for one new data byte
- * PARAM 8-bit data input
- * RETURN Current result of CRC32 shift reg
- * ------------------------------------------------------------ */
-uint32_t neo430_crc32_iterate(uint8_t data) {
-
-  CRC_CRC32IN = (uint16_t)data;
-  asm volatile ("nop");
-  return CRC_R32bit;
+  // set tuning word and prescaler
+  register uint16_t ctrl = FREQ_GEN_CT;
+  if (ch == 0) {
+    FREQ_GEN_TW_CH0 = tuning_word;
+    ctrl &= ~(0b111 << FREQ_GEN_CT_CH0_PRSC0); // clear old prescaler config
+    ctrl |=  (prsc  << FREQ_GEN_CT_CH0_PRSC0); // set new prescaler config
+  }
+  else if (ch == 1) {
+    FREQ_GEN_TW_CH1 = tuning_word;
+    ctrl &= ~(0b111 << FREQ_GEN_CT_CH1_PRSC0); // clear old prescaler config
+    ctrl |=  (prsc  << FREQ_GEN_CT_CH1_PRSC0); // set new prescaler config
+  }
+  else if (ch == 2) {
+    FREQ_GEN_TW_CH2 = tuning_word;
+    ctrl &= ~(0b111 << FREQ_GEN_CT_CH2_PRSC0); // clear old prescaler config
+    ctrl |=  (prsc  << FREQ_GEN_CT_CH2_PRSC0); // set new prescaler config
+  }
+  FREQ_GEN_CT = ctrl;
 }

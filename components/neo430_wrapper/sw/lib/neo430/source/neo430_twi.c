@@ -1,25 +1,35 @@
 // #################################################################################################
 // #  < neo430_twi.c - Internal Two Wire Serial interface functions >                              #
 // # ********************************************************************************************* #
-// # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
-// # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
+// # BSD 3-Clause License                                                                          #
 // #                                                                                               #
-// # This source file may be used and distributed without restriction provided that this copyright #
-// # statement is not removed from the file and that any derivative work contains the original     #
-// # copyright notice and the associated disclaimer.                                               #
+// # Copyright (c) 2020, Stephan Nolting. All rights reserved.                                     #
 // #                                                                                               #
-// # This source file is free software; you can redistribute it and/or modify it under the terms   #
-// # of the GNU Lesser General Public License as published by the Free Software Foundation,        #
-// # either version 3 of the License, or (at your option) any later version.                       #
+// # Redistribution and use in source and binary forms, with or without modification, are          #
+// # permitted provided that the following conditions are met:                                     #
 // #                                                                                               #
-// # This source is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;      #
-// # without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.     #
-// # See the GNU Lesser General Public License for more details.                                   #
+// # 1. Redistributions of source code must retain the above copyright notice, this list of        #
+// #    conditions and the following disclaimer.                                                   #
 // #                                                                                               #
-// # You should have received a copy of the GNU Lesser General Public License along with this      #
-// # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
+// # 2. Redistributions in binary form must reproduce the above copyright notice, this list of     #
+// #    conditions and the following disclaimer in the documentation and/or other materials        #
+// #    provided with the distribution.                                                            #
+// #                                                                                               #
+// # 3. Neither the name of the copyright holder nor the names of its contributors may be used to  #
+// #    endorse or promote products derived from this software without specific prior written      #
+// #    permission.                                                                                #
+// #                                                                                               #
+// # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS   #
+// # OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF               #
+// # MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE    #
+// # COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,     #
+// # EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE #
+// # GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED    #
+// # AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING     #
+// # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED  #
+// # OF THE POSSIBILITY OF SUCH DAMAGE.                                                            #
 // # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 10.10.2019 #
+// # The NEO430 Processor - https://github.com/stnolting/neo430                                    #
 // #################################################################################################
 
 #include "neo430.h"
@@ -47,29 +57,48 @@ void neo430_twi_disable(void) {
 
 
 /* ------------------------------------------------------------
+ * INFO Activate sending ACK by master after transmission
+ * ------------------------------------------------------------ */
+void neo430_twi_mack_enable(void) {
+
+  TWI_CT |= (1 << TWI_CT_MACK);
+}
+
+
+/* ------------------------------------------------------------
+ * INFO Deactivate sending ACK by master after transmission (normal mode)
+ * ACK is sampled from slave
+ * ------------------------------------------------------------ */
+void neo430_twi_mack_disable(void) {
+
+  TWI_CT &= ~(1 << TWI_CT_MACK);
+}
+
+
+/* ------------------------------------------------------------
  * INFO Generate START condition and send first byte (address & R/W)
  * PARAM 8-bit including 7-bit address and read/write bit
- * RETURN 0 if ACK received, 0xff if no valid ACK was received
+ * RETURN 0 if ACK received, 1 if no valid ACK was received
  * ------------------------------------------------------------ */
 uint8_t neo430_twi_start_trans(uint8_t a) {
 
   neo430_twi_generate_start(); // generate START condition
 
-  TWI_DATA = (uint16_t)a; // send data
+  TWI_DATA = (uint16_t)a; // send address
   while(TWI_CT & (1 << TWI_CT_BUSY)); // wait until idle again
 
   // check for ACK/NACK
   if (TWI_DATA & (1 << TWI_DT_ACK))
-    return 0x00; // ACK received
+    return 0; // ACK received
   else
-    return 0xff; // NACK received
+    return 1; // NACK received
 }
 
 
 /* ------------------------------------------------------------
  * INFO Send data and also sample input data
  * PARAM Data byte to be sent
- * RETURN 0 if ACK received, 0xff if no valid ACK was received
+ * RETURN 0 if ACK received, 1 if no valid ACK was received
  * ------------------------------------------------------------ */
 uint8_t neo430_twi_trans(uint8_t d) {
 
@@ -78,14 +107,14 @@ uint8_t neo430_twi_trans(uint8_t d) {
 
   // check for ACK/NACK
   if (TWI_DATA & (1 << TWI_DT_ACK))
-    return 0x00; // ACK received
+    return 0; // ACK received
   else
-    return 0xff; // NACK received
+    return 1; // NACK received
 }
 
 
 /* ------------------------------------------------------------
- * INFO Get receive data from previous transmission
+ * INFO Get rx data from previous transmission
  * RETURN Last received data byte
  * ------------------------------------------------------------ */
 uint8_t neo430_twi_get_data(void) {

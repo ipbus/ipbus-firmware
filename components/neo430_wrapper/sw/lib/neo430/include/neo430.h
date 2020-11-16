@@ -1,29 +1,35 @@
 // #################################################################################################
 // #  < neo430.h - MAIN NEO430 INCLUDE FILE >                                                      #
 // # ********************************************************************************************* #
-// # This file is crucial for all NEO430 software projects!                                        #
-// # You only need to include THIS file into your project code (all sub-libraries are included     #
-// # within this library file).                                                                    #
+// # BSD 3-Clause License                                                                          #
+// #                                                                                               #
+// # Copyright (c) 2020, Stephan Nolting. All rights reserved.                                     #
+// #                                                                                               #
+// # Redistribution and use in source and binary forms, with or without modification, are          #
+// # permitted provided that the following conditions are met:                                     #
+// #                                                                                               #
+// # 1. Redistributions of source code must retain the above copyright notice, this list of        #
+// #    conditions and the following disclaimer.                                                   #
+// #                                                                                               #
+// # 2. Redistributions in binary form must reproduce the above copyright notice, this list of     #
+// #    conditions and the following disclaimer in the documentation and/or other materials        #
+// #    provided with the distribution.                                                            #
+// #                                                                                               #
+// # 3. Neither the name of the copyright holder nor the names of its contributors may be used to  #
+// #    endorse or promote products derived from this software without specific prior written      #
+// #    permission.                                                                                #
+// #                                                                                               #
+// # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS   #
+// # OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF               #
+// # MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE    #
+// # COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,     #
+// # EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE #
+// # GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED    #
+// # AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING     #
+// # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED  #
+// # OF THE POSSIBILITY OF SUCH DAMAGE.                                                            #
 // # ********************************************************************************************* #
-// # This file is part of the NEO430 Processor project: https://github.com/stnolting/neo430        #
-// # Copyright by Stephan Nolting: stnolting@gmail.com                                             #
-// #                                                                                               #
-// # This source file may be used and distributed without restriction provided that this copyright #
-// # statement is not removed from the file and that any derivative work contains the original     #
-// # copyright notice and the associated disclaimer.                                               #
-// #                                                                                               #
-// # This source file is free software; you can redistribute it and/or modify it under the terms   #
-// # of the GNU Lesser General Public License as published by the Free Software Foundation,        #
-// # either version 3 of the License, or (at your option) any later version.                       #
-// #                                                                                               #
-// # This source is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;      #
-// # without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.     #
-// # See the GNU Lesser General Public License for more details.                                   #
-// #                                                                                               #
-// # You should have received a copy of the GNU Lesser General Public License along with this      #
-// # source; if not, download it from https://www.gnu.org/licenses/lgpl-3.0.en.html                #
-// # ********************************************************************************************* #
-// # Stephan Nolting, Hannover, Germany                                                 10.12.2019 #
+// # The NEO430 Processor - https://github.com/stnolting/neo430                                    #
 // #################################################################################################
 
 #ifndef neo430_h
@@ -32,6 +38,18 @@
 // Standard libraries
 #include <stdint.h>
 #include <stdlib.h>
+
+// ----------------------------------------------------------------------------
+// Aux data types
+// ----------------------------------------------------------------------------
+union uint16_u { uint16_t uint16; uint8_t  uint8[ sizeof(uint16_t)/1]; };
+union uint32_u { uint32_t uint32; uint16_t uint16[sizeof(uint32_t)/2]; uint8_t  uint8[ sizeof(uint32_t)/1]; };
+union uint64_u { uint64_t uint64; uint32_t uint32[sizeof(uint64_t)/4];  uint16_t uint16[sizeof(uint64_t)/2]; uint8_t uint8[sizeof(uint64_t)/1]; };
+
+union  int16_u { int16_t  int16; int8_t   int8[ sizeof(int16_t)/1]; };
+union  int32_u { int32_t  int32; int16_t  int16[sizeof(int32_t)/2]; int8_t  int8[ sizeof(int32_t)/1]; };
+union  int64_u { int64_t  int64; int32_t  int32[sizeof(int64_t)/4]; int16_t int16[sizeof(int64_t)/2]; int8_t int8[sizeof(int64_t)/1]; };
+
 
 // ----------------------------------------------------------------------------
 // CPU Status Register (r2) Flags
@@ -80,15 +98,44 @@
 // ----------------------------------------------------------------------------
 // Unsigned Multiplier/Divider Unit (MULDIV)
 // ----------------------------------------------------------------------------
-#define MULDIV_OPA     (*(REG16 0xFF80)) // -/w: operand A (dividend or factor1)
-#define MULDIV_OPB_DIV (*(REG16 0xFF82)) // -/w: operand B (divisor) for division
-#define MULDIV_OPB_MUL (*(REG16 0xFF84)) // -/w: operand B (factor2) for multiplication
-//#define reserved     (*(REG16 0xFF86))
-//#define reserved     (*(REG16 0xFF88))
-//#define reserved     (*(REG16 0xFF8A))
-#define MULDIV_RESX    (*(ROM16 0xFF8C)) // r/-: quotient or product low word
-#define MULDIV_RESY    (*(ROM16 0xFF8E)) // r/-: remainder or product high word
-#define MULDIV_R32bit  (*(ROM32 (&MULDIV_RESX))) // r/-: read result as 32-bit data word
+#define MULDIV_OPA_RESX      (*(REG16 0xFF80)) // r/w: operand A (dividend or factor1) / resx: quotient or product low word
+#define MULDIV_OPB_UMUL_RESY (*(REG16 0xFF82)) // r/w: operand B (factor2) for unsigned multiplication / resy: remainder or product high word
+#define MULDIV_OPB_SMUL      (*(REG16 0xFF84)) // -/w: operand B (factor2) for signed multiplication
+#define MULDIV_OPB_UDIV      (*(REG16 0xFF86)) // -/w: operand B (divisor) for unsigned division
+#define MULDIV_R32bit        (*(ROM32 (&MULDIV_OPA_RESX))) // r/-: read result as 32-bit data word
+
+
+// ----------------------------------------------------------------------------
+// Frequency Generator (FREQ_GEN)
+// ----------------------------------------------------------------------------
+#define FREQ_GEN_CT     (*(REG16 0xFF88)) // r/w: control register
+#define FREQ_GEN_TW_CH0 (*(REG16 0xFF8A)) // -/w: tuning word channel 0
+#define FREQ_GEN_TW_CH1 (*(REG16 0xFF8C)) // -/w: tuning word channel 1
+#define FREQ_GEN_TW_CH2 (*(REG16 0xFF8E)) // -/w: tuning word channel 2
+
+// FREQ_GEN control register
+#define FREQ_GEN_CT_CH0_EN     0 // r/w: enable NCO channel 0
+#define FREQ_GEN_CT_CH1_EN     1 // r/w: enable NCO channel 1
+#define FREQ_GEN_CT_CH2_EN     2 // r/w: enable NCO channel 2
+#define FREQ_GEN_CT_CH0_PRSC0  3 // r/w: prescaler select bit 0 for channel 0
+#define FREQ_GEN_CT_CH0_PRSC1  4 // r/w: prescaler select bit 1 for channel 0
+#define FREQ_GEN_CT_CH0_PRSC2  5 // r/w: prescaler select bit 2 for channel 0
+#define FREQ_GEN_CT_CH1_PRSC0  6 // r/w: prescaler select bit 0 for channel 1
+#define FREQ_GEN_CT_CH1_PRSC1  7 // r/w: prescaler select bit 1 for channel 1
+#define FREQ_GEN_CT_CH1_PRSC2  8 // r/w: prescaler select bit 2 for channel 1
+#define FREQ_GEN_CT_CH2_PRSC0  9 // r/w: prescaler select bit 0 for channel 2
+#define FREQ_GEN_CT_CH2_PRSC1 10 // r/w: prescaler select bit 1 for channel 2
+#define FREQ_GEN_CT_CH2_PRSC2 11 // r/w: prescaler select bit 2 for channel 2
+
+// clock prescalers 
+#define FREQ_GEN_PRSC_2    0 // CLK/2
+#define FREQ_GEN_PRSC_4    1 // CLK/4
+#define FREQ_GEN_PRSC_8    2 // CLK/8
+#define FREQ_GEN_PRSC_64   3 // CLK/64
+#define FREQ_GEN_PRSC_128  4 // CLK/128
+#define FREQ_GEN_PRSC_1024 5 // CLK/1024
+#define FREQ_GEN_PRSC_2048 6 // CLK/2048
+#define FREQ_GEN_PRSC_4096 7 // CLK/4096
 
 
 // ----------------------------------------------------------------------------
@@ -134,7 +181,7 @@
 #define UART_CT_PRSC0     8 // r/w: baud presclaer bit 0
 #define UART_CT_PRSC1     9 // r/w: baud presclaer bit 1
 #define UART_CT_PRSC2    10 // r/w: baud presclaer bit 2
-
+#define UART_CT_RXOR     11 // r/-: RX data overrun
 #define UART_CT_EN       12 // r/w: UART enable
 #define UART_CT_RX_IRQ   13 // r/w: Rx done interrupt enable
 #define UART_CT_TX_IRQ   14 // r/w: Tx done interrupt enable
@@ -161,18 +208,21 @@
 #define SPI_RTX (*(REG16 0xFFA6)) // r/w: receive/transmit register
 
 // SPI control register
-#define SPI_CT_EN       0 // r/w: spi enable
-#define SPI_CT_CPHA     1 // r/w: spi clock phase (idle polarity = '0')
-#define SPI_CT_IRQ      2 // r/w: spi transmission done interrupt enable
-#define SPI_CT_PRSC0    3 // r/w: spi clock prescaler select bit 0
-#define SPI_CT_PRSC1    4 // r/w: spi clock prescaler select bit 1
-#define SPI_CT_PRSC2    5 // r/w: spi clock prescaler select bit 2
-#define SPI_CT_CS_SEL0  6 // r/w: spi CS select 0
-#define SPI_CT_CS_SEL1  7 // r/w: spi CS select 1
-#define SPI_CT_CS_SEL2  8 // r/w: spi CS select 2
-#define SPI_CT_CS_SET   9 // r/w: selected CS becomes active ('0') when set
-#define SPI_CT_DIR     10 // r/w: shift direction (0: MSB first, 1: LSB first)
-
+#define SPI_CT_CS_SEL0  0 // r/w: spi CS 0
+#define SPI_CT_CS_SEL1  1 // r/w: spi CS 1
+#define SPI_CT_CS_SEL2  2 // r/w: spi CS 2
+#define SPI_CT_CS_SEL3  3 // r/w: spi CS 3
+#define SPI_CT_CS_SEL4  4 // r/w: spi CS 4
+#define SPI_CT_CS_SEL5  5 // r/w: spi CS 5
+#define SPI_CT_EN       6 // r/w: spi enable
+#define SPI_CT_CPHA     7 // r/w: spi clock phase (idle polarity = '0')
+#define SPI_CT_IRQ      8 // r/w: spi transmission done interrupt enable
+#define SPI_CT_PRSC0    9 // r/w: spi clock prescaler select bit 0
+#define SPI_CT_PRSC1   10 // r/w: spi clock prescaler select bit 1
+#define SPI_CT_PRSC2   11 // r/w: spi clock prescaler select bit 2
+#define SPI_CT_DIR     12 // r/w: shift direction (0: MSB first, 1: LSB first)
+#define SPI_CT_SIZE    13 // r/w: 0 = 8-bit, 1 = 16-bit
+// ...
 #define SPI_CT_BUSY    15 // r/-: spi transceiver is busy
 
 // clock prescalers 
@@ -189,28 +239,28 @@
 // ----------------------------------------------------------------------------
 // General Purpose Inputs/Outputs (GPIO)
 // ----------------------------------------------------------------------------
-//#define reserved   (*(REG16 0xFFA8)) // reserved
-#define GPIO_IRQMASK (*(REG16 0xFFAA)) // -/w: irq mask register
-#define GPIO_INPUT   (*(ROM16 0xFFAC)) // r/-: parallel input
-#define GPIO_OUTPUT  (*(REG16 0xFFAE)) // r/w: parallel output
+#define GPIO_IRQMASK (*(REG16 0xFFA8)) // -/w: irq mask register
+#define GPIO_INPUT   (*(ROM16 0xFFAA)) // r/-: parallel input
+#define GPIO_OUTPUT  (*(REG16 0xFFAC)) // r/w: parallel output
+//#define reserved   (*(REG16 0xFFAE)) // reserved
 
 
 // ----------------------------------------------------------------------------
 // High-Precision Timer (TIMER)
 // ----------------------------------------------------------------------------
-#define TMR_CT    (*(REG16 0xFFB0)) // r/w: control register
-#define TMR_CNT   (*(ROM16 0xFFB2)) // r/-: counter register
-#define TMR_THRES (*(REG16 0xFFB4)) // r/w: threshold register
-//#define reserved     (*(REG16 0xFFB6))
+#define TMR_CT     (*(REG16 0xFFB0)) // r/w: control register
+#define TMR_CNT    (*(ROM16 0xFFB2)) // r/-: counter register
+#define TMR_THRES  (*(REG16 0xFFB4)) // -/w: threshold register
+//#define reserved (*(REG16 0xFFB6)) // reserved
 
 // Timer control register
-#define TMR_CT_EN    0 // r/w: timer enable
-#define TMR_CT_ARST  1 // r/w: auto reset on match
-#define TMR_CT_IRQ   2 // r/w: interrupt enable
-#define TMR_CT_RUN   3 // r/w: start/stop timer
-#define TMR_CT_PRSC0 4 // r/w: clock prescaler select bit 0
-#define TMR_CT_PRSC1 5 // r/w: clock prescaler select bit 1
-#define TMR_CT_PRSC2 6 // r/w: clock prescaler select bit 2
+#define TMR_CT_EN     0 // r/w: timer unit global enable
+#define TMR_CT_ARST   1 // r/w: auto reset on match
+#define TMR_CT_IRQ    2 // r/w: interrupt enable
+#define TMR_CT_RUN    3 // r/w: start/stop timer
+#define TMR_CT_PRSC0  4 // r/w: clock prescaler select bit 0
+#define TMR_CT_PRSC1  5 // r/w: clock prescaler select bit 1
+#define TMR_CT_PRSC2  6 // r/w: clock prescaler select bit 2
 
 // Timer clock prescaler select:
 #define TMR_PRSC_2    0 // CLK/2
@@ -318,6 +368,7 @@
 #define TWI_CT_PRSC1    5 // r/w: clock prescaler select bit 1
 #define TWI_CT_PRSC2    6 // r/w: clock prescaler select bit 2
 #define TWI_CT_IRQ_EN   7 // r/w: transmission done interrupt enable
+#define TWI_CT_MACK     8 // r/w: send ack by master after transmission
 
 // TWI clock prescaler select:
 #define TWI_PRSC_2    0 // CLK/2
@@ -339,15 +390,37 @@
 #define TRNG_CT (*(REG16 0xFFEC)) // r/w: control register
 
 // TRNG control register
-#define TRNG_CT_RND0  0 // r/-: TRNG random data byte bit 0
-#define TRNG_CT_RND1  1 // r/-: TRNG random data byte bit 1
-#define TRNG_CT_RND2  2 // r/-: TRNG random data byte bit 2
-#define TRNG_CT_RND3  3 // r/-: TRNG random data byte bit 3
-#define TRNG_CT_RND4  4 // r/-: TRNG random data byte bit 4
-#define TRNG_CT_RND5  5 // r/-: TRNG random data byte bit 5
-#define TRNG_CT_RND6  6 // r/-: TRNG random data byte bit 6
-#define TRNG_CT_RND7  7 // r/-: TRNG random data byte bit 7
-#define TRNG_CT_EN   15 // r/w: TRNG enable
+#define TRNG_CT_DATA0     0 // r/-: TRNG random data byte bit 0
+#define TRNG_CT_DATA1     1 // r/-: TRNG random data byte bit 1
+#define TRNG_CT_DATA2     2 // r/-: TRNG random data byte bit 2
+#define TRNG_CT_DATA3     3 // r/-: TRNG random data byte bit 3
+#define TRNG_CT_DATA4     4 // r/-: TRNG random data byte bit 4
+#define TRNG_CT_DATA5     5 // r/-: TRNG random data byte bit 5
+#define TRNG_CT_DATA6     6 // r/-: TRNG random data byte bit 6
+#define TRNG_CT_DATA7     7 // r/-: TRNG random data byte bit 7
+#define TRNG_CT_DATA8     8 // r/-: TRNG random data byte bit 8
+#define TRNG_CT_DATA9     9 // r/-: TRNG random data byte bit 9
+#define TRNG_CT_DATA10   10 // r/-: TRNG random data byte bit 10
+#define TRNG_CT_DATA11   11 // r/-: TRNG random data byte bit 11
+// --
+#define TRNG_CT_TAP00_EN  0 // -/w: Activate tap 0 switch
+#define TRNG_CT_TAP01_EN  1 // -/w: Activate tap 1 switch
+#define TRNG_CT_TAP02_EN  2 // -/w: Activate tap 2 switch
+#define TRNG_CT_TAP03_EN  3 // -/w: Activate tap 3 switch
+#define TRNG_CT_TAP04_EN  4 // -/w: Activate tap 4 switch
+#define TRNG_CT_TAP05_EN  5 // -/w: Activate tap 5 switch
+#define TRNG_CT_TAP06_EN  6 // -/w: Activate tap 6 switch
+#define TRNG_CT_TAP07_EN  7 // -/w: Activate tap 7 switch
+#define TRNG_CT_TAP08_EN  8 // -/w: Activate tap 8 switch
+#define TRNG_CT_TAP09_EN  9 // -/w: Activate tap 9 switch
+#define TRNG_CT_TAP10_EN 10 // -/w: Activate tap 10 switch
+#define TRNG_CT_TAP11_EN 11 // -/w: Activate tap 11 switch
+#define TRNG_CT_TAP12_EN 12 // -/w: Activate tap 12 switch
+#define TRNG_CT_TAP13_EN 13 // -/w: Activate tap 13 switch
+// --
+#define TRNG_CT_EN       14 // r/w: TRNG enable
+#define TRNG_CT_VALID    15 // r/-: TRNG output byte is valid
+
 
 
 // ----------------------------------------------------------------------------
@@ -356,14 +429,13 @@
 #define EXIRQ_CT (*(REG16 0xFFEE)) // r/w: control register
 
 // EXIRQ control register
-#define EXIRQ_CT_SRC0         0 // r/-: IRQ source bit 0
-#define EXIRQ_CT_SRC1         1 // r/-: IRQ source bit 1
-#define EXIRQ_CT_SRC2         2 // r/-: IRQ source bit 2
+#define EXIRQ_CT_SEL0         0 // r/w: IRQ source bit 0 / SW_IRQ select
+#define EXIRQ_CT_SEL1         1 // r/w: IRQ source bit 1 / SW_IRQ select
+#define EXIRQ_CT_SEL2         2 // r/w: IRQ source bit 2 / SW_IRQ select
 #define EXIRQ_CT_EN           3 // r/w: unit enable
-#define EXIRQ_CT_SW_IRQ       4 // -/w: enable SW IRQ trigger, auto-clears
-#define EXIRQ_CT_SW_IRQ_SEL0  5 // -/w: SW IRQ select bit 0, read as zero
-#define EXIRQ_CT_SW_IRQ_SEL1  6 // -/w: SW IRQ select bit 1, read as zero
-#define EXIRQ_CT_SW_IRQ_SEL2  7 // -/w: SW IRQ select bit 2, read as zero
+#define EXIRQ_CT_SW_IRQ       4 // -/w: use irq_sel as SW IRQ trigger, auto-clears
+#define EXIRQ_CT_ACK_IRQ      5 // -/w: use irq_sel as ACK select, auto-clears
+// ...
 #define EXIRQ_CT_IRQ0_EN      8 // r/w: Enable IRQ channel 0
 #define EXIRQ_CT_IRQ1_EN      9 // r/w: Enable IRQ channel 1
 #define EXIRQ_CT_IRQ2_EN     10 // r/w: Enable IRQ channel 2
@@ -381,7 +453,7 @@
 #define CPUID1 (*(ROM16 0xFFF2)) // r/-: synthesized system features
 #define CPUID2 (*(ROM16 0xFFF4)) // r/-: custom user code
 #define CPUID3 (*(ROM16 0xFFF6)) // r/-: IMEM/ROM size in bytes
-#define CPUID4 (*(ROM16 0xFFF8)) // r/-: reserved
+#define CPUID4 (*(ROM16 0xFFF8)) // r/-: advanced/experimental hardware configuration features
 #define CPUID5 (*(ROM16 0xFFFA)) // r/-: DMEM/RAM size in bytes
 #define CPUID6 (*(ROM16 0xFFFC)) // r/-: clock speed (in Hz) low part
 #define CPUID7 (*(ROM16 0xFFFE)) // r/-: clock speed (in Hz) high part
@@ -391,7 +463,7 @@
 #define SYS_FEATURES  CPUID1 // r/-: synthesized system features
 #define USER_CODE     CPUID2 // r/-: custom user code
 #define IMEM_SIZE     CPUID3 // r/-: IMEM/ROM size in bytes
-//#define             CPUID4 // r/-: reserved
+#define NX_FEATURES   CPUID4 // r/-: advanced/experimental hardware configuration features
 #define DMEM_SIZE     CPUID5 // r/-: DMEM/RAM size in bytes
 #define CLOCKSPEED_LO CPUID6 // r/-: clock speed (in Hz) low part
 #define CLOCKSPEED_HI CPUID7 // r/-: clock speed (in Hz) high part
@@ -400,22 +472,33 @@
 #define CLOCKSPEED_32bit (*(ROM32 (&CLOCKSPEED_LO))) // r/-: clock speed (in Hz)
 
 // SYS features
-#define SYS_MULDIV_EN 0 // r/-: MULDIV synthesized
-#define SYS_WB32_EN   1 // r/-: WB32 synthesized
-#define SYS_WDT_EN    2 // r/-: WDT synthesized
-#define SYS_GPIO_EN   3 // r/-: GPIO synthesized
-#define SYS_TIMER_EN  4 // r/-: TIMER synthesized
-#define SYS_UART_EN   5 // r/-: UART synthesized
-#define SYS_DADD_EN   6 // r/-: DADD instruction synthesized
-#define SYS_BTLD_EN   7 // r/-: Bootloader installed and enabled
-#define SYS_IROM_EN   8 // r/-: Implement IMEM as true ROM
-#define SYS_CRC_EN    9 // r/-: CRC synthesized
-#define SYS_CFU_EN   10 // r/-: CFU synthesized
-#define SYS_PWM_EN   11 // r/-: PWM controller synthesized
-#define SYS_TWI_EN   12 // r/-: TWI synthesized
-#define SYS_SPI_EN   13 // r/-: SPI synthesized
-#define SYS_TRNG_EN  14 // r/-: TRNG synthesized
-#define SYS_EXIRQ_EN 15 // r/-: EXIRQ synthesized
+#define SYS_MULDIV_EN    0 // r/-: MULDIV synthesized
+#define SYS_WB32_EN      1 // r/-: WB32 synthesized
+#define SYS_WDT_EN       2 // r/-: WDT synthesized
+#define SYS_GPIO_EN      3 // r/-: GPIO synthesized
+#define SYS_TIMER_EN     4 // r/-: TIMER synthesized
+#define SYS_UART_EN      5 // r/-: UART synthesized
+#define SYS_FREQ_GEN_EN  6 // r/-: FREQ_GEN synthesized
+#define SYS_BTLD_EN      7 // r/-: Bootloader installed and enabled
+#define SYS_IROM_EN      8 // r/-: Implement IMEM as true ROM
+#define SYS_CRC_EN       9 // r/-: CRC synthesized
+#define SYS_CFU_EN      10 // r/-: CFU synthesized
+#define SYS_PWM_EN      11 // r/-: PWM controller synthesized
+#define SYS_TWI_EN      12 // r/-: TWI synthesized
+#define SYS_SPI_EN      13 // r/-: SPI synthesized
+#define SYS_TRNG_EN     14 // r/-: TRNG synthesized
+#define SYS_EXIRQ_EN    15 // r/-: EXIRQ synthesized
+
+// NX features (advanced/experimental features)
+#define NX_DSP_MUL_EN   0 // r/-: using DSP-blocks for MULDIV.multiplier
+#define NX_XALU_EN      1 // r/-: implement eXtended ALU functions
+#define NX_LOWPOWER_EN  2 // r/-: use low-power implementation (experimental!)
+
+
+// ----------------------------------------------------------------------------
+// ~~ EXPERIMENTAL ~~
+// ----------------------------------------------------------------------------
+#define NEO430_DEVNULL (*(REG16 0xFF00)) // r/w: read: 0, write: no effect
 
 
 // ----------------------------------------------------------------------------
@@ -424,6 +507,7 @@
 #include "neo430_cpu.h"
 #include "neo430_crc.h"
 #include "neo430_exirq.h"
+#include "neo430_freq_gen.h"
 #include "neo430_gpio.h"
 #include "neo430_muldiv.h"
 #include "neo430_pwm.h"

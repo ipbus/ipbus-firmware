@@ -18,18 +18,24 @@ bool checkack(uint32_t delayVal);
 int16_t write_i2c_address(uint8_t addr , uint8_t nToWrite , uint8_t data[], bool stop);
 void dump_wb(void);
 uint32_t hex_str_to_uint32(char *buffer);
+uint16_t hex_str_to_uint16(char *buffer);
 void delay(uint32_t n );
 bool enable_i2c_bridge();
 int64_t read_E24AA025E48T();
 uint16_t zero_buffer( uint8_t buffer[] , uint16_t elements);
 int16_t write_Prom();
 uint32_t read_Prom();
+int16_t write_PromGPO();
+uint16_t read_PromGPO();
+
 int16_t  read_i2c_prom( uint8_t startAddress , uint8_t wordsToRead , uint8_t buffer[] );
 int16_t write_i2c_prom( uint8_t startAddress , uint8_t wordsToWrite, uint8_t buffer[] );
 void uint8_to_decimal_str( uint8_t value , uint8_t *buffer) ;
 void print_IP_address( uint32_t ipAddr);
+void print_MAC_address( uint64_t macAddr);
+void print_GPO( uint16_t gpo);
 
-#define DEBUG 1
+// #define DEBUG 1
 #define DELAYVAL 512
 
 #define MAX_CMD_LENGTH 16
@@ -79,6 +85,9 @@ void print_IP_address( uint32_t ipAddr);
 
 // PROM memory address start...
 #define PROMMEMORYADDR 0x00
+
+// Define area for general purpose flags.
+#define PROMMEMORY_GPO_ADDR 0x10
 
 // UID location in PROM memory ...
 #define PROMUIDADDR 0xFA

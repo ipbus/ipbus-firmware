@@ -63,6 +63,7 @@ entity enclustra_ax3_pm3_macprom_infra is
 		uid_sda_o: out std_logic;
 		uid_scl_i: in std_logic;
 		uid_sda_i: in std_logic;
+		gp_o: out std_logic_vector(11 downto 0); -- General purpose output from soft-core CPU
 		ipb_in: in ipb_rbus; -- ipbus
 		ipb_out: out ipb_wbus
 	);
@@ -78,7 +79,8 @@ architecture rtl of enclustra_ax3_pm3_macprom_infra is
 	signal mac_addr: std_logic_vector(47 downto 0); -- MAC address
 	signal ip_addr:  std_logic_vector(31 downto 0); -- IP address
 	signal internal_nuke, neo430_nuke: std_logic;
-
+    signal RARP_select : std_logic; -- set high to use RARP
+    
 begin
 
 --	DCM clock generation for internal bus, ethernet
@@ -140,6 +142,8 @@ begin
 	    	scl_i      => uid_scl_i,                       -- the actual state of the line back to NEO
     		sda_o      => uid_sda_o,                        -- I2C data from NEO
     		sda_i      => uid_sda_i,
+    		use_rarp_o => RARP_select,
+    		gp_o       => gp_o,
     		ip_addr_o  => ip_addr,
     		mac_addr_o => mac_addr,
     		ipbus_rst_o => neo430_nuke
@@ -192,6 +196,7 @@ begin
 			mac_tx_ready => mac_tx_ready,
 			ipb_out => ipb_out,
 			ipb_in => ipb_in,
+			RARP_select => RARP_select,
 			mac_addr => mac_addr,
 			ip_addr => ip_addr,
 			pkt => pkt
