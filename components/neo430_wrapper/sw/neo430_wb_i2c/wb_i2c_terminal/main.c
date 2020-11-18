@@ -32,9 +32,9 @@
 // Libraries
 #include <stdint.h>
 #include <string.h>
-#include "../../lib/neo430/include/neo430.h"
-#include "../../lib/neo430/include/neo430_i2c.h"
-#include "../../lib/neo430/include/neo430_wishbone_mac_ip.h"
+#include "neo430.h"
+#include "neo430_i2c.h"
+#include "neo430_wishbone_mac_ip.h"
 #include <stdbool.h>
 
 // Configuration
@@ -72,8 +72,8 @@ int setMacIP(void){
   neo430_wishbone_writeRarpFlag(useRARP);
 
   // then read the value to write to general purpose output (used for endpoint addr in DUNE)
-  //gpo = read_PromGPO();
-  //neo430_gpio_port_set(gpo);
+  gpo = read_PromGPO();
+  neo430_gpio_port_set(gpo);
 
   // then release IPBus reset line
   neo430_wishbone_writeIPBusReset(false);
@@ -94,9 +94,9 @@ int main(void) {
   neo430_uart_setup(BAUD_RATE);
   //  USI_CT = (1<<USI_CT_EN);
  
-  neo430_uart_br_print("\n---------------------------------------\n"
-                          "- I2C Wishbone Explorer Terminal v0.13 -\n"
-                          "--------------------------------------\n\n");
+  neo430_uart_br_print( "\n----------------------------------------\n"
+                          "- IPBus Address Control Terminal v0.14 -\n"
+                          "----------------------------------------\n\n");
 
   // check if WB unit was synthesized, exit if no WB is available
   if (!(SYS_FEATURES & (1<<SYS_WB32_EN))) {

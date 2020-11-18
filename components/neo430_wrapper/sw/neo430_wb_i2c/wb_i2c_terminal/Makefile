@@ -30,10 +30,10 @@
 EFFORT = -Os
 
 # User's application sources (add additional files here)
-APP_SRC = main.c 
+APP_SRC = main.c ../lib/source/neo430_i2c.c ../lib/source/neo430_wishbone_mac_ip.c
 
 # User's application include folders (don't forget the '-I' before each entry)
-APP_INC = -I .
+APP_INC = -I . -I ../lib/include
 #-------------------------------------------------------------------------------
 
 
@@ -41,16 +41,21 @@ APP_INC = -I .
 #-------------------------------------------------------------------------------
 # NEO430 framework
 #-------------------------------------------------------------------------------
+# This is a bit fragile ... point to neo430 checked out from github.
+NEO430_REPO_PATH=../../../../../../neo430/sw
 # Path to NEO430 linker script and startup file
-NEO430_COM_PATH=../../common
+NEO430_COM_PATH=$(NEO430_REPO_PATH)/common
 # Path to main NEO430 library include files
-NEO430_INC_PATH=../../lib/neo430/include
+NEO430_INC_PATH=$(NEO430_REPO_PATH)/lib/neo430/include
 # Path to main NEO430 library source files
-NEO430_SRC_PATH=../../lib/neo430/source
+NEO430_SRC_PATH=$(NEO430_REPO_PATH)/lib/neo430/source
 # Path to NEO430 executable generator
-NEO430_EXE_PATH=../../tools/image_gen
+NEO430_EXE_PATH=$(NEO430_REPO_PATH)/tools/image_gen
+
 # Path to NEO430 core rtl folder
 NEO430_RTL_PATH=../../../firmware/hdl
+# Path to location of Neo430 linker script - edit this if you want to change ROM,RAM size
+NEO430_LINKER_SCRIPT_PATH=../common
 
 
 #-------------------------------------------------------------------------------
@@ -130,7 +135,7 @@ $(OBJ): %.o : %.c crt0.elf
 
 # Link object files
 main.elf: $(OBJ)
-	@$(CC) $(LD_OPTS) $(EFFORT) -I $(NEO430_INC_PATH) $(APP_INC) -T $(NEO430_COM_PATH)/neo430_linker_script.x $(OBJ) -o $@ -lm
+	@$(CC) $(LD_OPTS) $(EFFORT) -I $(NEO430_INC_PATH) $(APP_INC) -T $(NEO430_LINKER_SCRIPT_PATH)/neo430_linker_script.x $(OBJ) -o $@ -lm
 	@echo Memory utilization:
 	@$(SIZE) main.elf
 
