@@ -42,7 +42,7 @@ APP_INC = -I . -I ../lib/include
 # NEO430 framework
 #-------------------------------------------------------------------------------
 # This is a bit fragile ... point to neo430 checked out from github.
-NEO430_REPO_PATH=../../../../../../neo430/sw
+NEO430_REPO_PATH=../../../../../neo430/sw
 # Path to NEO430 linker script and startup file
 NEO430_COM_PATH=$(NEO430_REPO_PATH)/common
 # Path to main NEO430 library include files
@@ -53,7 +53,7 @@ NEO430_SRC_PATH=$(NEO430_REPO_PATH)/lib/neo430/source
 NEO430_EXE_PATH=$(NEO430_REPO_PATH)/tools/image_gen
 
 # Path to NEO430 core rtl folder
-NEO430_RTL_PATH=../../../firmware/hdl
+NEO430_RTL_PATH=../../firmware/hdl
 # Path to location of Neo430 linker script - edit this if you want to change ROM,RAM size
 NEO430_LINKER_SCRIPT_PATH=../common
 
