@@ -26,5 +26,5 @@
 
 src -c boards/enclustra_ax3_pm3/synth top_enclustra_ax3_pm3.vhd
 include ram_slaves_tester.dep
-include -c boards/enclustra_ax3_pm3/synth a35.dep
+include -c boards/enclustra_ax3_pm3/synth a35-2.dep
 include -c boards/enclustra_ax3_pm3/synth enclustra_ax3_pm3.dep
