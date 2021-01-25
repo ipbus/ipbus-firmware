@@ -78,7 +78,10 @@ entity ipbus_ctrl is
 		mac_addr: in std_logic_vector(47 downto 0) := X"000000000000"; -- Static MAC and IP addresses
 		ip_addr: in std_logic_vector(31 downto 0) := X"00000000";
 		enable: in std_logic := '1';
-		RARP_select: in std_logic := '0';
+		ipam_select: in std_logic := '0';
+		actual_mac_addr: out std_logic_vector(47 downto 0); -- actual MAC and IP addresses
+		actual_ip_addr: out std_logic_vector(31 downto 0);
+		Got_IP_addr: OUT std_logic;
 		pkt: out std_logic;
 		pkt_oob: out std_logic;
 		oob_in: in ipbus_trans_in_array(N_OOB - 1 downto 0) := (others => ('0', X"00000000", '0'));
@@ -95,7 +98,7 @@ architecture rtl of ipbus_ctrl is
   signal cfg, cfg_out: std_logic_vector(127 downto 0);
   signal my_mac_addr: std_logic_vector(47 downto 0);
   signal my_ip_addr, my_ip_addr_udp: std_logic_vector(31 downto 0);
-  signal udp_en, rarp_en: std_logic;
+  signal udp_en, ipam_en: std_logic;
   signal buf_in_a: ipbus_trans_in_array(N_OOB downto 0);
   signal buf_out_a: ipbus_trans_out_array(N_OOB downto 0);
   signal pkts: std_logic_vector(N_OOB downto 0);
@@ -119,7 +122,7 @@ begin
 			IP_addr => my_ip_addr,
 			MAC_addr => my_mac_addr,
 			enable => udp_en,
-			RARP => rarp_en,
+			ipam => ipam_en,
 			mac_rx_data => mac_rx_data,
 			mac_rx_error => mac_rx_error,
 			mac_rx_last => mac_rx_last,
@@ -137,6 +140,7 @@ begin
 			mac_tx_last => mac_tx_last,
 			mac_tx_valid => mac_tx_valid,
 			My_IP_addr => my_ip_addr_udp,
+			Got_IP_addr => Got_IP_addr,
 			pkt_rdy => trans_in_udp.pkt_rdy,
 			rdata => trans_in_udp.rdata,
 			rxpacket_ignored => udp_rxpacket_ignored,
@@ -197,7 +201,12 @@ begin
     '1' when EXTERNAL,
     '0' when others;
 
-  cfg_out <= my_ip_addr_udp & X"00" & "000" & not rst_macclk & mac_src_flag & ip_src_flag & rarp_en & udp_en & my_mac_addr & X"00000000";
+  cfg_out <= my_ip_addr_udp & X"00" & "000" & not rst_macclk & mac_src_flag & ip_src_flag & ipam_en & udp_en & my_mac_addr & X"00000000";
+
+-- expose actual MAC and IP addresses
+  actual_mac_addr <= my_mac_addr;
+  actual_ip_addr <= my_ip_addr_udp;
+
 	
 	with MAC_CFG select my_mac_addr <=
 		mac_addr when EXTERNAL,
@@ -209,6 +218,6 @@ begin
 		
 	udp_en <= cfg(80) or enable;
 
-	rarp_en <= cfg(81) or RARP_select;
+	ipam_en <= cfg(81) or ipam_select;
 			
 end rtl;

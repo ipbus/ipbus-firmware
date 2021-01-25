@@ -45,7 +45,7 @@ entity udp_clock_crossing_if is
     rx_req_send_125: in std_logic;
     tx_write_buffer_125: in std_logic_vector(BUFWIDTH - 1 downto 0);
     enable_125: out std_logic;
-    rarp_125: out std_logic;
+    ipam_125: out std_logic;
     rst_ipb_125: out std_logic;
     rx_ram_sent: out std_logic;
     tx_ram_written: out std_logic;
@@ -57,7 +57,7 @@ entity udp_clock_crossing_if is
     enable: in std_logic;
     pkt_done_read: in std_logic;
     pkt_done_write: in std_logic;
-    RARP: in std_logic;
+    ipam: in std_logic;
     we: in std_logic;
     busy: out std_logic;
     pkt_rdy: out std_logic;
@@ -69,23 +69,23 @@ end udp_clock_crossing_if;
 architecture rtl of udp_clock_crossing_if is
 
   signal req_send_tff, busy_buf, busy_up_tff, busy_down_tff: std_logic;
-  signal enable_buf, rarp_buf, we_buf, rst_ipb_buf: std_logic_vector(1 downto 0);
+  signal enable_buf, ipam_buf, we_buf, rst_ipb_buf: std_logic_vector(1 downto 0);
   signal req_send_buf, pkt_done_read_buf, pkt_done_write_buf, busy_up_buf,
   busy_down_buf, pkt_done_r_tff, pkt_done_w_tff: std_logic_vector(2 downto 0);
   signal rx_read_buf_buf, tx_write_buf_buf: std_logic_vector(BUFWIDTH - 1 downto 0);
 
-  attribute KEEP: string;
-  attribute KEEP of busy_down_buf: signal is "TRUE";
-  attribute KEEP of busy_up_buf: signal is "TRUE";
-  attribute KEEP of enable_buf: signal is "TRUE";
-  attribute KEEP of pkt_done_read_buf: signal is "TRUE";
-  attribute KEEP of pkt_done_write_buf: signal is "TRUE";
-  attribute KEEP of rarp_buf: signal is "TRUE";
-  attribute KEEP of req_send_buf: signal is "TRUE";
-  attribute KEEP of rst_ipb_buf: signal is "TRUE";
-  attribute KEEP of rx_read_buf_buf: signal is "TRUE";
-  attribute KEEP of tx_write_buf_buf: signal is "TRUE";
-  attribute KEEP of we_buf: signal is "TRUE";
+  attribute ASYNC_REG: string;
+  attribute ASYNC_REG of busy_down_buf: signal is "TRUE";
+  attribute ASYNC_REG of busy_up_buf: signal is "TRUE";
+  attribute ASYNC_REG of enable_buf: signal is "TRUE";
+  attribute ASYNC_REG of pkt_done_read_buf: signal is "TRUE";
+  attribute ASYNC_REG of pkt_done_write_buf: signal is "TRUE";
+  attribute ASYNC_REG of ipam_buf: signal is "TRUE";
+  attribute ASYNC_REG of req_send_buf: signal is "TRUE";
+  attribute ASYNC_REG of rst_ipb_buf: signal is "TRUE";
+  attribute ASYNC_REG of rx_read_buf_buf: signal is "TRUE";
+  attribute ASYNC_REG of tx_write_buf_buf: signal is "TRUE";
+  attribute ASYNC_REG of we_buf: signal is "TRUE";
 
 begin
 
@@ -97,7 +97,7 @@ begin
 -- but just to be safe do the same for pkt_done...
 
   enable_125 <= enable_buf(1);
-  rarp_125 <= rarp_buf(1);
+  ipam_125 <= ipam_buf(1);
   we_125 <= we_buf(1);
   rst_ipb_125 <= rst_ipb_buf(1);
 
@@ -170,10 +170,10 @@ enable_mac_clk: process(mac_clk)
     end if;
   end process;      
 
-rarp_mac_clk: process(mac_clk)
+ipam_mac_clk: process(mac_clk)
   begin
     if rising_edge(mac_clk) then
-      rarp_buf <= rarp_buf(0) & RARP;
+      ipam_buf <= ipam_buf(0) & ipam;
     end if;
   end process;      
 

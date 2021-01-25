@@ -36,10 +36,10 @@ entity udp_build_resend is
   port (
     mac_clk: in std_logic;
     rx_reset: in std_logic;
-    mac_rx_data: in std_logic_vector(7 downto 0);
-    mac_rx_error: in std_logic;
-    mac_rx_last: in std_logic;
-    mac_rx_valid: in std_logic;
+    my_rx_data: in std_logic_vector(7 downto 0);
+    my_rx_error: in std_logic;
+    my_rx_last: in std_logic;
+    my_rx_valid: in std_logic;
     pkt_drop_resend: in std_logic;
     pkt_resend: out std_logic;
     resend_pkt_id: out std_logic_vector(15 downto 0)
@@ -53,8 +53,8 @@ begin
 send_packet:  process (mac_clk)
   begin
     if rising_edge(mac_clk) then
-      if mac_rx_last = '1' and pkt_drop_resend = '0' and 
-      mac_rx_error = '0' then
+      if my_rx_last = '1' and pkt_drop_resend = '0' and 
+      my_rx_error = '0' then
         pkt_resend <= '1'
 -- pragma translate_off
         after 4 ns
@@ -80,11 +80,11 @@ resend_pkt_id_block: process(mac_clk)
         "11" & "11" & "11" & "11" & "1" & "1" & "11" &
         "1111" & "1111" & "11" & "11" & "11" & "11" & "100";
 	resend_pkt_id_int := (Others => '0');
-      elsif mac_rx_valid = '1' then
+      elsif my_rx_valid = '1' then
         if pkt_drop_resend = '1' then
 	  resend_pkt_id_int := (Others => '0');
         elsif pkt_mask(44) = '0' then
-          resend_pkt_id_int := resend_pkt_id_int(7 downto 0) & mac_rx_data;
+          resend_pkt_id_int := resend_pkt_id_int(7 downto 0) & my_rx_data;
         end if;
         pkt_mask := pkt_mask(43 downto 0) & '1';
       end if;
