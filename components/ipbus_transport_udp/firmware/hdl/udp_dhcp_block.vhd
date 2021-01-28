@@ -148,7 +148,7 @@ data_block:  process(mac_clk)
       --  & x"c0a800ef" & x"FFFFFFFF" crosscheck for sniped packetMSB_half_store
         & x"00440043" &  x"0109" & x"0000" &  x"01" & x"01" & x"06" & x"00" & MAC_addr(31 downto 0) & std_logic_vector(secs_elapsed)
         & x"8000" & x"00000000" & x"00000000"& x"00000000"& x"00000000" & MAC_addr & x"00000000000000000000" & zeroes_192  -- Bootstrap
-        & x"62825363" -- DHCP Magic Cookie
+        & x"63825363" -- DHCP Magic Cookie
         & x"350101"  & x"39020240" & x"37077D014206034396" --DHCP options
         & x"FF"; --end
 	  we_buffer := (Others => '1');
