@@ -39,18 +39,18 @@ entity udp_dhcp_block is
     rst_macclk: in std_logic;
     enable_125: in std_logic;
     MAC_addr: in std_logic_vector(47 downto 0);
-    dhcp_mode: in std_logic; 
-    dhcp_addr: out std_logic_vector(12 downto 0); --! ethernet RAM location write to 
-    dhcp_data: out std_logic_vector(7 downto 0); --! Data to ethernet RAM address
-    dhcp_end_addr: out std_logic_vector(12 downto 0); --! End of packet
-    dhcp_send: out std_logic; --! Trigger to send ethernet packet
-    dhcp_we: out std_logic --! write enable
+    ipam_mode: in std_logic; 
+    ipam_addr: out std_logic_vector(12 downto 0); --! ethernet RAM location write to 
+    ipam_data: out std_logic_vector(7 downto 0); --! Data to ethernet RAM address
+    ipam_end_addr: out std_logic_vector(12 downto 0); --! End of packet
+    ipam_send: out std_logic; --! Trigger to send ethernet packet
+    ipam_we: out std_logic --! write enable
   );
 end udp_dhcp_block;
 
 architecture rtl of udp_dhcp_block is
 
-  signal dhcp_we_sig: std_logic;
+  signal ipam_we_sig: std_logic;
   signal address: unsigned(11 downto 0);
   signal dhcp_req, tick: std_logic;
   signal rndm: std_logic_vector(4 downto 0);
@@ -58,28 +58,28 @@ architecture rtl of udp_dhcp_block is
   
 begin
 
-  dhcp_we <= dhcp_we_sig;
-  dhcp_addr <= std_logic_vector("0" & address);
+  ipam_we <= ipam_we_sig;
+  ipam_addr <= std_logic_vector("0" & address);
   
 send_packet:  process (mac_clk)
   variable last_we, send_i: std_logic := '0';
   variable end_addr_i: std_logic_vector(12 downto 0);
   begin
     if rising_edge(mac_clk) then
-      if dhcp_we_sig = '0' and last_we = '1' then
+      if ipam_we_sig = '0' and last_we = '1' then
         end_addr_i := "0" & x"12a";
 	send_i := '1';
       else
         end_addr_i := (Others => '0');
 	send_i := '0';
       end if;
-      last_we := dhcp_we_sig;
-      dhcp_end_addr <= end_addr_i
+      last_we := ipam_we_sig;
+      ipam_end_addr <= end_addr_i
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
       ;
-      dhcp_send <= send_i
+      ipam_send <= send_i
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
@@ -154,12 +154,12 @@ data_block:  process(mac_clk)
 	  we_buffer := (Others => '1');
 	  --ipv4_head_buffer()
       end if;
-      dhcp_data <= data_buffer(2391 downto 2384)
+      ipam_data <= data_buffer(2391 downto 2384)
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
       ;
-      dhcp_we_sig <= we_buffer(298)
+      ipam_we_sig <= we_buffer(298)
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
@@ -179,7 +179,7 @@ addr_block:  process(mac_clk)
 	    counting := '0';
       elsif dhcp_req = '1' then
         counting := '1';
-      elsif dhcp_we_sig = '0' then
+      elsif ipam_we_sig = '0' then
 	next_addr := (Others => '0');
         counting := '0';
       end if;
@@ -274,7 +274,7 @@ dhcp_req_block: process(mac_clk)
       elsif req_count = req_end then
         req_count := (Others => '0');
 	    req_end := unsigned(rndm & "1");
-	    dhcp_req_int := dhcp_mode;
+	    dhcp_req_int := ipam_mode;
       elsif tick = '1' then
         req_count := req_count + 1;
 	    dhcp_req_int := '0';
