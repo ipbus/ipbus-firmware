@@ -163,7 +163,7 @@ begin
             ipb_in       => ipb_in,
             mac_addr     => mac_addr,
             ip_addr      => ip_addr,
-            RARP_select  => rarp_select,
+            ipam_select => '1',
             pkt          => pkt
             );
 
