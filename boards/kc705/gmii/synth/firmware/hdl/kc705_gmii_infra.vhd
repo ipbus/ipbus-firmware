@@ -145,6 +145,9 @@ begin
 -- ipbus control logic
 
     ipbus : entity work.ipbus_ctrl
+        generic map(
+            DHCP_RARP => '1'
+        )
         port map(
             mac_clk      => clk125,
             rst_macclk   => rst125,

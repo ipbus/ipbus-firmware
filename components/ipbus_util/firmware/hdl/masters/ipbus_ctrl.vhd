@@ -55,6 +55,9 @@ entity ipbus_ctrl is
 		IPBUSPORT: std_logic_vector(15 DOWNTO 0) := x"C351";
 -- Flag whether this UDP I/F instance ignores everything except IPBus traffic
 		SECONDARYPORT: std_logic := '0';
+-- Switch between using DHCP or RARP as the protocol for external IP address management
+-- '0' => RARP, '1' => DHCP
+  		DHCP_RARP: std_logic := '0';
 		N_OOB: natural := 0
 	);
 	port(
@@ -112,7 +115,8 @@ begin
 			INTERNALWIDTH => INTERNALWIDTH,
 			ADDRWIDTH => ADDRWIDTH,
 			IPBUSPORT => IPBUSPORT,
-			SECONDARYPORT => SECONDARYPORT
+			SECONDARYPORT => SECONDARYPORT,
+			DHCP_RARP => DHCP_RARP
 		)
 		port map(
 			mac_clk => mac_clk,

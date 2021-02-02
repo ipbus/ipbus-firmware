@@ -24,9 +24,9 @@
 ---------------------------------------------------------------------------------
 
 
--- Parses first 42 bytes of incoming ethernet packet for supported protocols
+-- Parses up to first 74 bytes of incoming ethernet packet for supported protocols
 --
--- Dave Sankey, June 2012, March 2013
+-- Dave Sankey, June 2012, March 2013, Feb 2021
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -34,7 +34,8 @@ use ieee.std_logic_1164.all;
 entity udp_packet_parser is
   generic(
     IPBUSPORT: std_logic_vector(15 DOWNTO 0) := x"C351";
-    SECONDARYPORT: std_logic := '0'
+    SECONDARYPORT: std_logic := '0';
+    DHCP_RARP: std_logic := '0' -- '0' => RARP, '1' => DHCP
   );
   port (
     mac_clk: in std_logic;
@@ -62,18 +63,17 @@ end udp_packet_parser;
 
 architecture v3 of udp_packet_parser is
 
-  signal pkt_drop_arp_sig, pkt_drop_ipam_sig, pkt_drop_ping_sig: std_logic;
-  signal pkt_drop_ip_sig, pkt_drop_ipbus_sig: std_logic;
+  signal pkt_drop_ip_sig, pkt_drop_ipbus_sig, pkt_broadcast_sig: std_logic;
   signal pkt_drop_payload_sig, pkt_payload_drop_sig: std_logic;
   signal pkt_drop_reliable_sig, pkt_reliable_drop_sig: std_logic;
   signal ipbus_status_mask, ipbus_hdr_mask: std_logic;
 
 begin
 
-  pkt_drop_ipam <= pkt_drop_ipam_sig;
   pkt_drop_ipbus <= pkt_drop_ipbus_sig;
   pkt_drop_payload <= pkt_drop_payload_sig and pkt_payload_drop_sig;
   pkt_byteswap <= pkt_drop_payload_sig;
+  pkt_broadcast <= pkt_broadcast_sig;
 
 secondary_mode: if SECONDARYPORT = '1' generate
 -- Don't respond to arp or ping (but do capture rarp...)
@@ -82,9 +82,6 @@ secondary_mode: if SECONDARYPORT = '1' generate
 end generate secondary_mode;
 
 primary_mode: if SECONDARYPORT = '0' generate
-  pkt_drop_arp <= pkt_drop_arp_sig;
-  pkt_drop_ping <= pkt_drop_ping_sig;
-
 -- ARP:
 -- Ethernet DST_MAC(6), SRC_MAC(6), Ether_Type = x"0806"
 -- HTYPE = x"0001"
@@ -118,7 +115,7 @@ arp:  process (mac_clk)
         end if;
         pkt_mask := pkt_mask(40 downto 0) & '1';
       end if;
-      pkt_drop_arp_sig <= pkt_drop
+      pkt_drop_arp <= pkt_drop
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
@@ -164,7 +161,7 @@ ping:  process (mac_clk)
         end if;
         pkt_mask := pkt_mask(34 downto 0) & '1';
       end if;
-      pkt_drop_ping_sig <= pkt_drop
+      pkt_drop_ping <= pkt_drop
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
@@ -174,6 +171,7 @@ ping:  process (mac_clk)
 
 end generate primary_mode;
 
+rarp_reply: if DHCP_RARP = '0' generate
 -- RARP:
 -- Ethernet DST_MAC(6) = My_MAC_addr, SRC_MAC(6), Ether_Type = x"8035"
 -- HTYPE = x"0001"
@@ -205,13 +203,60 @@ rarp:  process (mac_clk)
         end if;
         pkt_mask := pkt_mask(20 downto 0) & '1';
       end if;
-      pkt_drop_ipam_sig <= pkt_drop
+      pkt_drop_ipam <= pkt_drop
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
       ;
     end if;
   end process;
+end generate rarp_reply;
+
+dhcp_offer: if DHCP_RARP = '1' generate
+-- DHCPOFFER:
+-- Ethernet DST_MAC(6) = Broadcast, SRC_MAC(6), Ether_Type = x"0800"
+-- IP VERS = x"4", HL = x"5"
+-- TOS/DSCP, IP LEN, IP ID, IP FLAG-FRAG, IP TTL, PROTO = UDP (x"11")
+-- IP CKSUM, IP SPA(4), IP DPA(4)
+-- UDP SRCPORT = 67 (x"0043")
+-- UDP DSTPORT = 68 (x"0044")
+-- UDP length, cksum
+-- DHCP Boot reply = x"02", Hardware Ethernet = x"01", length = x"06"
+-- DHCP Hops, transaction ID, seconds, flags, IP addresses (4*4)
+-- DHCP Client MAC address = My_MAC_addr
+dhcp:  process (mac_clk)
+  variable pkt_data: std_logic_vector(135 downto 0);
+  variable pkt_mask: std_logic_vector(73 downto 0);
+  variable pkt_drop: std_logic;
+  begin
+    if rising_edge(mac_clk) then
+      if rx_reset = '1' then
+        pkt_mask := "111111" & "111111" & "00" & "01" & "1111" & "1110" &
+		"11" & "1111" & "1111" & "0000" & "1111" & "0001" &
+		"111111" & "1111" & "1111" & "1111" & "1111" & "000000"
+        pkt_data := x"0800" & x"45" & x"11" & x"0043" & x"0044" & x"020106" & My_MAC_addr;
+        pkt_drop := not enable_125;
+      elsif my_rx_last = '1' then
+        pkt_drop := '1';
+      elsif my_rx_valid = '1' then
+        if pkt_broadcast_sig = '0' then
+        	pkt_drop := '1';
+        elsif pkt_mask(21) = '0' then
+          if pkt_data(127 downto 120) /= my_rx_data then
+            pkt_drop := '1';
+          end if;
+          pkt_data := pkt_data(119 downto 0) & x"00";
+        end if;
+        pkt_mask := pkt_mask(20 downto 0) & '1';
+      end if;
+      pkt_drop_ipam <= pkt_drop
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+    end if;
+  end process;
+end generate dhcp_offer;
 
 -- IP packet:
 -- Ethernet DST_MAC(6) = My_MAC_addr, SRC_MAC(6), Ether_Type = x"0800"
@@ -533,7 +578,7 @@ broadcast:  process (mac_clk)
         end if;
         pkt_mask := pkt_mask(4 downto 0) & '1';
       end if;
-      pkt_broadcast <= broadcast_int
+      pkt_broadcast_sig <= broadcast_int
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on

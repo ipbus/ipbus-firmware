@@ -51,7 +51,11 @@ ENTITY UDP_if IS
  	 IPBUSPORT: std_logic_vector(15 DOWNTO 0) := x"C351";
 
 -- Flag whether this instance ignores everything except IPBus traffic
-  	SECONDARYPORT: std_logic := '0'
+  	SECONDARYPORT: std_logic := '0';
+
+-- Switch between using DHCP or RARP as the protocol for external IP address management
+-- '0' => RARP, '1' => DHCP
+  	DHCP_RARP: std_logic := '0'
   );
   PORT( 
 		mac_clk: IN std_logic;
@@ -491,7 +495,8 @@ end generate primary_mode;
 	rx_packet_parser: entity work.udp_packet_parser
 		GENERIC MAP (
 			IPBUSPORT => IPBUSPORT,
-			SECONDARYPORT => SECONDARYPORT
+			SECONDARYPORT => SECONDARYPORT,
+			DHCP_RARP => DHCP_RARP
 		)
 		PORT MAP (
 			mac_clk => mac_clk,
