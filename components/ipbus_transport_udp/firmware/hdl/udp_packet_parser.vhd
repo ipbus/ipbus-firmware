@@ -225,7 +225,7 @@ dhcp_offer: if DHCP_RARP = '1' generate
 -- DHCP Hops, transaction ID, seconds, flags, IP addresses (4*4)
 -- DHCP Client MAC address = My_MAC_addr
 dhcp:  process (mac_clk)
-  variable pkt_data: std_logic_vector(135 downto 0);
+  variable pkt_data: std_logic_vector(111 downto 0);
   variable pkt_mask: std_logic_vector(73 downto 0);
   variable pkt_drop: std_logic;
   begin
