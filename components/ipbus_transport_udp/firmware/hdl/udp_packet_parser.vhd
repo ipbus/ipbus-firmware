@@ -241,13 +241,13 @@ dhcp:  process (mac_clk)
       elsif my_rx_valid = '1' then
         if pkt_broadcast_sig = '0' then
         	pkt_drop := '1';
-        elsif pkt_mask(21) = '0' then
-          if pkt_data(127 downto 120) /= my_rx_data then
+        elsif pkt_mask(73) = '0' then
+          if pkt_data(135 downto 128) /= my_rx_data then
             pkt_drop := '1';
           end if;
-          pkt_data := pkt_data(119 downto 0) & x"00";
+          pkt_data := pkt_data(127 downto 0) & x"00";
         end if;
-        pkt_mask := pkt_mask(20 downto 0) & '1';
+        pkt_mask := pkt_mask(72 downto 0) & '1';
       end if;
       pkt_drop_ipam <= pkt_drop
 -- pragma translate_off
