@@ -225,7 +225,7 @@ dhcp_offer: if DHCP_RARP = '1' generate
 -- DHCP Hops, transaction ID, seconds, flags, IP addresses (4*4)
 -- DHCP Client MAC address = My_MAC_addr
 dhcp:  process (mac_clk)
-  variable pkt_data: std_logic_vector(111 downto 0);
+  variable pkt_data: std_logic_vector(135 downto 0);
   variable pkt_mask: std_logic_vector(73 downto 0);
   variable pkt_drop: std_logic;
   begin
@@ -233,7 +233,7 @@ dhcp:  process (mac_clk)
       if rx_reset = '1' then
         pkt_mask := "111111" & "111111" & "00" & "01" & "1111" & "1110" &
 		"11" & "1111" & "1111" & "0000" & "1111" & "0001" &
-		"111111" & "1111" & "1111" & "1111" & "1111" & "000000"
+		"111111" & "1111" & "1111" & "1111" & "1111" & "000000";
         pkt_data := x"0800" & x"45" & x"11" & x"0043" & x"0044" & x"020106" & My_MAC_addr;
         pkt_drop := not enable_125;
       elsif my_rx_last = '1' then
