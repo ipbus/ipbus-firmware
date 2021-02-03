@@ -301,7 +301,10 @@ primary_mode: if SECONDARYPORT = '0' generate
 	rx_int_valid <= int_valid_ping or int_valid_payload;
 	rx_int_data <= int_data_payload when int_valid_payload = '1' else int_data_ping;
 	
-	DHCP_block: entity work.udp_dhcp_block
+	IPAM_block: entity work.udp_ipam_block
+		GENERIC MAP (
+			DHCP_RARP => DHCP_RARP
+		)
 		PORT MAP (
 			mac_clk => mac_clk,
 			rst_macclk => rst_macclk_reg,
@@ -356,7 +359,10 @@ primary_mode: if SECONDARYPORT = '0' generate
 
 end generate primary_mode;
 
-	IPADDR: entity work.udp_ipaddr_rarp
+	IPADDR: entity work.udp_ipaddr_ipam
+		GENERIC MAP (
+			DHCP_RARP => DHCP_RARP
+		)
 		PORT MAP (
 			mac_clk => mac_clk,
 			rst_macclk => rst_macclk_reg,

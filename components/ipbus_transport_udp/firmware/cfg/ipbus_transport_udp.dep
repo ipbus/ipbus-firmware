@@ -39,9 +39,9 @@ src udp_do_rx_reset.vhd
 src udp_dualportram.vhd
 src udp_dualportram_rx.vhd
 src udp_dualportram_tx.vhd
-src udp_ipaddr_rarp.vhd
+src udp_ipaddr_ipam.vhd
 src udp_packet_parser.vhd
-src udp_dhcp_block.vhd
+src udp_ipam_block.vhd
 src udp_rxram_mux.vhd
 src udp_rxram_shim.vhd
 src udp_rxtransactor_if_simple.vhd

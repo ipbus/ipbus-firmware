@@ -33,7 +33,12 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity udp_ipaddr_rarp is
+entity udp_ipaddr_ipam is
+  generic(
+-- Switch between using DHCP or RARP as the protocol for external IP address management
+-- '0' => RARP, '1' => DHCP
+  	DHCP_RARP: std_logic := '0'
+  );
   port (
     mac_clk: in std_logic;
     rst_macclk: in std_logic;
@@ -51,9 +56,9 @@ entity udp_ipaddr_rarp is
     My_IP_addr: out std_logic_vector(31 downto 0);
     ipam_mode: out std_logic
   );
-end udp_ipaddr_rarp;
+end udp_ipaddr_ipam;
 
-architecture rtl of udp_ipaddr_rarp is
+architecture rtl of udp_ipaddr_ipam is
 
   signal MAC_IP_addr_rx_vld: std_logic;
   signal MAC_IP_addr_rx: std_logic_vector(79 downto 0);

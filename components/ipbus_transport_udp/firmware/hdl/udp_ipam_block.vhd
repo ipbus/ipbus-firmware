@@ -24,7 +24,7 @@
 ---------------------------------------------------------------------------------
 
 
--- Builds outbound dhcp request at random intervals...
+-- Builds outbound rarp or dhcp request at random intervals...
 --
 -- Dave Sankey, June 2013
 -- Gareth Bird, December 2020
@@ -33,7 +33,12 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity udp_dhcp_block is
+entity udp_ipam_block is
+  generic(
+-- Switch between using DHCP or RARP as the protocol for external IP address management
+-- '0' => RARP, '1' => DHCP
+  	DHCP_RARP: std_logic := '0'
+  );
   port (
     mac_clk: in std_logic;
     rst_macclk: in std_logic;
@@ -46,13 +51,13 @@ entity udp_dhcp_block is
     ipam_send: out std_logic; --! Trigger to send ethernet packet
     ipam_we: out std_logic --! write enable
   );
-end udp_dhcp_block;
+end udp_ipam_block;
 
-architecture rtl of udp_dhcp_block is
+architecture rtl of udp_ipam_block is
 
   signal ipam_we_sig: std_logic;
   signal address: unsigned(11 downto 0);
-  signal dhcp_req, tick: std_logic;
+  signal ipam_req, tick: std_logic;
   signal rndm: std_logic_vector(4 downto 0);
   signal secs_elapsed: unsigned(15 downto 0) := (others=> '0');
   
@@ -60,33 +65,8 @@ begin
 
   ipam_we <= ipam_we_sig;
   ipam_addr <= std_logic_vector("0" & address);
-  
-send_packet:  process (mac_clk)
-  variable last_we, send_i: std_logic := '0';
-  variable end_addr_i: std_logic_vector(12 downto 0);
-  begin
-    if rising_edge(mac_clk) then
-      if ipam_we_sig = '0' and last_we = '1' then
-        end_addr_i := "0" & x"12a";
-	send_i := '1';
-      else
-        end_addr_i := (Others => '0');
-	send_i := '0';
-      end if;
-      last_we := ipam_we_sig;
-      ipam_end_addr <= end_addr_i
--- pragma translate_off
-      after 4 ns
--- pragma translate_on
-      ;
-      ipam_send <= send_i
--- pragma translate_off
-      after 4 ns
--- pragma translate_on
-      ;
-    end if;
-  end process;
 
+dhcp_discover: if DHCP_RARP = '1' generate
 -- dhcp packet structure:
 -- ETHERNET
     -- Ethernet DST_MAC(6) discover -> broadcast (FFFFFFFFFFFF) , 
@@ -118,7 +98,7 @@ send_packet:  process (mac_clk)
     -- 4 empty IPs  x"00000000" * 4
     -- MAC address
     -- 192 empty bytes (!)
--- DHCP magic cookie (x"62825363")
+-- DHCP magic cookie (x"63825363")
 -- Options
     -- Discover option x"350101"
     -- Max size (opt 57) opt size 2 msg size 576 x"39020240" 
@@ -133,8 +113,7 @@ send_packet:  process (mac_clk)
         --    Parameter Request List Item: (67) Bootfile name
         --    Parameter Request List Item: (150) TFTP Server Address
 -- end x"FF"
-
-data_block:  process(mac_clk)
+dhcp_block:  process(mac_clk)
   variable data_buffer: std_logic_vector(2391 downto 0):= (others => '0');
   variable we_buffer: std_logic_vector(298 downto 0) := (others => '0');
   constant zeroes_192: std_logic_vector(1535 downto 0) := (others => '0');
@@ -142,7 +121,7 @@ data_block:  process(mac_clk)
     if rising_edge(mac_clk) then
       if (rst_macclk = '1') then
 	we_buffer := (Others => '0');
-      elsif dhcp_req = '1' then
+      elsif ipam_req = '1' then
       data_buffer  :=  x"FFFFFFFFFFFF" & MAC_addr & x"0800" &x"45"   -- Ethernet header
         & x"00" & x"011D" & MAC_addr(15 downto 0) & x"4000" & x"40" & x"11" & x"7928" & x"C0A8" & NOT MAC_addr(15 downto 0) & x"FFFFFFFF" -- IPv4 Header
       --  & x"c0a800ef" & x"FFFFFFFF" crosscheck for sniped packetMSB_half_store
@@ -169,6 +148,107 @@ data_block:  process(mac_clk)
     end if;
   end process;
 
+second_count: process(mac_clk)
+    variable tickcount: unsigned(2 to 0) := (others => '0');
+    begin
+    if (tick = '1') then
+        tickcount := tickcount + 1;
+    end if;
+    if (tickcount = 7) then
+        secs_elapsed <= secs_elapsed + 1;
+        tickcount := (others => '0');
+    end if;
+	end process;
+end generate dhcp_discover;
+
+rarp_request: if DHCP_RARP = '0' generate
+-- rarp:
+-- Ethernet DST_MAC(6), SRC_MAC(6), Ether_Type = x"8035"
+-- HTYPE = x"0001"
+-- PTYPE = x"0800"
+-- HLEN = x"06", PLEN = x"04"
+-- OPER = x"0003"
+-- SHA(6)
+-- SPA(4)
+-- THA(6)
+-- TPA(4)
+data_block:  process(mac_clk)
+  variable pkt_data: std_logic_vector(7 downto 0);
+  variable data_buffer: std_logic_vector(55 downto 0);
+  variable pkt_mask: std_logic_vector(41 downto 0);
+  variable filler: std_logic;
+  variable we: std_logic;
+  begin
+    If rising_edge(mac_clk) then
+      If rst_macclk_sig = '1' then
+	we := '0';
+      ElsIf ipam_req = '1' then
+        we := '1';
+	pkt_mask := "0000001111111101101101" &
+	"11111100001111110000";
+	filler := '1';
+      End If;
+      Case to_integer(address) is
+	When 5 | 21 | 31 =>
+	  data_buffer := MAC_addr & x"00";
+	  filler := '0';
+	When 11 =>
+	  data_buffer := x"80350108060403";
+	When 41 =>
+	  we := '0';
+	When Others =>
+      End Case;
+      If pkt_mask(41) = '1' then
+        pkt_data := data_buffer(55 downto 48);
+	data_buffer := data_buffer(47 downto 0) & x"00";
+      Else
+        pkt_data := (Others => filler);
+      End If;
+      pkt_mask := pkt_mask(40 downto 0) & '0';
+      ipam_data <= pkt_data
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+      ipam_we_sig <= we
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+    end if;
+  end process data_block;
+end generate rarp_request;
+  
+send_packet:  process (mac_clk)
+  variable last_we, send_i: std_logic := '0';
+  variable end_addr_i: std_logic_vector(12 downto 0);
+  begin
+    if rising_edge(mac_clk) then
+      if ipam_we_sig = '0' and last_we = '1' then
+      	if DHCP_RARP = '0' then
+      	  end_addr_i := std_logic_vector(to_unsigned(41, 13));
+      	else
+      	  end_addr_i := std_logic_vector(to_unsigned(298, 13));
+      	end if;
+		send_i := '1';
+      else
+        end_addr_i := (Others => '0');
+		send_i := '0';
+      end if;
+      last_we := ipam_we_sig;
+      ipam_end_addr <= end_addr_i
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+      ipam_send <= send_i
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+    end if;
+  end process;
+
 addr_block:  process(mac_clk)
   variable addr_int, next_addr: unsigned(11 downto 0);
   variable counting: std_logic;
@@ -177,7 +257,7 @@ addr_block:  process(mac_clk)
       if rst_macclk = '1' then
 	    next_addr := (Others => '0');
 	    counting := '0';
-      elsif dhcp_req = '1' then
+      elsif ipam_req = '1' then
         counting := '1';
       elsif ipam_we_sig = '0' then
 	next_addr := (Others => '0');
@@ -195,7 +275,7 @@ addr_block:  process(mac_clk)
     end if;
   end process;
     
- tick_counter:  process(mac_clk)
+tick_counter:  process(mac_clk)
   variable counter_int: unsigned(23 downto 0);
   variable tick_int: std_logic;
   begin
@@ -222,18 +302,6 @@ addr_block:  process(mac_clk)
       ;
     end if;
   end process;
-second_count: process(mac_clk)
-    variable tickcount: unsigned(2 to 0) := (others => '0');
-    begin
-    if (tick = '1') then
-        tickcount := tickcount + 1;
-    end if;
-    if (tickcount = 7) then
-        secs_elapsed <= secs_elapsed + 1;
-        tickcount := (others => '0');
-    end if;
-end process;
-
 
 random: process(mac_clk)
 -- xorshift rng based on http://b2d-f9r.blogspot.co.uk/2010/08/16-bit-xorshift-rng-now-with-more.html
@@ -257,9 +325,9 @@ random: process(mac_clk)
     end if;
   end process;
 
-dhcp_req_block: process(mac_clk)
+ipam_req_block: process(mac_clk)
   variable req_count, req_end: unsigned(5 downto 0);
-  variable dhcp_req_int: std_logic;
+  variable ipam_req_int: std_logic;
   begin
     if rising_edge(mac_clk) then
       if (rst_macclk = '1') or (enable_125 = '0') then
@@ -270,18 +338,18 @@ dhcp_req_block: process(mac_clk)
 -- kludge for simulation in finite number of ticks!
 	    req_end := to_unsigned(1, 6);
 -- pragma translate_on
-	    dhcp_req_int := '0';
+	    ipam_req_int := '0';
       elsif req_count = req_end then
         req_count := (Others => '0');
 	    req_end := unsigned(rndm & "1");
-	    dhcp_req_int := ipam_mode;
+	    ipam_req_int := ipam_mode;
       elsif tick = '1' then
         req_count := req_count + 1;
-	    dhcp_req_int := '0';
+	    ipam_req_int := '0';
       else
-	    dhcp_req_int := '0';
+	    ipam_req_int := '0';
       end if;
-      dhcp_req <= dhcp_req_int
+      ipam_req <= ipam_req_int
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
@@ -290,4 +358,3 @@ dhcp_req_block: process(mac_clk)
   end process;
 
 end rtl;
-
