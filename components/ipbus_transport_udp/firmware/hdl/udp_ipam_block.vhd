@@ -180,7 +180,7 @@ data_block:  process(mac_clk)
   variable we: std_logic;
   begin
     If rising_edge(mac_clk) then
-      If rst_macclk_sig = '1' then
+      If rst_macclk = '1' then
 	we := '0';
       ElsIf ipam_req = '1' then
         we := '1';
