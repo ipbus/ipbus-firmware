@@ -226,14 +226,14 @@ dhcp_offer: if DHCP_RARP = '1' generate
 -- DHCP Client MAC address = My_MAC_addr
 dhcp:  process (mac_clk)
   variable pkt_data: std_logic_vector(135 downto 0);
-  variable pkt_mask: std_logic_vector(73 downto 0);
+  variable pkt_mask: std_logic_vector(75 downto 0);
   variable pkt_drop: std_logic;
   begin
     if rising_edge(mac_clk) then
       if rx_reset = '1' then
         pkt_mask := "111111" & "111111" & "00" & "01" & "1111" & "1110" &
 		"11" & "1111" & "1111" & "0000" & "1111" & "0001" &
-		"111111" & "1111" & "1111" & "1111" & "1111" & "000000";
+		"11111111" & "1111" & "1111" & "1111" & "1111" & "000000";
         pkt_data := x"0800" & x"45" & x"11" & x"0043" & x"0044" & x"020106" & My_MAC_addr;
         pkt_drop := not enable_125;
       elsif my_rx_last = '1' then
@@ -241,13 +241,13 @@ dhcp:  process (mac_clk)
       elsif my_rx_valid = '1' then
         if pkt_broadcast_sig = '0' then
         	pkt_drop := '1';
-        elsif pkt_mask(73) = '0' then
+        elsif pkt_mask(75) = '0' then
           if pkt_data(135 downto 128) /= my_rx_data then
             pkt_drop := '1';
           end if;
           pkt_data := pkt_data(127 downto 0) & x"00";
         end if;
-        pkt_mask := pkt_mask(72 downto 0) & '1';
+        pkt_mask := pkt_mask(74 downto 0) & '1';
       end if;
       pkt_drop_ipam <= pkt_drop
 -- pragma translate_off
