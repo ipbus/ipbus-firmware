@@ -24,7 +24,8 @@
 ---------------------------------------------------------------------------------
 
 
--- Builds outbound rarp or dhcp request at random intervals...
+-- Builds outbound rarp or dhcp discover at random intervals...
+-- Sends dhcp request once valid dhcp offer received
 --
 -- Dave Sankey, June 2013
 -- Gareth Bird, December 2020
@@ -44,6 +45,7 @@ entity udp_ipam_block is
     rst_macclk: in std_logic;
     enable_125: in std_logic;
     MAC_addr: in std_logic_vector(47 downto 0);
+    My_IP_addr: in std_logic_vector(31 downto 0);
     ipam_mode: in std_logic; 
     ipam_addr: out std_logic_vector(12 downto 0); --! ethernet RAM location write to 
     ipam_data: out std_logic_vector(7 downto 0); --! Data to ethernet RAM address
@@ -114,37 +116,44 @@ dhcp_discover: if DHCP_RARP = '1' generate
         --    Parameter Request List Item: (150) TFTP Server Address
 -- end x"FF"
 dhcp_block:  process(mac_clk)
-  variable data_buffer: std_logic_vector(2391 downto 0):= (others => '0');
-  variable we_buffer: std_logic_vector(298 downto 0) := (others => '0');
+  variable data_buffer: std_logic_vector(2383 downto 0):= (others => '0');
+  variable we_buffer: std_logic_vector(297 downto 0) := (others => '0');
   constant zeroes_192: std_logic_vector(1535 downto 0) := (others => '0');
   begin
     if rising_edge(mac_clk) then
       if (rst_macclk = '1') then
-	we_buffer := (Others => '0');
+		we_buffer := (Others => '0');
       elsif ipam_req = '1' then
-      data_buffer  :=  x"FFFFFFFFFFFF" & MAC_addr & x"0800" &x"45"   -- Ethernet header
-        & x"00" & x"011D" & MAC_addr(15 downto 0) & x"4000" & x"40" & x"11" & x"7928" & x"C0A8" & NOT MAC_addr(15 downto 0) & x"FFFFFFFF" -- IPv4 Header
+      	data_buffer(2383 downto 112)  :=  x"FFFFFFFFFFFF" & MAC_addr & x"0800" &x"45"   -- Ethernet header
+        & x"00" & x"0110" & MAC_addr(15 downto 0) & x"4000" & x"40" & x"11" & x"7929" & x"C0A8" & NOT MAC_addr(15 downto 0) & x"FFFFFFFF" -- IPv4 Header
       --  & x"c0a800ef" & x"FFFFFFFF" crosscheck for sniped packetMSB_half_store
-        & x"00440043" &  x"0109" & x"0000" &  x"01" & x"01" & x"06" & x"00" & MAC_addr(31 downto 0) & std_logic_vector(secs_elapsed)
+        & x"00440043" &  x"0108" & x"0000" &  x"01" & x"01" & x"06" & x"00" & MAC_addr(31 downto 0) & std_logic_vector(secs_elapsed)
         & x"8000" & x"00000000" & x"00000000"& x"00000000"& x"00000000" & MAC_addr & x"00000000000000000000" & zeroes_192  -- Bootstrap
         & x"63825363" -- DHCP Magic Cookie
-        & x"350101"  & x"39020240" & x"37077D014206034396" --DHCP options
-        & x"FF"; --end
-	  we_buffer := (Others => '1');
-	  --ipv4_head_buffer()
+        & x"3501";
+	  	we_buffer := (Others => '1');
+	  	if ipam_mode = '1' then -- dhcp discover
+	  	  data_buffer(2247 downto 2240) := x"04";  -- IP length
+	  	  data_buffer(2183 downto 2176) := x"35";  -- IP checksum
+	  	  data_buffer(2079 downto 2064) := x"0f0c";  -- UDP length
+	  	  data_buffer(111 downto 0) := x"01ff000000000000000000000000";
+	  	  we_buffer(11 downto 0) := (Others => '0');
+	  	else -- dhcp request
+	  	  data_buffer(111 downto 0) := x"033604c0a801dd3204" & My_IP_addr & x"ff";
+	  	end if;
       end if;
-      ipam_data <= data_buffer(2391 downto 2384)
+      ipam_data <= data_buffer(2383 downto 2376)
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
       ;
-      ipam_we_sig <= we_buffer(298)
+      ipam_we_sig <= we_buffer(297)
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
       ;
-      data_buffer := data_buffer(2383 downto 0) & x"00";
-      we_buffer := we_buffer(297 downto 0) & '0';
+      data_buffer := data_buffer(2375 downto 0) & x"00";
+      we_buffer := we_buffer(296 downto 0) & '0';
     end if;
   end process;
 
@@ -227,7 +236,9 @@ send_packet:  process (mac_clk)
       if ipam_we_sig = '0' and last_we = '1' then
       	if DHCP_RARP = '0' then
       	  end_addr_i := std_logic_vector(to_unsigned(41, 13));
-      	else
+      	elsif ipam_mode = '1' then -- DHCPDISCOVER
+      	  end_addr_i := std_logic_vector(to_unsigned(298, 13));
+      	else -- DHCPREQUEST
       	  end_addr_i := std_logic_vector(to_unsigned(298, 13));
       	end if;
 		send_i := '1';
@@ -327,7 +338,7 @@ random: process(mac_clk)
 
 ipam_req_block: process(mac_clk)
   variable req_count, req_end: unsigned(5 downto 0);
-  variable ipam_req_int: std_logic;
+  variable ipam_req_int, dhcp_active: std_logic;
   begin
     if rising_edge(mac_clk) then
       if (rst_macclk = '1') or (enable_125 = '0') then
@@ -339,10 +350,16 @@ ipam_req_block: process(mac_clk)
 	    req_end := to_unsigned(1, 6);
 -- pragma translate_on
 	    ipam_req_int := '0';
+	    dhcp_active := ipam_mode;
       elsif req_count = req_end then
+-- time to send RARP/DHCPDISCOVER
         req_count := (Others => '0');
 	    req_end := unsigned(rndm & "1");
 	    ipam_req_int := ipam_mode;
+      elsif (dhcp_active /= ipam_mode) and (ipam_we_sig = '0') then
+-- time to send DHCPREQUEST...
+        dhcp_active := ipam_mode;
+	    ipam_req_int := DHCP_RARP;
       elsif tick = '1' then
         req_count := req_count + 1;
 	    ipam_req_int := '0';
