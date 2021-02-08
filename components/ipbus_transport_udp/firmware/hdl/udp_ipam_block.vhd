@@ -134,7 +134,7 @@ dhcp_block:  process(mac_clk)
 	  	we_buffer := (Others => '1');
 	  	if ipam_mode = '1' then -- dhcp discover
 	  	  data_buffer(2247 downto 2240) := x"04";  -- IP length
-	  	  data_buffer(2183 downto 2176) := x"35";  -- IP checksum
+	  	  data_buffer(2183 downto 2176) := x"41";  -- IP checksum
 	  	  data_buffer(2079 downto 2064) := x"00fc";  -- UDP length
 	  	  data_buffer(111 downto 0) := x"01ff000000000000000000000000";
 	  	  we_buffer(11 downto 0) := (Others => '0');
