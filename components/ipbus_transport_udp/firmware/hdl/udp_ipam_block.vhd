@@ -46,7 +46,8 @@ entity udp_ipam_block is
     enable_125: in std_logic;
     MAC_addr: in std_logic_vector(47 downto 0);
     My_IP_addr: in std_logic_vector(31 downto 0);
-    ipam_mode: in std_logic; 
+    ipam_running : in std_logic;
+    ipam_mode: out std_logic;
     ipam_addr: out std_logic_vector(12 downto 0); --! ethernet RAM location write to 
     ipam_data: out std_logic_vector(7 downto 0); --! Data to ethernet RAM address
     ipam_end_addr: out std_logic_vector(12 downto 0); --! End of packet
@@ -57,7 +58,7 @@ end udp_ipam_block;
 
 architecture rtl of udp_ipam_block is
 
-  signal ipam_we_sig: std_logic;
+  signal ipam_we_sig, ipam_send_sig: std_logic;
   signal address: unsigned(11 downto 0);
   signal ipam_req, tick: std_logic;
   signal rndm: std_logic_vector(4 downto 0);
@@ -66,6 +67,7 @@ architecture rtl of udp_ipam_block is
 begin
 
   ipam_we <= ipam_we_sig;
+  ipam_send <= ipam_send_sig;
   ipam_addr <= std_logic_vector("0" & address);
 
 dhcp_discover: if DHCP_RARP = '1' generate
@@ -132,7 +134,7 @@ dhcp_block:  process(mac_clk)
         & x"63825363" -- DHCP Magic Cookie
         & x"3501";
 	  	we_buffer := (Others => '1');
-	  	if ipam_mode = '1' then -- dhcp discover
+	  	if ipam_running = '1' then -- dhcp discover
 	  	  data_buffer(2247 downto 2240) := x"10";  -- IP length
 	  	  data_buffer(2183 downto 2176) := x"35";  -- IP checksum
 	  	  data_buffer(2079 downto 2064) := x"00fc";  -- UDP length
@@ -154,6 +156,24 @@ dhcp_block:  process(mac_clk)
       ;
       data_buffer := data_buffer(2375 downto 0) & x"00";
       we_buffer := we_buffer(296 downto 0) & '0';
+    end if;
+  end process;
+
+delay_ipam_mode: process(mac_clk)
+  variable ipam_mode_i: std_logic := '0';
+  begin
+    if rising_edge(mac_clk) then
+      if (rst_macclk = '1') or (enable_125 = '0') then
+	    ipam_mode_i := ipam_running;
+-- wait until we've sent DHCPREQUEST before updating ipam_mode_i...
+      elsif (ipam_mode_i /= ipam_running) and (ipam_send_sig = '1') then
+	    ipam_mode_i := ipam_running;
+	  end if;
+      ipam_mode <= ipam_mode_i
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
     end if;
   end process;
 
@@ -181,7 +201,7 @@ rarp_request: if DHCP_RARP = '0' generate
 -- SPA(4)
 -- THA(6)
 -- TPA(4)
-data_block:  process(mac_clk)
+rarp_block:  process(mac_clk)
   variable pkt_data: std_logic_vector(7 downto 0);
   variable data_buffer: std_logic_vector(55 downto 0);
   variable pkt_mask: std_logic_vector(41 downto 0);
@@ -225,7 +245,9 @@ data_block:  process(mac_clk)
 -- pragma translate_on
       ;
     end if;
-  end process data_block;
+  end process rarp_block;
+
+ipam_mode <= ipam_running;  -- end IPAM mode as soon as we've got IP address!
 end generate rarp_request;
   
 send_packet:  process (mac_clk)
@@ -236,7 +258,7 @@ send_packet:  process (mac_clk)
       if ipam_we_sig = '0' and last_we = '1' then
       	if DHCP_RARP = '0' then
       	  end_addr_i := std_logic_vector(to_unsigned(41, 13));
-      	elsif ipam_mode = '1' then -- DHCPDISCOVER
+      	elsif ipam_running = '1' then -- DHCPDISCOVER
       	  end_addr_i := std_logic_vector(to_unsigned(285, 13));
       	else -- DHCPREQUEST
       	  end_addr_i := std_logic_vector(to_unsigned(297, 13));
@@ -252,7 +274,7 @@ send_packet:  process (mac_clk)
       after 4 ns
 -- pragma translate_on
       ;
-      ipam_send <= send_i
+      ipam_send_sig <= send_i
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
@@ -350,15 +372,15 @@ ipam_req_block: process(mac_clk)
 	    req_end := to_unsigned(1, 6);
 -- pragma translate_on
 	    ipam_req_int := '0';
-	    dhcp_active := ipam_mode;
+	    dhcp_active := ipam_running;
       elsif req_count = req_end then
 -- time to send RARP/DHCPDISCOVER
         req_count := (Others => '0');
 	    req_end := unsigned(rndm & "1");
-	    ipam_req_int := ipam_mode;
-      elsif (dhcp_active /= ipam_mode) and (ipam_we_sig = '0') then
+	    ipam_req_int := ipam_running;
+      elsif (dhcp_active /= ipam_running) and (ipam_we_sig = '0') then
 -- time to send DHCPREQUEST...
-        dhcp_active := ipam_mode;
+        dhcp_active := ipam_running;
 	    ipam_req_int := DHCP_RARP;
       elsif tick = '1' then
         req_count := req_count + 1;

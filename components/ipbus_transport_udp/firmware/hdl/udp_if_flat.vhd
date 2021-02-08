@@ -126,7 +126,7 @@ ARCHITECTURE flat OF UDP_if IS
    SIGNAL ipam_addr: std_logic_vector(12 DOWNTO 0);
    SIGNAL ipam_data: std_logic_vector(7 DOWNTO 0);
    SIGNAL ipam_end_addr: std_logic_vector(12 DOWNTO 0);
-   SIGNAL ipam_mode: std_logic;
+   SIGNAL ipam_mode, ipam_running: std_logic;
    SIGNAL ipam_send: std_logic;
    SIGNAL ipam_we: std_logic;
 --
@@ -311,6 +311,7 @@ primary_mode: if SECONDARYPORT = '0' generate
 			enable_125 => enable_125,
 			MAC_addr => MAC_addr,
 			My_IP_addr => My_IP_addr_sig,
+			ipam_running => ipam_running,
 			ipam_mode => ipam_mode,
 			ipam_addr => ipam_addr,
 			ipam_data => ipam_data,
@@ -379,7 +380,7 @@ end generate primary_mode;
 			pkt_drop_ipam => pkt_drop_ipam,
 			My_MAC_addr => My_MAC_addr,
 			My_IP_addr => My_IP_addr_sig,
-			ipam_mode => ipam_mode
+			ipam_running => ipam_running
 		);
 
 	payload: entity work.udp_build_payload

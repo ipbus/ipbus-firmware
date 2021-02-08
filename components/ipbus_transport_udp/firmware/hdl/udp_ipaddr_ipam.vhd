@@ -54,7 +54,7 @@ entity udp_ipaddr_ipam is
     pkt_drop_ipam: in std_logic;
     My_MAC_addr: out std_logic_vector(47 downto 0);
     My_IP_addr: out std_logic_vector(31 downto 0);
-    ipam_mode: out std_logic
+    ipam_running: out std_logic
   );
 end udp_ipaddr_ipam;
 
@@ -172,7 +172,7 @@ My_MAC_IP_addr_block:  process (mac_clk)
       after 4 ns
 -- pragma translate_on
       ;
-      ipam_mode <= enable_125 and ipam_125 and not Got_MAC_IP_addr_rx
+      ipam_running <= enable_125 and ipam_125 and not Got_MAC_IP_addr_rx
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
