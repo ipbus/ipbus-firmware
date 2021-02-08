@@ -122,6 +122,7 @@ ARCHITECTURE flat OF UDP_if IS
 --
    SIGNAL My_IP_addr_sig: std_logic_vector(31 DOWNTO 0);
    SIGNAL My_MAC_addr: std_logic_vector(47 DOWNTO 0);
+   SIGNAL Server_IP_addr: std_logic_vector(31 DOWNTO 0);
    SIGNAL pkt_drop_ipam: std_logic;
    SIGNAL ipam_addr: std_logic_vector(12 DOWNTO 0);
    SIGNAL ipam_data: std_logic_vector(7 DOWNTO 0);
@@ -311,6 +312,7 @@ primary_mode: if SECONDARYPORT = '0' generate
 			enable_125 => enable_125,
 			MAC_addr => MAC_addr,
 			My_IP_addr => My_IP_addr_sig,
+			Server_IP_addr => Server_IP_addr,
 			ipam_running => ipam_running,
 			ipam_mode => ipam_mode,
 			ipam_addr => ipam_addr,
@@ -380,6 +382,7 @@ end generate primary_mode;
 			pkt_drop_ipam => pkt_drop_ipam,
 			My_MAC_addr => My_MAC_addr,
 			My_IP_addr => My_IP_addr_sig,
+			Server_IP_addr => Server_IP_addr,
 			ipam_running => ipam_running
 		);
 

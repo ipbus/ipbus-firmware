@@ -54,6 +54,7 @@ entity udp_ipaddr_ipam is
     pkt_drop_ipam: in std_logic;
     My_MAC_addr: out std_logic_vector(47 downto 0);
     My_IP_addr: out std_logic_vector(31 downto 0);
+    Server_IP_addr: out std_logic_vector(31 downto 0);
     ipam_running: out std_logic
   );
 end udp_ipaddr_ipam;
@@ -62,6 +63,7 @@ architecture rtl of udp_ipaddr_ipam is
 
   signal MAC_IP_addr_rx_vld: std_logic;
   signal MAC_IP_addr_rx: std_logic_vector(79 downto 0);
+  signal Server_IP_addr_rx: std_logic_vector(31 downto 0);
 
 begin
 
@@ -87,6 +89,8 @@ MAC_IP_addr_rx_vld_block:  process (mac_clk)
   end process;
 
 rarp_reply: if DHCP_RARP = '0' generate
+Server_IP_addr_rx <= (Others => '0');
+
 MAC_IP_addr_rx_rarp: process(mac_clk)
   variable pkt_mask: std_logic_vector(41 downto 0);
   variable MAC_IP_addr_rx_int: std_logic_vector(79 downto 0);
@@ -138,6 +142,11 @@ MAC_IP_addr_rx_dhcp: process(mac_clk)
       after 4 ns
 -- pragma translate_on
       ;
+      Server_IP_addr_rx <= x"c0a801dd"
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
     end if;
   end process;
 end generate dhcp_offer;
@@ -168,6 +177,11 @@ My_MAC_IP_addr_block:  process (mac_clk)
 -- pragma translate_on
       ;
       My_MAC_addr <= My_MAC_IP_addr_int(47 downto 0)
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+      Server_IP_addr <= Server_IP_addr_rx
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on

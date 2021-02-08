@@ -46,6 +46,7 @@ entity udp_ipam_block is
     enable_125: in std_logic;
     MAC_addr: in std_logic_vector(47 downto 0);
     My_IP_addr: in std_logic_vector(31 downto 0);
+    Server_IP_addr: in std_logic_vector(31 downto 0);
     ipam_running : in std_logic;
     ipam_mode: out std_logic;
     ipam_addr: out std_logic_vector(12 downto 0); --! ethernet RAM location write to 
@@ -141,7 +142,7 @@ dhcp_block:  process(mac_clk)
 	  	  data_buffer(111 downto 0) := x"01ff000000000000000000000000";
 	  	  we_buffer(11 downto 0) := (Others => '0');
 	  	else -- dhcp request
-	  	  data_buffer(111 downto 0) := x"033604c0a801dd3204" & My_IP_addr & x"ff";
+	  	  data_buffer(111 downto 0) := x"033604" & Server_IP_addr & x"3204" & My_IP_addr & x"ff";
 	  	end if;
       end if;
       ipam_data <= data_buffer(2383 downto 2376)
