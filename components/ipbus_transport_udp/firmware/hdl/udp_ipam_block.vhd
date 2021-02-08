@@ -135,7 +135,7 @@ dhcp_block:  process(mac_clk)
 	  	if ipam_mode = '1' then -- dhcp discover
 	  	  data_buffer(2247 downto 2240) := x"04";  -- IP length
 	  	  data_buffer(2183 downto 2176) := x"35";  -- IP checksum
-	  	  data_buffer(2079 downto 2064) := x"0f0c";  -- UDP length
+	  	  data_buffer(2079 downto 2064) := x"00fc";  -- UDP length
 	  	  data_buffer(111 downto 0) := x"01ff000000000000000000000000";
 	  	  we_buffer(11 downto 0) := (Others => '0');
 	  	else -- dhcp request
@@ -237,9 +237,9 @@ send_packet:  process (mac_clk)
       	if DHCP_RARP = '0' then
       	  end_addr_i := std_logic_vector(to_unsigned(41, 13));
       	elsif ipam_mode = '1' then -- DHCPDISCOVER
-      	  end_addr_i := std_logic_vector(to_unsigned(298, 13));
+      	  end_addr_i := std_logic_vector(to_unsigned(285, 13));
       	else -- DHCPREQUEST
-      	  end_addr_i := std_logic_vector(to_unsigned(298, 13));
+      	  end_addr_i := std_logic_vector(to_unsigned(297, 13));
       	end if;
 		send_i := '1';
       else
