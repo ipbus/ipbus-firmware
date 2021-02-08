@@ -127,7 +127,7 @@ dhcp_block:  process(mac_clk)
 		we_buffer := (Others => '0');
       elsif ipam_req = '1' then
       	data_buffer(2383 downto 112)  :=  x"FFFFFFFFFFFF" & MAC_addr & x"0800" &x"45"   -- Ethernet header
-        & x"00" & x"0110" & MAC_addr(15 downto 0) & x"4000" & x"40" & x"11" & x"7929" & x"C0A8" & NOT MAC_addr(15 downto 0) & x"FFFFFFFF" -- IPv4 Header
+        & x"00" & x"011c" & MAC_addr(15 downto 0) & x"4000" & x"40" & x"11" & x"7929" & x"C0A8" & NOT MAC_addr(15 downto 0) & x"FFFFFFFF" -- IPv4 Header
       --  & x"c0a800ef" & x"FFFFFFFF" crosscheck for sniped packetMSB_half_store
         & x"00440043" &  x"0108" & x"0000" &  x"01" & x"01" & x"06" & x"00" & MAC_addr(31 downto 0) & std_logic_vector(secs_elapsed)
         & x"8000" & x"00000000" & x"00000000"& x"00000000"& x"00000000" & MAC_addr & x"00000000000000000000" & zeroes_192  -- Bootstrap
