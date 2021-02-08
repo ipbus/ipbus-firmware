@@ -310,6 +310,7 @@ primary_mode: if SECONDARYPORT = '0' generate
 			rst_macclk => rst_macclk_reg,
 			enable_125 => enable_125,
 			MAC_addr => MAC_addr,
+			My_IP_addr => My_IP_addr_sig,
 			ipam_mode => ipam_mode,
 			ipam_addr => ipam_addr,
 			ipam_data => ipam_data,
