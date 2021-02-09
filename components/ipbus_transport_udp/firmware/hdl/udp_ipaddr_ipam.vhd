@@ -134,7 +134,7 @@ end generate rarp_reply;
 dhcp_offer: if DHCP_RARP = '1' generate
 MAC_IP_addr_rx_dhcp: process(mac_clk)
   variable pkt_mask: std_logic_vector(5 downto 0);
-  variable Parse_DHCP, Good_DHCP_i: std_logic;
+  variable Parse_DHCP, Good_DHCP: std_logic;
   variable DHCP_state: STATE_TYPE;
   variable bytes_to_skip: unsigned(7 downto 0);
   variable MAC_IP_addr_rx_int: std_logic_vector(111 downto 0);
