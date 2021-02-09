@@ -61,7 +61,13 @@ end udp_ipaddr_ipam;
 
 architecture rtl of udp_ipaddr_ipam is
 
-  signal MAC_IP_addr_rx_vld: std_logic;
+  TYPE STATE_TYPE IS (
+    Option,
+    Length,
+	Payload
+  );
+
+  signal MAC_IP_addr_rx_vld, DHCP_vld: std_logic;
   signal MAC_addr_rx: std_logic_vector(47 downto 0);
   signal IP_addr_rx, Server_IP_addr_rx: std_logic_vector(31 downto 0);
   signal address: unsigned(8 downto 0);
@@ -71,10 +77,10 @@ begin
 MAC_IP_addr_rx_vld_block:  process (mac_clk)
   begin
     if rising_edge(mac_clk) then
--- Valid RARP response received.
+-- Valid RARP/DHCP response received.
       if my_rx_last = '1' and pkt_drop_ipam = '0' and 
       my_rx_error = '0' then
-        MAC_IP_addr_rx_vld <= '1'
+        MAC_IP_addr_rx_vld <= DHCP_vld
 -- pragma translate_off
         after 4 ns
 -- pragma translate_on
@@ -91,6 +97,7 @@ MAC_IP_addr_rx_vld_block:  process (mac_clk)
 
 rarp_reply: if DHCP_RARP = '0' generate
 Server_IP_addr_rx <= (Others => '0');
+DHCP_vld <= '1';
 
 MAC_IP_addr_rx_rarp: process(mac_clk)
   variable pkt_mask: std_logic_vector(41 downto 0);
@@ -127,38 +134,73 @@ end generate rarp_reply;
 dhcp_offer: if DHCP_RARP = '1' generate
 MAC_IP_addr_rx_dhcp: process(mac_clk)
   variable pkt_mask: std_logic_vector(5 downto 0);
+  variable Parse_DHCP, Good_DHCP_i: std_logic;
+  variable DHCP_state: STATE_TYPE;
+  variable bytes_to_skip: unsigned(7 downto 0);
   variable MAC_IP_addr_rx_int: std_logic_vector(111 downto 0);
   begin
     if rising_edge(mac_clk) then
       if rx_reset = '1' then
         pkt_mask := (Others => '1');
         MAC_IP_addr_rx_int := (Others => '0');
+        Parse_DHCP := '0';
+        Good_DHCP := '0';
       elsif my_rx_valid = '1' then
         case to_integer(address) is
           when 58 => -- IP address
             pkt_mask := "000011";
           when 70 => -- MAC address
             pkt_mask := (Others => '0');
+          when 282 =>
+            Parse_DHCP := '1';
+            DHCP_state := Option;
           when Others =>
         end case;
         if pkt_drop_ipam = '1' then
           MAC_IP_addr_rx_int := (Others => '0');
+        elsif Parse_DHCP = '1' then
+          case DHCP_state is
+            when Option =>
+              if my_rx_data = x"36" then -- get ready to capture server address
+                Parse_DHCP := '0';
+                Good_DHCP := '1';
+                pkt_mask := "100001";
+              elsif my_rx_data = x"FF" then -- Oops, didn't find server address
+                Parse_DHCP := '0';
+                MAC_IP_addr_rx_int := (Others => '0');
+              elsif my_rx_data /= x"00" then
+                DHCP_state := Length;
+              end if;
+            when Length =>
+              bytes_to_skip: unsigned(my_rx_data);
+              DHCP_state := Payload;
+            when Payload =>
+              bytes_to_skip := bytes_to_skip - 1;
+              if bytes_to_skip = x"00" then
+                DHCP_state := Option;
+              end if;
+          end case;
         elsif pkt_mask(5) = '0' then
           MAC_IP_addr_rx_int := MAC_IP_addr_rx_int(103 downto 0) & my_rx_data;
         end if;
         pkt_mask := pkt_mask(4 downto 0) & '1';
       end if;
-      MAC_addr_rx <= MAC_IP_addr_rx_int(47 downto 0)
+      MAC_addr_rx <= MAC_IP_addr_rx_int(79 downto 32)
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
       ;
-      IP_addr_rx <= MAC_IP_addr_rx_int(79 downto 48)
+      IP_addr_rx <= MAC_IP_addr_rx_int(111 downto 80)
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
       ;
-      Server_IP_addr_rx <= x"c0a801dd"
+      Server_IP_addr_rx <= MAC_IP_addr_rx_int(31 downto 0)
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+      DHCP_vld <= Good_DHCP
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
