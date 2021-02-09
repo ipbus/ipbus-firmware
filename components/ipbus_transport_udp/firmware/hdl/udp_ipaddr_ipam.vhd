@@ -172,7 +172,7 @@ MAC_IP_addr_rx_dhcp: process(mac_clk)
                 DHCP_state := Length;
               end if;
             when Length =>
-              bytes_to_skip: unsigned(my_rx_data);
+              bytes_to_skip := unsigned(my_rx_data);
               DHCP_state := Payload;
             when Payload =>
               bytes_to_skip := bytes_to_skip - 1;
