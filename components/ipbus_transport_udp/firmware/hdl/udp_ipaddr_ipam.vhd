@@ -164,7 +164,7 @@ MAC_IP_addr_rx_dhcp: process(mac_clk)
               if my_rx_data = x"36" then -- get ready to capture server address
                 Parse_DHCP := '0';
                 Good_DHCP := '1';
-                pkt_mask := "100001";
+                pkt_mask := "110000";
               elsif my_rx_data = x"FF" then -- Oops, didn't find server address
                 Parse_DHCP := '0';
                 MAC_IP_addr_rx_int := (Others => '0');
