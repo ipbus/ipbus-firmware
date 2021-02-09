@@ -62,8 +62,9 @@ end udp_ipaddr_ipam;
 architecture rtl of udp_ipaddr_ipam is
 
   signal MAC_IP_addr_rx_vld: std_logic;
-  signal MAC_IP_addr_rx: std_logic_vector(79 downto 0);
-  signal Server_IP_addr_rx: std_logic_vector(31 downto 0);
+  signal MAC_addr_rx: std_logic_vector(47 downto 0);
+  signal IP_addr_rx, Server_IP_addr_rx: std_logic_vector(31 downto 0);
+  signal address: unsigned(8 downto 0);
 
 begin
 
@@ -109,7 +110,12 @@ MAC_IP_addr_rx_rarp: process(mac_clk)
         end if;
         pkt_mask := pkt_mask(40 downto 0) & '1';
       end if;
-      MAC_IP_addr_rx <= MAC_IP_addr_rx_int
+      MAC_addr_rx <= MAC_IP_addr_rx_int(79 downto 32)
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+      IP_addr_rx <= MAC_IP_addr_rx_int(31 downto 0)
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
@@ -120,24 +126,34 @@ end generate rarp_reply;
 
 dhcp_offer: if DHCP_RARP = '1' generate
 MAC_IP_addr_rx_dhcp: process(mac_clk)
-  variable pkt_mask: std_logic_vector(75 downto 0);
-  variable MAC_IP_addr_rx_int: std_logic_vector(79 downto 0);
+  variable pkt_mask: std_logic_vector(5 downto 0);
+  variable MAC_IP_addr_rx_int: std_logic_vector(111 downto 0);
   begin
     if rising_edge(mac_clk) then
       if rx_reset = '1' then
-         pkt_mask := "111111" & "111111" & "1111" & "1111" & "1111" &
-		"11" & "1111" & "1111" & "1111" & "1111" & "1111" &
-		"11111111" & "1111" & "0000" & "1111" & "1111" & "000000";
-	MAC_IP_addr_rx_int := (Others => '0');
+        pkt_mask := (Others => '1');
+        MAC_IP_addr_rx_int := (Others => '0');
       elsif my_rx_valid = '1' then
+        case to_integer(address) is
+          when 58 => -- IP address
+            pkt_mask := "000011";
+          when 70 => -- MAC address
+            pkt_mask := (Others => '0');
+          when Others =>
+        end case;
         if pkt_drop_ipam = '1' then
-	  MAC_IP_addr_rx_int := (Others => '0');
-        elsif pkt_mask(75) = '0' then
-          MAC_IP_addr_rx_int := MAC_IP_addr_rx_int(71 downto 0) & my_rx_data;
+          MAC_IP_addr_rx_int := (Others => '0');
+        elsif pkt_mask(5) = '0' then
+          MAC_IP_addr_rx_int := MAC_IP_addr_rx_int(103 downto 0) & my_rx_data;
         end if;
-        pkt_mask := pkt_mask(74 downto 0) & '1';
+        pkt_mask := pkt_mask(4 downto 0) & '1';
       end if;
-      MAC_IP_addr_rx <= MAC_IP_addr_rx_int
+      MAC_addr_rx <= MAC_IP_addr_rx_int(47 downto 0)
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+      IP_addr_rx <= MAC_IP_addr_rx_int(79 downto 48)
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
@@ -149,39 +165,57 @@ MAC_IP_addr_rx_dhcp: process(mac_clk)
       ;
     end if;
   end process;
+
+next_addr:  process(mac_clk)
+  variable addr_int, next_addr: unsigned(8 downto 0);
+  begin
+    if rising_edge(mac_clk) then
+      if rx_reset = '1' then
+        addr_int := (Others => '0');
+      elsif (my_rx_valid = '1') and (pkt_drop_ipam = '0') then
+        addr_int := next_addr;
+      end if;
+      address <= addr_int
+-- pragma translate_off
+      after 4 ns
+-- pragma translate_on
+      ;
+      next_addr := addr_int + 1;
+    end if;
+  end process;
 end generate dhcp_offer;
 
 My_MAC_IP_addr_block:  process (mac_clk)
   variable Got_MAC_IP_addr_rx, last_enable_125: std_logic;
-  variable My_MAC_IP_addr_int: std_logic_vector(79 downto 0);
+  variable MAC_addr_int: std_logic_vector(47 downto 0);
+  variable IP_addr_int, Server_IP_addr_int: std_logic_vector(31 downto 0);
   begin
     if rising_edge(mac_clk) then
 -- Sample MAC_addr & IP_addr on reset or enable going high...
       if (rst_macclk = '1') or
       (enable_125 = '1' and last_enable_125 = '0') then
         Got_MAC_IP_addr_rx := '0';
-	My_MAC_IP_addr_int := IP_addr & MAC_addr;
+		MAC_addr_int := MAC_addr;
+		IP_addr_int := IP_addr;
+		Server_IP_addr_int := (Others => '0');
       elsif MAC_IP_addr_rx_vld = '1' and ipam_125 = '1' then
         Got_MAC_IP_addr_rx := '1';
-        if DHCP_RARP = '0'  then
--- IP address and MAC address are swapped compared to DHCP...
-		  My_MAC_IP_addr_int := MAC_IP_addr_rx(31 downto 0) & MAC_IP_addr_rx(79 downto 32);
-		else
-		  My_MAC_IP_addr_int := MAC_IP_addr_rx;
-		end if;
+		MAC_addr_int := MAC_addr_rx;
+		IP_addr_int := IP_addr_rx;
+		Server_IP_addr_int := Server_IP_addr_rx;
       end if;
       last_enable_125 := enable_125;
-      My_IP_addr <= My_MAC_IP_addr_int(79 downto 48)
+      My_IP_addr <= IP_addr_int
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
       ;
-      My_MAC_addr <= My_MAC_IP_addr_int(47 downto 0)
+      My_MAC_addr <= MAC_addr_int
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
       ;
-      Server_IP_addr <= Server_IP_addr_rx
+      Server_IP_addr <= Server_IP_addr_int
 -- pragma translate_off
       after 4 ns
 -- pragma translate_on
