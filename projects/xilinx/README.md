@@ -1,47 +1,50 @@
-# Instructions on building and running the various Xilinx-specific example designs and scripts.
+# Instructions on building and running the various Xilinx-specific example designs and scripts
 
-## KC705 with RJ45 Ethernet connection.
-```
-$ ipbb init xilinx_example
-$ cd xilinx_example
-$ ipbb add git https://github.com/ipbus-firmware
-$ ipbb proj create vivado -t top_kc705_gmii.dep example_kc705 ipbus-firmware:projects/xilinx
-$ cd proj/example_kc705
-$ ipbb vivado make-project
-$ ipbb vivado synth -j4 impl -j 4
-$ ipbb vivado package
-```
+## KC705 with RJ45 Ethernet connection
 
-Now program the bit file into the FPGA.
-
-```
-$ cd ../../src/ipbus-firmware/projects/xilinx/scripts/
-$ cp ../../../../../proj/example_kc705/package/src/addrtab/* .
-$ ./example_sysmon.py 192.168.200.16 ipbus_example_xilinx_x7.xml
-$ ./example_icap.py 192.168.200.16 ipbus_example_xilinx_x7.xml
-$ ./example_axi4lite_master.py 192.168.200.16 ipbus_example_xilinx_x7.xml
-```
-
-## VCU118 with RJ45 Ethernet connection.
-```
-$ ipbb init xilinx_example
-$ cd xilinx_example
-$ ipbb add git https://github.com/ipbus-firmware
-$ ipbb proj create vivado -t top_vcu118_sgmii.dep example_vcu118 ipbus-firmware:projects/xilinx
-$ cd proj/example_vcu118
-$ ipbb vivado make-project
-$ ipbb vivado synth -j4 impl -j 4
-$ ipbb vivado package
+```shell
+ipbb init xilinx_example
+cd xilinx_example
+ipbb add git https://github.com/ipbus/ipbus-firmware
+ipbb proj create vivado -t top_kc705_gmii.dep example_kc705 ipbus-firmware:projects/xilinx
+cd proj/example_kc705
+ipbb vivado make-project
+ipbb vivado synth -j4 impl -j 4
+ipbb vivado package
 ```
 
 Now program the bit file into the FPGA.
 
+```shell
+cd ../../src/ipbus-firmware/projects/xilinx/scripts/
+cp ../../../../../proj/example_kc705/package/src/addrtab/* .
+./example_sysmon.py 192.168.200.16 ipbus_example_xilinx_x7.xml
+./example_icap.py 192.168.200.16 ipbus_example_xilinx_x7.xml
+./example_axi4lite_master.py 192.168.200.16 ipbus_example_xilinx_x7.xml
 ```
-$ cd ../../src/ipbus-firmware/projects/xilinx/scripts/
-$ cp ../../../../../proj/example_vcu118/package/src/addrtab/* .
-$ ./example_sysmon.py 192.168.200.17 ipbus_example_xilinx_usp.xml
-$ ./example_device_dna.py 192.168.200.17 ipbus_example_xilinx_usp.xml
-$ ./example_axi4lite_master.py 192.168.200.17 ipbus_example_xilinx_usp.xml
+
+
+## VCU118 with RJ45 Ethernet connection
+
+```shell
+ipbb init xilinx_example
+cd xilinx_example
+ipbb add git https://github.com/ipbus/ipbus-firmware
+ipbb proj create vivado -t top_vcu118_sgmii.dep example_vcu118 ipbus-firmware:projects/xilinx
+cd proj/example_vcu118
+ipbb vivado make-project
+ipbb vivado synth -j4 impl -j 4
+ipbb vivado package
+```
+
+Now program the bit file into the FPGA.
+
+```shell
+cd ../../src/ipbus-firmware/projects/xilinx/scripts/
+cp ../../../../../proj/example_vcu118/package/src/addrtab/* .
+./example_sysmon.py 192.168.200.17 ipbus_example_xilinx_usp.xml
+./example_device_dna.py 192.168.200.17 ipbus_example_xilinx_usp.xml
+./example_axi4lite_master.py 192.168.200.17 ipbus_example_xilinx_usp.xml
 ```
 
 ## Expected output
