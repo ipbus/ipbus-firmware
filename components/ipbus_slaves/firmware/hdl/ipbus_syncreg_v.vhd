@@ -78,9 +78,9 @@ architecture rtl of ipbus_syncreg_v is
 	signal sel: integer range 0 to 2 ** ADDR_WIDTH - 1 := 0;
 	signal s_cyc, ctrl_cyc_w, ctrl_cyc_r, stat_cyc: std_logic;
 	signal cq: ipb_reg_v(2 ** ADDR_WIDTH - 1 downto 0);
-	signal sq, ds: std_logic_vector(31 downto 0);
+	signal sq, ds, cd: std_logic_vector(31 downto 0);
 	signal crdy, cack: std_logic_vector(N_CTRL - 1 downto 0);
-	signal sre, srdy, sack, sstb: std_logic;
+	signal sre, srdy, sack, sstb, cstab, sstab: std_logic;
 	signal rdy, ack, rdy_d, pend: std_logic;
 
 begin
@@ -93,6 +93,11 @@ begin
 	stat_cyc <= ipb_in.ipb_strobe and not ipb_in.ipb_write and s_cyc;
 	ctrl_cyc_r <= ipb_in.ipb_strobe and not ipb_in.ipb_write and not s_cyc;
 	ctrl_cyc_w <= ipb_in.ipb_strobe and ipb_in.ipb_write and not s_cyc;
+	
+-- Avoid race between handshake and bus settling time (since the latter is unconstrained)
+
+	cd <= ipb_in.ipb_wdata when rising_edge(clk);
+	cstab <= '1' when cd = ipb_in.ipb_wdata else '0';	
 
 -- Write registers
 	
@@ -103,7 +108,7 @@ begin
 		
 	begin
 	
-		cwe <= '1' when ctrl_cyc_w = '1' and sel = i and rdy = '1' else '0';
+		cwe <= '1' when ctrl_cyc_w = '1' and sel = i and rdy = '1' and cstab = '1' else '0';
 		ctrl_m <= ipb_in.ipb_wdata and qmask(i);
 		
 		wsync: entity work.syncreg_w

@@ -57,8 +57,8 @@ end syncreg_r;
 
 architecture rtl of syncreg_r is
 		
-	signal we, rdy, cyc, ack, s1, s2, s3, s4, s5, m1, m2, m3, stable: std_logic;
-	signal d: std_logic_vector(SIZE - 1 downto 0);
+	signal we, rdy, cyc, ack, s1, s2, s3, s4, s5, m1, m2, m3, stab: std_logic;
+	signal da, db: std_logic_vector(SIZE - 1 downto 0);
 	
 	attribute SHREG_EXTRACT: string;
 	attribute SHREG_EXTRACT of s1, m1, s2, m2: signal is "no"; -- Synchroniser not to be optimised into shreg
@@ -93,7 +93,7 @@ begin
 			s2 <= s1;
 			s3 <= s2;
 			s4 <= s3;
-			s5 <= s4 and stable;
+			s5 <= s4 and stab;
 		end if;
 	end process;
 	
@@ -106,14 +106,15 @@ begin
 	begin
 		if rising_edge(s_clk) then
 			if we = '1' then
-				m_q <= s_d;
+				da <= s_d;
 			end if;
 		end if;
 	end process;
 	
 -- Avoid race between data and handshake
 
-	d <= m_q when rising_edge(s_clk);
-	stable <= '1' when d = m_q else '0';
+	db <= da when rising_edge(s_clk);
+	stab <= '1' when db = da else '0';
+	m_q <= da;
 	
 end rtl;
