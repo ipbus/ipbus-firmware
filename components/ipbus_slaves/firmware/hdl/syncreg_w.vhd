@@ -57,7 +57,8 @@ end syncreg_w;
 
 architecture rtl of syncreg_w is
 		
-	signal rdy, cyc, ack, s1, s2, s3, m1, m2, m3: std_logic;
+	signal stable, rdy, cyc, ack, s1, s2, s3, m1, m2, m3: std_logic;
+	signal d: std_logic_vector(SIZE - 1 downto 0);
 	
 	attribute SHREG_EXTRACT: string;
 	attribute SHREG_EXTRACT of s1, m1, s2, m2: signal is "no"; -- Synchroniser not to be optimised into shreg
@@ -65,6 +66,11 @@ architecture rtl of syncreg_w is
 	attribute ASYNC_REG of s1, m1, s2, m2: signal is "yes";
 	
 begin
+
+-- Ensure static levels on bus signals (since settling time is unconstrained)
+
+	d <= m_d when rising_edge(m_clk);
+	stable <= '1' when d = m_d else '0';
 
 -- Generate cyc and recover handshake into master domain
 
@@ -74,7 +80,7 @@ begin
 			m1 <= s3; -- CDC, with synchroniser
 			m2 <= m1;
 			m3 <= m2;
-			cyc <= (cyc or (m_we and rdy)) and not (ack or m_rst);
+			cyc <= (cyc or (m_we and stable and rdy)) and not (ack or m_rst);
 			rdy <= (rdy or m_rst or (m3 and not m2)) and not m_we;
 		end if;
 	end process;
