@@ -1,6 +1,6 @@
 
 .template_base:
-  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-cc7:2020-03-15__ipbb0.5.2_uhal2.7.2
+  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-centos7:2021-04-26__ipbbdev-2021f_uhal2.8.0
   before_script:
     - source /software/Xilinx/Vivado/${VIVADO_VERSION}/settings64.sh
 
@@ -15,9 +15,9 @@
     - ipbb init work_area
     - cd work_area
     - ln -s ${CI_PROJECT_DIR} src/ipbus-firmware
-    - ipbb proj create vivado -t top_${PROJ}.dep ${CI_JOB_NAME#quick_check:} ipbus-firmware:projects/example
+    - ipbb proj create vivado ${CI_JOB_NAME#quick_check:} ipbus-firmware:projects/example top_${PROJ}.dep
     - cd proj/${CI_JOB_NAME#quick_check:}
-    - ipbb vivado make-project
+    - ipbb vivado generate-project
     - ipbb vivado check-syntax
   artifacts:
     when: on_success

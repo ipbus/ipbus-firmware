@@ -1,7 +1,7 @@
 
 run_sim_udp:vivado2018.3:modelsim10.6c:
   extends: .template_base
-  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-cc7:2020-03-15__ipbb0.5.2_uhal2.7.2
+  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-centos7:2021-04-26__ipbbdev-2021f_uhal2.8.0
   tags:
     - docker
     - docker-cap-net-admin
@@ -24,7 +24,7 @@ run_sim_udp:vivado2018.3:modelsim10.6c:
 
 run_sim:vivado2018.3:modelsim10.6c:
   extends: .template_base
-  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-cc7:2020-03-15__ipbb0.5.2_uhal2.7.2
+  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-centos7:2021-04-26__ipbbdev-2021f_uhal2.8.0
   tags:
     - docker
     - docker-cap-net-admin
@@ -48,7 +48,7 @@ run_sim:vivado2018.3:modelsim10.6c:
 
 run_ram_slaves_testbench_sim:vivado2018.3:modelsim10.6c:
   extends: .template_base
-  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-cc7:2020-03-15__ipbb0.5.2_uhal2.7.2
+  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-centos7:2021-04-26__ipbbdev-2021f_uhal2.8.0
   tags:
     - docker
     - docker-cap-net-admin
@@ -66,18 +66,18 @@ run_ram_slaves_testbench_sim:vivado2018.3:modelsim10.6c:
     - ipbb init work_area
     - cd work_area
     - ln -s ${CI_PROJECT_DIR} src/ipbus-firmware
-    - ipbb proj create sim ram_slvs_tb ipbus-firmware:tests/ram_slaves -t top_sim.dep
+    - ipbb proj create sim ram_slvs_tb ipbus-firmware:tests/ram_slaves top_sim.dep
     - cd proj/ram_slvs_tb
     - ipbb sim setup-simlib
     - ipbb sim ipcores
     - ipbb sim fli
-    - ipbb sim make-project
+    - ipbb sim generate-project
     - ./vsim -c work.top -gIP_ADDR='X"c0a8c902"' -do 'run 1ms' -do 'quit'
 
 
 run_ctr_slaves_testbench_sim:vivado2018.3:modelsim10.6c:
   extends: .template_base
-  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-cc7:2020-03-15__ipbb0.5.2_uhal2.7.2
+  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-centos7:2021-04-26__ipbbdev-2021f_uhal2.8.0
   tags:
     - docker
     - xilinx-tools

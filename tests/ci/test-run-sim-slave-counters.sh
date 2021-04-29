@@ -37,13 +37,13 @@ set -e
 cd ${WORK_ROOT}
 rm -rf proj/${PROJ}
 
-ipbb proj create sim -t top_sim.dep ${PROJ} ipbus-firmware:tests/ctr_slaves 
+ipbb proj create sim ${PROJ} ipbus-firmware:tests/ctr_slaves top_sim.dep
 cd proj/sim_ctr_slaves
 
 ipbb sim setup-simlib
 ipbb sim ipcores
 ipbb sim fli-udp
-ipbb sim make-project
+ipbb sim generate-project
 ipbb sim addrtab
 
 set -x
