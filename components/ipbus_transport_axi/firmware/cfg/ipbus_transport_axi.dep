@@ -33,6 +33,6 @@ src ipbus_transport_multibuffer_rx_dpram.vhd ipbus_transport_multibuffer_tx_dpra
 
 src ipbus_axi_decl.vhd
 
-?toolset=="Vivado"? src ../cgn/axi_bram_ctrl_0.xci
+? toolset.lower() == "vivado" ? src ../cgn/axi_bram_ctrl_0.xci
 
 include -c components/ipbus_core
