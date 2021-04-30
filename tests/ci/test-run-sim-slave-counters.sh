@@ -47,7 +47,7 @@ ipbb sim generate-project
 ipbb sim addrtab
 
 set -x
-./vsim -c work.top -do 'run 60sec' -do 'quit' > /dev/null 2>&1 &
+./run_sim -c work.top -do 'run 60sec' -do 'quit' > /dev/null 2>&1 &
 VSIM_PID=$!
 VSIM_PGRP=$(ps -p ${VSIM_PID} -o pgrp=)
 

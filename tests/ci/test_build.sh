@@ -65,7 +65,7 @@ if [[ "$PROJ" == "sim" ]]; then
   ipbb sim generate-project
   cd proj/sim
   set -x
-  ./vsim -c work.top -gIP_ADDR='X"c0a8c902"' -do 'run 60sec' -do 'quit' > /dev/null 2>&1 &
+  ./run_sim -c work.top -gIP_ADDR='X"c0a8c902"' -do 'run 60sec' -do 'quit' > /dev/null 2>&1 &
   VSIM_PID=$!
   VSIM_PGRP=$(ps -p ${VSIM_PID} -o pgrp=)
   # ait for the simulation to start
