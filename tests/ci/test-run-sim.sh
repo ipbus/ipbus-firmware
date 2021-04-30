@@ -61,7 +61,7 @@ if [[ "$PROJ" == "sim" ]]; then
   cd proj/${PROJ}
   ipbb sim setup-simlib
   ipbb sim ipcores
-  ipbb sim fli
+  ipbb sim fli-eth
   ipbb sim generate-project
   set -x
   ./vsim -c work.top -gIP_ADDR='X"c0a8c902"' -do 'run 60sec' -do 'quit' > /dev/null 2>&1 &
