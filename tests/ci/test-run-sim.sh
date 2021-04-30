@@ -57,12 +57,12 @@ echo "#------------------------------------------------"
 echo "Building Project ${PROJ}"
 echo "#------------------------------------------------"
 if [[ "$PROJ" == "sim" ]]; then
-  ipbb proj create sim sim ipbus-firmware:projects/example top_sim_eth.dep
-  ipbb sim -p ${PROJ} setup-simlib
-  ipbb sim -p ${PROJ} ipcores
-  ipbb sim -p ${PROJ} fli
-  ipbb sim -p ${PROJ} generate-project
-  cd proj/sim
+  ipbb proj create sim ${PROJ} ipbus-firmware:projects/example top_sim_eth.dep
+  cd proj/${PROJ}
+  ipbb sim setup-simlib
+  ipbb sim ipcores
+  ipbb sim fli
+  ipbb sim generate-project
   set -x
   ./vsim -c work.top -gIP_ADDR='X"c0a8c902"' -do 'run 60sec' -do 'quit' > /dev/null 2>&1 &
   VSIM_PID=$!

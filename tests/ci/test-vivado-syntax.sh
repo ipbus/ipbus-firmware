@@ -57,8 +57,9 @@ echo "#------------------------------------------------"
 echo "Building Project ${PROJ}"
 echo "#------------------------------------------------"
 ipbb proj create vivado ${PROJ} ipbus-firmware:projects/example top_${PROJ}.dep
-ipbb vivado -p ${PROJ} generate-project
-ipbb vivado -p ${PROJ} check-syntax
+cd proj/${PROJ}
+ipbb vivado generate-project
+ipbb vivado check-syntax
 
 
 
