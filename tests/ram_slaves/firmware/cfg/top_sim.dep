@@ -23,6 +23,6 @@
 #
 #-------------------------------------------------------------------------------
 
-include -c boards/sim sim_eth.dep
+include -c boards/sim sim_udp.dep
 include ram_slaves_tester.dep
 src -c components/ipbus_core ipbus_package.vhd
