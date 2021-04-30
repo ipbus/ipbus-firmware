@@ -26,8 +26,8 @@
 
 
 SH_SOURCE=${BASH_SOURCE}
-IPBUS_PATH=$(cd $(dirname ${SH_SOURCE})/../.. && pwd)
-WORK_ROOT=$(cd ${IPBUS_PATH}/../.. && pwd)
+IPBUS_PATH=$(readlink -f $(cd $(dirname ${SH_SOURCE})/../.. && pwd))
+WORK_ROOT=$(cd $(dirname ${SH_SOURCE})/../../../.. && pwd)
 PROJ=sim_ctr_slaves
 
 # Stop on the first error
