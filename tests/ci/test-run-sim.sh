@@ -25,13 +25,23 @@
 #-------------------------------------------------------------------------------
 
 
+function print_log_on_error {
+  set +x
+  echo " ----------------------------------------------------"
+  echo " ----------------------------------------------------"
+  echo "ERROR occurred. Printing simulation output before bailing"
+  cat ${SIM_LOGFILE}
+}
 
 
 SH_SOURCE=${BASH_SOURCE}
 IPBUS_PATH=$(cd $(dirname ${SH_SOURCE})/../.. && pwd)
 WORK_ROOT=$(cd ${IPBUS_PATH}/../.. && pwd)
 
+SIM_LOGFILE=sim_output.txt
 PROJECTS=(sim)
+
+
 
 if (( $# != 1 )); then
   echo "No project specified."
@@ -64,7 +74,8 @@ if [[ "$PROJ" == "sim" ]]; then
   ipbb sim fli-eth
   ipbb sim generate-project
   set -x
-  ./run_sim -c work.top -gIP_ADDR='X"c0a8c902"' -do 'run 60sec' -do 'quit' > /dev/null 2>&1 &
+  ./run_sim -c work.top -gIP_ADDR='X"c0a8c902"' -do 'run 60sec' -do 'quit' > ${SIM_LOGFILE} 2>&1 &
+  trap print_log_on_error EXIT
   VSIM_PID=$!
   VSIM_PGRP=$(ps -p ${VSIM_PID} -o pgrp=)
   # ait for the simulation to start
