@@ -56,9 +56,10 @@ rm -rf proj/${PROJ}
 echo "#------------------------------------------------"
 echo "Building Project ${PROJ}"
 echo "#------------------------------------------------"
-ipbb proj create vivado -t top_${PROJ}.dep ${PROJ} ipbus-firmware:projects/example
-ipbb vivado -p ${PROJ} make-project
-ipbb vivado -p ${PROJ} check-syntax
+ipbb proj create vivado ${PROJ} ipbus-firmware:projects/example top_${PROJ}.dep
+cd proj/${PROJ}
+ipbb vivado generate-project
+ipbb vivado check-syntax
 
 
 

@@ -57,14 +57,15 @@ echo "#------------------------------------------------"
 echo "Building Project ${PROJ}"
 echo "#------------------------------------------------"
 if [[ "$PROJ" == "sim" ]]; then
-  ipbb proj create sim -t top_sim.dep sim ipbus-firmware:projects/example 
-  ipbb sim -p ${PROJ} setup-simlib
-  ipbb sim -p ${PROJ} ipcores
-  ipbb sim -p ${PROJ} fli
-  ipbb sim -p ${PROJ} make-project
+  ipbb proj create sim ${PROJ} ipbus-firmware:projects/example top_sim.dep
+  cd proj/${PROJ}
+  ipbb sim setup-simlib
+  ipbb sim ipcores
+  ipbb sim fli
+  ipbb sim generate-project
   cd proj/sim
   set -x
-  ./vsim -c work.top -gIP_ADDR='X"c0a8c902"' -do 'run 60sec' -do 'quit' > /dev/null 2>&1 &
+  ./run_sim -c work.top -gIP_ADDR='X"c0a8c902"' -do 'run 60sec' -do 'quit' > /dev/null 2>&1 &
   VSIM_PID=$!
   VSIM_PGRP=$(ps -p ${VSIM_PID} -o pgrp=)
   # ait for the simulation to start
@@ -75,11 +76,13 @@ if [[ "$PROJ" == "sim" ]]; then
   pkill -SIGINT -g ${VSIM_PGRP} vsimk
   set +x
 else
-  ipbb proj create vivado -t top_${PROJ}.dep ${PROJ} ipbus-firmware:projects/example
-  ipbb vivado -p ${PROJ} make-project
-  ipbb vivado -p ${PROJ} synth -j4
-  ipbb vivado -p ${PROJ} impl 
-  ipbb vivado -p ${PROJ} bitfile
+  ipbb proj create vivado ${PROJ} ipbus-firmware:projects/example top_${PROJ}.dep
+  cd proj/${PROJ}
+  ipbb vivado generate-project
+  ipbb vivado synth -j4
+  ipbb vivado impl 
+  ipbb vivado bitfile
+  cd -
 fi
 
 exit 0

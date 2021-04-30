@@ -26,8 +26,8 @@
 
 
 SH_SOURCE=${BASH_SOURCE}
-IPBUS_PATH=$(cd $(dirname ${SH_SOURCE})/../.. && pwd)
-WORK_ROOT=$(cd ${IPBUS_PATH}/../.. && pwd)
+IPBUS_PATH=$(readlink -f $(cd $(dirname ${SH_SOURCE})/../.. && pwd))
+WORK_ROOT=$(cd $(dirname ${SH_SOURCE})/../../../.. && pwd)
 PROJ=sim_ctr_slaves
 
 # Stop on the first error
@@ -37,17 +37,17 @@ set -e
 cd ${WORK_ROOT}
 rm -rf proj/${PROJ}
 
-ipbb proj create sim -t top_sim.dep ${PROJ} ipbus-firmware:tests/ctr_slaves 
+ipbb proj create sim ${PROJ} ipbus-firmware:tests/ctr_slaves top_sim.dep
 cd proj/sim_ctr_slaves
 
 ipbb sim setup-simlib
 ipbb sim ipcores
 ipbb sim fli-udp
-ipbb sim make-project
+ipbb sim generate-project
 ipbb sim addrtab
 
 set -x
-./vsim -c work.top -do 'run 60sec' -do 'quit' > /dev/null 2>&1 &
+./run_sim -c work.top -do 'run 60sec' -do 'quit' > /dev/null 2>&1 &
 VSIM_PID=$!
 VSIM_PGRP=$(ps -p ${VSIM_PID} -o pgrp=)
 

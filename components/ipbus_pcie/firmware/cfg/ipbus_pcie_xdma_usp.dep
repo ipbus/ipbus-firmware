@@ -24,7 +24,7 @@
 #-------------------------------------------------------------------------------
 
 src pcie_xdma_axi_usp_if.vhd
-?toolset=="Vivado"? src ../cgn/pcie_xdma_usp/xdma_0.xci
+? toolset == "vivado" ? src ../cgn/pcie_xdma_usp/xdma_0.xci
 src pcie_int_gen_msix.vhd
 
 src -c components/ipbus_transport_axi ipbus_axi_decl.vhd

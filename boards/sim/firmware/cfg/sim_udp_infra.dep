@@ -23,6 +23,12 @@
 #
 #-------------------------------------------------------------------------------
 
+# Dummy device information
+# (Not used in practice for this specific simulation, but required for setting up sim project)
+@device_name = "xcvu9p"
+@device_package = "-flga2104"
+@device_speed = "-2L-e"
+
 
 src sim_udp_infra.vhd
 src -c components/ipbus_util ../sim_hdl/clock_sim.vhd

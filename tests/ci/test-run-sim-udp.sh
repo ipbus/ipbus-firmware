@@ -57,14 +57,14 @@ echo "#------------------------------------------------"
 echo "Building Project ${PROJ}"
 echo "#------------------------------------------------"
 if [[ "$PROJ" == "sim" ]]; then
-  ipbb proj create sim -t top_sim_udp.dep sim_udp ipbus-firmware:projects/example 
+  ipbb proj create sim sim_udp ipbus-firmware:projects/example top_sim_udp.dep
   cd proj/sim_udp
   ipbb sim setup-simlib
   ipbb sim ipcores
   ipbb sim fli-udp
-  ipbb sim make-project
+  ipbb sim generate-project
   set -x
-  ./vsim -c work.top -do 'run 60sec' -do 'quit' > /dev/null 2>&1 &
+  ./run_sim -c work.top -do 'run 60sec' -do 'quit' > /dev/null 2>&1 &
   VSIM_PID=$!
   VSIM_PGRP=$(ps -p ${VSIM_PID} -o pgrp=)
   # Wait for the simulation to start

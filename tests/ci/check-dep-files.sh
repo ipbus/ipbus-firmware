@@ -40,7 +40,7 @@ do
       TOOLSET=$([[ "${componentDir}/firmware/cfg/${depFile}" =~ "sim" ]] && echo "sim" || echo "vivado")
 
       echo "Checking ${componentDir} - ${depFile}   [tool: ${TOOLSET}]"
-      ipbb toolbox check-dep -t ${TOOLSET} ipbus-firmware:${componentDir} $(basename ${depFile})
+      ipbb toolbox check-dep ${TOOLSET} ipbus-firmware:${componentDir} $(basename ${depFile})
 
       if [ $? -ne 0 ]; then
         ((N_ERRORS++))
