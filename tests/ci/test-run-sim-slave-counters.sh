@@ -25,9 +25,20 @@
 #-------------------------------------------------------------------------------
 
 
+function print_log_on_error {
+  set +x
+  echo " ----------------------------------------------------"
+  echo " ----------------------------------------------------"
+  echo "ERROR occurred. Printing simulation output before bailing"
+  cat ${SIM_LOGFILE}
+}
+
+
 SH_SOURCE=${BASH_SOURCE}
 IPBUS_PATH=$(readlink -f $(cd $(dirname ${SH_SOURCE})/../.. && pwd))
 WORK_ROOT=$(cd $(dirname ${SH_SOURCE})/../../../.. && pwd)
+
+SIM_LOGFILE=sim_output.txt
 PROJ=sim_ctr_slaves
 
 # Stop on the first error
@@ -47,7 +58,8 @@ ipbb sim generate-project
 ipbb sim addrtab
 
 set -x
-./run_sim -c work.top -do 'run 60sec' -do 'quit' > /dev/null 2>&1 &
+./run_sim -c work.top -do 'run 60sec' -do 'quit' > ${SIM_LOGFILE} 2>&1 &
+trap print_log_on_error EXIT
 VSIM_PID=$!
 VSIM_PGRP=$(ps -p ${VSIM_PID} -o pgrp=)
 
