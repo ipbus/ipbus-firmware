@@ -29,7 +29,7 @@
 -- Defines records for AXI4 interface
 --
 -- Tom Williams, April 2018
-
+-- edited by Paschalis Vichoudis(CERN) to add AXI NULL constants [2021.04.19]
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
@@ -104,5 +104,49 @@ package ipbus_axi_decl is
 
 		end record;
 
+	constant AXI4MM_MS_NULL: axi4mm_ms(araddr(63 downto 0), awaddr(63 downto 0), wdata(63 downto 0)):=
+	    (
+			aclk    => '0',
+			aresetn => '0',
+            araddr  => (others => '0'),
+			arid    => (others => '0'),
+			arlen   => (others => '0'),
+			arsize  => (others => '0'),
+			arprot  => (others => '0'),
+			arvalid => '0',
+			arlock  => '0',
+			arcache => (others => '0'),
+			arburst => (others => '0'),
+			rready  => '0',
+			awaddr  => (others => '0'),
+			awid    => (others => '0'),
+			awlen   => (others => '0'),
+			awsize  => (others => '0'),
+			awburst => (others => '0'),
+			awprot  => (others => '0'),
+			awvalid => '0',
+			awlock  => '0',
+			awcache => (others => '0'),
+			wdata   => (others => '0'),
+			wlast   => '0',
+			wstrb   => (others => '0'),
+			wvalid  => '0',
+			bready  => '0'
+        );
 
+	constant AXI4MM_SM_NULL: axi4mm_sm(rdata(63 downto 0)):=
+	    (		
+	        arready => '0',
+            rdata   => (others => '0'),
+			rid     => (others => '0'),
+			rresp   => (others => '0'),
+			rlast   => '0',
+			rvalid  => '0',
+			awready => '0',
+			wready  => '0',
+			bvalid  => '0',
+			bresp   => (others => '0'),
+			bid     => (others => '0')
+        );
+		
 end ipbus_axi_decl;
