@@ -42,10 +42,10 @@ quick_check:zcu102_basex__2019.2:
     VIVADO_VERSION: "2019.2"
     PROJ: zcu102_basex
 
-quick_check:zcu102_c2c_loopback__2019.1:
+quick_check:zcu102_c2c_loopback__2019.2:
   extends: .template_vivado_quick_check
   variables:
-    VIVADO_VERSION: "2019.1"
+    VIVADO_VERSION: "2019.2"
     PROJ: zcu102_c2c_loopback
 
 quick_check:k800__2018.3:
