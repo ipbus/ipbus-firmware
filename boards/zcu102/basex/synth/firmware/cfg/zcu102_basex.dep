@@ -29,3 +29,4 @@ src top_zcu102_basex.vhd
 include zcu102_basex_infra.dep
 src -c components/ipbus_core ipbus_package.vhd
 src --cd ../ucf zcu102_basex.tcl
+src -c components/ipbus_util --cd ../ucf clock_utils.tcl

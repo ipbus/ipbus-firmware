@@ -19,7 +19,9 @@ def reset(csr_node):
     csr_node.getNode('rst').write(1)
     csr_node.getNode('rst').write(0)
     csr_node.getClient().dispatch()
-
+    csr_node.getNode('ctr_rst').write(1)
+    csr_node.getNode('ctr_rst').write(0)
+    csr_node.getClient().dispatch()
 
 class Controller:
 

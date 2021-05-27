@@ -22,10 +22,22 @@
 --       https://ipbus.web.cern.ch/ipbus
 --
 ---------------------------------------------------------------------------------
-
-
--- ...
--- ...
+--
+-- CPU-FPGA interface 
+-- * Separated into N pages; 1 IPbus packet per page (same format as with IPbus 2.0 over UDP/TCP); i.e. N = maximum number of packets in flight
+-- * *FPGA-to-CPU* (in 32-bit words)
+--   * Word 0: N
+--   * Word 1: M = number of 32-bit words per page
+--   * Word 2: Index of next request (CPU-to-FPGA) page to fill
+--   * Word 3: Number of reply pages that have been filled
+--   * For `i` in `0` to `N-1`:
+--     * Word `4 + M * i` : Start of page `i` ; `0x00010000` + number of words in IPbus reply packet excluding packet header
+--     * Words `5 + M * i` to `5 + M * i + packet size`: IPbus reply packet
+-- * *CPU-to-FPGA* (in 32-bit words)
+--   * For `i` in `0` to `N-1`:
+--     * Word `M * i` : Start of page `i`; `0x00010000` + number of words in IPbus request packet excluding packet header
+--     * Word `M * i + 1` to `M * i + 1 + packet size` : IPbus request packet
+--
 -- Tom Williams, June 2018
 
 library ieee;
