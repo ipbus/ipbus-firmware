@@ -50,12 +50,12 @@ build:zcu102_basex__2019.2:
   dependencies:
     - quick_check:zcu102_basex__2019.2
 
-build:zcu102_c2c_loopback__2019.2:
-  extends: .template_vivado_build
-  variables:
-    VIVADO_VERSION: "2019.2"
-  dependencies:
-    - quick_check:zcu102_c2c_loopback__2019.2
+# build:zcu102_c2c_loopback__2019.2:
+#   extends: .template_vivado_build
+#   variables:
+#     VIVADO_VERSION: "2019.2"
+#   dependencies:
+#     - quick_check:zcu102_c2c_loopback__2019.2
 
 build:k800__2018.3:
   extends: .template_vivado_build
