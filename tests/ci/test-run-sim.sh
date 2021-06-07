@@ -33,6 +33,18 @@ function print_log_on_error {
   cat ${SIM_LOGFILE}
 }
 
+function wait_for_file {
+  i=0
+  while [ ! -f ${HAVE_LICENCE_FILE} ]; do 
+    ((i++))
+    m=$(($i%6))
+    if [[ "$m" -eq "0" ]]  ]]; then
+      echo "Tik tok $i";
+    fi
+    sleep 10; 
+  done
+}
+
 
 SH_SOURCE=${BASH_SOURCE}
 IPBUS_PATH=$(cd $(dirname ${SH_SOURCE})/../.. && pwd)
@@ -74,7 +86,9 @@ if [[ "$PROJ" == "sim" ]]; then
   ipbb sim fli-eth
   ipbb sim generate-project
   set -x
-  ./run_sim -c work.top -gIP_ADDR='X"c0a8c902"' -do 'run 60sec' -do 'quit' > ${SIM_LOGFILE} 2>&1 &
+  HAVE_LICENCE_FILE="i_got_a_licence.txt"
+  ./run_sim -c work.top -gIP_ADDR='X"c0a8c902"' -do "exec touch ${HAVE_LICENCE_FILE}" -do 'run 60sec' -do 'quit' > ${SIM_LOGFILE} 2>&1 &
+  while [ ! -f ${HAVE_LICENCE_FILE} ]; do sleep 10; done
   trap print_log_on_error EXIT
   VSIM_PID=$!
   VSIM_PGRP=$(ps -p ${VSIM_PID} -o pgrp=)
