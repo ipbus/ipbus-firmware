@@ -39,7 +39,7 @@ function wait_for_licence {
     ((i=i+1))
     m=$(($i%6))
     if [[ "$m" -eq "0" ]]; then
-      echo "Waiting for licene to be acquired (${HAVE_LICENCE_FILE}) [$i]"
+      echo "Waiting for license to be acquired (${HAVE_LICENCE_FILE}) [$i]"
     fi
     sleep 10; 
   done
