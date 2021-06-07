@@ -52,14 +52,14 @@ WORK_ROOT=$(cd ${IPBUS_PATH}/../.. && pwd)
 
 SIM_LOGFILE=sim_output.txt
 
-
+PROJ=sim_eth
 cd ${WORK_ROOT}
 rm -rf proj/${PROJ}
 echo "#------------------------------------------------"
 echo "Building Project ${PROJ}"
 echo "#------------------------------------------------"
 
-ipbb proj create sim sim_eth ipbus-firmware:projects/example top_sim_eth.dep
+ipbb proj create sim ${PROJ} ipbus-firmware:projects/example top_sim_eth.dep
 cd proj/${PROJ}
 ipbb sim setup-simlib
 ipbb sim ipcores

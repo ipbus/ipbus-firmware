@@ -22,7 +22,7 @@ run_sim_udp:vivado2019.2:questasim2019.2:
     - /${CI_PROJECT_DIR}/work_area/src/ipbus-firmware/tests/ci/test-run-sim-udp.sh sim
 
 
-run_sim:vivado2019.2:questasim2019.2:
+run_sim_eth:vivado2019.2:questasim2019.2:
   extends: .template_base
   image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-centos7:2021-04-26__ipbbdev-2021f_uhal2.8.0
   tags:
