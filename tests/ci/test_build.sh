@@ -31,7 +31,7 @@ SH_SOURCE=${BASH_SOURCE}
 IPBUS_PATH=$(cd $(dirname ${SH_SOURCE})/../.. && pwd)
 WORK_ROOT=$(cd ${IPBUS_PATH}/../.. && pwd)
 
-PROJECTS=(sim enclustra_ax3_pm3_a35 enclustra_ax3_pm3_a50 kc705_basex kc705_gmii kcu105_basex zcu102_basex)
+PROJECTS=(sim kc705_basex kc705_gmii kcu105_basex zcu102_basex)
 
 if (( $# != 1 )); then
   echo "No project specified."

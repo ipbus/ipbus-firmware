@@ -1,26 +1,3 @@
-
-quick_check:enclustra_ax3_pm3_a35__2018.3:
-  extends: .template_vivado_quick_check
-  variables:
-    VIVADO_VERSION: "2018.3"
-    PROJ: enclustra_ax3_pm3_a35
-quick_check:enclustra_ax3_pm3_a35__2019.2:
-  extends: .template_vivado_quick_check
-  variables:
-    VIVADO_VERSION: "2019.2"
-    PROJ: enclustra_ax3_pm3_a35
-
-quick_check:enclustra_ax3_pm3_a50__2018.3:
-  extends: .template_vivado_quick_check
-  variables:
-    VIVADO_VERSION: "2018.3"
-    PROJ: enclustra_ax3_pm3_a50
-quick_check:enclustra_ax3_pm3_a50__2019.2:
-  extends: .template_vivado_quick_check
-  variables:
-    VIVADO_VERSION: "2019.2"
-    PROJ: enclustra_ax3_pm3_a50
-
 quick_check:kc705_basex__2018.3:
   extends: .template_vivado_quick_check
   variables:
@@ -65,10 +42,10 @@ quick_check:zcu102_basex__2019.2:
     VIVADO_VERSION: "2019.2"
     PROJ: zcu102_basex
 
-quick_check:zcu102_c2c_loopback__2019.1:
+quick_check:zcu102_c2c_loopback__2019.2:
   extends: .template_vivado_quick_check
   variables:
-    VIVADO_VERSION: "2019.1"
+    VIVADO_VERSION: "2019.2"
     PROJ: zcu102_c2c_loopback
 
 quick_check:k800__2018.3:
