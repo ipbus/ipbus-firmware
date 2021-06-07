@@ -17,8 +17,8 @@ include:
   - local: '/ci/github-notifications.yml'
   - local: '/ci/templates.yml'
   - local: '/ci/sim.yml'
-  # - local: '/ci/publish.yml'
-  # - local: '/ci/vivado-checks.yml'
-  # - local: '/ci/vivado-builds.yml'
+  - local: '/ci/publish.yml'
+  - local: '/ci/vivado-checks.yml'
+  - local: '/ci/vivado-builds.yml'
 
 
