@@ -8,6 +8,11 @@ run_sim_udp:vivado2019.2:questasim2019.2:
     - docker-device-net-tun
     - xilinx-tools
   stage: quick_checks
+  only:
+  - /^pull-requests.[0-9]+$/
+  - master
+  - tags
+  - web
   variables:
     VIVADO_VERSION: "2019.2"
     IPBB_SIMLIB_BASE: /scratch/xilinx-simlibs
@@ -31,6 +36,11 @@ run_sim_eth:vivado2019.2:questasim2019.2:
     - docker-device-net-tun
     - xilinx-tools
   stage: quick_checks
+  only:
+  - /^pull-requests.[0-9]+$/
+  - master
+  - tags
+  - web
   variables:
     VIVADO_VERSION: "2019.2"
     IPBB_SIMLIB_BASE: /scratch/xilinx-simlibs
@@ -55,6 +65,11 @@ run_ram_slaves_testbench_sim:vivado2019.2:questasim2019.2:
     - docker-device-net-tun
     - xilinx-tools
   stage: quick_checks
+  only:
+  - /^pull-requests.[0-9]+$/
+  - master
+  - tags
+  - web
   variables:
     VIVADO_VERSION: "2019.2"
     IPBB_SIMLIB_BASE: /scratch/xilinx-simlibs
@@ -82,6 +97,11 @@ run_ctr_slaves_testbench_sim:vivado2019.2:questasim2019.2:
     - docker
     - xilinx-tools
   stage: quick_checks
+  only:
+  - /^pull-requests.[0-9]+$/
+  - master
+  - tags
+  - web
   variables:
     VIVADO_VERSION: "2019.2"
     IPBB_SIMLIB_BASE: /scratch/xilinx-simlibs
