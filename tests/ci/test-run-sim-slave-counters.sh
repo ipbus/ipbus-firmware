@@ -59,7 +59,7 @@ echo "#------------------------------------------------"
 echo "Building Project ${PROJ}"
 echo "#------------------------------------------------"
 
-ipbb proj create sim ${PROJ} ipbus-firmware:tests/ctr_slaves top_sim_eth.dep
+ipbb proj create sim ${PROJ} ipbus-firmware:tests/ctr_slaves top_sim.dep
 cd proj/${PROJ}
 ipbb sim setup-simlib
 ipbb sim ipcores
