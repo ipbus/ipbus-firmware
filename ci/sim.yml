@@ -1,5 +1,5 @@
 
-run_sim_udp:vivado2018.3:modelsim10.6c:
+run_sim_udp:vivado2019.2:questasim2019.2:
   extends: .template_base
   image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-centos7:2021-04-26__ipbbdev-2021f_uhal2.8.0
   tags:
@@ -8,11 +8,16 @@ run_sim_udp:vivado2018.3:modelsim10.6c:
     - docker-device-net-tun
     - xilinx-tools
   stage: quick_checks
+  only:
+  - /^pull-requests.[0-9]+$/
+  - master
+  - tags
+  - web
   variables:
-    VIVADO_VERSION: "2018.3"
+    VIVADO_VERSION: "2019.2"
     IPBB_SIMLIB_BASE: /scratch/xilinx-simlibs
   script:
-    - export PATH=/software/mentor/modelsim_10.6c/modeltech/bin:$PATH
+    - export PATH=/software/mentor/questa/2019.2/questasim/bin:$PATH
     - export PATH=/opt/cactus/bin/uhal/tests:$PATH
     - export LD_LIBRARY_PATH=/opt/cactus/lib:$LD_LIBRARY_PATH
 
@@ -22,7 +27,7 @@ run_sim_udp:vivado2018.3:modelsim10.6c:
     - /${CI_PROJECT_DIR}/work_area/src/ipbus-firmware/tests/ci/test-run-sim-udp.sh sim
 
 
-run_sim:vivado2018.3:modelsim10.6c:
+run_sim_eth:vivado2019.2:questasim2019.2:
   extends: .template_base
   image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-centos7:2021-04-26__ipbbdev-2021f_uhal2.8.0
   tags:
@@ -31,22 +36,27 @@ run_sim:vivado2018.3:modelsim10.6c:
     - docker-device-net-tun
     - xilinx-tools
   stage: quick_checks
+  only:
+  - /^pull-requests.[0-9]+$/
+  - master
+  - tags
+  - web
   variables:
-    VIVADO_VERSION: "2018.3"
+    VIVADO_VERSION: "2019.2"
     IPBB_SIMLIB_BASE: /scratch/xilinx-simlibs
   script:
     - sudo openvpn --mktun --dev tap0
     - sudo /sbin/ifconfig tap0 up 192.168.201.1
     - sudo chmod a+rw /dev/net/tun
-    - export PATH=/software/mentor/modelsim_10.6c/modeltech/bin:$PATH
+    - export PATH=/software/mentor/questa/2019.2/questasim/bin:$PATH
 
     - ipbb init work_area
     - cd work_area
     - ln -s ${CI_PROJECT_DIR} src/ipbus-firmware
-    - /${CI_PROJECT_DIR}/work_area/src/ipbus-firmware/tests/ci/test-run-sim.sh sim
+    - /${CI_PROJECT_DIR}/work_area/src/ipbus-firmware/tests/ci/test-run-sim-eth.sh
 
 
-run_ram_slaves_testbench_sim:vivado2018.3:modelsim10.6c:
+run_ram_slaves_testbench_sim:vivado2019.2:questasim2019.2:
   extends: .template_base
   image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-centos7:2021-04-26__ipbbdev-2021f_uhal2.8.0
   tags:
@@ -55,14 +65,19 @@ run_ram_slaves_testbench_sim:vivado2018.3:modelsim10.6c:
     - docker-device-net-tun
     - xilinx-tools
   stage: quick_checks
+  only:
+  - /^pull-requests.[0-9]+$/
+  - master
+  - tags
+  - web
   variables:
-    VIVADO_VERSION: "2018.3"
+    VIVADO_VERSION: "2019.2"
     IPBB_SIMLIB_BASE: /scratch/xilinx-simlibs
   script:
     - sudo openvpn --mktun --dev tap0
     - sudo /sbin/ifconfig tap0 up 192.168.201.1
     - sudo chmod a+rw /dev/net/tun
-    - export PATH=/software/mentor/modelsim_10.6c/modeltech/bin:$PATH
+    - export PATH=/software/mentor/questa/2019.2/questasim/bin:$PATH
     - ipbb init work_area
     - cd work_area
     - ln -s ${CI_PROJECT_DIR} src/ipbus-firmware
@@ -75,18 +90,23 @@ run_ram_slaves_testbench_sim:vivado2018.3:modelsim10.6c:
     - ./run_sim -c work.top -do 'run 1ms' -do 'quit'
 
 
-run_ctr_slaves_testbench_sim:vivado2018.3:modelsim10.6c:
+run_ctr_slaves_testbench_sim:vivado2019.2:questasim2019.2:
   extends: .template_base
   image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-centos7:2021-04-26__ipbbdev-2021f_uhal2.8.0
   tags:
     - docker
     - xilinx-tools
   stage: quick_checks
+  only:
+  - /^pull-requests.[0-9]+$/
+  - master
+  - tags
+  - web
   variables:
-    VIVADO_VERSION: "2018.3"
+    VIVADO_VERSION: "2019.2"
     IPBB_SIMLIB_BASE: /scratch/xilinx-simlibs
   script:
-    - export PATH=/software/mentor/modelsim_10.6c/modeltech/bin:$PATH
+    - export PATH=/software/mentor/questa/2019.2/questasim/bin:$PATH
     - export LD_LIBRARY_PATH=/opt/cactus/lib:$LD_LIBRARY_PATH
 
     - ipbb init work_area
