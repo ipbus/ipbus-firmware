@@ -154,7 +154,7 @@ begin
             debug_leds(7 downto 0) => debug_leds(7 downto 0),
             dip_sw                 => dip_sw,
             -- eth clock out
-            clk125_eth                => clk_eth,
+            clk125_eth             => clk_eth,
             -- mac ports (go to ipbus)
             tx_data                => tx_data,
             rx_data                => rx_data,

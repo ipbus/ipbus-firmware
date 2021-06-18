@@ -29,6 +29,5 @@ setup -f xdma_loc.tcl
 
 src top_k800.vhd
 include k800_infra.dep
-include -c components/ipbus_util ipbus_example.dep
 src -c components/ipbus_core ipbus_package.vhd
 src --cd ../ucf k800.tcl

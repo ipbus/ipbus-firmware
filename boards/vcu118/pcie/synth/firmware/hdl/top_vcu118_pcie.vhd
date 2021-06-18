@@ -42,78 +42,78 @@ use UNISIM.VComponents.all;
 
 
 entity top is
-  port(
-    -- PCIe clock and reset
-    pcie_sys_clk_p : in std_logic;
-    pcie_sys_clk_n : in std_logic;
-    pcie_sys_rst_n : in std_logic;  -- active low reset from the pcie edge connector
+    port(
+        -- PCIe clock and reset
+        pcie_sys_clk_p : in std_logic;
+        pcie_sys_clk_n : in std_logic;
+        pcie_sys_rst_n : in std_logic;  -- active low reset from the pcie edge connector
 
-    -- PCIe lanes
-    pcie_rx_p : in std_logic_vector(0 downto 0);
-    pcie_rx_n : in std_logic_vector(0 downto 0);
-    pcie_tx_p : out std_logic_vector(0 downto 0);
-    pcie_tx_n : out std_logic_vector(0 downto 0);
+        -- PCIe lanes
+        pcie_rx_p : in  std_logic_vector(0 downto 0);
+        pcie_rx_n : in  std_logic_vector(0 downto 0);
+        pcie_tx_p : out std_logic_vector(0 downto 0);
+        pcie_tx_n : out std_logic_vector(0 downto 0);
 
-    -- External oscillator
-    osc_clk_p : in std_logic;
-    osc_clk_n : in std_logic;
+        -- External oscillator
+        osc_clk_p : in std_logic;
+        osc_clk_n : in std_logic;
 
-    -- status LEDs
-    leds: out std_logic_vector(3 downto 0)
-  );
+        -- status LEDs
+        leds : out std_logic_vector(3 downto 0)
+        );
 
 end top;
 
 architecture rtl of top is
 
-  signal clk_ipb, rst_ipb, clk_aux, rst_aux, nuke, soft_rst, userled : std_logic;
-  
-  signal ipb_out: ipb_wbus;
-  signal ipb_in: ipb_rbus;
+    signal clk_ipb, rst_ipb, clk_aux, rst_aux, nuke, soft_rst, userled : std_logic;
+
+    signal ipb_out : ipb_wbus;
+    signal ipb_in  : ipb_rbus;
 
 
 begin
 
 -- Infrastructure
 
-  infra: entity work.vcu118_infra_pcie
-    port map(
-      pcie_sys_clk_p => pcie_sys_clk_p,
-      pcie_sys_clk_n => pcie_sys_clk_n,
-      pcie_sys_rst_n => pcie_sys_rst_n,
-      pcie_rx_p      => pcie_rx_p,
-      pcie_rx_n      => pcie_rx_n,
-      pcie_tx_p      => pcie_tx_p,
-      pcie_tx_n      => pcie_tx_n,
-      osc_clk_p      => osc_clk_p,
-      osc_clk_n      => osc_clk_n,
-      clk_ipb_o     => clk_ipb,
-      rst_ipb_o     => rst_ipb,
-      clk_aux_o     => clk_aux,
-      rst_aux_o     => rst_aux,
-      nuke           => nuke,
-      soft_rst       => soft_rst,
-      leds           => leds(1 downto 0),
-      ipb_in         => ipb_in,
-      ipb_out        => ipb_out
-      );
-      
-  leds(3 downto 2) <= '0' & userled;
+    infra : entity work.vcu118_infra_pcie
+        port map(
+            pcie_sys_clk_p => pcie_sys_clk_p,
+            pcie_sys_clk_n => pcie_sys_clk_n,
+            pcie_sys_rst_n => pcie_sys_rst_n,
+            pcie_rx_p      => pcie_rx_p,
+            pcie_rx_n      => pcie_rx_n,
+            pcie_tx_p      => pcie_tx_p,
+            pcie_tx_n      => pcie_tx_n,
+            osc_clk_p      => osc_clk_p,
+            osc_clk_n      => osc_clk_n,
+            clk_ipb_o      => clk_ipb,
+            rst_ipb_o      => rst_ipb,
+            clk_aux_o      => clk_aux,
+            rst_aux_o      => rst_aux,
+            nuke           => nuke,
+            soft_rst       => soft_rst,
+            leds           => leds(1 downto 0),
+            ipb_in         => ipb_in,
+            ipb_out        => ipb_out
+            );
+
+    leds(3 downto 2) <= '0' & userled;
 
 -- ipbus slaves live in the entity below, and can expose top-level ports.
 -- The ipbus fabric is instantiated within.
 
-  payload: entity work.payload
-    port map(
-      ipb_clk => clk_ipb,
-      ipb_rst => rst_ipb,
-      ipb_in => ipb_out,
-      ipb_out => ipb_in,
-      clk => clk_aux,
-      rst => rst_aux,
-      nuke => nuke,
-      soft_rst => soft_rst,
-      userled => userled
-    );
+    payload : entity work.payload
+        port map(
+            ipb_clk  => clk_ipb,
+            ipb_rst  => rst_ipb,
+            ipb_in   => ipb_out,
+            ipb_out  => ipb_in,
+            clk      => clk_aux,
+            rst      => rst_aux,
+            nuke     => nuke,
+            soft_rst => soft_rst,
+            userled  => userled
+            );
 
 end rtl;

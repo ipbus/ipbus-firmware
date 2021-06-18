@@ -55,7 +55,7 @@ entity eth_sgmii_lvds_vcu118 is
         phy_mdio    : inout std_logic;  -- control line to program the PHY chip
         phy_mdc     : out   std_logic;  -- clock line (must be < 2.5 MHz)
         -- 125 MHz clocks
-        clk125_eth     : out   std_logic;  -- 125 MHz from ethernet
+        clk125_eth  : out   std_logic;  -- 125 MHz from ethernet
         -- input free-running clock
         clk125_fr   : in    std_logic;
         -- connection control and status (to logic)
@@ -200,16 +200,16 @@ architecture rtl of eth_sgmii_lvds_vcu118 is
     end component;
 
     --- clocks
-    signal clk125_sgmii, clk2mhz      : std_logic;
+    signal clk125_sgmii, clk2mhz        : std_logic;
     --- slow clocks and edges
-    signal onehz, onehz_d, onehz_re   : std_logic                    := '0';  -- slow generated clocks
+    signal onehz, onehz_d, onehz_re     : std_logic                    := '0';  -- slow generated clocks
     --- resets
-    signal rst_delay_slr              : std_logic_vector(4 downto 0) := (others => '1');  -- reset delay shift-register
-    signal rst_i, rst_i_n           : std_logic;  -- in to logic
-    signal rst125_sgmii, rst125_sgmii_n             : std_logic;  -- out from SGMII
-    signal tx_reset_out, rx_reset_out : std_logic;  -- out from MAC
+    signal rst_delay_slr                : std_logic_vector(4 downto 0) := (others => '1');  -- reset delay shift-register
+    signal rst_i, rst_i_n               : std_logic;  -- in to logic
+    signal rst125_sgmii, rst125_sgmii_n : std_logic;  -- out from SGMII
+    signal tx_reset_out, rx_reset_out   : std_logic;  -- out from MAC
     --- locked
-    signal rx_locked, tx_locked       : std_logic;
+    signal rx_locked, tx_locked         : std_logic;
 
     -- data
     signal gmii_txd, gmii_rxd                             : std_logic_vector(7 downto 0);
@@ -220,7 +220,7 @@ architecture rtl of eth_sgmii_lvds_vcu118 is
     signal sgmii_status_vector      : std_logic_vector(15 downto 0);
 
     -- mdio controls and status
-    signal phy_cfg_done, phy_cfg_done_d, phy_cfg_not_done, phy_clkcfg_done, phy_poll_done                        : std_logic := '0';
+    signal phy_cfg_done, phy_cfg_done_d, phy_cfg_not_done, phy_clkcfg_done, phy_poll_done      : std_logic := '0';
     signal phy_status_reg1, phy_status_reg2, phy_status_reg3, phy_status_reg4, phy_status_reg5 : std_logic_vector(15 downto 0);
 
 begin
@@ -277,12 +277,12 @@ begin
     phy_resetb <= not rst_delay_slr(3);
 
     -- Reset to PHY config module and temac
-    rst_i   <= rst_delay_slr(0);       -- high until reset slr is flushed
+    rst_i   <= rst_delay_slr(0);        -- high until reset slr is flushed
     rst_i_n <= not rst_i;  -- as the previous, but negated because the temac like it so
 
     rst125_sgmii_n <= not rst125_sgmii;
     -- Reset to temac clients (outgoing)
-    rst_o       <= tx_reset_out or rx_reset_out;
+    rst_o          <= tx_reset_out or rx_reset_out;
 
 
     mac : temac_gbe_v9_0
@@ -331,8 +331,8 @@ begin
             rxn_0                  => sgmii_rxn,
             signal_detect_0        => phy_clkcfg_done,
             an_adv_config_vector_0 => b"1101_1000_0000_0001",  -- probably useless
-            an_restart_config_0    => an_restart,              --important
-            an_interrupt_0         => open,                    --useless
+            an_restart_config_0    => an_restart,       --important
+            an_interrupt_0         => open,             --useless
             gmii_txd_0             => gmii_txd,
             gmii_tx_en_0           => gmii_tx_en,
             gmii_tx_er_0           => gmii_tx_er,
@@ -340,9 +340,9 @@ begin
             gmii_rx_dv_0           => gmii_rx_dv,
             gmii_rx_er_0           => gmii_rx_er,
             gmii_isolate_0         => open,
-            sgmii_clk_r_0          => open,                    --??
-            sgmii_clk_f_0          => open,                    --??
-            sgmii_clk_en_0         => open,                    --??
+            sgmii_clk_r_0          => open,             --??
+            sgmii_clk_f_0          => open,             --??
+            sgmii_clk_en_0         => open,             --??
             speed_is_10_100_0      => '0',
             speed_is_100_0         => '0',
             status_vector_0        => sgmii_status_vector,
@@ -374,11 +374,11 @@ begin
             rx_vtc_rdy_3           => '1',
             tx_vtc_rdy_3           => '1',
             -- input reset
-            reset                  => phy_cfg_not_done -- hold the bridge in reset until PHY is up and happy
+            reset                  => phy_cfg_not_done  -- hold the bridge in reset until PHY is up and happy
             );
 
     clk125_eth <= clk125_sgmii;
-    locked  <= rx_locked and tx_locked;
+    locked     <= rx_locked and tx_locked;
 
     phy_cfgrt : entity work.phy_mdio_configurator_vcu118
         port map (
@@ -411,7 +411,7 @@ begin
     -- 5: RXDISPERR
     -- 6: RXNOTINTABLE
     -- 7: PHY Link Status
-    
+
     -- PHY status registers
     -- 
     -- https://www.ti.com/lit/gpn/DP83867E
