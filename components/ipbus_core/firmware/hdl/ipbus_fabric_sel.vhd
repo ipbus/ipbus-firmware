@@ -30,6 +30,10 @@
 -- of incoming control lines
 --
 -- Dave Newbold, February 2011
+--
+-- Updated to reflect true ack and err in case of misbehaving slave...
+--
+-- Dave Sankey April 2021
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -55,18 +59,14 @@ end ipbus_fabric_sel;
 architecture rtl of ipbus_fabric_sel is
 
 	signal sel_i: integer range 0 to NSLV := 0;
-	signal ored_ack, ored_err: std_logic_vector(NSLV downto 0);
-	signal qstrobe: std_logic;
+	signal true_ack, true_err, qstrobe: std_logic;
 
 begin
 
 	sel_i <= to_integer(unsigned(sel)) when NSLV > 1 else 0;
-
-	ored_ack(NSLV) <= '0';
-	ored_err(NSLV) <= '0';
 	
 	qstrobe <= ipb_in.ipb_strobe when STROBE_GAP = false else
-	 ipb_in.ipb_strobe and not (ored_ack(0) or ored_err(0));
+	 ipb_in.ipb_strobe and not (true_ack or true_err);
 
 	busgen: for i in NSLV - 1 downto 0 generate
 	begin
@@ -75,13 +75,13 @@ begin
 		ipb_to_slaves(i).ipb_wdata <= ipb_in.ipb_wdata;
 		ipb_to_slaves(i).ipb_strobe <= qstrobe when sel_i = i else '0';
 		ipb_to_slaves(i).ipb_write <= ipb_in.ipb_write;
-		ored_ack(i) <= ored_ack(i+1) or ipb_from_slaves(i).ipb_ack;
-		ored_err(i) <= ored_err(i+1) or ipb_from_slaves(i).ipb_err;		
 
 	end generate;
 
+  true_ack <= ipb_from_slaves(sel_i).ipb_ack when sel_i /= NSLV else '0';
+  true_err <= ipb_from_slaves(sel_i).ipb_err when sel_i /= NSLV else '0';
   ipb_out.ipb_rdata <= ipb_from_slaves(sel_i).ipb_rdata when sel_i /= NSLV else (others => '0');
-  ipb_out.ipb_ack <= ored_ack(0);
-  ipb_out.ipb_err <= ored_err(0);
+  ipb_out.ipb_ack <= true_ack;
+  ipb_out.ipb_err <= true_err;
   
 end rtl;
