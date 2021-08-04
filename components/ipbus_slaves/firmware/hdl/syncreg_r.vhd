@@ -39,7 +39,8 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 entity syncreg_r is
 	generic(
-		SIZE: positive := 32
+		SIZE: positive := 32;
+		ULTRA_SAFE: boolean
 	);
 	port(
 		m_clk: in std_logic;
@@ -93,7 +94,7 @@ begin
 			s2 <= s1;
 			s3 <= s2;
 			s4 <= s3;
-			s5 <= s4 and stab;
+			s5 <= s4 and (stab or not ULTRA_SAFE);
 		end if;
 	end process;
 	
@@ -110,11 +111,12 @@ begin
 			end if;
 		end if;
 	end process;
+
+	m_q <= da;
 	
--- Avoid race between data and handshake
+-- Avoid race between data and handshake (optimised away if ULTRA_SAFE is false)
 
 	db <= da when rising_edge(s_clk);
 	stab <= '1' when db = da else '0';
-	m_q <= da;
 	
 end rtl;

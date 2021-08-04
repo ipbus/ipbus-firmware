@@ -54,7 +54,8 @@ entity ipbus_syncreg_v is
 	generic(
 		N_CTRL: natural := 1;
 		N_STAT: natural := 1;
-		SWAP_ORDER: boolean := false
+		SWAP_ORDER: boolean := false;
+		ULTRA_SAFE: boolean := false
 	);
 	port(
 		clk: in std_logic;
@@ -94,7 +95,7 @@ begin
 	ctrl_cyc_r <= ipb_in.ipb_strobe and not ipb_in.ipb_write and not s_cyc;
 	ctrl_cyc_w <= ipb_in.ipb_strobe and ipb_in.ipb_write and not s_cyc;
 	
--- Avoid race between handshake and bus settling time (since the latter is unconstrained)
+-- Avoid race between data and handshake (optimised away if ULTRA_SAFE is false)
 
 	cd <= ipb_in.ipb_wdata when rising_edge(clk);
 	cstab <= '1' when cd = ipb_in.ipb_wdata else '0';	
@@ -108,7 +109,7 @@ begin
 		
 	begin
 	
-		cwe <= '1' when ctrl_cyc_w = '1' and sel = i and rdy = '1' and cstab = '1' else '0';
+		cwe <= '1' when ctrl_cyc_w = '1' and sel = i and rdy = '1' and (cstab = '1' or not ULTRA_SAFE) else '0';
 		ctrl_m <= ipb_in.ipb_wdata and qmask(i);
 		
 		wsync: entity work.syncreg_w
@@ -135,6 +136,9 @@ begin
 	sre <= stat_cyc and rdy;
 	
 	rsync: entity work.syncreg_r
+		generic map(
+			ULTRA_SAFE => ULTRA_SAFE
+		)
 		port map(
 			m_clk => clk,
 			m_rst => rst,
