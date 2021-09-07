@@ -29,6 +29,8 @@
 @device_speed = "-none"
 @boardname = "sim"
 
+@sim.run_sim.design_units = "work.ipbus_transport_ram_if_simtb"
+
 src ipbus_transport_ram_if_simtb.vhd
 include ipbus_transport_axi.dep
 
