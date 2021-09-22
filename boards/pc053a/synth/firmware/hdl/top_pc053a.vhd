@@ -95,36 +95,37 @@ begin
 
 -- Infrastructure
 
-	-- Should work for artix also...
-	infra: entity work.pc053a_infra 
-		port map(
-			eth_clk_p => eth_clk_p,
-			eth_clk_n => eth_clk_n,
-			eth_tx_p => eth_tx_p,
-			eth_tx_n => eth_tx_n,
-			eth_rx_p => eth_rx_p,
-			eth_rx_n => eth_rx_n,
-			sfp_los => sfp_los,
-			clk_ipb_o => clk_ipb,
-			rst_ipb_o => rst_ipb,
-			clk125_o => clk125,
-			rst125_o => rst125,
-			clk200 => clk200,
-			nuke => nuke,
-			soft_rst => soft_rst,
-			leds => leds(1 downto 0),
-			debug => leds_c,
-			mac_addr(47 downto 4) => MAC_ADDR(47 downto 4),
-			mac_addr(3 downto 0) => dip_sw,
-			ip_addr(31 downto 4) => IP_ADDR(31 downto 4),
-			ip_addr(3 downto 0) => dip_sw,
-			ipb_in => ipb_in,
-			ipb_out => ipb_out
-		);
-	
-	sfp_tx_disable <= '0';
-	sfp_scl <= '1';
-	sfp_sda <= '1';
+    -- Should work for artix also...
+    infra : entity work.pc053a_infra
+        port map(
+            eth_clk_p             => eth_clk_p,
+            eth_clk_n             => eth_clk_n,
+            eth_tx_p              => eth_tx_p,
+            eth_tx_n              => eth_tx_n,
+            eth_rx_p              => eth_rx_p,
+            eth_rx_n              => eth_rx_n,
+            sfp_los               => sfp_los,
+            clk_ipb_o             => clk_ipb,
+            rst_ipb_o             => rst_ipb,
+            clk125_o              => clk125,
+            rst125_o              => rst125,
+            clk200                => clk200,
+            nuke                  => nuke,
+            soft_rst              => soft_rst,
+            leds                  => leds(1 downto 0),
+            debug                 => leds_c,
+            mac_addr(47 downto 4) => MAC_ADDR(47 downto 4),
+            mac_addr(3 downto 0)  => dip_sw,
+            ip_addr(31 downto 4)  => IP_ADDR(31 downto 4),
+            ip_addr(3 downto 0)   => dip_sw,
+            rarp_select           => '0',
+            ipb_in                => ipb_in,
+            ipb_out               => ipb_out
+            );
+
+    sfp_tx_disable <= '0';
+    sfp_scl        <= '1';
+    sfp_sda        <= '1';
 
 	payload: entity work.payload
 		port map(

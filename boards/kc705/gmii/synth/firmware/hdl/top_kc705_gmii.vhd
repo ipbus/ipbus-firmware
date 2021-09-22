@@ -67,37 +67,38 @@ begin
 
 -- Infrastructure
 
-	infra: entity work.kc705_gmii_infra
-		port map(
-			sysclk_p => sysclk_p,
-			sysclk_n => sysclk_n,
-			clk_ipb_o => clk_ipb,
-			rst_ipb_o => rst_ipb,
-			rst_125_o => phy_rst_e,
-			clk_aux_o => clk_aux,
-			rst_aux_o => rst_aux,
-			nuke => nuke,
-			soft_rst => soft_rst,
-			leds => leds(1 downto 0),
-			gmii_gtx_clk => gmii_gtx_clk,
-			gmii_txd => gmii_txd,
-			gmii_tx_en => gmii_tx_en,
-			gmii_tx_er => gmii_tx_er,
-			gmii_rx_clk => gmii_rx_clk,
-			gmii_rxd => gmii_rxd,
-			gmii_rx_dv => gmii_rx_dv,
-			gmii_rx_er => gmii_rx_er,
-			mac_addr => mac_addr,
-			ip_addr => ip_addr,
-			ipb_in => ipb_in,
-			ipb_out => ipb_out
-		);
-		
-	leds(3 downto 2) <= '0' & userled;
-	phy_rst <= not phy_rst_e;
-		
-	mac_addr <= X"020ddba1151" & dip_sw; -- Careful here, arbitrary addresses do not always work
-	ip_addr <= X"c0a8c81" & dip_sw; -- 192.168.200.16+n
+    infra : entity work.kc705_gmii_infra
+        port map(
+            sysclk_p     => sysclk_p,
+            sysclk_n     => sysclk_n,
+            clk_ipb_o    => clk_ipb,
+            rst_ipb_o    => rst_ipb,
+            rst_125_o    => phy_rst_e,
+            clk_aux_o    => clk_aux,
+            rst_aux_o    => rst_aux,
+            nuke         => nuke,
+            soft_rst     => soft_rst,
+            leds         => leds(1 downto 0),
+            gmii_gtx_clk => gmii_gtx_clk,
+            gmii_txd     => gmii_txd,
+            gmii_tx_en   => gmii_tx_en,
+            gmii_tx_er   => gmii_tx_er,
+            gmii_rx_clk  => gmii_rx_clk,
+            gmii_rxd     => gmii_rxd,
+            gmii_rx_dv   => gmii_rx_dv,
+            gmii_rx_er   => gmii_rx_er,
+            mac_addr     => mac_addr,
+            ip_addr      => ip_addr,
+            rarp_select  => '0',
+            ipb_in       => ipb_in,
+            ipb_out      => ipb_out
+            );
+
+    leds(3 downto 2) <= '0' & userled;
+    phy_rst          <= not phy_rst_e;
+
+    mac_addr <= X"020ddba1151" & dip_sw;  -- Careful here, arbitrary addresses do not always work
+    ip_addr  <= X"c0a8c81" & dip_sw;    -- 192.168.200.16+n
 
 -- ipbus slaves live in the entity below, and can expose top-level ports
 -- The ipbus fabric is instantiated within.

@@ -64,33 +64,34 @@ begin
 
 -- Infrastructure
 
-	infra: entity work.kc705_basex_infra
-		port map(
-			eth_clk_p => eth_clk_p,
-			eth_clk_n => eth_clk_n,
-			eth_tx_p => eth_tx_p,
-			eth_tx_n => eth_tx_n,
-			eth_rx_p => eth_rx_p,
-			eth_rx_n => eth_rx_n,
-			sfp_los => sfp_los,
-			clk_ipb_o => clk_ipb,
-			rst_ipb_o => rst_ipb,
-			clk_aux_o => clk_aux,
-			rst_aux_o => rst_aux,
-			nuke => nuke,
-			soft_rst => soft_rst,
-			leds => leds(1 downto 0),
-			mac_addr => mac_addr,
-			ip_addr => ip_addr,
-			ipb_in => ipb_in,
-			ipb_out => ipb_out
-		);
-		
-	leds(3 downto 2) <= '0' & userled;
-	sfp_tx_disable <= '0';
-		
-	mac_addr <= X"020ddba1151" & dip_sw; -- Careful here, arbitrary addresses do not always work
-	ip_addr <= X"c0a8c81" & dip_sw; -- 192.168.200.16+n
+    infra : entity work.kc705_basex_infra
+        port map(
+            eth_clk_p   => eth_clk_p,
+            eth_clk_n   => eth_clk_n,
+            eth_tx_p    => eth_tx_p,
+            eth_tx_n    => eth_tx_n,
+            eth_rx_p    => eth_rx_p,
+            eth_rx_n    => eth_rx_n,
+            sfp_los     => sfp_los,
+            clk_ipb_o   => clk_ipb,
+            rst_ipb_o   => rst_ipb,
+            clk_aux_o   => clk_aux,
+            rst_aux_o   => rst_aux,
+            nuke        => nuke,
+            soft_rst    => soft_rst,
+            leds        => leds(1 downto 0),
+            mac_addr    => mac_addr,
+            ip_addr     => ip_addr,
+            rarp_select => '0', 
+            ipb_in      => ipb_in,
+            ipb_out     => ipb_out
+            );
+
+    leds(3 downto 2) <= '0' & userled;
+    sfp_tx_disable   <= '0';
+
+    mac_addr <= X"020ddba1151" & dip_sw;  -- Careful here, arbitrary addresses do not always work
+    ip_addr  <= X"c0a8c81" & dip_sw;    -- 192.168.200.16+n
 
 -- ipbus slaves live in the entity below, and can expose top-level ports
 -- The ipbus fabric is instantiated within.

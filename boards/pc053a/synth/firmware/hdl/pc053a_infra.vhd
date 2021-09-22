@@ -36,28 +36,29 @@ use IEEE.STD_LOGIC_1164.ALL;
 use work.ipbus.all;
 
 entity pc053a_infra is
-	port(
-		eth_clk_p: in std_logic; -- 125MHz MGT clock
-		eth_clk_n: in std_logic;
-		eth_rx_p: in std_logic; -- Ethernet MGT input
-		eth_rx_n: in std_logic;
-		eth_tx_p: out std_logic; -- Ethernet MGT output
-		eth_tx_n: out std_logic;
-		sfp_los: in std_logic;
-		clk_ipb_o: out std_logic; -- IPbus clock
-		rst_ipb_o: out std_logic;
-		clk125_o: out std_logic;
-		rst125_o: out std_logic;
-		clk200: out std_logic; -- 200MHz unbuffered clock for IDELAYCTRL
-		nuke: in std_logic; -- The signal of doom
-		soft_rst: in std_logic; -- The signal of lesser doom
-		leds: out std_logic_vector(1 downto 0); -- status LEDs
-		debug: out std_logic_vector(3 downto 0);
-		mac_addr: in std_logic_vector(47 downto 0); -- MAC address
-		ip_addr: in std_logic_vector(31 downto 0); -- IP address
-		ipb_in: in ipb_rbus; -- ipbus
-		ipb_out: out ipb_wbus
-	);
+    port(
+        eth_clk_p   : in  std_logic;      -- 125MHz MGT clock
+        eth_clk_n   : in  std_logic;
+        eth_rx_p    : in  std_logic;      -- Ethernet MGT input
+        eth_rx_n    : in  std_logic;
+        eth_tx_p    : out std_logic;      -- Ethernet MGT output
+        eth_tx_n    : out std_logic;
+        sfp_los     : in  std_logic;
+        clk_ipb_o   : out std_logic;      -- IPbus clock
+        rst_ipb_o   : out std_logic;
+        clk125_o    : out std_logic;
+        rst125_o    : out std_logic;
+        clk200      : out std_logic;  -- 200MHz unbuffered clock for IDELAYCTRL
+        nuke        : in  std_logic;      -- The signal of doom
+        soft_rst    : in  std_logic;      -- The signal of lesser doom
+        leds        : out std_logic_vector(1 downto 0);   -- status LEDs
+        debug       : out std_logic_vector(3 downto 0);
+        mac_addr    : in  std_logic_vector(47 downto 0);  -- MAC address
+        ip_addr     : in  std_logic_vector(31 downto 0);  -- IP address
+        rarp_select : in  std_logic;      -- enable RARP
+        ipb_in      : in  ipb_rbus;       -- ipbus
+        ipb_out     : out ipb_wbus
+        );
 
 end pc053a_infra;
 
@@ -139,26 +140,27 @@ begin
 	
 -- ipbus control logic
 
-	ipbus: entity work.ipbus_ctrl
-		port map(
-			mac_clk => clk125,
-			rst_macclk => rst125,
-			ipb_clk => clk_ipb,
-			rst_ipb => rst_ipb_ctrl,
-			mac_rx_data => mac_rx_data,
-			mac_rx_valid => mac_rx_valid,
-			mac_rx_last => mac_rx_last,
-			mac_rx_error => mac_rx_error,
-			mac_tx_data => mac_tx_data,
-			mac_tx_valid => mac_tx_valid,
-			mac_tx_last => mac_tx_last,
-			mac_tx_error => mac_tx_error,
-			mac_tx_ready => mac_tx_ready,
-			ipb_out => ipb_out,
-			ipb_in => ipb_in,
-			mac_addr => mac_addr,
-			ip_addr => ip_addr,
-			pkt => pkt
-		);
+    ipbus : entity work.ipbus_ctrl
+        port map(
+            mac_clk      => clk125,
+            rst_macclk   => rst125,
+            ipb_clk      => clk_ipb,
+            rst_ipb      => rst_ipb_ctrl,
+            mac_rx_data  => mac_rx_data,
+            mac_rx_valid => mac_rx_valid,
+            mac_rx_last  => mac_rx_last,
+            mac_rx_error => mac_rx_error,
+            mac_tx_data  => mac_tx_data,
+            mac_tx_valid => mac_tx_valid,
+            mac_tx_last  => mac_tx_last,
+            mac_tx_error => mac_tx_error,
+            mac_tx_ready => mac_tx_ready,
+            ipb_out      => ipb_out,
+            ipb_in       => ipb_in,
+            mac_addr     => mac_addr,
+            ip_addr      => ip_addr,
+            RARP_select  => rarp_select,
+            pkt          => pkt
+            );
 
 end rtl;
