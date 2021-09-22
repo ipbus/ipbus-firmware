@@ -174,7 +174,7 @@ begin
             ipb_in       => ipb_in,
             mac_addr     => mac_addr,
             ip_addr      => ip_addr,
-            RARP_select  => rarp_select
+            RARP_select  => rarp_select,
             pkt          => pkt
             );
 
