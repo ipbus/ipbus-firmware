@@ -24,14 +24,14 @@
 #-------------------------------------------------------------------------------
 
 
-src ipbus_transport_axi_if.vhd
+src --vhdl2008 ipbus_transport_axi_if.vhd
 
 src ipbus_transport_ram_if.vhd
 src ipbus_transport_multibuffer_if.vhd
 src ipbus_transport_multibuffer_cdc.vhd
 src ipbus_transport_multibuffer_rx_dpram.vhd ipbus_transport_multibuffer_tx_dpram.vhd
 
-src ipbus_axi_decl.vhd
+src --vhdl2008 ipbus_axi_decl.vhd
 
 ? toolset.lower() == "vivado" ? src ../cgn/axi_bram_ctrl_0.xci
 

@@ -23,8 +23,18 @@
 #
 #-------------------------------------------------------------------------------
 
+@device_family = "none"
+@device_name = "none"
+@device_package = "-none"
+@device_speed = "-none"
+@boardname = "sim"
+
+@sim.run_sim.design_units = "work.ipbus_transport_ram_if_simtb"
+
 src ipbus_transport_ram_if_simtb.vhd
 include ipbus_transport_axi.dep
 
 # The following is internally used by the ipbus_transport_ram_if_simtb.
 include -c components/ipbus_util ipbus_example.dep
+
+include -c components/ipbus_core
