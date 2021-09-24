@@ -1,7 +1,7 @@
 
 run_sim_udp:vivado2019.2:questasim2019.2:
   extends: .template_base
-  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-centos7:2021-04-26__ipbbdev-2021f_uhal2.8.0
+  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-centos7:2021-06-21__ipbbdev-2021i_uhal2.8.0
   tags:
     - docker
     - docker-cap-net-admin
@@ -29,7 +29,7 @@ run_sim_udp:vivado2019.2:questasim2019.2:
 
 run_sim_eth:vivado2019.2:questasim2019.2:
   extends: .template_base
-  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-centos7:2021-04-26__ipbbdev-2021f_uhal2.8.0
+  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-centos7:2021-06-21__ipbbdev-2021i_uhal2.8.0
   tags:
     - docker
     - docker-cap-net-admin
@@ -58,7 +58,7 @@ run_sim_eth:vivado2019.2:questasim2019.2:
 
 run_ram_slaves_testbench_sim:vivado2019.2:questasim2019.2:
   extends: .template_base
-  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-centos7:2021-04-26__ipbbdev-2021f_uhal2.8.0
+  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-centos7:2021-06-21__ipbbdev-2021i_uhal2.8.0
   tags:
     - docker
     - docker-cap-net-admin
@@ -87,12 +87,12 @@ run_ram_slaves_testbench_sim:vivado2019.2:questasim2019.2:
     - ipbb sim ipcores
     - ipbb sim fli-udp
     - ipbb sim generate-project
-    - ./run_sim -c work.top -do 'run 1ms' -do 'quit'
+    - ./run_sim -c work.top -do 'run 10us' -do 'quit'
 
 
 run_ctr_slaves_testbench_sim:vivado2019.2:questasim2019.2:
   extends: .template_base
-  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-centos7:2021-04-26__ipbbdev-2021f_uhal2.8.0
+  image: ${IPBUS_DOCKER_REGISTRY}/ipbus-fw-dev-centos7:2021-06-21__ipbbdev-2021i_uhal2.8.0
   tags:
     - docker
     - xilinx-tools
