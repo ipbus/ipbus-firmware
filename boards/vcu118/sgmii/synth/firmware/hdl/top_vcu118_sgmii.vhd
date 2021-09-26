@@ -117,6 +117,7 @@ begin
             debug_leds    => dleds,
             mac_addr      => mac_addr,
             ip_addr       => ip_addr,
+            rarp_select   => '0',
             ipb_in        => ipb_in,
             ipb_out       => ipb_out
             );
