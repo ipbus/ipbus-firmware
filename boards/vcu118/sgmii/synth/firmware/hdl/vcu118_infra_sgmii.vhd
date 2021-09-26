@@ -73,11 +73,12 @@ entity vcu118_infra_sgmii is
         nuke          : in    std_logic;
         soft_rst      : in    std_logic;
 
-        mac_addr : in  std_logic_vector(47 downto 0);  -- MAC address
-        ip_addr  : in  std_logic_vector(31 downto 0);  -- IP address
+        mac_addr      : in  std_logic_vector(47 downto 0);  -- MAC address
+        ip_addr       : in  std_logic_vector(31 downto 0);  -- IP address
+        rarp_select   : in  std_logic;      -- enable RARP
         -- IPbus (from / to slaves)
-        ipb_in   : in  ipb_rbus;
-        ipb_out  : out ipb_wbus
+        ipb_in        : in  ipb_rbus;
+        ipb_out       : out ipb_wbus
         );
 end vcu118_infra_sgmii;
 
@@ -198,6 +199,7 @@ begin
             ipb_in       => ipb_in,
             mac_addr     => mac_addr,
             ip_addr      => ip_addr,
+            RARP_select  => rarp_select,
             pkt          => pkt
             );
 
