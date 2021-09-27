@@ -1,7 +1,7 @@
-quick_check:kc705_basex__2018.3:
+quick_check:kc705_basex__2020.2:
   extends: .template_vivado_quick_check
   variables:
-    VIVADO_VERSION: "2018.3"
+    VIVADO_VERSION: "2020.2"
     PROJ: kc705_basex
 quick_check:kc705_basex__2019.2:
   extends: .template_vivado_quick_check
@@ -9,10 +9,10 @@ quick_check:kc705_basex__2019.2:
     VIVADO_VERSION: "2019.2"
     PROJ: kc705_basex
 
-quick_check:kc705_gmii__2018.3:
+quick_check:kc705_gmii__2020.2:
   extends: .template_vivado_quick_check
   variables:
-    VIVADO_VERSION: "2018.3"
+    VIVADO_VERSION: "2020.2"
     PROJ: kc705_gmii
 quick_check:kc705_gmii__2019.2:
   extends: .template_vivado_quick_check
@@ -20,10 +20,10 @@ quick_check:kc705_gmii__2019.2:
     VIVADO_VERSION: "2019.2"
     PROJ: kc705_gmii
 
-quick_check:kcu105_basex__2018.3:
+quick_check:kcu105_basex__2020.2:
   extends: .template_vivado_quick_check
   variables:
-    VIVADO_VERSION: "2018.3"
+    VIVADO_VERSION: "2020.2"
     PROJ: kcu105_basex
 quick_check:kcu105_basex__2019.2:
   extends: .template_vivado_quick_check
@@ -31,10 +31,10 @@ quick_check:kcu105_basex__2019.2:
     VIVADO_VERSION: "2019.2"
     PROJ: kcu105_basex
 
-quick_check:zcu102_basex__2018.3:
+quick_check:zcu102_basex__2020.2:
   extends: .template_vivado_quick_check
   variables:
-    VIVADO_VERSION: "2018.3"
+    VIVADO_VERSION: "2020.2"
     PROJ: zcu102_basex
 quick_check:zcu102_basex__2019.2:
   extends: .template_vivado_quick_check
@@ -48,10 +48,10 @@ quick_check:zcu102_c2c_loopback__2019.2:
     VIVADO_VERSION: "2019.2"
     PROJ: zcu102_c2c_loopback
 
-quick_check:k800__2018.3:
+quick_check:k800__2020.2:
   extends: .template_vivado_quick_check
   variables:
-    VIVADO_VERSION: "2018.3"
+    VIVADO_VERSION: "2020.2"
     PROJ: k800
 quick_check:k800__2019.2:
   extends: .template_vivado_quick_check
@@ -59,10 +59,10 @@ quick_check:k800__2019.2:
     VIVADO_VERSION: "2019.2"
     PROJ: k800
 
-quick_check:vcu118_pcie__2018.3:
+quick_check:vcu118_pcie__2020.2:
   extends: .template_vivado_quick_check
   variables:
-    VIVADO_VERSION: "2018.3"
+    VIVADO_VERSION: "2020.2"
     PROJ: vcu118_pcie
 quick_check:vcu118_pcie__2019.2:
   extends: .template_vivado_quick_check
@@ -70,10 +70,10 @@ quick_check:vcu118_pcie__2019.2:
     VIVADO_VERSION: "2019.2"
     PROJ: vcu118_pcie
 
-quick_check:vcu118_sgmii__2018.3:
+quick_check:vcu118_sgmii__2020.2:
   extends: .template_vivado_quick_check
   variables:
-    VIVADO_VERSION: "2018.3"
+    VIVADO_VERSION: "2020.2"
     PROJ: vcu118_sgmii
 quick_check:vcu118_sgmii__2019.2:
   extends: .template_vivado_quick_check
