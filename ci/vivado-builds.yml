@@ -1,9 +1,9 @@
-build:kc705_basex__2018.3:
+build:kc705_basex__2020.2:
   extends: .template_vivado_build
   variables:
-    VIVADO_VERSION: "2018.3"
+    VIVADO_VERSION: "2020.2"
   dependencies:
-    - quick_check:kc705_basex__2018.3
+    - quick_check:kc705_basex__2020.2
 build:kc705_basex__2019.2:
   extends: .template_vivado_build
   variables:
@@ -11,12 +11,12 @@ build:kc705_basex__2019.2:
   dependencies:
     - quick_check:kc705_basex__2019.2
 
-build:kc705_gmii__2018.3:
+build:kc705_gmii__2020.2:
   extends: .template_vivado_build
   variables:
-    VIVADO_VERSION: "2018.3"
+    VIVADO_VERSION: "2020.2"
   dependencies:
-    - quick_check:kc705_gmii__2018.3
+    - quick_check:kc705_gmii__2020.2
 build:kc705_gmii__2019.2:
   extends: .template_vivado_build
   variables:
@@ -24,12 +24,12 @@ build:kc705_gmii__2019.2:
   dependencies:
     - quick_check:kc705_gmii__2019.2
 
-build:kcu105_basex__2018.3:
+build:kcu105_basex__2020.2:
   extends: .template_vivado_build
   variables:
-    VIVADO_VERSION: "2018.3"
+    VIVADO_VERSION: "2020.2"
   dependencies:
-    - quick_check:kcu105_basex__2018.3
+    - quick_check:kcu105_basex__2020.2
 build:kcu105_basex__2019.2:
   extends: .template_vivado_build
   variables:
@@ -37,12 +37,12 @@ build:kcu105_basex__2019.2:
   dependencies:
     - quick_check:kcu105_basex__2019.2
 
-build:zcu102_basex__2018.3:
+build:zcu102_basex__2020.2:
   extends: .template_vivado_build
   variables:
-    VIVADO_VERSION: "2018.3"
+    VIVADO_VERSION: "2020.2"
   dependencies:
-    - quick_check:zcu102_basex__2018.3
+    - quick_check:zcu102_basex__2020.2
 build:zcu102_basex__2019.2:
   extends: .template_vivado_build
   variables:
@@ -57,12 +57,12 @@ build:zcu102_basex__2019.2:
 #   dependencies:
 #     - quick_check:zcu102_c2c_loopback__2019.2
 
-build:k800__2018.3:
+build:k800__2020.2:
   extends: .template_vivado_build
   variables:
-    VIVADO_VERSION: "2018.3"
+    VIVADO_VERSION: "2020.2"
   dependencies:
-    - quick_check:k800__2018.3
+    - quick_check:k800__2020.2
 build:k800__2019.2:
   extends: .template_vivado_build
   variables:
@@ -70,12 +70,12 @@ build:k800__2019.2:
   dependencies:
     - quick_check:k800__2019.2
 
-build:vcu118_pcie__2018.3:
+build:vcu118_pcie__2020.2:
   extends: .template_vivado_build
   variables:
-    VIVADO_VERSION: "2018.3"
+    VIVADO_VERSION: "2020.2"
   dependencies:
-    - quick_check:vcu118_pcie__2018.3
+    - quick_check:vcu118_pcie__2020.2
 build:vcu118_pcie__2019.2:
   extends: .template_vivado_build
   variables:
@@ -83,12 +83,12 @@ build:vcu118_pcie__2019.2:
   dependencies:
     - quick_check:vcu118_pcie__2019.2
 
-build:vcu118_sgmii__2018.3:
+build:vcu118_sgmii__2020.2:
   extends: .template_vivado_build
   variables:
-    VIVADO_VERSION: "2018.3"
+    VIVADO_VERSION: "2020.2"
   dependencies:
-    - quick_check:vcu118_sgmii__2018.3
+    - quick_check:vcu118_sgmii__2020.2
 build:vcu118_sgmii__2019.2:
   extends: .template_vivado_build
   variables:
