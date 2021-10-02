@@ -45,6 +45,10 @@ function wait_for_licence {
   done
 }
 
+set -e
+set -u
+set -f 
+set -o pipefail
 
 SH_SOURCE=${BASH_SOURCE}
 IPBUS_PATH=$(cd $(dirname ${SH_SOURCE})/../.. && pwd)
@@ -72,14 +76,14 @@ HAVE_LICENCE_FILE="i_got_a_licence.txt"
 VSIM_PID=$!
 VSIM_PGRP=$(ps -p ${VSIM_PID} -o pgrp=)
 trap print_log_on_error EXIT
+set +x
 
 # Wait for a licence to be available
-set +x
 wait_for_licence
-set -x
 # wait for the simulation to start
 sleep 10
 
+set -x
 # Run the test script
 pytest -x -v ${IPBUS_PATH}/tests/ctr_slaves/scripts/test_ctr_slaves.py --client ipbusudp-2.0://localhost:50001 --addr file://addrtab/ctr_slaves_tester.xml
 
