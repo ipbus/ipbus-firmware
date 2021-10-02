@@ -45,10 +45,8 @@ function wait_for_licence {
   done
 }
 
+# Stop at the first error 
 set -e
-set -u
-set -f 
-set -o pipefail
 
 SH_SOURCE=${BASH_SOURCE}
 IPBUS_PATH=$(cd $(dirname ${SH_SOURCE})/../.. && pwd)

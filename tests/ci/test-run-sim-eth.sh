@@ -45,6 +45,8 @@ function wait_for_licence {
   done
 }
 
+# Stop at the first error 
+set -e
 
 SH_SOURCE=${BASH_SOURCE}
 IPBUS_PATH=$(cd $(dirname ${SH_SOURCE})/../.. && pwd)
