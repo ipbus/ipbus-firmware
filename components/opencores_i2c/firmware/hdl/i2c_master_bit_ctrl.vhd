@@ -148,12 +148,14 @@ architecture arch of i2c_master_bit_ctrl is
 --attribute UGROUP:string;                                   
 --attribute UGROUP of arch : label is "bit_group"; 
 
-
 signal sSCL, sSDA : std_logic;	-- synchronized SCL and SDA inputs
 signal dscl_oen : std_logic;	-- delayed scl_oen
 signal sda_chk : std_logic;		-- check SDA output (Multi-master arbitration)
 signal clk_en : std_logic;		-- clock generation signals
 signal slave_wait : std_logic;
+
+signal sda_i_buf : std_logic_vector(63 downto 0);   -- buffer for sda_i
+signal sda_i_fil : std_logic;                       -- filtered sda_i
 
 -- bus status controller signals
 signal dSCL,dSDA : std_logic;
@@ -197,6 +199,33 @@ constant I2C_CMD_WRITE	: std_logic_vector(3 downto 0) := "0100";
 constant I2C_CMD_READ	: std_logic_vector(3 downto 0) := "1000";
 
 begin
+
+--delay sda_i
+process(clk)
+
+variable cnt : integer := 0;
+
+begin
+	if rising_edge(clk) then
+	
+	   sda_i_buf <= sda_i_buf(62 downto 0) & sda_i;
+	
+	   cnt := 0;
+	   
+	   for I in 0 to 63 loop
+	       if (sda_i_buf(I) = '1') then
+		      cnt := cnt + 1;
+	       end if;
+        end loop;
+        
+        if (cnt > 32) then
+            sda_i_fil <= '1';
+        else
+            sda_i_fil <= '0';
+        end if;
+	
+	end if;
+end process;
 
 scl_oen <= scl_oen_int;
 sda_oen <= sda_oen_int;
@@ -261,7 +290,7 @@ begin
 				sSCL <= '0';
 			end if;
 			-- if ((sda_i = '1') OR (sda_i = 'H')) then
-                        if (sda_i = '1')  then
+                        if (sda_i_fil = '1')  then
 				sSDA <= '1';
 			else
 				sSDA <= '0';
