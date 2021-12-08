@@ -35,7 +35,7 @@ entity pcie_xdma_axi_us_if is
 
     pcie_user_lnk_up: out std_logic;
 
-    axi_ms : out axi4mm_ms(araddr(15 downto 0), awaddr(15 downto 0), wdata(63 downto 0));
+    axi_ms : out axi4mm_ms(araddr(63 downto 0), awaddr(63 downto 0), wdata(63 downto 0));
     axi_sm : in axi4mm_sm(rdata(63 downto 0));
 
     -- User interrupts
@@ -58,16 +58,11 @@ architecture rtl of pcie_xdma_axi_us_if is
   signal usr_irq_req: std_logic_vector ( C_NUM_USR_IRQ - 1 downto 0 );
   signal usr_irq_ack: std_logic_vector ( C_NUM_USR_IRQ - 1 downto 0 );
 
-  signal xdma_axi_araddr: std_logic_vector(C_AXI_ADDR_WIDTH - 1 DOWNTO 0);
-  signal xdma_axi_awaddr: std_logic_vector(C_AXI_ADDR_WIDTH - 1 DOWNTO 0);
-  signal xdma_axib_araddr: std_logic_vector(C_AXI_ADDR_WIDTH - 1 DOWNTO 0);
-  signal xdma_axib_awaddr: std_logic_vector(C_AXI_ADDR_WIDTH - 1 DOWNTO 0);
-
   signal msi_vector_width: std_logic_vector ( 2 downto 0 );
   signal msi_enable: std_logic;
 
   signal dma_axi_sm : axi4mm_sm(rdata(63 downto 0));
-  signal dma_axi_ms, axib_ms_i: axi4mm_ms(araddr(15 downto 0), awaddr(15 downto 0), wdata(C_AXI_DATA_WIDTH - 1 downto 0));
+  signal dma_axi_ms, axib_ms_i: axi4mm_ms(araddr(63 downto 0), awaddr(63 downto 0), wdata(C_AXI_DATA_WIDTH - 1 downto 0));
 
   -- components
 
@@ -285,7 +280,7 @@ begin
       m_axi_rlast        => dma_axi_sm.rlast,
       m_axi_rvalid       => dma_axi_sm.rvalid,
       m_axi_awid         => dma_axi_ms.awid,
-      m_axi_awaddr       => xdma_axi_awaddr,
+      m_axi_awaddr       => dma_axi_ms.awaddr,
       m_axi_awlen        => dma_axi_ms.awlen,
       m_axi_awsize       => dma_axi_ms.awsize,
       m_axi_awburst      => dma_axi_ms.awburst,
@@ -299,7 +294,7 @@ begin
       m_axi_wvalid       => dma_axi_ms.wvalid,
       m_axi_bready       => dma_axi_ms.bready,
       m_axi_arid         => dma_axi_ms.arid,
-      m_axi_araddr       => xdma_axi_araddr,
+      m_axi_araddr       => dma_axi_ms.araddr,
       m_axi_arlen        => dma_axi_ms.arlen,
       m_axi_arsize       => dma_axi_ms.arsize,
       m_axi_arburst      => dma_axi_ms.arburst,
@@ -329,7 +324,7 @@ begin
       m_axib_rlast       => axi_sm.rlast,
       m_axib_rvalid      => axi_sm.rvalid,
       m_axib_awid        => axib_ms_i.awid,
-      m_axib_awaddr      => xdma_axib_awaddr,
+      m_axib_awaddr      => axib_ms_i.awaddr,
       m_axib_awlen       => axib_ms_i.awlen,
       m_axib_awsize      => axib_ms_i.awsize,
       m_axib_awburst     => axib_ms_i.awburst,
@@ -343,7 +338,7 @@ begin
       m_axib_wvalid      => axib_ms_i.wvalid,
       m_axib_bready      => axib_ms_i.bready,
       m_axib_arid        => axib_ms_i.arid,
-      m_axib_araddr      => xdma_axib_araddr,
+      m_axib_araddr      => axib_ms_i.araddr,
       m_axib_arlen       => axib_ms_i.arlen,
       m_axib_arsize      => axib_ms_i.arsize,
       m_axib_arburst     => axib_ms_i.arburst,
@@ -365,19 +360,14 @@ begin
   axi_ms.aresetn <= axib_ms_i.aresetn;
   axi_ms.aclk <= axib_ms_i.aclk;
 
-  axib_ms_i.araddr <= xdma_axib_araddr(axi_ms.araddr'length - 1 downto 0);
-  axib_ms_i.awaddr <= xdma_axib_awaddr(axi_ms.awaddr'length - 1 downto 0);
   axi_ms <= axib_ms_i;
-
-  dma_axi_ms.araddr <= xdma_axi_araddr(dma_axi_ms.araddr'length - 1 downto 0);
-  dma_axi_ms.awaddr <= xdma_axi_awaddr(dma_axi_ms.awaddr'length - 1 downto 0);
 
   null_bram_ctrl : axi_bram_ctrl_1
     port map (
       s_axi_aclk => dma_axi_ms.aclk,
       s_axi_aresetn => dma_axi_ms.aresetn,
       s_axi_awid => dma_axi_ms.awid,
-      s_axi_awaddr => dma_axi_ms.awaddr,
+      s_axi_awaddr => dma_axi_ms.awaddr(15 downto 0),
       s_axi_awlen => dma_axi_ms.awlen,
       s_axi_awsize => dma_axi_ms.awsize,
       s_axi_awburst => dma_axi_ms.awburst,
@@ -396,7 +386,7 @@ begin
       s_axi_bvalid => dma_axi_sm.bvalid,
       s_axi_bready => dma_axi_ms.bready,
       s_axi_arid => dma_axi_ms.arid,
-      s_axi_araddr => dma_axi_ms.araddr,
+      s_axi_araddr => dma_axi_ms.araddr(15 downto 0),
       s_axi_arlen => dma_axi_ms.arlen,
       s_axi_arsize => dma_axi_ms.arsize,
       s_axi_arburst => dma_axi_ms.arburst,
