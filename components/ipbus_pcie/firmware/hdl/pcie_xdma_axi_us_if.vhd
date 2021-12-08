@@ -18,7 +18,7 @@ use work.ipbus_axi_decl.all;
 entity pcie_xdma_axi_us_if is
   generic (
       G_PCI_VENDOR_ID           : std_logic_vector(15 downto 0) := x"10ee";
-      G_PCI_DEVICE_ID           : std_logic_vector(15 downto 0) := x"9031";
+      G_PCI_DEVICE_ID           : std_logic_vector(15 downto 0) := x"8031";
       G_PCI_REVISION_ID         : std_logic_vector(7 downto 0)  := x"00";
       G_PCI_SUBSYSTEM_VENDOR_ID : std_logic_vector(15 downto 0) := x"10ee";
       G_PCI_SUBSYSTEM_ID        : std_logic_vector(15 downto 0) := x"0007"
