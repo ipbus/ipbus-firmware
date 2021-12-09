@@ -16,6 +16,13 @@ use work.ipbus_axi_decl.all;
 
 
 entity pcie_xdma_axi_us_if is
+  generic (
+      G_PCI_VENDOR_ID           : std_logic_vector(15 downto 0) := x"10ee";
+      G_PCI_DEVICE_ID           : std_logic_vector(15 downto 0) := x"8031";
+      G_PCI_REVISION_ID         : std_logic_vector(7 downto 0)  := x"00";
+      G_PCI_SUBSYSTEM_VENDOR_ID : std_logic_vector(15 downto 0) := x"10ee";
+      G_PCI_SUBSYSTEM_ID        : std_logic_vector(15 downto 0) := x"0007"
+  );
   port (
     pcie_sys_clk_p: in std_logic;
     pcie_sys_clk_n: in std_logic;
@@ -68,6 +75,11 @@ architecture rtl of pcie_xdma_axi_us_if is
       pci_exp_txn : OUT STD_LOGIC_VECTOR(C_NUM_PCIE_LANES - 1 DOWNTO 0);
       pci_exp_rxp : IN STD_LOGIC_VECTOR(C_NUM_PCIE_LANES - 1 DOWNTO 0);
       pci_exp_rxn : IN STD_LOGIC_VECTOR(C_NUM_PCIE_LANES - 1 DOWNTO 0);
+      cfg_subsys_vend_id : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+      cfg_vend_id : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+      cfg_dev_id_pf0 : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+      cfg_rev_id_pf0 : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+      cfg_subsys_id_pf0 : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
       axi_aclk : OUT STD_LOGIC;
       axi_aresetn : OUT STD_LOGIC;
       usr_irq_req : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
@@ -143,56 +155,61 @@ begin
 
   xdma : xdma_0
     port map (
-      sys_clk           => sys_clk,
-      sys_clk_gt        => sys_clk_gt,
-      sys_rst_n         => pcie_sys_rst_n,
-      user_lnk_up       => pcie_user_lnk_up,
-      pci_exp_txp       => pcie_tx_p,
-      pci_exp_txn       => pcie_tx_n,
-      pci_exp_rxp       => pcie_rx_p,
-      pci_exp_rxn       => pcie_rx_n,
-      axi_aclk          => axi_ms_i.aclk,
-      axi_aresetn       => axi_ms_i.aresetn,
-      usr_irq_req       => usr_irq_req,
-      usr_irq_ack       => usr_irq_ack,
-      msi_enable        => msi_enable,
-      msi_vector_width  => msi_vector_width,
+      sys_clk            => sys_clk,
+      sys_clk_gt         => sys_clk_gt,
+      sys_rst_n          => pcie_sys_rst_n,
+      user_lnk_up        => pcie_user_lnk_up,
+      pci_exp_txp        => pcie_tx_p,
+      pci_exp_txn        => pcie_tx_n,
+      pci_exp_rxp        => pcie_rx_p,
+      pci_exp_rxn        => pcie_rx_n,
+      cfg_subsys_vend_id => G_PCI_SUBSYSTEM_VENDOR_ID,
+      cfg_vend_id        => G_PCI_VENDOR_ID,
+      cfg_dev_id_pf0     => G_PCI_DEVICE_ID,
+      cfg_rev_id_pf0     => G_PCI_REVISION_ID,
+      cfg_subsys_id_pf0  => G_PCI_SUBSYSTEM_ID,
+      axi_aclk           => axi_ms_i.aclk,
+      axi_aresetn        => axi_ms_i.aresetn,
+      usr_irq_req        => usr_irq_req,
+      usr_irq_ack        => usr_irq_ack,
+      msi_enable         => msi_enable,
+      msi_vector_width   => msi_vector_width,
 
-      m_axi_awready     => axi_sm.awready,
-      m_axi_wready      => axi_sm.wready,
-      m_axi_bid         => axi_sm.bid,
-      m_axi_bresp       => axi_sm.bresp,
-      m_axi_bvalid      => axi_sm.bvalid,
-      m_axi_arready     => axi_sm.arready,
-      m_axi_rid         => axi_sm.rid,
-      m_axi_rdata       => axi_sm.rdata,
-      m_axi_rresp       => axi_sm.rresp,
-      m_axi_rlast       => axi_sm.rlast,
-      m_axi_rvalid      => axi_sm.rvalid,
-      m_axi_awid        => axi_ms_i.awid,
-      m_axi_awaddr      => axi_ms_i.awaddr,
-      m_axi_awlen       => axi_ms_i.awlen,
-      m_axi_awsize      => axi_ms_i.awsize,
-      m_axi_awburst     => axi_ms_i.awburst,
-      m_axi_awprot      => axi_ms_i.awprot,
-      m_axi_awvalid     => axi_ms_i.awvalid,
-      m_axi_awlock      => axi_ms_i.awlock,
-      m_axi_awcache     => axi_ms_i.awcache,
-      m_axi_wdata       => axi_ms_i.wdata,
-      m_axi_wstrb       => axi_ms_i.wstrb,
-      m_axi_wlast       => axi_ms_i.wlast,
-      m_axi_wvalid      => axi_ms_i.wvalid,
-      m_axi_bready      => axi_ms_i.bready,
-      m_axi_arid        => axi_ms_i.arid,
-      m_axi_araddr      => axi_ms_i.araddr,
-      m_axi_arlen       => axi_ms_i.arlen,
-      m_axi_arsize      => axi_ms_i.arsize,
-      m_axi_arburst     => axi_ms_i.arburst,
-      m_axi_arprot      => axi_ms_i.arprot,
-      m_axi_arvalid     => axi_ms_i.arvalid,
-      m_axi_arlock      => axi_ms_i.arlock,
-      m_axi_arcache     => axi_ms_i.arcache,
-      m_axi_rready      => axi_ms_i.rready,
+      m_axi_awready      => axi_sm.awready,
+      m_axi_wready       => axi_sm.wready,
+      m_axi_bid          => axi_sm.bid,
+      m_axi_bresp        => axi_sm.bresp,
+      m_axi_bvalid       => axi_sm.bvalid,
+      m_axi_arready      => axi_sm.arready,
+      m_axi_rid          => axi_sm.rid,
+      m_axi_rdata        => axi_sm.rdata,
+      m_axi_rresp        => axi_sm.rresp,
+      m_axi_rlast        => axi_sm.rlast,
+      m_axi_rvalid       => axi_sm.rvalid,
+      m_axi_awid         => axi_ms_i.awid,
+      m_axi_awaddr       => axi_ms_i.awaddr,
+      m_axi_awlen        => axi_ms_i.awlen,
+      m_axi_awsize       => axi_ms_i.awsize,
+      m_axi_awburst      => axi_ms_i.awburst,
+      m_axi_awprot       => axi_ms_i.awprot,
+      m_axi_awvalid      => axi_ms_i.awvalid,
+      m_axi_awlock       => axi_ms_i.awlock,
+      m_axi_awcache      => axi_ms_i.awcache,
+      m_axi_wdata        => axi_ms_i.wdata,
+      m_axi_wstrb        => axi_ms_i.wstrb,
+      m_axi_wlast        => axi_ms_i.wlast,
+      m_axi_wvalid       => axi_ms_i.wvalid,
+      m_axi_bready       => axi_ms_i.bready,
+      m_axi_arid         => axi_ms_i.arid,
+      m_axi_araddr       => axi_ms_i.araddr,
+      m_axi_arlen        => axi_ms_i.arlen,
+      m_axi_arsize       => axi_ms_i.arsize,
+      m_axi_arburst      => axi_ms_i.arburst,
+      m_axi_arprot       => axi_ms_i.arprot,
+      m_axi_arvalid      => axi_ms_i.arvalid,
+      m_axi_arlock       => axi_ms_i.arlock,
+      m_axi_arcache      => axi_ms_i.arcache,
+      m_axi_rready       => axi_ms_i.rready,
       -- CFG
       cfg_mgmt_addr        => "000" & X"0000",
       cfg_mgmt_write       => '0',
