@@ -94,7 +94,7 @@ begin
 			s2 <= s1;
 			s3 <= s2;
 			s4 <= s3;
-			s5 <= s4 and (stab or not ULTRA_SAFE);
+			s5 <= s4 and (stab or '0' when ULTRA_SAFE else '1');
 		end if;
 	end process;
 	
