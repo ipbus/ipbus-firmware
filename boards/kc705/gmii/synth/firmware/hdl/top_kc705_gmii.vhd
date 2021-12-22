@@ -97,8 +97,8 @@ begin
     leds(3 downto 2) <= '0' & userled;
     phy_rst          <= not phy_rst_e;
 
-    mac_addr <= X"80D336003CC" & dip_sw; -- Careful here, arbitrary addresses do not always work
-    ip_addr <= X"c0a8c82" & dip_sw; -- 192.168.200.32+n
+    mac_addr <= X"020ddba1151" & dip_sw;  -- Careful here, arbitrary addresses do not always work
+	ip_addr <= X"c0a8c82" & dip_sw; -- 192.168.200.32+n
 
 -- ipbus slaves live in the entity below, and can expose top-level ports
 -- The ipbus fabric is instantiated within.
