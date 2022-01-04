@@ -240,14 +240,20 @@ delay_ipam_mode: process(mac_clk)
   end process;
 
 second_count: process(mac_clk)
-    variable tickcount: unsigned(2 to 0) := (others => '0');
+    variable tickcount: unsigned(2 downto 0) := (others => '0');
     begin
-    if (tick = '1') then
-        tickcount := tickcount + 1;
-    end if;
-    if (tickcount = 7) then
-        secs_elapsed <= secs_elapsed + 1;
-        tickcount := (others => '0');
+    if rising_edge(mac_clk) then
+  		if (rst_macclk = '1') or (enable_125 = '0') then
+			secs_elapsed <= (Others => '0');
+			tickcount := (others => '0');
+		elsif (tick = '1') then
+			if (tickcount = 7) then
+				secs_elapsed <= secs_elapsed + 1;
+				tickcount := (others => '0');
+			else
+				tickcount := tickcount + 1;
+			end if;
+		end if;
     end if;
 	end process;
 end generate dhcp_discover;
