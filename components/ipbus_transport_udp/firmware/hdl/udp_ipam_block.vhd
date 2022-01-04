@@ -117,6 +117,7 @@ dhcp_block:  process(mac_clk)
     If rising_edge(mac_clk) then
       If rst_macclk = '1' then
         we := '0';
+        data_buffer := (Others => '0');
 	  ElsIf ipam_req = '1' then
 -- ETHERNET
     -- Ethernet DST_MAC(6) discover -> broadcast (FFFFFFFFFFFF) , 
