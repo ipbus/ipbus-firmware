@@ -58,7 +58,7 @@ end syncreg_r;
 
 architecture rtl of syncreg_r is
 		
-	signal we, rdy, cyc, ack, s1, s2, s3, s4, s5, m1, m2, m3, stab: std_logic;
+	signal we, rdy, cyc, ack, s1, s2, s3, s4, s5, m1, m2, m3, stab, stab_us: std_logic;
 	signal da, db: std_logic_vector(SIZE - 1 downto 0);
 	
 	attribute SHREG_EXTRACT: string;
@@ -67,7 +67,7 @@ architecture rtl of syncreg_r is
 	attribute ASYNC_REG of s1, m1, s2, m2: signal is "yes";
 
 begin
-	
+
 -- Generate cyc and recover handshake into master domain
 
 	process(m_clk)
@@ -84,7 +84,7 @@ begin
 	ack <= m2 and not m3;
 	m_ack <= ack;
 	m_rdy <= rdy;
-	
+
 -- Move cyc into slave domain, generate handshake
 	
 	process(s_clk)
@@ -94,7 +94,7 @@ begin
 			s2 <= s1;
 			s3 <= s2;
 			s4 <= s3;
-			s5 <= s4 and (stab or ('0' when ULTRA_SAFE else '1'));
+			s5 <= s4 and stab_us;
 		end if;
 	end process;
 	
@@ -118,5 +118,6 @@ begin
 
 	db <= da when rising_edge(s_clk);
 	stab <= '1' when db = da else '0';
+	stab_us <= stab or '0' when ULTRA_SAFE else '1';
 	
 end rtl;
