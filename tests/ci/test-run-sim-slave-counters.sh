@@ -67,6 +67,7 @@ ipbb sim setup-simlib
 ipbb sim ipcores
 ipbb sim fli-udp
 ipbb sim generate-project
+ipbb sim addrtab
 
 set -x
 HAVE_LICENCE_FILE="i_got_a_licence.txt"
