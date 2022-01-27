@@ -58,7 +58,7 @@ end syncreg_r;
 
 architecture rtl of syncreg_r is
 		
-	signal we, rdy, cyc, ack, s1, s2, s3, s4, s5, m1, m2, m3, stab, stab_us: std_logic;
+	signal we, rdy, cyc, ack, s1, s2, s3, s4, s5, m1, m2, m3, stab: std_logic;
 	signal da, db: std_logic_vector(SIZE - 1 downto 0);
 	
 	attribute SHREG_EXTRACT: string;
@@ -94,7 +94,7 @@ begin
 			s2 <= s1;
 			s3 <= s2;
 			s4 <= s3;
-			s5 <= s4 and stab_us;
+			s5 <= s4 and stab;
 		end if;
 	end process;
 	
@@ -117,7 +117,8 @@ begin
 -- Avoid race between data and handshake (optimised away if ULTRA_SAFE is false)
 
 	db <= da when rising_edge(s_clk);
-	stab <= '1' when db = da else '0';
-	stab_us <= stab or '0' when ULTRA_SAFE else '1';
+	stab <= '1' when (da = db or not ULTRA_SAFE) else '0';
+
+
 	
 end rtl;
