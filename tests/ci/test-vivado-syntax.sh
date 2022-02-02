@@ -47,9 +47,8 @@ if [[ ! " ${PROJECTS[@]} " =~ " ${PROJ} " ]]; then
   exit -1
 fi
 
-# Stop on the first error
+# Stop at the first error 
 set -e
-# set -x
 
 cd ${WORK_ROOT}
 rm -rf proj/${PROJ}

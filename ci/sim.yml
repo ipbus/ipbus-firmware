@@ -24,7 +24,7 @@ run_sim_udp:vivado2019.2:questasim2019.2:
     - ipbb init work_area
     - cd work_area
     - ln -s ${CI_PROJECT_DIR} src/ipbus-firmware
-    - /${CI_PROJECT_DIR}/work_area/src/ipbus-firmware/tests/ci/test-run-sim-udp.sh sim
+    - ${CI_PROJECT_DIR}/work_area/src/ipbus-firmware/tests/ci/test-run-sim-udp.sh sim
 
 
 run_sim_eth:vivado2019.2:questasim2019.2:
@@ -53,7 +53,7 @@ run_sim_eth:vivado2019.2:questasim2019.2:
     - ipbb init work_area
     - cd work_area
     - ln -s ${CI_PROJECT_DIR} src/ipbus-firmware
-    - /${CI_PROJECT_DIR}/work_area/src/ipbus-firmware/tests/ci/test-run-sim-eth.sh
+    - ${CI_PROJECT_DIR}/work_area/src/ipbus-firmware/tests/ci/test-run-sim-eth.sh
 
 
 run_ram_slaves_testbench_sim:vivado2019.2:questasim2019.2:
@@ -112,4 +112,4 @@ run_ctr_slaves_testbench_sim:vivado2019.2:questasim2019.2:
     - ipbb init work_area
     - cd work_area
     - ln -s ${CI_PROJECT_DIR} src/ipbus-firmware
-    - /${CI_PROJECT_DIR}/work_area/src/ipbus-firmware/tests/ci/test-run-sim-slave-counters.sh
+    - ${CI_PROJECT_DIR}/work_area/src/ipbus-firmware/tests/ci/test-run-sim-slave-counters.sh
