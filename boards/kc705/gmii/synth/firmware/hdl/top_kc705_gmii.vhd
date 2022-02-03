@@ -37,7 +37,12 @@ use IEEE.STD_LOGIC_1164.all;
 
 use work.ipbus.all;
 
-entity top is port(
+entity top is generic (
+	ENABLE_DHCP  : std_logic := '0'; -- Default is build with support for RARP rather than DHCP
+	USE_IPAM     : std_logic := '0'; -- Default is no, use static IP address as specified by ip_addr below
+	MAC_ADDRESS  : std_logic_vector(47 downto 0) := X"020ddba11510" -- Careful here, arbitrary addresses do not always work
+	);
+	port (
     sysclk_p     : in  std_logic;
     sysclk_n     : in  std_logic;
     leds         : out std_logic_vector(3 downto 0);  -- status LEDs
@@ -68,6 +73,9 @@ begin
 -- Infrastructure
 
     infra : entity work.kc705_gmii_infra
+		generic map(
+			DHCP_not_RARP => ENABLE_DHCP
+		)
         port map(
             sysclk_p     => sysclk_p,
             sysclk_n     => sysclk_n,
@@ -89,7 +97,7 @@ begin
             gmii_rx_er   => gmii_rx_er,
             mac_addr     => mac_addr,
             ip_addr      => ip_addr,
-            rarp_select  => '0',
+            ipam_select  => USE_IPAM,
             ipb_in       => ipb_in,
             ipb_out      => ipb_out
             );
@@ -97,7 +105,7 @@ begin
     leds(3 downto 2) <= '0' & userled;
     phy_rst          <= not phy_rst_e;
 
-    mac_addr <= X"020ddba1151" & dip_sw;  -- Careful here, arbitrary addresses do not always work
+    mac_addr <= MAC_ADDRESS;
 	ip_addr <= X"c0a8c82" & dip_sw; -- 192.168.200.32+n
 
 -- ipbus slaves live in the entity below, and can expose top-level ports
