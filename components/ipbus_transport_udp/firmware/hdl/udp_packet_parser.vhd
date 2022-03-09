@@ -40,7 +40,7 @@ entity udp_packet_parser is
   port (
     mac_clk: in std_logic;
     rx_reset: in std_logic;
-    enable_125: std_logic;
+    enable_125: in std_logic;
     my_rx_data: in std_logic_vector(7 downto 0);
     my_rx_last: in std_logic;
     my_rx_valid: in std_logic;
