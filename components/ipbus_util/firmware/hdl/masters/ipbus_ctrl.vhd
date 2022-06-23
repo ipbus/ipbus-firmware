@@ -51,8 +51,6 @@ entity ipbus_ctrl is
 -- Number of address bits within each buffer in UDP I/F
 -- Size of each buffer is 2**ADDRWIDTH
 		ADDRWIDTH: natural := 11;
--- UDP port for IPbus traffic in this instance of UDP I/F
-		IPBUSPORT: std_logic_vector(15 DOWNTO 0) := x"C351";
 -- Flag whether this UDP I/F instance ignores everything except IPBus traffic
 		SECONDARYPORT: std_logic := '0';
 -- Switch between using DHCP or RARP as the protocol for external IP address management
@@ -80,6 +78,7 @@ entity ipbus_ctrl is
 		ipb_grant: in std_logic := '1';
 		mac_addr: in std_logic_vector(47 downto 0) := X"000000000000"; -- Static MAC and IP addresses
 		ip_addr: in std_logic_vector(31 downto 0) := X"00000000";
+		ipbus_port: in std_logic_vector(15 DOWNTO 0) := x"C351"; -- UDP port for IPbus traffic in this instance of UDP I/F
 		enable: in std_logic := '1';
 		ipam_select: in std_logic := '0';
 		actual_mac_addr: out std_logic_vector(47 downto 0); -- actual MAC and IP addresses
@@ -114,7 +113,6 @@ begin
 			BUFWIDTH => BUFWIDTH,
 			INTERNALWIDTH => INTERNALWIDTH,
 			ADDRWIDTH => ADDRWIDTH,
-			IPBUSPORT => IPBUSPORT,
 			SECONDARYPORT => SECONDARYPORT,
 			DHCP_RARP => DHCP_RARP
 		)
@@ -125,6 +123,7 @@ begin
 			rst_ipb => rst_ipb,
 			IP_addr => my_ip_addr,
 			MAC_addr => my_mac_addr,
+			ipbus_port => ipbus_port,
 			enable => udp_en,
 			ipam => ipam_en,
 			mac_rx_data => mac_rx_data,
