@@ -432,26 +432,26 @@ udp_send_data:  process(mac_clk)
 	    send_special_int := '1';
 	    special_int := ip_len(7 downto 0);
 	  when 28 =>
-	    if ip_cksum(15 downto 8) = x"00" then
+	    if ip_cksum(15 downto 8) = x"FF" then
 	      flip_cksum := '1';
 	    else
 	      flip_cksum := '0';
 	    end if;
 	  when 29 =>
-	    if ip_cksum(7 downto 0) /= x"00" then
+	    if ip_cksum(7 downto 0) /= x"FF" then
 	      flip_cksum := '0';
 	    end if;
 	  when 30 =>
 	    send_special_int := '1';
 	    if flip_cksum = '1' then
-	      special_int := (Others => '1');
+	      special_int := (Others => '0');
 	    else
 	      special_int := ip_cksum(15 downto 8);
 	    end if;
 	  when 31 =>
 	    send_special_int := '1';
 	    if flip_cksum = '1' then
-	      special_int := (Others => '1');
+	      special_int := (Others => '0');
 	    else
 	      special_int := ip_cksum(7 downto 0);
 	    end if;
