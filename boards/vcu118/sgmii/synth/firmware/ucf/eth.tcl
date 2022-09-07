@@ -7,6 +7,10 @@ set_property IOSTANDARD LVDS [get_ports sgmii_clk_p]
 set_property IOSTANDARD LVDS [get_ports sgmii_clk_n]
 set_property PACKAGE_PIN AT22 [get_ports sgmii_clk_p]
 set_property PACKAGE_PIN AU22 [get_ports sgmii_clk_n]
+# Differential pair not terminated, so following settings needed to avoid reflection that
+# would degrade the clock until the Ethernet connection is lost (Credit: Javier Sastre)
+set_property DIFF_TERM_ADV TERM_100 [get_ports sgmii_clk_p]
+set_property DIFF_TERM_ADV TERM_100 [get_ports sgmii_clk_n]
 
  
 ############  Receive Pins 
