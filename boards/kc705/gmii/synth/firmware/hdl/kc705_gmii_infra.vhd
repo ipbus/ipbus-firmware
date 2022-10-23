@@ -37,7 +37,8 @@ use work.ipbus.all;
 
 entity kc705_gmii_infra is
     generic (
-        CLK_AUX_FREQ : real := 40.0     -- Default: 40 MHz clock - LHC
+        CLK_AUX_FREQ : real := 40.0;     -- Default: 40 MHz clock - LHC
+        DHCP_not_RARP : std_logic := '0' -- Default use RARP not DHCP for now...
         );
     port(
         sysclk_p     : in  std_logic;   -- 200MHz board crystal clock
@@ -61,7 +62,7 @@ entity kc705_gmii_infra is
         gmii_rx_er   : in  std_logic;
         mac_addr     : in  std_logic_vector(47 downto 0);  -- MAC address
         ip_addr      : in  std_logic_vector(31 downto 0);  -- IP address
-        rarp_select  : in  std_logic;      -- enable RARP
+        ipam_select  : in  std_logic;      -- enable RARP or DHCP
         ipb_in       : in  ipb_rbus;    -- ipbus
         ipb_out      : out ipb_wbus
         );
@@ -146,7 +147,7 @@ begin
 
     ipbus : entity work.ipbus_ctrl
         generic map(
-            DHCP_RARP => '1'
+            DHCP_RARP => DHCP_not_RARP
         )
         port map(
             mac_clk      => clk125,
@@ -166,7 +167,7 @@ begin
             ipb_in       => ipb_in,
             mac_addr     => mac_addr,
             ip_addr      => ip_addr,
-            ipam_select => '1',
+            ipam_select  => ipam_select,
             pkt          => pkt
             );
 
