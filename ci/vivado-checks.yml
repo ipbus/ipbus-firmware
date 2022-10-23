@@ -9,12 +9,45 @@ quick_check:kc705_basex__2019.2:
     VIVADO_VERSION: "2019.2"
     PROJ: kc705_basex
 
-quick_check:kc705_gmii__2020.2:
+quick_check:kc705_gmii__rarp_static__2020.2:
   extends: .template_vivado_quick_check
   variables:
     VIVADO_VERSION: "2020.2"
     PROJ: kc705_gmii
-quick_check:kc705_gmii__2019.2:
+quick_check:kc705_gmii__rarp_static__2019.2:
+  extends: .template_vivado_quick_check
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ: kc705_gmii
+
+quick_check:kc705_gmii__rarp_dynamic__2020.2:
+  extends: .template_vivado_quick_check
+  variables:
+    VIVADO_VERSION: "2020.2"
+    PROJ: kc705_gmii
+quick_check:kc705_gmii__rarp_dynamic__2019.2:
+  extends: .template_vivado_quick_check
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ: kc705_gmii
+
+quick_check:kc705_gmii__dhcp_static__2020.2:
+  extends: .template_vivado_quick_check
+  variables:
+    VIVADO_VERSION: "2020.2"
+    PROJ: kc705_gmii
+quick_check:kc705_gmii__dhcp_static__2019.2:
+  extends: .template_vivado_quick_check
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ: kc705_gmii
+
+quick_check:kc705_gmii__dhcp_dynamic__2020.2:
+  extends: .template_vivado_quick_check
+  variables:
+    VIVADO_VERSION: "2020.2"
+    PROJ: kc705_gmii
+quick_check:kc705_gmii__dhcp_dynamic__2019.2:
   extends: .template_vivado_quick_check
   variables:
     VIVADO_VERSION: "2019.2"

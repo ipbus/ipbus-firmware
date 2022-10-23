@@ -23,6 +23,8 @@
 #
 #-------------------------------------------------------------------------------
 
+# kc705_gmii with support for passing GENERICs to synthesis from environment variable SYNTH_GENERIC_VALUES
 
 include -c boards/kc705/gmii/synth kc705_gmii.dep
 include -c components/ipbus_util ipbus_example.dep
+setup -f add_generics_presynth_script.tcl
