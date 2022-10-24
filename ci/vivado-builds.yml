@@ -15,14 +15,14 @@ build:kc705_gmii__rarp_static__2020.2:
   extends: .template_vivado_build
   variables:
     VIVADO_VERSION: "2020.2"
-    SYNTH_GENERIC_VALUES: "MAC_ADDRESS=48'h000A35026697 ENABLE_DHCP=1'b0 USE_IPAM=1’b0"
+    SYNTH_GENERIC_VALUES: "MAC_ADDRESS=48'h000A35026697 ENABLE_DHCP=1'b0 USE_IPAM=1'b0"
   dependencies:
     - quick_check:kc705_gmii__rarp_static__2020.2
 build:kc705_gmii__rarp_static__2019.2:
   extends: .template_vivado_build
   variables:
     VIVADO_VERSION: "2019.2"
-    SYNTH_GENERIC_VALUES: "MAC_ADDRESS=48'h000A35026697 ENABLE_DHCP=1'b0 USE_IPAM=1’b0"
+    SYNTH_GENERIC_VALUES: "MAC_ADDRESS=48'h000A35026697 ENABLE_DHCP=1'b0 USE_IPAM=1'b0"
   dependencies:
     - quick_check:kc705_gmii__rarp_static__2019.2
 
@@ -30,14 +30,14 @@ build:kc705_gmii__rarp_dynamic__2020.2:
   extends: .template_vivado_build
   variables:
     VIVADO_VERSION: "2020.2"
-    SYNTH_GENERIC_VALUES: "MAC_ADDRESS=48'h000A35026697 ENABLE_DHCP=1'b0 USE_IPAM=1’b1"
+    SYNTH_GENERIC_VALUES: "MAC_ADDRESS=48'h020A35026697 ENABLE_DHCP=1'b0 USE_IPAM=1'b1"
   dependencies:
     - quick_check:kc705_gmii__rarp_dynamic__2020.2
 build:kc705_gmii__rarp_dynamic__2019.2:
   extends: .template_vivado_build
   variables:
     VIVADO_VERSION: "2019.2"
-    SYNTH_GENERIC_VALUES: "MAC_ADDRESS=48'h000A35026697 ENABLE_DHCP=1'b0 USE_IPAM=1’b1"
+    SYNTH_GENERIC_VALUES: "MAC_ADDRESS=48'h020A35026697 ENABLE_DHCP=1'b0 USE_IPAM=1'b1"
   dependencies:
     - quick_check:kc705_gmii__rarp_dynamic__2019.2
 
@@ -45,14 +45,14 @@ build:kc705_gmii__dhcp_static__2020.2:
   extends: .template_vivado_build
   variables:
     VIVADO_VERSION: "2020.2"
-    SYNTH_GENERIC_VALUES: "MAC_ADDRESS=48'h000A35026697 ENABLE_DHCP=1'b1 USE_IPAM=1’b0"
+    SYNTH_GENERIC_VALUES: "MAC_ADDRESS=48'h000A35026697 ENABLE_DHCP=1'b1 USE_IPAM=1'b0"
   dependencies:
     - quick_check:kc705_gmii__dhcp_static__2020.2
 build:kc705_gmii__dhcp_static__2019.2:
   extends: .template_vivado_build
   variables:
     VIVADO_VERSION: "2019.2"
-    SYNTH_GENERIC_VALUES: "MAC_ADDRESS=48'h000A35026697 ENABLE_DHCP=1'b1 USE_IPAM=1’b0"
+    SYNTH_GENERIC_VALUES: "MAC_ADDRESS=48'h000A35026697 ENABLE_DHCP=1'b1 USE_IPAM=1'b0"
   dependencies:
     - quick_check:kc705_gmii__dhcp_static__2019.2
 
@@ -60,14 +60,14 @@ build:kc705_gmii__dhcp_dynamic__2020.2:
   extends: .template_vivado_build
   variables:
     VIVADO_VERSION: "2020.2"
-    SYNTH_GENERIC_VALUES: "MAC_ADDRESS=48'h000A35026697 ENABLE_DHCP=1'b1 USE_IPAM=1’b1"
+    SYNTH_GENERIC_VALUES: "MAC_ADDRESS=48'h000A35026697 ENABLE_DHCP=1'b1 USE_IPAM=1'b1"
   dependencies:
     - quick_check:kc705_gmii__dhcp_dynamic__2020.2
 build:kc705_gmii__dhcp_dynamic__2019.2:
   extends: .template_vivado_build
   variables:
     VIVADO_VERSION: "2019.2"
-    SYNTH_GENERIC_VALUES: "MAC_ADDRESS=48'h000A35026697 ENABLE_DHCP=1'b1 USE_IPAM=1’b1"
+    SYNTH_GENERIC_VALUES: "MAC_ADDRESS=48'h000A35026697 ENABLE_DHCP=1'b1 USE_IPAM=1'b1"
   dependencies:
     - quick_check:kc705_gmii__dhcp_dynamic__2019.2
 
