@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<node fwinfo="endpoint;width=3">
+
+  <node id="ctrl" address="0x00000000" permission="rw">
+      <!-- Access mode: 0 = read, 1 = write. -->
+      <node id="access_mode" address="0x00000000" mask="0x00000001" />
+      <!-- A 0->1 transition on the access_strobe initiates the
+           read/write transaction. -->
+      <node id="access_strobe" address="0x00000000" mask="0x00000004" />
+      <node id="address" address="0x00000001" mask="0xffffffff" />
+      <node id="data_in" address="0x00000002" mask="0xffffffff" />
+      <node id="data_strobe" address="0x00000003" mask="0x0000000f" />
+      <node id="tick" address="0x00000003" mask="0x00000010" />
+  </node>
+
+  <node id="status" address="0x00000004" permission="rw">
+    <node id="done" address="0x00000000" mask="0x00000001" />
+    <node id="write_error" address="0x00000000" mask="0x00000006" />
+    <node id="read_error" address="0x00000000" mask="0x00000060" />
+    <node id="fsm_state_idle" address="0x00000000" mask="0x00000100" />
+    <node id="fsm_state_write" address="0x00000000" mask="0x00000200" />
+    <node id="fsm_state_read" address="0x00000000" mask="0x00000400" />
+    <node id="fsm_state_ack" address="0x00000000" mask="0x00000800" />
+    <node id="data_out" address="0x00000001" mask="0xffffffff" />
+  </node>
+
+</node>
