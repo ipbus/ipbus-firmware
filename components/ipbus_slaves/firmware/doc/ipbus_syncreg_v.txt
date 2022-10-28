@@ -1,0 +1,57 @@
+ipbus_syncreg_v
+
+This is a general_purpose control / status register, analogous to ipbus_reg_v, but including a
+clock domain crossing into a slave clock domain. This allows reliable ipbus access to registers in
+the 'application' clock domain (e.g. to control and monitor LHC-synchronous logic).
+
+The design uses a double-handshaking technique for both read and write, and is in principle capable of
+dealing with clocks of any relative speed.
+
+On write to a control register:
+
+- A ready signal is moved into the slave clock domain via double synchroniser registers
+- The data on the bus is captured into a slave clock register
+- A pulse on stb is sent to slave clock domain logic on the same cycle the reigister is updated
+- An acknowledge signal is moved into the ipbus clock domain via double synchroniser registers
+- The ipbus cycle is terminated
+
+On read from a status register:
+
+- A request signal is moved into the slave clock domain via double synchroniser registers
+- A pulse on rstb is sent to slave clock domain logic the cycle before the input lines are captured
+- The data on the input lines is captured into a slave clock register
+- An acknowledge signal is moved into the ipbus clock domain via double synchroniser registers
+- The slave clock register data is presented to the ipbus, and the cycle is terminated
+
+On read from a control register, the data currently held in the register is simply read without
+further precautions, since by construction it's static.
+
+The internal logic  is hard to follow unless you are very familiar with CDC techniques; be
+assured that it has been tested exhaustively and used in many designs. Problems observed are typically
+NOT due to design issues, but due to missing or unreliable slave clock. A good test for a suspected
+bad slave clock is to repeatedly write and read a control register, and check for correct return value,
+since this fully exercises the CDC mechanism.
+
+However: in very highly congested designs, where the slave clock is also much faster or much slower
+than the ipbus clock, it's possible that a race condition between the data on the bus and the handshake
+will occur. Note that this is an extreme situation, in that the routing delay on the bus must be at
+least twice the clock period of the faster clock. In this case, two further measures can be taken:
+
+- The ULTRA_SAFE generic can be set true, which invokes a mechanism to encourage routing software
+to keep delays under control, at expense of double-registering read and write data. 
+
+- An explicit set_max_delay constraint can be used on the register signals, of one period of the source
+clock (i.e. ipbus clock for control signals, slave clock for status signals).
+
+Unfortunately, the second method removes the possiblity to declare the ipbus and slave clock asynchronous globally via
+a set_clock_groups constraint, meaning that all paths between asynchronous clocks need to be controlled
+by either a set_false_path or set_max_delay or set_multicycle_path constraint.
+
+Following the ipbus philosophy, the ipbus_syncreg_v design sacrifices performance for simplicity,
+reliability and low resource usage. Writes (reads) to control registers and reads to status registers
+take 5 (1) and 6 bus cycles respectively. This is a good trade-off for random control registers, but
+NOT a good way to access significant volumes of data in memories. Here, you should think about using
+a dual-port RAM (ipbus_dpram and friends) or async FIFO buffer instead. For registers that are
+effectively 'static' as far as user logic is concerned, you can simply use ipbus_reg_v.
+
+Dave Newbold 14-Mar-21
