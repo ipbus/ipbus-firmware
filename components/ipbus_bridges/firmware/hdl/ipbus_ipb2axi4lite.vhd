@@ -47,6 +47,7 @@ entity ipbus_ipb2axi4lite is
 		ipb_in: in ipb_wbus;
 		ipb_out: out ipb_rbus
 	);
+	
 end ipbus_ipb2axi4lite;
 
 architecture rtl of ipbus_ipb2axi4lite is
