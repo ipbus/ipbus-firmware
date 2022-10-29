@@ -47,7 +47,7 @@ entity ipbus_ipb2axi4lite is
 		ipb_in: in ipb_wbus;
 		ipb_out: out ipb_rbus
 	);
-	
+
 end ipbus_ipb2axi4lite;
 
 architecture rtl of ipbus_ipb2axi4lite is
@@ -59,7 +59,7 @@ begin
 
 -- Address conversion
 
-	addr <= ipb_in.ipb_addr and ADDR_MASK or ADDR_BASE;
+	addr <= ipb_in.ipb_addr and AXI_ADDR_MASK or AXI_ADDR_BASE;
 
 -- ipbus handshaking
 
@@ -135,6 +135,6 @@ begin
 
 -- axi reset
 
-	s_axi_aresetn <= ipb_rst;
+	s_axi_aresetn <= not ipb_rst;
 
 end rtl;
