@@ -6,13 +6,13 @@ library ipbus;
 use work.ipbus.all;
 
 entity ipbus_axi4lite2ipb is
-	generic (
+	generic(
 		C_S_AXI_DATA_WIDTH: integer	:= 32;
 		C_S_AXI_ADDR_WIDTH: integer	:= 32;
         ADDR_MASK: std_logic_vector(31 downto 0) := X"11111111";
         ADDR_BASE: std_logic_vector(31 downto 0) := X"00000000"
 	);
-	port (
+	port(
 		s_axi_aclk: in std_logic;
 		s_axi_aresetn: in std_logic;
 		s_axi_awaddr: in std_logic_vector(C_S_AXI_ADDR_WIDTH - 1 downto 0);
@@ -39,8 +39,8 @@ entity ipbus_axi4lite2ipb is
 	);
 end ipbus_axi4lite2ipb;
 
-architecture arch_imp of ipbus_axi4lite2ipb is
+architecture rtl of ipbus_axi4lite2ipb is
 
 begin
 
-end arch_imp;
+end rtl;
