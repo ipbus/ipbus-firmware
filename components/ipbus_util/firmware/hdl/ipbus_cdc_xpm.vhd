@@ -18,7 +18,7 @@ entity ipbus_cdc is
 	port(
         dclk: in std_logic;
         d: in std_logic_vector(N - 1 downto 0);
-        qclk: out std_logic;
+        qclk: in std_logic;
         q: out std_logic_vector(N - 1 downto 0)
 	);
 	

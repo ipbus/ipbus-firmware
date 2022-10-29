@@ -1,0 +1,8 @@
+<node id="TOP" class="OuroborosDesign">
+    <node id="reg" address="0x0" mode="port" fwinfo="endpoint;width=0"/>
+    <node id="af_reg" address="0x1" mode="port" fwinfo="endpoint;width=0"/>
+    <node id="as_reg" address="0x2" mode="port" fwinfo="endpoint;width=0"/>
+    <node id="rf_reg" address="0x3" mode="port" fwinfo="endpoint;width=0"/>
+    <node id="rs_reg" address="0x4" mode="port" fwinfo="endpoint;width=0"/>   
+    <node id="c_reg" address="0x5" mode="port" fwinfo="endpoint;width=0"/>   
+</node>

@@ -53,7 +53,6 @@ end ipbus_clk_bridge;
 architecture rtl of ipbus_clk_bridge is
 
 	signal s_stb, s_ack, s_ack_d, d_rst_i, d_stb, stb, ack, err, d_ack: std_logic;
-	signal err: std_logic;
 	signal rdata: std_logic_vector(31 downto 0);
 
 begin
@@ -77,7 +76,7 @@ begin
             q(1) => d_rst_i
 		);
 
-	d_rst <= d_rst_i;
+	d_rsto <= d_rst_i;
 
     stb <= d_stb and not (ack or err); -- Strobe to bus driven by source side strobe until ack from bus
 	d_ipb_out.ipb_strobe <= stb;
@@ -86,7 +85,7 @@ begin
 	err <= (err or d_ipb_in.ipb_err) and d_stb and not d_rst_i when rising_edge(d_clk); -- Err captured from bus, cleared when source side drops strobe
 	rdata <= d_ipb_in.ipb_rdata when stb = '1' and (d_ipb_in.ipb_ack = '1' or d_ipb_in.ipb_err = '1') and rising_edge(d_clk); -- Return data captured from bus on ack or err
 
-	d_ack <= ack or err or s_ipb_in.ipb_ack or s_ipb_i.ipb_err; -- Ack back to source side driven until ack or err is cleared by strobe drop
+	d_ack <= ack or err or d_ipb_in.ipb_ack or d_ipb_in.ipb_err; -- Ack back to source side driven until ack or err is cleared by strobe drop
 
 	cdc_ds: entity work.ipbus_cdc
 		port map(
@@ -96,7 +95,7 @@ begin
 			q(0) => s_ack
 		);
 
-	s_ack_d <= s_ack when rising_edge(m_clk);
+	s_ack_d <= s_ack when rising_edge(s_clk);
 
 	s_ipb_out.ipb_ack <= s_ack and not s_ack_d and ack; -- Ack set by rising edge of ack from strobe, qualified by (stable) dest side ack
 	s_ipb_out.ipb_err <= s_ack and not s_ack_d and err; -- Err set by rising edge of ack from strobe, qualified by (stable) dest side err

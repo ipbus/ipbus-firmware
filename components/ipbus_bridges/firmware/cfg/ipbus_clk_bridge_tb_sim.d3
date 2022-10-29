@@ -1,0 +1,3 @@
+include payload_sim.d3
+include -c ipbus-firmware:boards/sim sim_udp.dep
+include sim_fake_setup.d3

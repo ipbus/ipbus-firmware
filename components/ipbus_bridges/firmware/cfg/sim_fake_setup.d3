@@ -1,0 +1,6 @@
+# This is needed to allow ip cores to be generated for simulation
+
+@device_family = "artix7"
+@device_name = "xc7a35t"
+@device_package = "csg324"
+@device_speed = "-1"

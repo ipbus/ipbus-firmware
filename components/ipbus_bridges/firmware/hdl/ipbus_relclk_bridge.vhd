@@ -54,11 +54,10 @@ end ipbus_relclk_bridge;
 
 architecture rtl of ipbus_relclk_bridge is
 
-	signal s_t, d_t;
+	signal s_t, d_t: std_logic;
 	signal s_c, s_c_d, s_cyc, d_c, d_c_d, d_cyc: std_logic;
 
 	signal s_stb, s_ack, s_ack_d, d_rst_i, d_stb, ack, err, d_ack: std_logic;
-	signal err: std_logic;
 	signal rdata: std_logic_vector(31 downto 0);
 
 begin
@@ -69,7 +68,7 @@ begin
 	d_ipb_out.ipb_wdata <= s_ipb_in.ipb_wdata when rising_edge(d_clk);
 	d_ipb_out.ipb_write <= s_ipb_in.ipb_write when rising_edge(d_clk);
 	d_rst_i <= s_rst when rising_edge(d_clk);
-	d_rst <= d_rst_i;
+	d_rsto <= d_rst_i;
 
 -- Clock edge detection
 
