@@ -1,0 +1,22 @@
+Using ipbus across clock domains
+
+dave.newbold@cern.ch, 29/10/22
+
+The designs ipbus_clk_bridge and ipbus_relclk_bridge allow the ipbus SoC bus to cross clock domains safely.
+
+To cross between unrelated clocks, use ipbus_clk_bridge. This design uses four-way handshaking on each bus,
+cycle and so significantly reduces performance. Note that you must take care of specifying the relationshop
+between clocks to the tools. In the case of extreme clock speeds or FPGA congestion, the four-way handshake
+may exhibit a race condition against settling of the data buses (this is extremely unlikely and would require
+bus skew of almost two clock cycles); in this case you must contrain the skew between paths explicitly.
+
+Internally, the ipbus_clk_bridge uses the ipbus_cdc component for transfer single bits across clock domains,
+for which there is a Xilinx-specific implementation in components/ipbus_util (ipbus_cdc_xpm.vhd). For other
+architectures or tools you will need to provide a suitable alternative implementation.
+
+To transfer data at high speeds across unrelated clock domains, you will need to use a custom approach based
+on a dual-port memory or asynchronous FIFO.
+
+To cross between related clocks (that is, where one clock is a strict multiple of the other and originates from
+the same source) use ipbus_relclk_bridge. This preserves almsot full bus performance. You must specify using the
+generic S_CLK_FASTER whether the source or destination clock is faster.
