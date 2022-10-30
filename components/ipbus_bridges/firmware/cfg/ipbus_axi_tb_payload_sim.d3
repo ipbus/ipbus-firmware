@@ -1,0 +1,8 @@
+src -c components/ipbus_core ipbus_package.vhd
+src -c components/ipbus_slaves ipbus_reg_types.vhd
+src -c components/ipbus_slaves ipbus_reg_v.vhd
+
+src --cd ../tb/ipbus_axi ipbus_decode_ipbus_axi_tb_sim.vhd
+src -c ipbus-firmware:components/ipbus_core ipbus_fabric_sel.vhd
+addrtab -t ipbus_axi_tb_sim.xml
+src --cd ../tb/ipbus_axi payload_sim.vhd
