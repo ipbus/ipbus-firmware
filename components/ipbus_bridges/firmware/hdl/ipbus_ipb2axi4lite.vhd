@@ -2,6 +2,7 @@
 --
 -- This block bridges ipbus to axi4lite, acting as an ipbus slave and an axi4lite master.
 -- It always produces 32b fully-aligned accesses on the axi4lite bus.
+-- Ipbus word addresses are converted to AXI byte addresses internally
 --
 -- Dave Newbold, 29/10/22
 
