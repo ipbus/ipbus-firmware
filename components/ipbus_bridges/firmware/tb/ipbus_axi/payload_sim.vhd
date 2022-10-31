@@ -102,7 +102,7 @@ begin
 
 	axi_reg: axi4lite_reg_0
 		port map(
-			s00_axi_awaddr => axi_mosi.awaddr,
+			s00_axi_awaddr => axi_mosi.awaddr(3 downto 0),
 			s00_axi_awprot => axi_mosi.awprot,
 			s00_axi_awvalid => axi_mosi.awvalid,
 			s00_axi_awready => axi_miso.awready,
@@ -113,7 +113,7 @@ begin
 			s00_axi_bresp => axi_miso.bresp,
 			s00_axi_bvalid => axi_miso.bvalid,
 			s00_axi_bready => axi_mosi.bready,
-			s00_axi_araddr => axi_mosi.araddr,
+			s00_axi_araddr => axi_mosi.araddr(3 downto 0),
 			s00_axi_arprot => axi_mosi.arprot,
 			s00_axi_arvalid => axi_mosi.arvalid,
 			s00_axi_arready => axi_miso.arready,

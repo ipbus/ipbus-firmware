@@ -8,14 +8,13 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library ipbus;
 use work.ipbus.all;
 use work.ipbus_axi4lite_decl.all;
 
 entity ipbus_ipb2axi4lite_wrapper is
     generic(
-        ADDR_MASK: std_logic_vector(31 downto 0) := X"11111111";
-        ADDR_BASE: std_logic_vector(31 downto 0) := X"00000000";
+        IPB_ADDR_MASK: std_logic_vector(31 downto 0) := X"11111111";
+        IPB_ADDR_BASE: std_logic_vector(31 downto 0) := X"00000000";
         C_S_AXI_DATA_WIDTH: integer	:= 32;
         C_S_AXI_ADDR_WIDTH: integer	:= 4
     );
@@ -59,8 +58,8 @@ begin
 
     bridge: entity work.ipbus_axi4lite2ipb is
         generic(
-            ADDR_MASK => ADDR_MASK,
-            ADDR_BASE => ADDR_BASE
+            IPB_ADDR_MASK => IPB_ADDR_MASK,
+            IPB_ADDR_BASE => IPB_ADDR_BASE
         );
         port(
             axi_clk => S_AXI_ACLK,

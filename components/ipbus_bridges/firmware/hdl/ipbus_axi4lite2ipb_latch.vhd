@@ -2,14 +2,13 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library ipbus;
 use work.ipbus.all;
 use work.ipbus_axi4lite_decl.all;
 
 entity ipbus_axi4lite2ipb is
 	generic(
-        ADDR_MASK: std_logic_vector(31 downto 0) := X"11111111";
-        ADDR_BASE: std_logic_vector(31 downto 0) := X"00000000"
+        IPB_ADDR_MASK: std_logic_vector(31 downto 0) := X"11111111";
+        IPB_ADDR_BASE: std_logic_vector(31 downto 0) := X"00000000"
 	);
 	port(
 		axi_clk: in std_logic;
@@ -44,7 +43,7 @@ begin
 -- ipbus output
 
     addr <= axi_in.awaddr when wrdy = '1' else axi_in.araddr;
-    ipb_out.ipb_addr <= addr and ADDR_MASK or ADDR_BASE;
+    ipb_out.ipb_addr <= (("00" & addr(31 downto 2)) and IPB_ADDR_MASK) or IPB_ADDR_BASE; -- axi byte address to ipbus word address
     ipb_out.ipb_wdata <= axi_in.wdata;
     ipb_out.ipb_write <= wrdy;
     ipb_out.ipb_strobe <= (wrdy or rrdy) and not hold_r;
