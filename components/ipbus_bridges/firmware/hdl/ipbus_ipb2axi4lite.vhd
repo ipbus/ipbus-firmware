@@ -15,7 +15,7 @@ use work.ipbus_axi4lite_decl.all;
 
 entity ipbus_ipb2axi4lite is
 	generic(
-        AXI_ADDR_MASK: std_logic_vector(31 downto 0) := X"11111111";
+        AXI_ADDR_MASK: std_logic_vector(31 downto 0) := X"ffffffff";
         AXI_ADDR_BASE: std_logic_vector(31 downto 0) := X"00000000"
 	);
 	port(
