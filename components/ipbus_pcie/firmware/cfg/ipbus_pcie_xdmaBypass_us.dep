@@ -24,7 +24,8 @@
 #-------------------------------------------------------------------------------
 
 src pcie_xdma_bypass_axi_us_if.vhd
-? toolset.lower() == "vivado" ? src ../cgn/pcie_xdmaBypass_us/xdma_0.xci
+#? toolset.lower() == "vivado" ? src ../cgn/pcie_xdmaBypass_us/5gbps_cpll/xdma_0.xci
+? toolset.lower() == "vivado" ? src ../cgn/pcie_xdmaBypass_us/8gbps_qpll/xdma_0.xci
 ? toolset.lower() == "vivado" ? src ../cgn/axi_bram_ctrl_1.xci
 src pcie_int_gen_msix.vhd
 
