@@ -1,3 +1,11 @@
+-- ipbus_axi4lite2ipb
+--
+-- This block bridges axi4lite to ipbus, acting as an AXI4 slave and an ipbus master.
+-- It will only respond to fully-aligned 32b data accesses
+-- AXI byte addresses are converted to ipbus word addresses internally
+--
+-- Dave Newbold, 30/10/22
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -7,7 +15,7 @@ use work.ipbus_axi4lite_decl.all;
 
 entity ipbus_axi4lite2ipb is
 	generic(
-        IPB_ADDR_MASK: std_logic_vector(31 downto 0) := X"11111111";
+        IPB_ADDR_MASK: std_logic_vector(31 downto 0) := X"ffffffff";
         IPB_ADDR_BASE: std_logic_vector(31 downto 0) := X"00000000"
 	);
 	port(
@@ -46,6 +54,7 @@ begin
     ipb_out.ipb_addr <= (("00" & addr(31 downto 2)) and IPB_ADDR_MASK) or IPB_ADDR_BASE; -- axi byte address to ipbus word address
     ipb_out.ipb_wdata <= axi_in.wdata;
     ipb_out.ipb_write <= wrdy;
+    hold_r <= hold when rising_edge(clk); 
     ipb_out.ipb_strobe <= (wrdy or rrdy) and not hold_r;
 
 -- ipbus input
@@ -61,7 +70,6 @@ begin
 
     ack <= l_ack or l_err;
     hold <= ack and ((wrdy and not axi_in.bready) or (not wrdy and not axi_in.rready));
-    hold_r <= hold when rising_edge(axi_clk); 
 
 -- B bus
 

@@ -2,6 +2,7 @@
 --
 -- This block bridges ipbus to axi4lite, acting as an ipbus slave and an axi4lite master.
 -- It always produces 32b fully-aligned accesses on the axi4lite bus.
+-- Ipbus word addresses are converted to AXI byte addresses internally
 --
 -- Dave Newbold, 29/10/22
 
@@ -14,7 +15,7 @@ use work.ipbus_axi4lite_decl.all;
 
 entity ipbus_ipb2axi4lite is
 	generic(
-        AXI_ADDR_MASK: std_logic_vector(31 downto 0) := X"11111111";
+        AXI_ADDR_MASK: std_logic_vector(31 downto 0) := X"ffffffff";
         AXI_ADDR_BASE: std_logic_vector(31 downto 0) := X"00000000"
 	);
 	port(
