@@ -24,7 +24,7 @@ end ipbus_axi4lite2ipb;
 
 architecture rtl of ipbus_axi4lite2ipb is
 
-    signal ack, wrdy, rrdy, hold, l_ack, l_err, hold_r;
+    signal ack, wrdy, rrdy, hold, l_ack, l_err, hold_r: std_logic;
     signal addr, l_rdata: std_logic_vector(31 downto 0);
 	
 begin
@@ -52,7 +52,7 @@ begin
 
     process(ipb_in.ipb_rdata, hold) -- This is an intentional latch
     begin
-        if ohold = '0' then
+        if hold = '0' then
             l_rdata <= ipb_in.ipb_rdata;
             l_ack <= ipb_in.ipb_ack;
             l_err <= ipb_in.ipb_err;
@@ -61,7 +61,7 @@ begin
 
     ack <= l_ack or l_err;
     hold <= ack and ((wrdy and not axi_in.bready) or (not wrdy and not axi_in.rready));
-    hold_r <= hold when rising_edge(clk); 
+    hold_r <= hold when rising_edge(axi_clk); 
 
 -- B bus
 
@@ -76,6 +76,6 @@ begin
 
 -- ipbus reset
 
-	ipb_rst <= not rstn;
+	ipb_rst <= not axi_rstn;
 
 end rtl;

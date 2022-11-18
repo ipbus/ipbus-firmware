@@ -11,32 +11,31 @@ use ieee.numeric_std.all;
 use work.ipbus.all;
 use work.ipbus_axi4lite_decl.all;
 
-entity ipbus_ipb2axi4lite_wrapper is
+entity ipbus_axi4lite2ipb_wrapper is
     generic(
         IPB_ADDR_MASK: std_logic_vector(31 downto 0) := X"11111111";
         IPB_ADDR_BASE: std_logic_vector(31 downto 0) := X"00000000";
-        C_S_AXI_DATA_WIDTH: integer	:= 32;
         C_S_AXI_ADDR_WIDTH: integer	:= 4
     );
     port(
         S_AXI_ACLK: in std_logic;
         S_AXI_ARESETN: in std_logic;
-        S_AXI_AWADDR: in std_logic_vector(C_S_AXI_ADDR_WIDTH-1 downto 0);
+        S_AXI_AWADDR: in std_logic_vector(C_S_AXI_ADDR_WIDTH - 1 downto 0);
         S_AXI_AWPROT: in std_logic_vector(2 downto 0);
         S_AXI_AWVALID: in std_logic;
         S_AXI_AWREADY: out std_logic;
-        S_AXI_WDATA: in std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
-        S_AXI_WSTRB: in std_logic_vector((C_S_AXI_DATA_WIDTH/8)-1 downto 0);
+        S_AXI_WDATA: in std_logic_vector(31 downto 0);
+        S_AXI_WSTRB: in std_logic_vector(3 downto 0);
         S_AXI_WVALID: in std_logic;
         S_AXI_WREADY: out std_logic;
         S_AXI_BRESP: out std_logic_vector(1 downto 0);
         S_AXI_BVALID: out std_logic;
         S_AXI_BREADY: in std_logic;
-        S_AXI_ARADDR: in std_logic_vector(C_S_AXI_ADDR_WIDTH-1 downto 0);
+        S_AXI_ARADDR: in std_logic_vector(C_S_AXI_ADDR_WIDTH - 1 downto 0);
         S_AXI_ARPROT: in std_logic_vector(2 downto 0);
         S_AXI_ARVALID: in std_logic;
         S_AXI_ARREADY: out std_logic;
-        S_AXI_RDATA: out std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
+        S_AXI_RDATA: out std_logic_vector(31 downto 0);
         S_AXI_RRESP: out std_logic_vector(1 downto 0);
         S_AXI_RVALID: out std_logic;
         S_AXI_RREADY: in std_logic;
@@ -50,33 +49,36 @@ entity ipbus_ipb2axi4lite_wrapper is
         ipb_rst: out std_logic
     );
 
-end ipbus_ipb2axi4lite_wrapper;
+end ipbus_axi4lite2ipb_wrapper;
 
-architecture rtl of ipbus_ipb2axi4lite_wrapper is
+architecture rtl of ipbus_axi4lite2ipb_wrapper is
 
 begin
 
-    bridge: entity work.ipbus_axi4lite2ipb is
-        generic(
+    bridge: entity work.ipbus_axi4lite2ipb
+        generic map(
             IPB_ADDR_MASK => IPB_ADDR_MASK,
             IPB_ADDR_BASE => IPB_ADDR_BASE
-        );
-        port(
+        )
+        port map(
             axi_clk => S_AXI_ACLK,
             axi_rstn => S_AXI_ARESETN,
-            axi_in.awaddr => S_AXI_AWADDR,
+            axi_in.awaddr(31 downto C_S_AXI_ADDR_WIDTH) => (others => '0'),
+            axi_in.awaddr(C_S_AXI_ADDR_WIDTH - 1 downto 0) => S_AXI_AWADDR,
             axi_in.awprot => S_AXI_AWPROT,
             axi_in.awvalid => S_AXI_AWVALID,
             axi_in.wdata => S_AXI_WDATA,
             axi_in.wstrb => S_AXI_WSTRB,
             axi_in.wvalid => S_AXI_WVALID,
             axi_in.bready => S_AXI_BREADY,
-            axi_in.araddr => S_AXI_ARADDR,
+            axi_in.araddr(31 downto C_S_AXI_ADDR_WIDTH) => (others => '0'),
+            axi_in.araddr(C_S_AXI_ADDR_WIDTH - 1 downto 0) => S_AXI_ARADDR,            
             axi_in.arprot => S_AXI_ARPROT,
             axi_in.arvalid => S_AXI_ARVALID,
-            axi_out.rready => S_AXI_RREADY,
+            axi_in.rready => S_AXI_RREADY,
             axi_out.awready => S_AXI_AWREADY,
             axi_out.wready => S_AXI_WREADY,
+            axi_out.bresp => S_AXI_BRESP,
             axi_out.bvalid => S_AXI_BVALID,
             axi_out.arready => S_AXI_ARREADY,
             axi_out.rdata => S_AXI_RDATA,
