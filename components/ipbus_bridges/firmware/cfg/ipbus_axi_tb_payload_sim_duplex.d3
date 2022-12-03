@@ -1,0 +1,6 @@
+src -c components/ipbus_core ipbus_package.vhd
+src -c components/ipbus_slaves ipbus_reg_types.vhd
+src -c components/ipbus_slaves ipbus_reg_v.vhd
+include -c components/ipbus_bridges ipbus_ipb2axi4lite.dep ipbus_axi4lite2ipb.dep
+addrtab ipbus_axi_tb_sim.xml
+src --cd ../tb/ipbus_axi payload_sim_duplex.vhd

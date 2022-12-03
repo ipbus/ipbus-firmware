@@ -42,6 +42,10 @@ architecture rtl of payload is
 	signal axi_miso: ipb_axi4lite_miso;
 	signal axi_rstn: std_logic;
 
+    signal ipb_out_a: ipb_wbus;
+    signal ipb_in_a: ipb_rbus;
+    signal ipb_rst_a: std_logic;
+
 	COMPONENT axi4lite_reg_0
 		PORT (
 			s00_axi_awaddr : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
@@ -100,39 +104,24 @@ begin
 			axi_rstn => axi_rstn	
 		);
 
-	checker: entity work.axi_proto_checker_wrapper
-		port map(
-			status => open,
-			asserted => open,
-			aclk => ipb_clk,
-			aresetn => axi_rstn,
-			axi_mosi => axi_mosi,
-			axi_miso => axi_miso
-		);
+    bridge2: entity work.ipbus_axi4lite2ipb
+        port map(
+            axi_clk => ipb_clk,
+            axi_rstn => axi_rstn,
+            axi_in => axi_mosi,
+            axi_out => axi_miso,
+            ipb_out => ipb_out_a,
+            ipb_in => ipb_in_a,
+            ipb_rst => ipb_rst_a
+        );
 
-	axi_reg: axi4lite_reg_0
-		port map(
-			s00_axi_awaddr => axi_mosi.awaddr(3 downto 0),
-			s00_axi_awprot => axi_mosi.awprot,
-			s00_axi_awvalid => axi_mosi.awvalid,
-			s00_axi_awready => axi_miso.awready,
-			s00_axi_wdata => axi_mosi.wdata,
-			s00_axi_wstrb => axi_mosi.wstrb,
-			s00_axi_wvalid => axi_mosi.wvalid,
-			s00_axi_wready => axi_miso.wready,
-			s00_axi_bresp => axi_miso.bresp,
-			s00_axi_bvalid => axi_miso.bvalid,
-			s00_axi_bready => axi_mosi.bready,
-			s00_axi_araddr => axi_mosi.araddr(3 downto 0),
-			s00_axi_arprot => axi_mosi.arprot,
-			s00_axi_arvalid => axi_mosi.arvalid,
-			s00_axi_arready => axi_miso.arready,
-			s00_axi_rdata => axi_miso.rdata,
-			s00_axi_rresp => axi_miso.rresp,
-			s00_axi_rvalid => axi_miso.rvalid,
-			s00_axi_rready => axi_mosi.rready,
-			s00_axi_aclk => ipb_clk,
-			s00_axi_aresetn => axi_rstn
-		);
+    reg: entity work.ipbus_reg_v
+        port map(
+            clk => ipb_clk,
+            reset => ipb_rst_a,
+            ipbus_in => ipb_out_a,
+            ipbus_out => ipb_in_a,
+            q => open        
+        );
 
 end rtl;
