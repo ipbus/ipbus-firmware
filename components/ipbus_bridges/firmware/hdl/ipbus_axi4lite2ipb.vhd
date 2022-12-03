@@ -54,7 +54,7 @@ begin
     ipb_out.ipb_addr <= (("00" & addr(31 downto 2)) and IPB_ADDR_MASK) or IPB_ADDR_BASE; -- axi byte address to ipbus word address
     ipb_out.ipb_wdata <= axi_in.wdata;
     ipb_out.ipb_write <= wrdy;
-    hold_r <= hold when rising_edge(clk); 
+    hold_r <= hold when rising_edge(axi_clk); 
     ipb_out.ipb_strobe <= (wrdy or rrdy) and not hold_r;
 
 -- ipbus input
