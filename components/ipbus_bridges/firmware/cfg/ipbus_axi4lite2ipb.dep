@@ -1,2 +1,2 @@
-src ipbus_axi4lite2ipb_latch.vhd ipbus_axi4lite_decl.vhd
+src ipbus_axi4lite2ipb.vhd ipbus_axi4lite_decl.vhd
 src -c components/ipbus_core ipbus_package.vhd
