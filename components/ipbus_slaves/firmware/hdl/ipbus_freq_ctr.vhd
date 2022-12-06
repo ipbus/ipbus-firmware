@@ -28,8 +28,15 @@
 --
 -- General clock frequency monitor (slightly advanced version).
 --
--- Just like the original ipbus_freq_ctr, but with a dedicated reference clock
--- for the counters, instead of relying on the IPBus clock.
+-- Optimised to measure a large number of clocks, without requiring large resources
+-- in each local clock domain (e.g. for monitoring transceiver clocks).
+--
+-- Counts number of pulses of the (divided by 64) clock in 16M cycles of ipbus clock
+-- Should deal with clocks between 1MHz and ~320MHz.
+--
+-- This version is just like the original ipbus_freq_ctr, but with a
+-- dedicated reference clock for the counters, instead of relying on
+-- the IPBus clock.
 
 --------------------------------------------------------------------------------
 
