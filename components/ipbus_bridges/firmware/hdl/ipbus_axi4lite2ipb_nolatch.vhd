@@ -34,7 +34,10 @@ architecture rtl of ipbus_axi4lite2ipb is
 
     signal ack, iack, wrdy, rrdy, rwait, l_ack, l_err: std_logic;
     signal addr, l_rdata: std_logic_vector(31 downto 0);
-	
+    
+	attribute mark_debug: boolean;
+	attribute mark_debug of ack, iack, wrdy, rrdy, rwait: signal is true;
+
 begin
 
 -- AW / W busses
@@ -54,7 +57,7 @@ begin
     ipb_out.ipb_addr <= (("00" & addr(31 downto 2)) and IPB_ADDR_MASK) or IPB_ADDR_BASE; -- axi byte address to ipbus word address
     ipb_out.ipb_wdata <= axi_in.wdata;
     ipb_out.ipb_write <= wrdy;
-    ipb_out.ipb_strobe <= (wrdy or rrdy) and not ack;
+    ipb_out.ipb_strobe <= (wrdy or rrdy) and not rwait;
 
 -- ipbus input
 

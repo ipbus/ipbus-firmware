@@ -54,6 +54,9 @@ architecture rtl of ipbus_roreg_v is
 	constant ADDR_WIDTH: integer := calc_width(N_REG);
 	signal sel: integer range 0 to 2 ** ADDR_WIDTH - 1 := 0;
 	signal valid: std_logic;
+	
+	attribute mark_debug: boolean;
+	attribute mark_debug of ipb_out: signal is true;
 
 begin
 
