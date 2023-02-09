@@ -68,8 +68,8 @@ begin
     end process;
 
     ack <= (l_ack or l_err) and axi_rstn;
-    iack <= (ipb_in.ipb_ack or ipb_in.ipb_err) and not ack;
     rwait <= ack and not ((wrdy and axi_in.bready) or (not wrdy and axi_in.rready));
+    iack <= ack and not rwait;
 
 -- B bus
 
