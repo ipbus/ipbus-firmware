@@ -38,8 +38,8 @@
 -- will be used for request packets. The 'wr_buf_idx' output port indicates the index
 -- of the request buffer that is currently being used.
 --
--- N.B. 'ram_clk' and 'ipb_clk' can be asynchrononous clocks, however 'ram_clk'
---     must have at least a factor of 5 higher frequency than 'ipb_clk'
+-- N.B. 'ram_clk' and 'ipb_clk' can be asynchrononous clocks, however if these clocks are
+--     async then 'ram_clk' must have at least a factor of 5 higher frequency than 'ipb_clk'
 --
 -- Tom Williams, July 2018
 
