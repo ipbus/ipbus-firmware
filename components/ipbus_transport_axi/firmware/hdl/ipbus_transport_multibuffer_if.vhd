@@ -211,7 +211,7 @@ begin
     end if;
   end process;
 
-  -- Combinatorial process for next state
+  -- Combinational process for next state
   process (state, buf_idx_transactor, wr_buf_filled_ipbclk, buf_processed, trans_out.pkt_done)
   begin
     case state is
