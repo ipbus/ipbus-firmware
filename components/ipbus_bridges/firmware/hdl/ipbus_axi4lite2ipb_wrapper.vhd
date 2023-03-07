@@ -55,7 +55,7 @@ architecture rtl of ipbus_axi4lite2ipb_wrapper is
 
 begin
 
-    bridge: entity work.ipbus_axi4lite2ipb_nolatch
+    bridge: entity work.ipbus_axi4lite2ipb
         generic map(
             IPB_ADDR_MASK => IPB_ADDR_MASK,
             IPB_ADDR_BASE => IPB_ADDR_BASE
