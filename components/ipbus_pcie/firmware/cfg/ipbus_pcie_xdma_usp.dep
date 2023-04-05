@@ -24,6 +24,7 @@
 #-------------------------------------------------------------------------------
 
 src pcie_xdma_axi_usp_if.vhd
+? toolset.lower() == "vivado" ? src --cd ../ucf fix_axi_clk_freq.tcl
 #? toolset.lower() == "vivado" ? src ../cgn/pcie_xdma_usp/5gbps_cpll/xdma_0.xci
 ? toolset.lower() == "vivado" ? src ../cgn/pcie_xdma_usp/8gbps_qpll/xdma_0.xci
 src pcie_int_gen_msix.vhd

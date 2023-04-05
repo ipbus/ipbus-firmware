@@ -105,7 +105,8 @@ begin
     --  DCM clock generation for internal bus, ethernet
     clocks : entity work.clocks_usp_serdes
         generic map (
-            CLK_FR_FREQ => 300.0
+            CLK_FR_FREQ => 300.0,
+            CLK_VCO_FREQ => 1200.0
             )
         port map (
             clki_fr       => clk_osc,
