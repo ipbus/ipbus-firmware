@@ -55,6 +55,7 @@ entity ipbus_freq_ctr is
 		N_CLK: natural := 1
 	);
 	port(
+		clk_ref: in std_logic;
 		clk: in std_logic;
 		rst: in std_logic;
 		ipb_in: in ipb_wbus;
@@ -71,28 +72,28 @@ architecture rtl of ipbus_freq_ctr is
 
 begin
 
-	reg: entity work.ipbus_ctrlreg_v
+	reg: entity work.ipbus_syncreg_v
 		generic map(
 			N_CTRL => 1,
 			N_STAT => 1
 		)
 		port map(
 			clk => clk,
-			reset => rst,
-			ipbus_in => ipb_in,
-			ipbus_out => ipb_out,
+			rst => rst,
+			ipb_in => ipb_in,
+			ipb_out => ipb_out,
+			slv_clk => clk_ref,
 			d => stat,
-			q => ctrl
+			q => ctrl,
+			stb(0) => cyc
 		);
-		
-	cyc <= ipb_in.ipb_strobe and ipb_in.ipb_write and not ipb_in.ipb_addr(0);
 
 	freq_ctr: entity work.ipbus_freq_ctr_core
 		generic map(
 			N_CLK => N_CLK
 		)
 		port map(
-			clk_ref => clk,
+			clk_ref => clk_ref,
 			ctrl_cyc => cyc,
 			ctrl => ctrl(0),
 			stat => stat(0),
