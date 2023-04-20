@@ -52,7 +52,8 @@ use unisim.VComponents.all;
 
 entity ipbus_freq_ctr is
 	generic(
-		N_CLK: natural := 1
+		N_CLK: natural := 1;
+		ASYNC_REF: boolean := false
 	);
 	port(
 		clk_ref: in std_logic;
@@ -85,20 +86,43 @@ architecture rtl of ipbus_freq_ctr is
 
 begin
 
-	reg: entity work.ipbus_ctrlreg_v
-		generic map(
-			N_CTRL => 1,
-			N_STAT => 1
-		)
-		port map(
-			clk => clk,
-			reset => rst,
-			ipbus_in => ipb_in,
-			ipbus_out => ipb_out,
-			d => stat,
-			q => ctrl
-		);
-		
+	syncreg_gen: if ASYNC_REF generate
+
+		reg: entity work.ipbus_syncreg_v
+			generic map(
+				N_CTRL => 1,
+				N_STAT => 1
+			)
+			port map(
+				clk => clk,
+				rst => rst,
+				ipb_in => ipb_in,
+				ipb_out => ipb_out,
+				slv_clk => clk_ref,
+				d => stat,
+				q => ctrl
+			);
+
+	end generate;
+
+	reg_gen: if not ASYNC_REF generate
+
+		reg: entity work.ipbus_ctrlreg_v
+			generic map(
+				N_CTRL => 1,
+				N_STAT => 1
+			)
+			port map(
+				clk => clk,
+				reset => rst,
+				ipbus_in => ipb_in,
+				ipbus_out => ipb_out,
+				d => stat,
+				q => ctrl
+			);
+
+    end generate;
+
 	cyc <= ipb_in.ipb_strobe and ipb_in.ipb_write and not ipb_in.ipb_addr(0);
 	sel <= to_integer(unsigned(ctrl(0)(ADDR_WIDTH - 1 downto 0))) when ADDR_WIDTH > 0 else 0;
 	
