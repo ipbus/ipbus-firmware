@@ -169,10 +169,10 @@ architecture rtl of pcie_xdma_axi_us_if is
       m_axib_rready : OUT STD_LOGIC;
 
       c2h_sts_0 : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-      h2c_sts_0 : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-      int_qpll1lock_out : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
-      int_qpll1outrefclk_out : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
-      int_qpll1outclk_out : OUT STD_LOGIC_VECTOR(0 DOWNTO 0)
+      h2c_sts_0 : OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
+      --int_qpll1lock_out : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+      --int_qpll1outrefclk_out : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+      --int_qpll1outclk_out : OUT STD_LOGIC_VECTOR(0 DOWNTO 0)
     );
   END COMPONENT;
 
@@ -349,11 +349,11 @@ begin
       m_axib_rready      => axib_ms_i.rready,
 
       c2h_sts_0            => open,
-      h2c_sts_0            => open,
+      h2c_sts_0            => open
 
-      int_qpll1lock_out      => open,
-      int_qpll1outrefclk_out => open,
-      int_qpll1outclk_out    => open
+      --int_qpll1lock_out      => open,
+      --int_qpll1outrefclk_out => open,
+      --int_qpll1outclk_out    => open
     );
   dma_axi_ms.aclk    <= axib_ms_i.aclk;
   dma_axi_ms.aresetn <= axib_ms_i.aresetn;
