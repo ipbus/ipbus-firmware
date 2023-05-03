@@ -40,7 +40,8 @@ use work.ipbus.all;
 
 entity zcu102_basex_infra is
     generic(
-        CLK_AUX_FREQ : real
+        CLK_AUX_FREQ : real;
+        DHCP_not_RARP : std_logic := '0' -- Default use RARP not DHCP for now...
         );
     port(
         sysclk_p    : in  std_logic;
@@ -61,7 +62,7 @@ entity zcu102_basex_infra is
         leds        : out std_logic_vector(1 downto 0);   -- status LEDs
         mac_addr    : in  std_logic_vector(47 downto 0);  -- MAC address
         ip_addr     : in  std_logic_vector(31 downto 0);  -- IP address
-        rarp_select : in  std_logic;      -- enable RARP
+        ipam_select : in  std_logic;      -- enable RARP or DHCP
         ipb_in      : in  ipb_rbus;       -- ipbus
         ipb_out     : out ipb_wbus
         );
@@ -156,6 +157,9 @@ begin
 -- ipbus control logic
 
     ipbus : entity work.ipbus_ctrl
+        generic map(
+            DHCP_RARP => DHCP_not_RARP
+        )
         port map(
             mac_clk      => clk125,
             rst_macclk   => rst125,
@@ -174,7 +178,7 @@ begin
             ipb_in       => ipb_in,
             mac_addr     => mac_addr,
             ip_addr      => ip_addr,
-            RARP_select  => rarp_select,
+            ipam_select  => ipam_select,
             pkt          => pkt
             );
 

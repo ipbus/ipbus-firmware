@@ -57,6 +57,7 @@ entity ipbus_ctrlreg_v is
 		ipbus_in: in ipb_wbus;
 		ipbus_out: out ipb_rbus;
 		d: in ipb_reg_v(N_STAT - 1 downto 0) := (others => (others => '0'));
+		ctrl_default: in ipb_reg_v(N_CTRL - 1 downto 0) := (others => (others => '0'));
 		q: out ipb_reg_v(N_CTRL - 1 downto 0);
 		qmask: in ipb_reg_v(N_CTRL - 1 downto 0) := (others => (others => '1'));		
 		stb: out std_logic_vector(N_CTRL - 1 downto 0)
@@ -84,7 +85,7 @@ begin
 	begin
 		if rising_edge(clk) then
 			if reset = '1' then
-				reg <= (others => (others => '0'));
+				reg <= ctrl_default;
 			elsif cw_cyc = '1' and sel < N_CTRL then
 				reg(sel) <= ipbus_in.ipb_wdata and qmask(sel);
 			end if;

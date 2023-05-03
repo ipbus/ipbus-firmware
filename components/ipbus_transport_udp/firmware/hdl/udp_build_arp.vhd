@@ -36,12 +36,12 @@ entity udp_build_arp is
   port (
     mac_clk: in std_logic;
     rx_reset: in std_logic;
-    mac_rx_data: in std_logic_vector(7 downto 0);
-    mac_rx_valid: in std_logic;
-    mac_rx_last: in std_logic;
-    mac_rx_error: in std_logic;
+    my_rx_data: in std_logic_vector(7 downto 0);
+    my_rx_valid: in std_logic;
+    my_rx_last: in std_logic;
+    my_rx_error: in std_logic;
     pkt_drop_arp: in std_logic;
-    MAC_addr: in std_logic_vector(47 downto 0);
+    My_MAC_addr: in std_logic_vector(47 downto 0);
     My_IP_addr: in std_logic_vector(31 downto 0);
     arp_data: out std_logic_vector(7 downto 0);
     arp_addr: out std_logic_vector(12 downto 0);
@@ -74,7 +74,7 @@ send_packet:  process (mac_clk)
       else
         end_addr_i := (Others => '0');
       end if;
-      send_pending := mac_rx_last and not (pkt_drop_arp or mac_rx_error);
+      send_pending := my_rx_last and not (pkt_drop_arp or my_rx_error);
       arp_end_addr <= end_addr_i
 -- pragma translate_off
       after 4 ns
@@ -106,7 +106,7 @@ address_block:  process(mac_clk)
       if (rx_reset = '1') then
 	set_addr_int := '1';
 	addr_to_set_int := to_unsigned(6, 6);
-      elsif (mac_rx_valid = '1') and (pkt_drop_arp = '0') then
+      elsif (my_rx_valid = '1') and (pkt_drop_arp = '0') then
 -- Because address is buffered this logic needs to switch a byte early...
         case to_integer(address) is
 -- RX Ethernet Dest MAC bytes 0 to 5 => TX write Source MAC bytes 6 to 11...
@@ -160,8 +160,8 @@ build_packet:  process (mac_clk)
       if (rx_reset = '1') then
 	send_buf_int := '1';
 	load_buf_int := '1';
-	buf_to_load_int := MAC_addr;
-      elsif (mac_rx_valid = '1') and (pkt_drop_arp = '0') then
+	buf_to_load_int := My_MAC_addr;
+      elsif (my_rx_valid = '1') and (pkt_drop_arp = '0') then
 -- Because address is buffered this logic needs to switch a byte early...
         case to_integer(address) is
 -- RX Ethernet Dest MAC bytes 0 to 5 => TX write Source MAC bytes 6 to 11...
@@ -180,7 +180,7 @@ build_packet:  process (mac_clk)
           when 40 =>
 	    send_buf_int := '1';
 	    load_buf_int := '1';
-	    buf_to_load_int := MAC_addr;
+	    buf_to_load_int := My_MAC_addr;
 -- RX ARP target MAC bytes 32 to 37 => TX write sender MAC bytes 22 to 27...
           when 26 =>
 	    load_buf_int := '1';
@@ -226,7 +226,7 @@ next_addr:  process(mac_clk)
         addr_to_set_buf := addr_to_set;
 	set_addr_buf := '1';
       end if;
-      if rx_reset = '1' or mac_rx_valid = '1' then
+      if rx_reset = '1' or my_rx_valid = '1' then
         if set_addr_buf = '1' then
           addr_int := addr_to_set_buf;
 	  set_addr_buf := '0';
@@ -252,11 +252,11 @@ write_data:  process(mac_clk)
       if load_buf = '1' then
         shift_buf := buf_to_load;
       end if;
-      if mac_rx_valid = '1' and pkt_drop_arp = '0' then
+      if my_rx_valid = '1' and pkt_drop_arp = '0' then
 	if send_buf = '1' then
 	  data_to_send := shift_buf(47 downto 40);
 	else
-	  data_to_send := mac_rx_data;
+	  data_to_send := my_rx_data;
 	end if;
 	shift_buf := shift_buf(39 downto 0) & x"00";
       end if;

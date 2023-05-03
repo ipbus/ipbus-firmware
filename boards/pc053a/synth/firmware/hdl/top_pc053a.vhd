@@ -118,7 +118,7 @@ begin
             mac_addr(3 downto 0)  => dip_sw,
             ip_addr(31 downto 4)  => IP_ADDR(31 downto 4),
             ip_addr(3 downto 0)   => dip_sw,
-            rarp_select           => '0',
+            ipam_select           => '0',
             ipb_in                => ipb_in,
             ipb_out               => ipb_out
             );

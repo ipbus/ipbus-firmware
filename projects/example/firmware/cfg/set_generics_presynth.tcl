@@ -22,31 +22,12 @@
 #       https://ipbus.web.cern.ch/ipbus
 #
 #-------------------------------------------------------------------------------
+# Presynth script for setting generics from environment variable SYNTH_GENERIC_VALUES
 
+if { [info exists ::env(SYNTH_GENERIC_VALUES) ] } {
+  set GENERIC_VALUES $::env(SYNTH_GENERIC_VALUES)
+  puts "Generics: $GENERIC_VALUES"
+  puts "Current fileset: [current_fileset]"
+  set_property generic "$GENERIC_VALUES" [current_fileset]
+}
 
-# Dependencies for ipbus_core
-
-src udp_if_flat.vhd
-src udp_buffer_selector.vhd
-src udp_build_arp.vhd
-src udp_build_payload.vhd
-src udp_build_ping.vhd
-src udp_build_resend.vhd
-src udp_build_status.vhd
-src udp_byte_sum.vhd
-src udp_clock_crossing_if.vhd
-src udp_do_rx_reset.vhd
-src udp_dualportram.vhd
-src udp_dualportram_rx.vhd
-src udp_dualportram_tx.vhd
-src udp_ipaddr_ipam.vhd
-src udp_packet_parser.vhd
-src udp_ipam_block.vhd
-src udp_rxram_mux.vhd
-src udp_rxram_shim.vhd
-src udp_rxtransactor_if_simple.vhd
-src udp_status_buffer.vhd
-src udp_tx_mux.vhd
-src udp_txtransactor_if_simple.vhd
-
-include -c components/ipbus_core

@@ -42,6 +42,9 @@ use UNISIM.VComponents.all;
 
 
 entity vcu118_infra_sgmii is
+    generic(
+        DHCP_not_RARP : std_logic := '0' -- Default use RARP not DHCP for now...
+    );
     port (
         -- External oscillators
         osc_clk_300_p : in    std_logic;
@@ -75,7 +78,7 @@ entity vcu118_infra_sgmii is
 
         mac_addr      : in  std_logic_vector(47 downto 0);  -- MAC address
         ip_addr       : in  std_logic_vector(31 downto 0);  -- IP address
-        rarp_select   : in  std_logic;      -- enable RARP
+        ipam_select   : in  std_logic;      -- enable RARP or DHCP
         -- IPbus (from / to slaves)
         ipb_in        : in  ipb_rbus;
         ipb_out       : out ipb_wbus
@@ -181,6 +184,9 @@ begin
 
 
     ipbus : entity work.ipbus_ctrl
+        generic map(
+            DHCP_RARP => DHCP_not_RARP
+        )
         port map(
             mac_clk      => clk_eth,
             rst_macclk   => rst_eth,
@@ -199,7 +205,7 @@ begin
             ipb_in       => ipb_in,
             mac_addr     => mac_addr,
             ip_addr      => ip_addr,
-            RARP_select  => rarp_select,
+            ipam_select  => ipam_select,
             pkt          => pkt
             );
 
