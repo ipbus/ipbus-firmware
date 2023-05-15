@@ -42,7 +42,7 @@ use work.ipbus.ALL;
 
 entity ipbus_fabric_sel is
   generic(
-    NSLV: positive;
+    NSLV: natural;
     STROBE_GAP: boolean := false;
     SEL_WIDTH: natural
    );
