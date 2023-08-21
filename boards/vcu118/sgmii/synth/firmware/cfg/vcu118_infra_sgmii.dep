@@ -32,6 +32,7 @@
 
 
 src vcu118_infra_sgmii.vhd
+src -c components/ipbus_util clocks/clocks_usp_serdes.vhd ipbus_clock_div.vhd
 include -c components/ipbus_util ipbus_ctrl.dep
 include eth_sgmii_lvds_vcu118.dep
 src -c components/ipbus_core ipbus_fabric_sel.vhd ipbus_package.vhd
