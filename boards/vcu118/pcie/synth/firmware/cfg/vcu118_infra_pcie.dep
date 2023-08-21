@@ -32,7 +32,7 @@
 
 
 src vcu118_infra_pcie.vhd
-src -c components/ipbus_util clocks/clocks_usp_serdes.vhd ipbus_clock_div.vhd led_stretcher.vhd
+src -c components/ipbus_util clocks/clocks_usp_serdes.vhd ipbus_clock_div.vhd
 include -c components/ipbus_pcie ipbus_pcie_xdma_usp.dep
 include -c components/ipbus_transport_axi
 src -c components/ipbus_core ipbus_fabric_sel.vhd ipbus_package.vhd
