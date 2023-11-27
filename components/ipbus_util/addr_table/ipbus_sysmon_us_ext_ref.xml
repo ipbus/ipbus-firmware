@@ -2,9 +2,9 @@
 
 <node fwinfo="endpoint; width=8">
 
-  <!-- NOTE: Since the lower nine bits of the address are passed
+  <!-- NOTE: Since the lower eight bits of the address are passed
        straigh to the DRP side of the sysmon, one should not
-       instantiate the IPBus sysmon entity below address 0x200. -->
+       instantiate the IPBus sysmon entity below address 0x100. -->
 
   <!-- More details about the actual register contents can be found in
        Xilinx UG580. -->
