@@ -51,6 +51,8 @@ entity vcu118_infra_sgmii is
         osc_clk_300_n : in    std_logic;
         osc_clk_125_p : in    std_logic;
         osc_clk_125_n : in    std_logic;
+        osc_clk_300_o : out   std_logic;
+        osc_clk_125_o : out   std_logic;
         -- status LEDs
         rst_in        : in    std_logic_vector(4 downto 0);  -- external reset button
         dip_sw        : in    std_logic_vector(3 downto 0);
@@ -109,6 +111,8 @@ begin
             o  => osc_clk_300
             );
 
+    osc_clk_300_o <= osc_clk_300;
+
     osc_clk_125_ibuf : IBUFDS
         port map(
             i  => osc_clk_125_p,
@@ -116,11 +120,13 @@ begin
             o  => osc_clk_125
             );
 
+    osc_clk_125_o <= osc_clk_125;
+
     --  DCM clock generation for internal bus, ethernet
     clocks : entity work.clocks_usp_serdes
         generic map (
             CLK_FR_FREQ => 300.0,
-            CLK_VCO_FREQ => 1200.0
+            CLK_VCO_FREQ => 1125.0
             )
         port map (
             clki_fr       => osc_clk_300,
