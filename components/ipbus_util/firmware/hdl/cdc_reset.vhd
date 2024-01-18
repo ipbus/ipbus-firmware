@@ -23,6 +23,10 @@ architecture rtl of cdc_reset is
   attribute ASYNC_REG of reset_d1 : signal is "TRUE";
   attribute ASYNC_REG of reset_d2 : signal is "TRUE";
 
+  attribute SHREG_EXTRACT: string;
+  attribute SHREG_EXTRACT of reset_d1 : signal is "no";
+  attribute SHREG_EXTRACT of reset_d2 : signal is "no";
+
 begin
 
   process(clk_dst, reset_in) is
