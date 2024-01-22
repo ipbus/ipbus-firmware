@@ -1,0 +1,9 @@
+src -c components/ipbus_core ipbus_package.vhd
+src -c components/ipbus_slaves ipbus_reg_types.vhd
+src -c components/ipbus_slaves ipbus_reg_v.vhd
+src ipbus_relclk_bridge.vhd
+include ipbus_clk_bridge.dep
+src --cd ../tb/ipbus_clk_bridge ipbus_decode_ipbus_clk_bridge_tb_sim.vhd
+src -c ipbus-firmware:components/ipbus_core ipbus_fabric_sel.vhd
+addrtab -t ipbus_clk_bridge_tb_sim.xml
+src --cd ../tb/ipbus_clk_bridge payload_sim.vhd

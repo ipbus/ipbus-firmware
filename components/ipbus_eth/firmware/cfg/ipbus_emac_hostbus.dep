@@ -24,6 +24,5 @@
 #-------------------------------------------------------------------------------
 
 
-src ipbus_emac_hostbus.vhd
-src -c components/ipbus_eth emac_hostbus_decl.vhd
+src ipbus_emac_hostbus.vhd emac_hostbus_decl.vhd
 src -c components/ipbus_core ipbus_package.vhd
