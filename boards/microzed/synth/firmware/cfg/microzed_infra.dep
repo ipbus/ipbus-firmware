@@ -1,0 +1,5 @@
+src enclustra_ax3_pm3_infra.vhd
+src -c ipbus-firmware:components/ipbus_util clocks_7s_extphy_se.vhd ipbus_clock_div.vhd led_stretcher.vhd
+include -c ipbus-firmware:components/ipbus_core
+include -c ipbus-firmware:components/ipbus_eth artix_rgmii.dep
+src -c ipbus-firmware:components/ipbus_core ipbus_fabric_sel.vhd ipbus_package.vhd

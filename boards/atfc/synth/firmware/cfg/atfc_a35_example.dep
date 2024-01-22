@@ -1,0 +1,3 @@
+src top_atfc.vhd
+include atfc_a35.dep
+include -c ipbus-firmware:components/ipbus_util ipbus_example.dep
