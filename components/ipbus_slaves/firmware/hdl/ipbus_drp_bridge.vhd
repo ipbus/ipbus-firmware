@@ -52,7 +52,7 @@ end ipbus_drp_bridge;
 
 architecture rtl of ipbus_drp_bridge is
 
-	signal busy, cyc, cyc_done, stb, stb_d, stb2, stb2_d: std_logic;
+	signal busy, cyc, cyc_done, stb, stb_d: std_logic;
 	signal ipb_out_drp_clk : ipb_rbus;
 	signal ipb_in_drp_clk : ipb_wbus;
 
@@ -108,12 +108,10 @@ begin
 		if rising_edge(clk_l) then
 			busy <= (busy or cyc) and not (cyc_done or rst_l);
 			stb_d <= stb;
-			stb2_d <= stb2;
 		end if;
 	end process;
 
 	stb  <= ipb_in_l.ipb_strobe and not busy;
-	stb2 <= ipb_in_l.ipb_strobe;
 	cyc      <= stb and not stb_d;
 	cyc_done <= drp_in.rdy and ipb_in_l.ipb_strobe and not cyc;
 
