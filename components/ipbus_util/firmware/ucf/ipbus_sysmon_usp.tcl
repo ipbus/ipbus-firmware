@@ -12,6 +12,10 @@ set sysmons [lsort [get_cells -hierarchical -regexp {.*sysmon.*} -filter {REF_NA
 set slr_pri [get_slrs -filter IS_MASTER]
 set slrs_sec [get_slrs -filter !IS_MASTER]
 
+# Check that we found one, and only one, SYSMON for each SLR.
+if {[llength $sysmons] != ([llength $slr_pri] + [llength $slrs_sec])} \
+    {error "There must be exactly one SYSMON instance for each SLR."}
+
 # The first SYSMON goes into the primary SLR.
 set sysmon_pri [lindex $sysmons 0]
 set slr_index [get_property SLR_INDEX $slr_pri]

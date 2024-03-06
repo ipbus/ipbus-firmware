@@ -1,15 +1,56 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
-<node fwinfo="endpoint; width=8">
+<node id="ipbus_sysmon_up_ext_ref" fwinfo="endpoint; width=12">
 
-  <!-- NOTE: Since the lower eight bits of the address are passed
-       straigh to the DRP side of the sysmon, one should not
-       instantiate the IPBus sysmon entity below address 0x100. -->
+  <node id="csr" fwinfo="endpoint; width=2">
+    <node id="control" address="0x00000000">
+      <node id="sysmon_select"
+            description="Selection of SYSMON to read. 0: SYSMON in primary SLR. [1, 4]: SYSMONs in additional SLRs, if present. See the 'num_slrs' status register for the number of SLRs present."
+            address="0x00000000"
+            mask="0x00000003"
+            permission="rw" />
+    </node>
+    <node id="status" address="0x00000002">
+      <node id="num_slrs"
+            description="The number of SLRs present in the FPGA. Each SLR has its dedicated SYSMON. Use the 'sysmon_select' control register to determine which SYSMON to read."
+            address="0x00000000"
+            mask="0x00000003"
+            permission="r" />
 
-  <!-- More details about the actual register contents can be found in
-       Xilinx UG580. -->
+      <node id="alarm_any"
+            description="Logical OR of all alarm flags, for all SYSMONs."
+            address="0x00000001"
+            mask="0x00000001"
+            permission="r" />
+      <node id="alarm_over_temperature"
+            description="Logical OR of over-temperature alarm flags of all SYSMONs."
+            address="0x00000001"
+            mask="0x00000002"
+            permission="r" />
+      <node id="alarm_user_temperature"
+            description="Logical OR of user-level over-temperature alarm flags of all SYSMONs."
+            address="0x00000001"
+            mask="0x00000004"
+            permission="r" />
+      <node id="alarm_vccint"
+            description="Logical OR of VCCINT alarm flags of all SYSMONs."
+            address="0x00000001"
+            mask="0x00000008"
+            permission="r" />
+      <node id="alarm_vccaux"
+            description="Logical OR of VCCAUX alarm flags of all SYSMONs."
+            address="0x00000001"
+            mask="0x00000010"
+            permission="r" />
+      <node id="alarm_vccbram"
+            description="Logical OR of VCCBRAM alarm flags of all SYSMONs."
+            address="0x00000001"
+            mask="0x00000020"
+            permission="r" />
+    </node>
+  </node>
 
-  <!-- Xilinx UG580 also says:
+  <!-- Xilinx UG580 says:
        The ADC always produces a 16-bit conversion result, and the
        full 16-bit result is stored in the 16-bit status
        registers. The 10-bit transfer functions shown in this section
@@ -22,43 +63,115 @@
        connected (which can be verified by looking at the reading of
        vrefp) and uses the full 16 bits. -->
 
-  <node id="temp"
-        description="FPGA die temperature. Conversion (for external reference and full 16-bit): (ADC_code x 502.9098 / 2^16) - 273.8195 [C]."
-        address="0x00000000"
-        mask="0x0000ffff"
-        tags="conversion=(val * 502.9098 / 65536.) - 273.8195;C" />
+  <node id="drp"
+        description="More details about the actual DRP register contents can be found in Xilinx UG580."
+        address="0x00000100"
+        fwinfo="endpoint; width=8">
+    <node id="temperature"
+          description="FPGA die temperature. Conversion (for external reference and full 16-bit): (ADC_code x 502.9098 / 2^16) - 273.8195 [C]."
+          address="0x00000000"
+          mask="0x0000ffff"
+          tags="conversion=(val * 502.9098 / 65536.) - 273.8195;C" />
 
-  <node id="vccint"
-        description="VCCINT. Conversion (for external reference and full 16-bit): (ADC_code / 2^16) * 3 [V]."
-        address="0x00000001"
-        mask="0x0000ffff"
-        tags="conversion=(val / 65536.) * 3.;V" />
+    <node id="vccint"
+          description="VCCINT. Conversion (for external reference and full 16-bit): (ADC_code / 2^16) * 3 [V]."
+          address="0x00000001"
+          mask="0x0000ffff"
+          tags="conversion=(val / 65536.) * 3.;V" />
 
-  <node id="vccaux"
-        description="VCCAUX. Conversion (for external reference and full 16-bit): (ADC_code / 2^16) * 3 [V]."
-        address="0x00000002"
-        mask="0x0000ffff"
-        tags="conversion=(val / 65536.) * 3.;V" />
+    <node id="vccaux"
+          description="VCCAUX. Conversion (for external reference and full 16-bit): (ADC_code / 2^16) * 3 [V]."
+          address="0x00000002"
+          mask="0x0000ffff"
+          tags="conversion=(val / 65536.) * 3.;V" />
 
-  <!-- NOTE: At address 0x3 lives the VP/VN measurement, which is
-       disabled on the VHDL side. -->
+    <!-- NOTE: At address 0x3 lives the VP/VN measurement, which is
+         disabled on the VHDL side. -->
 
-  <node id="vrefp"
-        description="VREFP. Conversion (for external reference and full 16-bit): (ADC_code / 2^16) * 3 [V]."
-        address="0x00000004"
-        mask="0x0000ffff"
-        tags="conversion=(val / 65536.) * 3.;V" />
+    <node id="vrefp"
+          description="VREFP. Conversion (for external reference and full 16-bit): (ADC_code / 2^16) * 3 [V]."
+          address="0x00000004"
+          mask="0x0000ffff"
+          tags="conversion=(val / 65536.) * 3.;V" />
 
-  <node id="vrefn"
-        description="VREFN. Conversion (for external reference and full 16-bit): (ADC_code / 2^16) * 3 [V]."
-        address="0x00000005"
-        mask="0x0000ffff"
-        tags="conversion=(val / 65536.) * 3.;V" />
+    <node id="vrefn"
+          description="VREFN. Conversion (for external reference and full 16-bit): (ADC_code / 2^16) * 3 [V]."
+          address="0x00000005"
+          mask="0x0000ffff"
+          tags="conversion=(val / 65536.) * 3.;V" />
 
-  <node id="vccbram"
-        description="VCCBRAM. Conversion (for external reference and full 16-bit): (ADC_code / 2^16) * 3 [V]."
-        address="0x00000006"
-        mask="0x0000ffff"
-        tags="conversion=(val / 65536.) * 3.;V" />
+    <node id="vccbram"
+          description="VCCBRAM. Conversion (for external reference and full 16-bit): (ADC_code / 2^16) * 3 [V]."
+          address="0x00000006"
+          mask="0x0000ffff"
+          tags="conversion=(val / 65536.) * 3.;V" />
+
+    <!-- Now follow the alarm thresholds. -->
+
+    <node id="alarm_threshold_user_temperature_set"
+          address="0x00000050"
+          description="User-level alarm threshold for the FPGA die temperature. Conversion (for external reference and full 16-bit): (ADC_code x 502.9098 / 2^16) - 273.8195 [C]."
+          address="0x00000000"
+          mask="0x0000ffff"
+          tags="conversion=(val * 501.3743 / 1024.) - 273.6777;C" />
+
+    <node id="alarm_threshold_vccint_hi"
+          description="Upper alarm threshold for VCCINT. Conversion (for external reference and full 16-bit): (ADC_code / 2^10) * 3 [V]."
+          address="0x00000051"
+          mask="0x0000ffff"
+          tags="conversion=(val / 1024.) * 3.;V" />
+
+    <node id="alarm_threshold_vccaux_hi"
+          description="Upper alarm threshold for VCCAUX. Conversion (for external reference and full 16-bit): (ADC_code / 2^10) * 3 [V]."
+          address="0x00000052"
+          mask="0x0000ffff"
+          tags="conversion=(val / 1024.) * 3.;V" />
+
+    <node id="alarm_threshold_over_temperature_set"
+          address="0x00000053"
+          description="Over-temperature alarm threshold for the FPGA die temperature. Conversion (for external reference and full 16-bit): (ADC_code x 502.9098 / 2^16) - 273.8195 [C]."
+          address="0x00000000"
+          mask="0x0000ffff"
+          tags="conversion=(val * 501.3743 / 1024.) - 273.6777;C" />
+
+    <node id="alarm_threshold_user_temperature_reset"
+          address="0x00000054"
+          description="User-level alarm reset threshold for the FPGA die temperature. Conversion (for external reference and full 16-bit): (ADC_code x 502.9098 / 2^16) - 273.8195 [C]."
+          address="0x00000000"
+          mask="0x0000ffff"
+          tags="conversion=(val * 501.3743 / 1024.) - 273.6777;C" />
+
+    <node id="alarm_threshold_vccint_lo"
+          description="Lower alarm threshold for VCCINT. Conversion (for external reference and full 16-bit): (ADC_code / 2^10) * 3 [V]."
+          address="0x00000055"
+          mask="0x0000ffff"
+          tags="conversion=(val / 1024.) * 3.;V" />
+
+    <node id="alarm_threshold_vccaux_lo"
+          description="Lower alarm threshold forVCCAUX. Conversion (for external reference and full 16-bit): (ADC_code / 2^10) * 3 [V]."
+          address="0x00000056"
+          mask="0x0000ffff"
+          tags="conversion=(val / 1024.) * 3.;V" />
+
+    <node id="alarm_threshold_over_temperature_reset"
+          address="0x00000057"
+          description="Over-temperature alarm reset threshold for the FPGA die temperature. Conversion (for external reference and full 16-bit): (ADC_code x 502.9098 / 2^16) - 273.8195 [C]."
+          address="0x00000000"
+          mask="0x0000ffff"
+          tags="conversion=(val * 501.3743 / 1024.) - 273.6777;C" />
+
+    <node id="alarm_threshold_vccbram_hi"
+          description="Upper alarm threshold for VCCBRAM. Conversion (for external reference and full 16-bit): (ADC_code / 2^10) * 3 [V]."
+          address="0x00000058"
+          mask="0x0000ffff"
+          tags="conversion=(val / 1024.) * 3.;V" />
+
+    <node id="alarm_threshold_vccbram_lo"
+          description="Lower alarm threshold for VCCBRAM. Conversion (for external reference and full 16-bit): (ADC_code / 2^10) * 3 [V]."
+          address="0x0000005c"
+          mask="0x0000ffff"
+          tags="conversion=(val / 1024.) * 3.;V" />
+
+  </node>
 
 </node>
