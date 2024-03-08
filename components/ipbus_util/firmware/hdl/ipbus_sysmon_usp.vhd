@@ -135,8 +135,7 @@ entity ipbus_sysmon_usp is
     adc_eos     : out std_logic;
 
     -- Summary alarm signal. This is the logical OR of all the ones
-    -- below. (Technically: with the exception of the top over
-    -- temperature alarm.)
+    -- below.
     alarm_any : out std_logic;
 
     -- Over temperature alarm signals.
@@ -166,7 +165,7 @@ architecture rtl of ipbus_sysmon_usp is
   signal ipbr : ipb_rbus_array(N_SLAVES - 1 downto 0);
 
   signal ctrl : ipb_reg_v(0 downto 0);
-  signal stat : ipb_reg_v(1 downto 0);
+  signal stat : ipb_reg_v(2 downto 0);
 
   signal sysmon_select : std_logic_vector(1 downto 0);
 
@@ -210,6 +209,8 @@ architecture rtl of ipbus_sysmon_usp is
   signal alarm_vccaux_ored : std_logic;
   signal alarm_vccbram_ored : std_logic;
 
+  signal alarm_any_top : std_logic;
+
 begin
 
   -- IPBus address decoder.
@@ -248,13 +249,21 @@ begin
   -- register.
   stat(0)(1 downto 0) <= std_logic_vector(to_unsigned(G_NUM_SLRS, 2));
 
-  -- Make all the alarms available.
-  stat(1)(0) <= alarm_any_ored;
+  -- Make all the top-level alarms available.
+  stat(1)(0) <= alarm_any_top;
   stat(1)(1) <= alarm_over_temp_ored;
   stat(1)(2) <= alarm_user_temp_ored;
   stat(1)(3) <= alarm_vccint_ored;
   stat(1)(4) <= alarm_vccaux_ored;
   stat(1)(5) <= alarm_vccbram_ored;
+
+  -- Make all alarms available for the currently selected SYSMON.
+  stat(2)(0) <= alarm_any_l(to_integer(unsigned(sysmon_select)));
+  stat(2)(1) <= alarm_over_temp_l(to_integer(unsigned(sysmon_select)));
+  stat(2)(2) <= alarm_user_temp_l(to_integer(unsigned(sysmon_select)));
+  stat(2)(3) <= alarm_vccint_l(to_integer(unsigned(sysmon_select)));
+  stat(2)(4) <= alarm_vccaux_l(to_integer(unsigned(sysmon_select)));
+  stat(2)(5) <= alarm_vccbram_l(to_integer(unsigned(sysmon_select)));
 
   -- IPBus to DRP bridge for sysmons.
   drp : entity work.ipbus_drp_bridge
@@ -428,7 +437,12 @@ begin
   alarm_vccaux_ored  <= or_reduce(alarm_vccaux_l);
   alarm_vccbram_ored <= or_reduce(alarm_vccbram_l);
 
-  alarm_any <= alarm_any_ored;
+  -- The top level 'any alarm' signal really includes all alarms from
+  -- all SYSMONs.
+  alarm_any_top <= alarm_any_ored or alarm_over_temp_ored;
+
+  -- Output mapping.
+  alarm_any <= alarm_any_top;
   alarm_over_temp <= alarm_over_temp_ored;
   alarm_user_temp <= alarm_user_temp_ored;
   alarm_vccint  <= alarm_vccint_ored;
