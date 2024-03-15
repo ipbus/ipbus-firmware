@@ -10,7 +10,7 @@ set sysmons [lsort [get_cells -hierarchical -regexp {.*sysmon.*} -filter {REF_NA
 
 # Find primary and secondary SLRs.
 set slr_pri [get_slrs -filter IS_MASTER]
-set slrs_sec [get_slrs -filter !IS_MASTER]
+set slrs_sec [get_slrs -filter !IS_MASTER -quiet]
 
 # Check that we found one, and only one, SYSMON for each SLR.
 if {[llength $sysmons] != ([llength $slr_pri] + [llength $slrs_sec])} \
