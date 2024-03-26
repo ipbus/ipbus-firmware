@@ -85,6 +85,7 @@ architecture rtl of pcie_xdma_axi_usp_if is
       usr_irq_req : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
       usr_irq_ack : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
       msi_enable : OUT STD_LOGIC;
+      msix_enable : OUT STD_LOGIC;
       msi_vector_width : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
       m_axi_awready : IN STD_LOGIC;
       m_axi_wready : IN STD_LOGIC;
