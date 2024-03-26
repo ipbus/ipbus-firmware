@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<node id="ipbus_sysmon_up_int_ref" fwinfo="endpoint; width=12">
+
+  <node id="csr" fwinfo="endpoint; width=2">
+    <node id="control" address="0x00000000">
+      <node id="sysmon_select"
+            description="Selection of SYSMON to read. 0: SYSMON in primary SLR. [1, 4]: SYSMONs in additional SLRs, if present. See the 'num_slrs' status register for the number of SLRs present."
+            address="0x00000000"
+            mask="0x00000003"
+            permission="rw" />
+    </node>
+    <node id="status" address="0x00000002">
+      <node id="num_slrs"
+            description="The number of SLRs present in the FPGA. Each SLR has its dedicated SYSMON. Use the 'sysmon_select' control register to determine which SYSMON to read."
+            address="0x00000000"
+            mask="0x00000003"
+            permission="r" />
+
+      <node id="any_sysmon"
+            address="0x00000001">
+        <node id="alarm_any"
+              description="Logical OR of all alarm flags, for all SYSMONs."
+              address="0x00000000"
+              mask="0x00000001"
+              permission="r" />
+        <node id="alarm_over_temperature"
+              description="Logical OR of over-temperature alarm flags of all SYSMONs."
+              address="0x00000000"
+              mask="0x00000002"
+              permission="r" />
+        <node id="alarm_user_temperature"
+              description="Logical OR of user-level over-temperature alarm flags of all SYSMONs."
+              address="0x00000000"
+              mask="0x00000004"
+              permission="r" />
+        <node id="alarm_vccint"
+              description="Logical OR of VCCINT alarm flags of all SYSMONs."
+              address="0x00000000"
+              mask="0x00000008"
+              permission="r" />
+        <node id="alarm_vccaux"
+              description="Logical OR of VCCAUX alarm flags of all SYSMONs."
+              address="0x00000000"
+              mask="0x00000010"
+              permission="r" />
+        <node id="alarm_vccbram"
+              description="Logical OR of VCCBRAM alarm flags of all SYSMONs."
+              address="0x00000000"
+              mask="0x00000020"
+              permission="r" />
+      </node>
+
+      <node id="selected_sysmon"
+            address="0x00000002">
+        <node id="alarm_any"
+              description="Logical OR of all alarm flags, for the selected SYSMON."
+              address="0x00000000"
+              mask="0x00000001"
+              permission="r" />
+        <node id="alarm_over_temperature"
+              description="Logical OR of over-temperature alarm flags of the selected SYSMON."
+              address="0x00000000"
+              mask="0x00000002"
+              permission="r" />
+        <node id="alarm_user_temperature"
+              description="Logical OR of user-level over-temperature alarm flags of the selected SYSMON."
+              address="0x00000000"
+              mask="0x00000004"
+              permission="r" />
+        <node id="alarm_vccint"
+              description="Logical OR of VCCINT alarm flags of the selected SYSMON."
+              address="0x00000000"
+              mask="0x00000008"
+              permission="r" />
+        <node id="alarm_vccaux"
+              description="Logical OR of VCCAUX alarm flags of the selected SYSMON."
+              address="0x00000000"
+              mask="0x00000010"
+              permission="r" />
+        <node id="alarm_vccbram"
+              description="Logical OR of VCCBRAM alarm flags of the selected SYSMON."
+              address="0x00000000"
+              mask="0x00000020"
+              permission="r" />
+      </node>
+
+    </node>
+  </node>
+
+  <!-- Xilinx UG580 says:
+       The ADC always produces a 16-bit conversion result, and the
+       full 16-bit result is stored in the 16-bit status
+       registers. The 10-bit transfer functions shown in this section
+       correspond to the 10 MSBs (most significant or left-most bits)
+       in the 16-bit status registers. The six LSBs can be used to
+       minimize quantization effects or improve resolution through
+       averaging or filtering.
+
+       This address table assumes that no external reference is
+       connected (which can be verified by looking at the reading of
+       vrefp) and only uses the top 10 bits. -->
+
+  <node id="drp"
+        description="More details about the actual DRP register contents can be found in Xilinx UG580."
+        address="0x00000100"
+        fwinfo="endpoint; width=8">
+    <node id="temperature"
+          description="FPGA die temperature. Conversion (for internal reference, and 10 MSBs only): (ADC_code x 501.3743 / 2^10) - 273.6777 [C]."
+          address="0x00000000"
+          mask="0x0000ffc0"
+          tags="conversion=(val * 501.3743 / 1024.) - 273.6777;C" />
+
+    <node id="vccint"
+          description="VCCINT. Conversion (for internal reference, and 10 MSBs only): (ADC_code / 2^10) * 3 [V]."
+          address="0x00000001"
+          mask="0x0000ffc0"
+          tags="conversion=(val / 1024.) * 3.;V" />
+
+    <node id="vccaux"
+          description="VCCAUX. Conversion (for internal reference, and 10 MSBs only): (ADC_code / 2^10) * 3 [V]."
+          address="0x00000002"
+          mask="0x0000ffc0"
+          tags="conversion=(val / 1024.) * 3.;V" />
+
+    <!-- NOTE: At address 0x3 lives the VP/VN measurement, which is
+         disabled on the VHDL side. -->
+
+    <node id="vrefp"
+          description="VREFP. Conversion (for internal reference, and 10 MSBs only): (ADC_code / 2^10) * 3 [V]."
+          address="0x00000004"
+          mask="0x0000ffc0"
+          tags="conversion=(val / 1024.) * 3.;V" />
+
+    <node id="vrefn"
+          description="VREFN. Conversion (for internal reference, and 10 MSBs only): (ADC_code / 2^10) * 3 [V]."
+          address="0x00000005"
+          mask="0x0000ffc0"
+          tags="conversion=(val / 1024.) * 3.;V" />
+
+    <node id="vccbram"
+          description="VCCBRAM. Conversion (for internal reference, and 10 MSBs only): (ADC_code / 2^10) * 3 [V]."
+          address="0x00000006"
+          mask="0x0000ffc0"
+          tags="conversion=(val / 1024.) * 3.;V" />
+
+    <!-- Now follow the alarm thresholds and settings. -->
+
+    <node id="alarm_threshold_user_temperature_set"
+          description="User-level alarm threshold for the FPGA die temperature. Conversion (for internal reference, and using all 16 available bits): (ADC_code x 501.3743 / 2^16) - 273.6777 [C]."
+          address="0x00000050"
+          mask="0x0000ffff"
+          tags="conversion=(val * 501.3743 / 65536.) - 273.6777;C" />
+
+    <node id="alarm_threshold_vccint_hi"
+          description="Upper alarm threshold for VCCINT. Conversion (for internal reference, and 10 MSBs only): (ADC_code / 2^10) * 3 [V]."
+          address="0x00000051"
+          mask="0x0000ffc0"
+          tags="conversion=(val / 1024.) * 3.;V" />
+
+    <node id="alarm_threshold_vccaux_hi"
+          description="Upper alarm threshold for VCCAUX. Conversion (for internal reference, and 10 MSBs only): (ADC_code / 2^10) * 3 [V]."
+          address="0x00000052"
+          mask="0x0000ffc0"
+          tags="conversion=(val / 1024.) * 3.;V" />
+
+    <node id="alarm_threshold_over_temperature_set"
+          description="Over-temperature alarm threshold for the FPGA die temperature. Conversion (for internal reference, and using all 12 available bits): (ADC_code x 501.3743 / 2^12) - 273.6777 [C]."
+          address="0x00000053"
+          mask="0x0000fff0"
+          tags="conversion=(val * 501.3743 / 4096.) - 273.6777;C" />
+
+    <node id="alarm_mode_over_temperature_set"
+          address="0x00000053"
+          description="If set to 0x3: over-temperature shutdown is enabled. Otherwise: no over-temperature shutdown. NOTE: This is considered an expert register. Please don't touch if not absolutely sure about its functionality."
+          mask="0x0000000f" />
+
+    <node id="alarm_threshold_user_temperature_reset"
+          description="User-level alarm reset threshold for the FPGA die temperature. Conversion (for internal reference, and using all 15 available bits): (ADC_code x 501.3743 / 2^15) - 273.6777 [C]."
+          address="0x00000054"
+          mask="0x0000fffe"
+          tags="conversion=(val * 501.3743 / 32768.) - 273.6777;C" />
+
+    <node id="alarm_mode_user_temperature_reset"
+          description="If set to 1: the lower user temperature limit is considered a lower threshold. If set to 0: the lower user temperature limit is considered the (hysteresis) reset level for an user temperature alarm. NOTE: This is considered an expert register. Please don't touch if not absolutely sure about its functionality."
+          address="0x00000054"
+          mask="0x00000001" />
+
+    <node id="alarm_threshold_vccint_lo"
+          description="Lower alarm threshold for VCCINT. Conversion (for internal reference, and 10 MSBs only): (ADC_code / 2^10) * 3 [V]."
+          address="0x00000055"
+          mask="0x0000ffc0"
+          tags="conversion=(val / 1024.) * 3.;V" />
+
+    <node id="alarm_threshold_vccaux_lo"
+          description="Lower alarm threshold forVCCAUX. Conversion (for internal reference, and 10 MSBs only): (ADC_code / 2^10) * 3 [V]."
+          address="0x00000056"
+          mask="0x0000ffc0"
+          tags="conversion=(val / 1024.) * 3.;V" />
+
+    <node id="alarm_threshold_over_temperature_reset"
+          description="Over-temperature alarm reset threshold for the FPGA die temperature. Conversion (for internal reference, and using all 15 available bits): (ADC_code x 501.3743 / 2^15) - 273.6777 [C]."
+          address="0x00000057"
+          mask="0x0000fffe"
+          tags="conversion=(val * 501.3743 / 32768.) - 273.6777;C" />
+
+    <node id="alarm_mode_over_temperature_reset"
+          description="If set to 1: the lower over-temperature limit is considered a lower threshold. If set to 0: the lower over-temperature limit is considered the (hysteresis) reset level for an over-temperature alarm. NOTE: This is considered an expert register. Please don't touch if not absolutely sure about its functionality."
+          address="0x00000057"
+          mask="0x00000001" />
+
+    <node id="alarm_threshold_vccbram_hi"
+          description="Upper alarm threshold for VCCBRAM. Conversion (for internal reference, and 10 MSBs only): (ADC_code / 2^10) * 3 [V]."
+          address="0x00000058"
+          mask="0x0000ffc0"
+          tags="conversion=(val / 1024.) * 3.;V" />
+
+    <node id="alarm_threshold_vccbram_lo"
+          description="Lower alarm threshold for VCCBRAM. Conversion (for internal reference, and 10 MSBs only): (ADC_code / 2^10) * 3 [V]."
+          address="0x0000005c"
+          mask="0x0000ffc0"
+          tags="conversion=(val / 1024.) * 3.;V" />
+
+  </node>
+
+</node>
