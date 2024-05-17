@@ -48,7 +48,7 @@ entity ipbus_sysmon_usp is
 
     -- Use this flag to disable the SYSMON I2C connections, if really
     -- needed.
-    G_ENABLE_I2C : boolean := false;
+    G_ENABLE_I2C : boolean := true;
 
     -- The following are all generics that are passed straight to the
     -- SYSMON instances. Refer to UG580 for their values.
