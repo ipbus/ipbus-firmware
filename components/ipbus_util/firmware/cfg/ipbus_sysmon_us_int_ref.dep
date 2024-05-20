@@ -23,9 +23,13 @@
 #
 #-------------------------------------------------------------------------------
 
+src -c components/ipbus_core ipbus_fabric_sel.vhd
+src -c components/ipbus_core ipbus_package.vhd
+include -c components/ipbus_slaves ipbus_drp_bridge.dep
+include -c ipbus-firmware:components/ipbus_slaves ipbus_ctrlreg_v.dep
 
 src ipbus_sysmon_us.vhd
-include -c components/ipbus_slaves ipbus_drp_bridge.dep
-src -c components/ipbus_core ipbus_package.vhd
+src --cd ../ucf ipbus_sysmon_us.tcl
 
-addrtab ipbus_sysmon_us_int_ref.xml
+addrtab -t ipbus_sysmon_us_int_ref/ipbus_sysmon_us.xml
+src ipbus_sysmon_us_int_ref/ipbus_decode_ipbus_sysmon_us.vhd
