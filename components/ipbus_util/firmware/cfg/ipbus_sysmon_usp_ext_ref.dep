@@ -29,7 +29,7 @@ include -c components/ipbus_slaves ipbus_drp_bridge.dep
 include -c ipbus-firmware:components/ipbus_slaves ipbus_ctrlreg_v.dep
 
 src ipbus_sysmon_usp.vhd
-src --cd ../ucf ipbus_sysmon_usp.tcl
+src --cd ../ucf --usefor "implementation" ipbus_sysmon_usp.tcl
 
 addrtab -t ipbus_sysmon_usp_ext_ref/ipbus_sysmon_usp.xml
 src ipbus_sysmon_usp_ext_ref/ipbus_decode_ipbus_sysmon_usp.vhd
