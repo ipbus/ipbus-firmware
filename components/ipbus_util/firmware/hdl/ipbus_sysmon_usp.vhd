@@ -46,6 +46,10 @@ entity ipbus_sysmon_usp is
     -- to four SLRs.
     G_NUM_SLRS : positive range 1 to 4;
 
+    -- Use this flag to disable the SYSMON I2C connections, if really
+    -- needed.
+    G_ENABLE_I2C : boolean := true;
+
     -- The following are all generics that are passed straight to the
     -- SYSMON instances. Refer to UG580 for their values.
     -- G_INIT_40 - G_INIT_44: SYSMON configuration registers
@@ -383,25 +387,30 @@ begin
 
   end generate;
 
-  -- I2C I/O buffers.
-  iobuf_i2c_scl : iobuf
-    port map (
-      io => i2c_scl,
-      i  => '0',
-      o  => i2c_scl_l,
-      t  => i2c_scl_tristate
-    );
-  iobuf_i2c_sda : iobuf
-    port map (
-      io => i2c_sda,
-      i  => '0',
-      o  => i2c_sda_l,
-      t  => i2c_sda_tristate
-    );
+  -- I2C I/O buffers etc. (unless I2C has been disabled).
+  i2c_iobufs : if G_ENABLE_I2C generate
 
-  -- I2C tristating signals.
-  i2c_scl_tristate <= and_reduce(i2c_scl_ts);
-  i2c_sda_tristate <= and_reduce(i2c_sda_ts);
+    iobuf_i2c_scl : iobuf
+      port map (
+        io => i2c_scl,
+        i  => '0',
+        o  => i2c_scl_l,
+        t  => i2c_scl_tristate
+      );
+
+    iobuf_i2c_sda : iobuf
+      port map (
+        io => i2c_sda,
+        i  => '0',
+        o  => i2c_sda_l,
+        t  => i2c_sda_tristate
+      );
+
+    -- I2C tristating signals.
+    i2c_scl_tristate <= and_reduce(i2c_scl_ts);
+    i2c_sda_tristate <= and_reduce(i2c_sda_ts);
+
+  end generate;
 
   -- DRP muxing.
   gen_drp_den : for i in 0 to G_NUM_SLRS - 1 generate
