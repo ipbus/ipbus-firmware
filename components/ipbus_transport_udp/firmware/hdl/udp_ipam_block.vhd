@@ -81,12 +81,12 @@ dhcp_discover: if DHCP_RARP = '1' generate
 -- IPV4
     -- 'Differentiated services' set to: x"00"
     -- IPv4 Packet Length 272 (DHCPDISCOVER) or 284 (DHCPREQUEST) = x"0110" or x"011c"
-    -- Identification: MAC address bits
+    -- Identification set to: x"ffff"
     -- Flags: x"4000" (Don't fragment)
     -- Time to live ~64s x"40"
     -- UDP protocol = x"11" (17)
-    -- Checksum: Fixed by source IP and ID 
-    -- Source IP (on discover) 0.0.0.0 =  x 192.168 & NOT MAC addr
+    -- Checksum: Fixed
+    -- Source IP (on discover) 0.0.0.0 = x"00000000"
     -- Dest IP (broadcast on discover) 255.255.255.255 = x"FFFFFFFF"
 -- UDP
     -- Ports (68->67) x"00440043"
@@ -139,20 +139,20 @@ dhcp_block:  process(mac_clk)
 		  data_buffer(3 downto 0) := x"c";
 		end if;
 	  When 17 =>
-    -- Identification: MAC address bits
+    -- Identification: x"ffff"
     -- Flags: x"4000" (Don't fragment)
     -- Time to live ~64s x"40"
     -- UDP protocol = x"11" (17)
-		data_buffer := MAC_addr(15 downto 0) & x"40004011";
+		data_buffer := x"ffff" & x"40004011";
 	  When 23 =>
-    -- Checksum: Fixed by source IP and ID 
-    -- Source IP (on discover) 0.0.0.0 =  x 192.168 & NOT MAC addr(15 downto 0)
+    -- Checksum: Fixed
+    -- Source IP (on discover) 0.0.0.0 = x"00000000"
 		if ipam_running = '1' then -- dhcp discover
-		  data_buffer(47 downto 32) := x"7935";
+		  data_buffer(47 downto 32) := x"39de";
 		else
-		  data_buffer(47 downto 32) := x"7929";
+		  data_buffer(47 downto 32) := x"39d2";
 		end if;
-		data_buffer(31 downto 0) := x"C0A8" & NOT MAC_addr(15 downto 0);
+		data_buffer(31 downto 0) := x"00000000";
 	  When 29 =>
     -- Dest IP (broadcast on discover) 255.255.255.255 = x"FFFFFFFF"
 -- UDP
