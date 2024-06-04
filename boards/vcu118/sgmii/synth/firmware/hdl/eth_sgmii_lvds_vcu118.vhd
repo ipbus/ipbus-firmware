@@ -223,6 +223,8 @@ architecture rtl of eth_sgmii_lvds_vcu118 is
     signal phy_cfg_done, phy_cfg_done_d, phy_cfg_not_done, phy_clkcfg_done, phy_poll_done      : std_logic := '0';
     signal phy_status_reg1, phy_status_reg2, phy_status_reg3, phy_status_reg4, phy_status_reg5 : std_logic_vector(15 downto 0);
 
+    signal configuration_vector : std_logic_vector(4 downto 0);
+
 begin
 
     phy_on <= '1';
@@ -346,7 +348,7 @@ begin
             speed_is_10_100_0      => '0',
             speed_is_100_0         => '0',
             status_vector_0        => sgmii_status_vector,
-            configuration_vector_0 => (4 => '1', 3 => phy_cfg_not_done, others => '0'),
+            configuration_vector_0 => configuration_vector,
             clk125_out             => clk125_sgmii,
             rst_125_out            => rst125_sgmii,
             rx_locked              => rx_locked,
@@ -376,6 +378,8 @@ begin
             -- input reset
             reset                  => phy_cfg_not_done  -- hold the bridge in reset until PHY is up and happy
             );
+
+    configuration_vector <= (4 => '1', 3 => phy_cfg_not_done, others => '0');
 
     clk125_eth <= clk125_sgmii;
     locked     <= rx_locked and tx_locked;

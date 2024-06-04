@@ -26,4 +26,6 @@
 
 src ipbus_drp_bridge.vhd
 src drp_decl.vhd
+src -c components/ipbus_util cdc_reset.vhd
+src -c components/ipbus_util ipbus_clk_bridge.vhd
 src -c components/ipbus_core ipbus_package.vhd
