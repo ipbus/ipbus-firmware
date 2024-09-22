@@ -70,6 +70,9 @@ begin
     );
 
   sysm : SYSMONE4
+    generic map (
+      SIM_DEVICE => "ZYNQ_ULTRASCALE"
+    )
     port map (
       -- DRP interface.
       do => drp_s2m.data,
