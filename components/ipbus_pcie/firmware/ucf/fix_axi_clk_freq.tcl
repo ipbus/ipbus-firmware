@@ -3,11 +3,13 @@
 # of what was requested if the CPLL is being used. (See also:
 # https://gitlab.cern.ch/p2-xware/firmware/emp-fwk/-/issues/26.)
 #
-# Until this gets fixed/solved upstream, we redefine the problem clock
+# This bug appears to have been fixed in 2023.2 (IP core 4.1 revision 26).
+# For the affected IP core versions, we redefine the problem clock
 # with a modified constraint adapted from the IP core itself.
 
 if {([get_property IPDEF [get_ips xdma_0]] == "xilinx.com:ip:xdma:4.1")
     && ([get_property CORE_REVISION [get_ips xdma_0]] >= 10)
+    && ([get_property CORE_REVISION [get_ips xdma_0]] < 26)
     && ([get_property CONFIG.plltype [get_ips xdma_0]] == "CPLL")} {
   puts "Fixing up AXI clock frequency as workaround for a Vivado bug."
   # create_clock -period 2.000 -name xdma_txoutclk [get_pins -hierarchical -filter {NAME =~infra/dma/xdma/*/*_CHANNEL_PRIM_INST/TXOUTCLK}]
