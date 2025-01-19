@@ -8,12 +8,16 @@
 
 import random
 import sys
+import time
 import uhal
 
 ######################################################################
 
 ACCESS_MODE_READ = 0
 ACCESS_MODE_WRITE = 1
+
+AXI_ACCESS_MAX_NUM_TRIES = 10
+AXI_ACCESS_SLEEP = 0.1
 
 ######################################################################
 
@@ -25,11 +29,22 @@ def axi_read(hw, register_address):
     hw.getNode("axi4lite_master.ctrl.access_strobe").write(0x1)
     hw.getNode("axi4lite_master.ctrl.access_strobe").write(0x0)
     hw.dispatch()
-    axi_data = hw.getNode("axi4lite_master.status.data_out").read()
-    axi_data_valid = hw.getNode("axi4lite_master.status.done").read()
+    access_done_raw = hw.getNode("axi4lite_master.status.done").read()
+    num_tries = 1
     hw.dispatch()
-    data = axi_data.value()
-    data_valid = axi_data_valid.value()
+    access_done = access_done_raw.value()
+    while (not access_done) and (num_tries <= AXI_ACCESS_MAX_NUM_TRIES):
+        num_tries += 1
+        time.sleep(AXI_ACCESS_SLEEP)
+        access_done_raw = hw.getNode("axi4lite_master.status.done").read()
+        hw.dispatch()
+        access_done = access_done_raw.value()
+    if not access_done:
+        raise RuntimeError("Failed to execute AXI read")
+    data_raw = hw.getNode("axi4lite_master.status.data_out").read()
+    hw.dispatch()
+    data = data_raw.value()
+    data_valid = True
     return (data_valid, data)
 
 def axi_write(hw, register_address, data):
@@ -40,7 +55,18 @@ def axi_write(hw, register_address, data):
     hw.getNode("axi4lite_master.ctrl.access_strobe").write(0x0)
     hw.getNode("axi4lite_master.ctrl.access_strobe").write(0x1)
     hw.getNode("axi4lite_master.ctrl.access_strobe").write(0x0)
+    access_done_raw = hw.getNode("axi4lite_master.status.done").read()
+    num_tries = 1
     hw.dispatch()
+    access_done = access_done_raw.value()
+    while (not access_done) and (num_tries <= AXI_ACCESS_MAX_NUM_TRIES):
+        num_tries += 1
+        time.sleep(AXI_ACCESS_SLEEP)
+        access_done_raw = hw.getNode("axi4lite_master.status.done").read()
+        hw.dispatch()
+        access_done = access_done_raw.value()
+    if not access_done:
+        raise RuntimeError("Failed to execute AXI write")
 
 ######################################################################
 
