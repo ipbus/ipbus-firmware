@@ -92,6 +92,10 @@ if __name__ == '__main__':
 
     if data_valid:
         print("  Wrote 0x{0:08x}, read back 0x{1:08x} and 0x{2:08x}".format(rnd, res0, res1))
+        if (res0 == res1 == rnd):
+            print("  This looks okay")
+        else:
+            print("  --> Clearly something is wrong!")
     else:
         print("    Failed to read back AXI register")
 
