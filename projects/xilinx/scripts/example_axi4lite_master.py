@@ -1,5 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
+######################################################################
+## Call this script with as arguments:
+## - the IP address (or host name) of the target board, and
+## - the name of the top-level IPBus address table to use.
 ######################################################################
 
 import random
@@ -43,8 +47,8 @@ def axi_write(hw, register_address, data):
 if __name__ == '__main__':
 
     if len(sys.argv) < 3:
-        print "Please specify the device IP address" \
-            " and the top-level address table file to use"
+        print("Please specify the device IP address" \
+            " and the top-level address table file to use")
         sys.exit(1)
 
     device_ip = sys.argv[1]
@@ -72,9 +76,9 @@ if __name__ == '__main__':
     #     print msg_base.format(max_len, reg_name_spec, val)
     # DEBUG DEBUG DEBUG end
 
-    print "-" * 50
-    print "IPBus AXI4-lite master demo:"
-    print "-" * 50
+    print("-" * 50)
+    print("IPBus AXI4-lite master demo:")
+    print("-" * 50)
 
     # Write a random number, and read it back from both sides of the
     # AXI GPIO register.
@@ -87,8 +91,8 @@ if __name__ == '__main__':
     hw.dispatch()
 
     if data_valid:
-        print "  Wrote 0x{0:08x}, read back 0x{1:08x} and 0x{2:08x}".format(rnd, res0, res1)
+        print("  Wrote 0x{0:08x}, read back 0x{1:08x} and 0x{2:08x}".format(rnd, res0, res1))
     else:
-        print "    Failed to read back AXI register"
+        print("    Failed to read back AXI register")
 
 ######################################################################
