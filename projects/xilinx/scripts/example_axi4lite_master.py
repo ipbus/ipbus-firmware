@@ -35,7 +35,7 @@ def axi_read(hw, register_address):
 def axi_write(hw, register_address, data):
     hw.getNode("axi4lite_master.ctrl.address").write(register_address)
     hw.getNode("axi4lite_master.ctrl.data_strobe").write(0xf)
-    hw.getNode("axi4lite_master.ctrl.data_in").write(rnd)
+    hw.getNode("axi4lite_master.ctrl.data_in").write(data)
     hw.getNode("axi4lite_master.ctrl.access_mode").write(ACCESS_MODE_WRITE)
     hw.getNode("axi4lite_master.ctrl.access_strobe").write(0x0)
     hw.getNode("axi4lite_master.ctrl.access_strobe").write(0x1)
