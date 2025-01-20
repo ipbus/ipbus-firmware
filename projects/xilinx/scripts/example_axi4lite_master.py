@@ -46,8 +46,7 @@ def axi_read(hw, axi4lite_master_node, register_address):
     data_raw = hw.getNode(f"{stat_reg_name}.data_out").read()
     hw.dispatch()
     data = data_raw.value()
-    data_valid = True
-    return (data_valid, data)
+    return data
 
 def axi_write(hw, axi4lite_master_node, register_address, data):
     ctrl_reg_name = f"{axi4lite_master_node}.ctrl"
@@ -109,23 +108,23 @@ if __name__ == '__main__':
     print("IPBus AXI4-lite master demo:")
     print("-" * 50)
 
-    # Write a random number, and read it back from both sides of the
-    # AXI GPIO register.
-    register_address = 0x0
-    rnd = random.randint(0, 255)
-    axi_write(hw, "axi4lite_gpio", register_address, rnd)
+    try:
+        # Write a random number, and read it back from both sides of
+        # the AXI GPIO register.
+        register_address = 0x0
+        rnd = random.randint(0, 255)
+        axi_write(hw, "axi4lite_gpio", register_address, rnd)
+        res0 = axi_read(hw, "axi4lite_gpio", register_address)
+        res1 = hw.getNode("axi4lite_gpio_readback_reg.word0").read()
+        hw.dispatch()
+    except Exception as err:
+        print(f"    Failed to access AXI GPIO register: {err}")
+        sys.exit(1)
 
-    (data_valid, res0) = axi_read(hw, "axi4lite_gpio", register_address)
-    res1 = hw.getNode("axi4lite_gpio_readback_reg.word0").read()
-    hw.dispatch()
-
-    if data_valid:
-        print(f"  Wrote 0x{rnd:08x}, read back 0x{res0:08x} and 0x{res1:08x}")
-        if (res0 == res1 == rnd):
-            print("  This looks okay")
-        else:
-            print("  --> Clearly something is wrong!")
+    print(f"  Wrote 0x{rnd:08x}, read back 0x{res0:08x} and 0x{res1:08x}")
+    if (res0 == res1 == rnd):
+        print("  This looks okay")
     else:
-        print("    Failed to read back AXI GPIO register")
+        print("  --> Clearly something is wrong!")
 
 ######################################################################
