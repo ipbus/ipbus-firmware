@@ -59,7 +59,7 @@ def axi_write(hw, axi4lite_master_node, register_address, data):
     hw.getNode(f"{ctrl_reg_name}.access_strobe").write(0x0)
     hw.getNode(f"{ctrl_reg_name}.access_strobe").write(0x1)
     hw.getNode(f"{ctrl_reg_name}.access_strobe").write(0x0)
-    access_done_raw = hw.getNode("axi4lite_master.status.done").read()
+    access_done_raw = hw.getNode(f"{stat_reg_name}.done").read()
     num_tries = 1
     hw.dispatch()
     access_done = access_done_raw.value()
@@ -89,13 +89,12 @@ if __name__ == '__main__':
     uhal.setLogLevelTo(uhal.LogLevel.WARNING)
     hw = uhal.getDevice("dummy", device_uri, address_table_uri)
 
-    reg_name_base = "axi4lite_master."
-    regs = ["status",
-            "status.done",
-            "status.data_out"]
-    max_len = max([len(i) for i in regs])
-
     # DEBUG DEBUG DEBUG
+    # reg_name_base = "axi4lite_gpio."
+    # regs = ["status",
+    #         "status.done",
+    #         "status.data_out"]
+    # max_len = max([len(i) for i in regs])
     # for reg_name_spec in regs:
     #     reg_name = reg_name_base + reg_name_spec
     #     node = hw.getNode(reg_name)
@@ -114,10 +113,10 @@ if __name__ == '__main__':
     # AXI GPIO register.
     register_address = 0x0
     rnd = random.randint(0, 255)
-    axi_write(hw, "axi4lite_master", register_address, rnd)
+    axi_write(hw, "axi4lite_gpio", register_address, rnd)
 
-    (data_valid, res0) = axi_read(hw, "axi4lite_master", register_address)
-    res1 = hw.getNode("axi_readback_reg.word0").read()
+    (data_valid, res0) = axi_read(hw, "axi4lite_gpio", register_address)
+    res1 = hw.getNode("axi4lite_gpio_readback_reg.word0").read()
     hw.dispatch()
 
     if data_valid:
@@ -127,6 +126,6 @@ if __name__ == '__main__':
         else:
             print("  --> Clearly something is wrong!")
     else:
-        print("    Failed to read back AXI register")
+        print("    Failed to read back AXI GPIO register")
 
 ######################################################################
