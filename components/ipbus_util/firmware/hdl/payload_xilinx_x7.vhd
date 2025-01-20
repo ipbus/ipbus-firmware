@@ -72,15 +72,6 @@ architecture rtl of payload is
   signal axi_traffic_status : std_logic_vector(31 downto 0);
   signal axi_bridged_data : std_logic_vector(31 downto 0);
 
-  -- Yeah.... Not pretty, but it makes it easier to create
-  -- a simple piece of example code.
-  signal nuke_i : std_logic;
-  signal soft_rst_i : std_logic;
-
-  attribute keep : string;
-  attribute keep of nuke_i : signal is "true";
-  attribute keep of soft_rst_i : signal is "true";
-
 begin
 
   fabric : entity work.ipbus_fabric_sel
@@ -128,7 +119,11 @@ begin
 
   --==========
 
-  axi_bridge : entity work.ipbus_axi4lite_master
+  -- First AXI4Lite bridge example. Bridges into nowhere, really. Uses
+  -- an AXI GPIO as endpoint, and an IPBus register to read back the
+  -- data from the GPIO.
+
+  axi_bridge_simple : entity work.ipbus_axi4lite_master
     port map (
       clk     => ipb_clk,
       rst     => ipb_rst,
@@ -182,15 +177,15 @@ begin
       gpio_io_o     => axi_bridged_data
     );
 
-  axi_demo_readback_register : entity work.ipbus_ctrlreg_v
+  axi_readback_register : entity work.ipbus_ctrlreg_v
     generic map (
       N_CTRL => 0,
       N_STAT => 1
     )
     port map (
-      clk => ipb_clk,
+      clk   => ipb_clk,
       reset => ipb_rst,
-      ipbus_in => ipbw(N_SLV_AXI_READBACK_REG),
+      ipbus_in  => ipbw(N_SLV_AXI_READBACK_REG),
       ipbus_out => ipbr(N_SLV_AXI_READBACK_REG),
       d => axi_stat,
       q => open
@@ -200,10 +195,8 @@ begin
 
   --==========
 
-  nuke_i     <= '0';
-  nuke       <= nuke_i;
-  soft_rst_i <= '0';
-  soft_rst   <= soft_rst_i;
+  nuke       <= '0';
+  soft_rst   <= '0';
   userled    <= '0';
 
 end rtl;
