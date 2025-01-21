@@ -156,7 +156,6 @@ begin
       m_axi_awready => m_axi_awready,
       m_axi_wdata   => m_axi_wdata,
       m_axi_wstrb   => m_axi_wstrb,
-      m_axi_size    => open,
       m_axi_wvalid  => m_axi_wvalid,
       m_axi_wready  => m_axi_wready,
       m_axi_bresp   => m_axi_bresp,

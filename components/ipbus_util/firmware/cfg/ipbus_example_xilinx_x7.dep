@@ -32,4 +32,6 @@ include ipbus_icap_x7.dep
 include ipbus_iprog_x7.dep
 include -c components/ipbus_slaves ipbus_axi4lite_master.dep
 src -c components/ipbus_util --cd ../cgn axi_gpio_example.xci
+src -c components/ipbus_util --cd ../cgn axi_mem_example_32bit.xci
+src -c components/ipbus_util --cd ../cgn axi_mem_example_64bit.xci
 addrtab -t ipbus_example_xilinx_x7.xml

@@ -49,28 +49,64 @@ architecture rtl of payload is
   signal ipbw : ipb_wbus_array(N_SLAVES - 1 downto 0);
   signal ipbr : ipb_rbus_array(N_SLAVES - 1 downto 0);
 
-  signal m_axi_awready : std_logic;
-  signal m_axi_awvalid : std_logic;
-  signal m_axi_awaddr : std_logic_vector(31 downto 0);
-  signal m_axi_wready : std_logic;
-  signal m_axi_wvalid : std_logic;
-  signal m_axi_wdata : std_logic_vector(31 downto 0);
-  signal m_axi_wstrb : std_logic_vector(3 downto 0);
-  signal m_axi_bready : std_logic;
-  signal m_axi_bvalid : std_logic;
-  signal m_axi_bresp : std_logic_vector(1 downto 0);
-  signal s_axi_arready : std_logic;
-  signal s_axi_arvalid : std_logic;
-  signal s_axi_araddr : std_logic_vector(31 downto 0);
-  signal s_axi_rready : std_logic;
-  signal s_axi_rvalid : std_logic;
-  signal s_axi_rdata : std_logic_vector(31 downto 0);
-  signal s_axi_rresp : std_logic_vector(1 downto 0);
+  signal m_axi_awready_gpio : std_logic;
+  signal m_axi_awvalid_gpio : std_logic;
+  signal m_axi_awaddr_gpio  : std_logic_vector(31 downto 0);
+  signal m_axi_wready_gpio  : std_logic;
+  signal m_axi_wvalid_gpio  : std_logic;
+  signal m_axi_wdata_gpio   : std_logic_vector(31 downto 0);
+  signal m_axi_wstrb_gpio   : std_logic_vector(3 downto 0);
+  signal m_axi_bready_gpio  : std_logic;
+  signal m_axi_bvalid_gpio  : std_logic;
+  signal m_axi_bresp_gpio   : std_logic_vector(1 downto 0);
+  signal s_axi_arready_gpio : std_logic;
+  signal s_axi_arvalid_gpio : std_logic;
+  signal s_axi_araddr_gpio  : std_logic_vector(31 downto 0);
+  signal s_axi_rready_gpio  : std_logic;
+  signal s_axi_rvalid_gpio  : std_logic;
+  signal s_axi_rdata_gpio   : std_logic_vector(31 downto 0);
+  signal s_axi_rresp_gpio   : std_logic_vector(1 downto 0);
 
-  signal axi_stat : ipb_reg_v(0 downto 0);
-  signal axi_traffic_done : std_logic;
-  signal axi_traffic_status : std_logic_vector(31 downto 0);
-  signal axi_bridged_data : std_logic_vector(31 downto 0);
+  signal axi_stat_gpio           : ipb_reg_v(0 downto 0);
+  signal axi_traffic_done_gpio   : std_logic;
+  signal axi_traffic_status_gpio : std_logic_vector(31 downto 0);
+  signal axi_bridged_data_gpio   : std_logic_vector(31 downto 0);
+
+  signal m_axi_awready_mem32 : std_logic;
+  signal m_axi_awvalid_mem32 : std_logic;
+  signal m_axi_awaddr_mem32  : std_logic_vector(31 downto 0);
+  signal m_axi_wready_mem32  : std_logic;
+  signal m_axi_wvalid_mem32  : std_logic;
+  signal m_axi_wdata_mem32   : std_logic_vector(31 downto 0);
+  signal m_axi_wstrb_mem32   : std_logic_vector(3 downto 0);
+  signal m_axi_bready_mem32  : std_logic;
+  signal m_axi_bvalid_mem32  : std_logic;
+  signal m_axi_bresp_mem32   : std_logic_vector(1 downto 0);
+  signal s_axi_arready_mem32 : std_logic;
+  signal s_axi_arvalid_mem32 : std_logic;
+  signal s_axi_araddr_mem32  : std_logic_vector(31 downto 0);
+  signal s_axi_rready_mem32  : std_logic;
+  signal s_axi_rvalid_mem32  : std_logic;
+  signal s_axi_rdata_mem32   : std_logic_vector(31 downto 0);
+  signal s_axi_rresp_mem32   : std_logic_vector(1 downto 0);
+
+  signal m_axi_awready_mem64 : std_logic;
+  signal m_axi_awvalid_mem64 : std_logic;
+  signal m_axi_awaddr_mem64  : std_logic_vector(31 downto 0);
+  signal m_axi_wready_mem64  : std_logic;
+  signal m_axi_wvalid_mem64  : std_logic;
+  signal m_axi_wdata_mem64   : std_logic_vector(63 downto 0);
+  signal m_axi_wstrb_mem64   : std_logic_vector(7 downto 0);
+  signal m_axi_bready_mem64  : std_logic;
+  signal m_axi_bvalid_mem64  : std_logic;
+  signal m_axi_bresp_mem64   : std_logic_vector(1 downto 0);
+  signal s_axi_arready_mem64 : std_logic;
+  signal s_axi_arvalid_mem64 : std_logic;
+  signal s_axi_araddr_mem64  : std_logic_vector(31 downto 0);
+  signal s_axi_rready_mem64  : std_logic;
+  signal s_axi_rvalid_mem64  : std_logic;
+  signal s_axi_rdata_mem64   : std_logic_vector(63 downto 0);
+  signal s_axi_rresp_mem64   : std_logic_vector(1 downto 0);
 
 begin
 
@@ -123,32 +159,31 @@ begin
   -- an AXI GPIO as endpoint, and an IPBus register to read back the
   -- data from the GPIO.
 
-  axi_bridge_simple : entity work.ipbus_axi4lite_master
+  axi_bridge_gpio : entity work.ipbus_axi4lite_master
     port map (
       clk     => ipb_clk,
       rst     => ipb_rst,
-      ipb_in  => ipbw(N_SLV_AXI4LITE_MASTER),
-      ipb_out => ipbr(N_SLV_AXI4LITE_MASTER),
+      ipb_in  => ipbw(N_SLV_AXI4LITE_GPIO),
+      ipb_out => ipbr(N_SLV_AXI4LITE_GPIO),
 
       m_axi_clock   => ipb_clk,
-      m_axi_awaddr  => m_axi_awaddr,
-      m_axi_awvalid => m_axi_awvalid,
-      m_axi_awready => m_axi_awready,
-      m_axi_wdata   => m_axi_wdata,
-      m_axi_wstrb   => m_axi_wstrb,
-      m_axi_size    => open,
-      m_axi_wvalid  => m_axi_wvalid,
-      m_axi_wready  => m_axi_wready,
-      m_axi_bresp   => m_axi_bresp,
-      m_axi_bvalid  => m_axi_bvalid,
-      m_axi_bready  => m_axi_bready,
-      m_axi_araddr  => s_axi_araddr,
-      m_axi_arvalid => s_axi_arvalid,
-      m_axi_arready => s_axi_arready,
-      m_axi_rdata   => s_axi_rdata,
-      m_axi_rvalid  => s_axi_rvalid,
-      m_axi_rready  => s_axi_rready,
-      m_axi_rresp   => s_axi_rresp
+      m_axi_awaddr  => m_axi_awaddr_gpio,
+      m_axi_awvalid => m_axi_awvalid_gpio,
+      m_axi_awready => m_axi_awready_gpio,
+      m_axi_wdata   => m_axi_wdata_gpio,
+      m_axi_wstrb   => m_axi_wstrb_gpio,
+      m_axi_wvalid  => m_axi_wvalid_gpio,
+      m_axi_wready  => m_axi_wready_gpio,
+      m_axi_bresp   => m_axi_bresp_gpio,
+      m_axi_bvalid  => m_axi_bvalid_gpio,
+      m_axi_bready  => m_axi_bready_gpio,
+      m_axi_araddr  => s_axi_araddr_gpio,
+      m_axi_arvalid => s_axi_arvalid_gpio,
+      m_axi_arready => s_axi_arready_gpio,
+      m_axi_rdata   => s_axi_rdata_gpio,
+      m_axi_rvalid  => s_axi_rvalid_gpio,
+      m_axi_rready  => s_axi_rready_gpio,
+      m_axi_rresp   => s_axi_rresp_gpio
     );
 
   -- We (ab)use an AXI GPIO interface to extract the results of our
@@ -157,27 +192,27 @@ begin
     port map (
       s_axi_aclk    => ipb_clk,
       s_axi_aresetn => not ipb_rst,
-      s_axi_awaddr  => m_axi_awaddr(8 downto 0),
-      s_axi_awvalid => m_axi_awvalid,
-      s_axi_awready => m_axi_awready,
-      s_axi_wdata   => m_axi_wdata,
-      s_axi_wstrb   => m_axi_wstrb,
-      s_axi_wvalid  => m_axi_wvalid,
-      s_axi_wready  => m_axi_wready,
-      s_axi_bresp   => m_axi_bresp,
-      s_axi_bvalid  => m_axi_bvalid,
-      s_axi_bready  => m_axi_bready,
-      s_axi_araddr  => s_axi_araddr(8 downto 0),
-      s_axi_arvalid => s_axi_arvalid,
-      s_axi_arready => s_axi_arready,
-      s_axi_rdata   => s_axi_rdata,
-      s_axi_rresp   => s_axi_rresp,
-      s_axi_rvalid  => s_axi_rvalid,
-      s_axi_rready  => s_axi_rready,
-      gpio_io_o     => axi_bridged_data
+      s_axi_awaddr  => m_axi_awaddr_gpio(8 downto 0),
+      s_axi_awvalid => m_axi_awvalid_gpio,
+      s_axi_awready => m_axi_awready_gpio,
+      s_axi_wdata   => m_axi_wdata_gpio,
+      s_axi_wstrb   => m_axi_wstrb_gpio,
+      s_axi_wvalid  => m_axi_wvalid_gpio,
+      s_axi_wready  => m_axi_wready_gpio,
+      s_axi_bresp   => m_axi_bresp_gpio,
+      s_axi_bvalid  => m_axi_bvalid_gpio,
+      s_axi_bready  => m_axi_bready_gpio,
+      s_axi_araddr  => s_axi_araddr_gpio(8 downto 0),
+      s_axi_arvalid => s_axi_arvalid_gpio,
+      s_axi_arready => s_axi_arready_gpio,
+      s_axi_rdata   => s_axi_rdata_gpio,
+      s_axi_rresp   => s_axi_rresp_gpio,
+      s_axi_rvalid  => s_axi_rvalid_gpio,
+      s_axi_rready  => s_axi_rready_gpio,
+      gpio_io_o     => axi_bridged_data_gpio
     );
 
-  axi_readback_register : entity work.ipbus_ctrlreg_v
+  axi_gpio_readback_register : entity work.ipbus_ctrlreg_v
     generic map (
       N_CTRL => 0,
       N_STAT => 1
@@ -185,13 +220,133 @@ begin
     port map (
       clk   => ipb_clk,
       reset => ipb_rst,
-      ipbus_in  => ipbw(N_SLV_AXI_READBACK_REG),
-      ipbus_out => ipbr(N_SLV_AXI_READBACK_REG),
-      d => axi_stat,
+      ipbus_in  => ipbw(N_SLV_AXI4LITE_GPIO_READBACK_REG),
+      ipbus_out => ipbr(N_SLV_AXI4LITE_GPIO_READBACK_REG),
+      d => axi_stat_gpio,
       q => open
     );
 
-  axi_stat(0) <= axi_bridged_data;
+  axi_stat_gpio(0) <= axi_bridged_data_gpio;
+
+  --==========
+
+  -- Second AXI4Lite bridge example. Bridges into a dual-port block
+  -- RAM of 32 bits wide.
+
+  axi_bridge_mem32 : entity work.ipbus_axi4lite_master
+    generic map (
+      NUM_BYTES_PER_AXI_WORD => 4
+    )
+    port map (
+      clk     => ipb_clk,
+      rst     => ipb_rst,
+      ipb_in  => ipbw(N_SLV_AXI4LITE_MEM_32BIT),
+      ipb_out => ipbr(N_SLV_AXI4LITE_MEM_32BIT),
+
+      m_axi_clock   => ipb_clk,
+      m_axi_awaddr  => m_axi_awaddr_mem32,
+      m_axi_awvalid => m_axi_awvalid_mem32,
+      m_axi_awready => m_axi_awready_mem32,
+      m_axi_wdata   => m_axi_wdata_mem32,
+      m_axi_wstrb   => m_axi_wstrb_mem32,
+      m_axi_wvalid  => m_axi_wvalid_mem32,
+      m_axi_wready  => m_axi_wready_mem32,
+      m_axi_bresp   => m_axi_bresp_mem32,
+      m_axi_bvalid  => m_axi_bvalid_mem32,
+      m_axi_bready  => m_axi_bready_mem32,
+      m_axi_araddr  => s_axi_araddr_mem32,
+      m_axi_arvalid => s_axi_arvalid_mem32,
+      m_axi_arready => s_axi_arready_mem32,
+      m_axi_rdata   => s_axi_rdata_mem32,
+      m_axi_rvalid  => s_axi_rvalid_mem32,
+      m_axi_rready  => s_axi_rready_mem32,
+      m_axi_rresp   => s_axi_rresp_mem32
+    );
+
+  axi_mem32 : entity work.axi_mem_example_32bit
+    port map (
+      s_aclk        => ipb_clk,
+      s_aresetn     => not ipb_rst,
+      s_axi_awaddr  => m_axi_awaddr_mem32,
+      s_axi_awvalid => m_axi_awvalid_mem32,
+      s_axi_awready => m_axi_awready_mem32,
+      s_axi_wdata   => m_axi_wdata_mem32,
+      s_axi_wstrb   => m_axi_wstrb_mem32,
+      s_axi_wvalid  => m_axi_wvalid_mem32,
+      s_axi_wready  => m_axi_wready_mem32,
+      s_axi_bresp   => m_axi_bresp_mem32,
+      s_axi_bvalid  => m_axi_bvalid_mem32,
+      s_axi_bready  => m_axi_bready_mem32,
+      s_axi_araddr  => s_axi_araddr_mem32,
+      s_axi_arvalid => s_axi_arvalid_mem32,
+      s_axi_arready => s_axi_arready_mem32,
+      s_axi_rdata   => s_axi_rdata_mem32,
+      s_axi_rresp   => s_axi_rresp_mem32,
+      s_axi_rvalid  => s_axi_rvalid_mem32,
+      s_axi_rready  => s_axi_rready_mem32,
+      rsta_busy     => open,
+      rstb_busy     => open
+    );
+
+  --==========
+
+  -- Third AXI4Lite bridge example. Bridges into a dual-port block RAM
+  -- of 64 bits wide (i.e., wider than an IPBus word).
+
+  axi_bridge_mem64 : entity work.ipbus_axi4lite_master
+    generic map (
+      NUM_BYTES_PER_AXI_WORD => 8
+    )
+    port map (
+      clk     => ipb_clk,
+      rst     => ipb_rst,
+      ipb_in  => ipbw(N_SLV_AXI4LITE_MEM_64BIT),
+      ipb_out => ipbr(N_SLV_AXI4LITE_MEM_64BIT),
+
+      m_axi_clock   => ipb_clk,
+      m_axi_awaddr  => m_axi_awaddr_mem64,
+      m_axi_awvalid => m_axi_awvalid_mem64,
+      m_axi_awready => m_axi_awready_mem64,
+      m_axi_wdata   => m_axi_wdata_mem64,
+      m_axi_wstrb   => m_axi_wstrb_mem64,
+      m_axi_wvalid  => m_axi_wvalid_mem64,
+      m_axi_wready  => m_axi_wready_mem64,
+      m_axi_bresp   => m_axi_bresp_mem64,
+      m_axi_bvalid  => m_axi_bvalid_mem64,
+      m_axi_bready  => m_axi_bready_mem64,
+      m_axi_araddr  => s_axi_araddr_mem64,
+      m_axi_arvalid => s_axi_arvalid_mem64,
+      m_axi_arready => s_axi_arready_mem64,
+      m_axi_rdata   => s_axi_rdata_mem64,
+      m_axi_rvalid  => s_axi_rvalid_mem64,
+      m_axi_rready  => s_axi_rready_mem64,
+      m_axi_rresp   => s_axi_rresp_mem64
+    );
+
+  axi_mem64 : entity work.axi_mem_example_64bit
+    port map (
+      s_aclk        => ipb_clk,
+      s_aresetn     => not ipb_rst,
+      s_axi_awaddr  => m_axi_awaddr_mem64,
+      s_axi_awvalid => m_axi_awvalid_mem64,
+      s_axi_awready => m_axi_awready_mem64,
+      s_axi_wdata   => m_axi_wdata_mem64,
+      s_axi_wstrb   => m_axi_wstrb_mem64,
+      s_axi_wvalid  => m_axi_wvalid_mem64,
+      s_axi_wready  => m_axi_wready_mem64,
+      s_axi_bresp   => m_axi_bresp_mem64,
+      s_axi_bvalid  => m_axi_bvalid_mem64,
+      s_axi_bready  => m_axi_bready_mem64,
+      s_axi_araddr  => s_axi_araddr_mem64,
+      s_axi_arvalid => s_axi_arvalid_mem64,
+      s_axi_arready => s_axi_arready_mem64,
+      s_axi_rdata   => s_axi_rdata_mem64,
+      s_axi_rresp   => s_axi_rresp_mem64,
+      s_axi_rvalid  => s_axi_rvalid_mem64,
+      s_axi_rready  => s_axi_rready_mem64,
+      rsta_busy     => open,
+      rstb_busy     => open
+    );
 
   --==========
 

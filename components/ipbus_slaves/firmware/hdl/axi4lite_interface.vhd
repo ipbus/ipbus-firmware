@@ -1,18 +1,24 @@
 --======================================================================
 
 library ieee;
+use ieee.numeric_std.all;
 use ieee.std_logic_1164.all;
-use ieee.std_logic_arith.all;
-use ieee.std_logic_unsigned.all;
 
 entity axi4lite_interface is
+  generic (
+    -- AXI words have an internal granularity of bytes. So that's how
+    -- we specify the width on the AXI side. The IPBus side width (or
+    -- depth, really) will be derived from this too.
+    -- NOTE: Possible values for the AXI side width are 4, 8, ..., 32.
+    NUM_BYTES_PER_AXI_WORD : positive := 4
+  );
   port (
     reset         : in std_logic;
     usr_clock     : in std_logic;
     usr_add       : in std_logic_vector(31 downto 0);
-    usr_strb      : in std_logic_vector(3 downto 0);
-    usr_dti       : in std_logic_vector(31 downto 0);
-    usr_dto       : out std_logic_vector(31 downto 0);
+    usr_strb      : in std_logic_vector(NUM_BYTES_PER_AXI_WORD - 1 downto 0);
+    usr_dti       : in std_logic_vector(8 * NUM_BYTES_PER_AXI_WORD - 1 downto 0);
+    usr_dto       : out std_logic_vector(8 * NUM_BYTES_PER_AXI_WORD - 1 downto 0);
     usr_rdreq     : in std_logic;
     usr_wrreq     : in std_logic;
     usr_axi_tick  : in std_logic;
@@ -24,9 +30,8 @@ entity axi4lite_interface is
     s_axi_awaddr  : out std_logic_vector(31 downto 0);
     s_axi_awvalid : out std_logic;
     s_axi_awready : in std_logic;
-    s_axi_wdata   : out std_logic_vector(31 downto 0);
-    s_axi_wstrb   : out std_logic_vector(3 downto 0);
-    s_axi_size    : out std_logic_vector(2 downto 0);
+    s_axi_wdata   : out std_logic_vector(8 * NUM_BYTES_PER_AXI_WORD - 1 downto 0);
+    s_axi_wstrb   : out std_logic_vector(NUM_BYTES_PER_AXI_WORD - 1 downto 0);
     s_axi_wvalid  : out std_logic;
     s_axi_wready  : in std_logic;
     s_axi_bresp   : in std_logic_vector(1 downto 0);
@@ -35,7 +40,7 @@ entity axi4lite_interface is
     s_axi_araddr  : out std_logic_vector(31 downto 0);
     s_axi_arvalid : out std_logic;
     s_axi_arready : in std_logic;
-    s_axi_rdata   : in std_logic_vector(31 downto 0);
+    s_axi_rdata   : in std_logic_vector(8 * NUM_BYTES_PER_AXI_WORD - 1 downto 0);
     s_axi_rresp   : in std_logic_vector(1 downto 0);
     s_axi_rvalid  : in std_logic;
     s_axi_rready  : out std_logic
@@ -51,10 +56,9 @@ architecture behavioral of axi4lite_interface is
   signal fsm_state : fsm_state_type;
 
   signal axi_add_reg          : std_logic_vector(31 downto 0);
-  signal axi_dt_wr            : std_logic_vector(31 downto 0);
-  signal axi_dt_rd            : std_logic_vector(31 downto 0);
-  signal axi_be_rg            : std_logic_vector(3 downto 0);
-  signal axi_size_rg          : std_logic_vector(2 downto 0);
+  signal axi_dt_wr            : std_logic_vector(8 * NUM_BYTES_PER_AXI_WORD - 1 downto 0);
+  signal axi_dt_rd            : std_logic_vector(8 * NUM_BYTES_PER_AXI_WORD - 1 downto 0);
+  signal axi_be_rg            : std_logic_vector(NUM_BYTES_PER_AXI_WORD - 1 downto 0);
 
   signal axi_error_wr         : std_logic_vector(1 downto 0);
   signal axi_error_rd         : std_logic_vector(1 downto 0);
@@ -100,14 +104,14 @@ begin
 
   cdc_reset : entity work.cdc_reset
     port map (
-      reset_in => reset,
-      clk_dst => s_axi_clock,
+      reset_in  => reset,
+      clk_dst   => s_axi_clock,
       reset_out => reset_axi
     );
 
   cdc_read_req : entity work.ipbus_cdc_reg
     port map (
-      clk => usr_clock,
+      clk  => usr_clock,
       d(0) => usr_rdreq,
       clks => s_axi_clock,
       q(0) => resync_req_axi_read
@@ -115,50 +119,34 @@ begin
 
   cdc_write_req : entity work.ipbus_cdc_reg
     port map (
-      clk => usr_clock,
+      clk  => usr_clock,
       d(0) => usr_wrreq,
       clks => s_axi_clock,
       q(0) => resync_req_axi_write
     );
 
-  -- Static values for the size. Always four bytes to make up a 32-bit
-  -- word.
-  axi_size : process(s_axi_clock)
+  usr_assign : process(s_axi_clock)
   begin
     if rising_edge(s_axi_clock) then
       if resync_req_axi_read = '1' or resync_req_axi_write = '1' then
         axi_add_reg <= usr_add;
-        axi_dt_wr <= usr_dti;
-        axi_be_rg <= usr_strb;
-        case usr_strb is
-          when "1111" =>
-            axi_size_rg <= "010";
-          when "1100" | "0011" | "0110" | "1001" =>
-            axi_size_rg <= "001";
-          when others =>
-            axi_size_rg <= "000";
-        end case;
-        -- if usr_strb = "1111" then
-        --   axi_size_rg <= "010";
-        -- else
-        --   axi_size_rg <= "000";
-        -- end if;
+        axi_dt_wr   <= usr_dti;
+        axi_be_rg   <= usr_strb;
       end if;
     end if;
   end process;
 
   s_axi_awaddr <= axi_add_reg;
   s_axi_araddr <= axi_add_reg;
-  s_axi_wdata <= axi_dt_wr;
-  s_axi_wstrb <= axi_be_rg;
-  s_axi_size <= axi_size_rg;
+  s_axi_wdata  <= axi_dt_wr;
+  s_axi_wstrb  <= axi_be_rg;
 
   -- Write request.
   write_request : process(reset_axi, s_axi_clock)
   begin
     if reset_axi = '1' then
       wr_addw_rg <= '0';
-      wr_dtw_rg <= '0';
+      wr_dtw_rg  <= '0';
       wr_req_reg <= '0';
       wr_done_rg <= '0';
     elsif rising_edge(s_axi_clock) then
@@ -186,8 +174,8 @@ begin
   end process;
 
   s_axi_awvalid <= wr_addw_rg;
-  s_axi_wvalid <= wr_dtw_rg;
-  s_axi_bready <= wr_done_rg;
+  s_axi_wvalid  <= wr_dtw_rg;
+  s_axi_bready  <= wr_done_rg;
 
   -- Read request.
   read_request : process(reset_axi, s_axi_clock)
@@ -196,7 +184,7 @@ begin
       wr_addr_rg <= '0';
       rd_req_reg <= '0';
       rd_done_rg <= '0';
-      axi_dt_rd <= (others => '0');
+      axi_dt_rd  <= (others => '0');
     elsif rising_edge(s_axi_clock) then
       if resync_req_axi_read = '1' then
         wr_addr_rg <= '1';
@@ -207,19 +195,19 @@ begin
       rd_done_rg <= '0';
       if resync_req_axi_read = '1' then
         rd_req_reg <= '1';
-        axi_dt_rd <= (others => '0');
+        axi_dt_rd  <= (others => '0');
       elsif fsm_state = state_axi_ack and s_axi_rvalid = '1' then
         axi_error_rd <= s_axi_rresp;
         rd_req_reg <= '0';
-        axi_dt_rd <= s_axi_rdata;
+        axi_dt_rd  <= s_axi_rdata;
         rd_done_rg <= '1';
       end if;
     end if;
   end process;
 
   s_axi_arvalid <= wr_addr_rg;
-  s_axi_rready <= rd_done_rg;
-  usr_dto <= axi_dt_rd;
+  s_axi_rready  <= rd_done_rg;
+  usr_dto       <= axi_dt_rd;
   s_axi_pm_tick <= usr_axi_tick;
 
   -- Status read-back.

@@ -16,14 +16,22 @@
         module="file://ipbus_iprog.xml"
         address="0x00030000" />
 
-  <node id="axi4lite_master"
+  <node id="axi4lite_gpio"
         module="file://ipbus_axi4lite_master.xml"
         address="0x00040000" />
 
-  <node id="axi_readback_reg"
+  <node id="axi4lite_gpio_readback_reg"
         address="0x00041000"
         fwinfo="endpoint;width=0">
         <node id="word0" address="0x0" />
   </node>
+
+  <node id="axi4lite_mem_32bit"
+        module="file://ipbus_axi4lite_master.xml"
+        address="0x00050000" />
+
+  <node id="axi4lite_mem_64bit"
+        module="file://ipbus_axi4lite_master.xml"
+        address="0x00070000" />
 
 </node>
