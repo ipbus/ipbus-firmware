@@ -51,11 +51,12 @@ def axi_read(hw, axi4lite_master_node, word_address, num_bytes_per_axi_word=None
         access_done = access_done_raw.value()
     if not access_done:
         raise RuntimeError("Failed to execute AXI read")
+    tmp_raw = hw.getNode(f"{stat_reg_name}.data_out").readBlock(num_ipbus_words)
+    hw.dispatch()
+    tmp = tmp_raw.value()
     data = 0
-    for i in range(num_ipbus_words):
-        tmp = hw.getNode(f"{stat_reg_name}.data_out.word{i}").read()
-        hw.dispatch()
-        data += (tmp.value() << (i * 32))
+    for (i, j) in enumerate(tmp):
+        data += (j << (i * 32))
     return data
 
 ##############################
@@ -85,12 +86,14 @@ def axi_write(hw, axi4lite_master_node, word_address, data, num_bytes_per_axi_wo
     data_strobe = int("0b" + ("1" * num_bytes_per_axi_word), 2)
     hw.getNode(f"{ctrl_reg_name}.data_strobe").write(data_strobe)
 
+    vals = []
     tmp = data
     for i in range(num_ipbus_words):
         val = tmp & 0xffffffff
         tmp = (tmp >> 32)
-        hw.getNode(f"{ctrl_reg_name}.data_in.word{i}").write(val)
-        hw.dispatch()
+        vals.append(val)
+    hw.getNode(f"{ctrl_reg_name}.data_in").writeBlock(vals)
+    hw.dispatch()
 
     hw.getNode(f"{ctrl_reg_name}.access_mode").write(ACCESS_MODE_WRITE)
     hw.getNode(f"{ctrl_reg_name}.access_strobe").write(0x0)
@@ -174,6 +177,8 @@ if __name__ == '__main__':
         print(f"- AXI4Lite to {num_bits}-bit wide dual-port block RAM")
 
         node_name = f"axi4lite_mem_{num_bits}bit"
+        # NOTE: The actual memory depth is 1024 words.
+        # C_NUM_AXI_WORDS = 1024
         C_NUM_AXI_WORDS = 16
 
         try:

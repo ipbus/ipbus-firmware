@@ -11,16 +11,7 @@
     <node id="word_address" address="0x00000001" mask="0xffffffff" />
     <node id="data_strobe" address="0x00000002" mask="0x000000ff" />
     <node id="tick" address="0x00000002" mask="0x00000100" />
-    <node id="data_in" address="0x00000003">
-      <node id="word0" address="0x00000000" mask="0xffffffff" />
-      <node id="word1" address="0x00000001" mask="0xffffffff" />
-      <node id="word2" address="0x00000002" mask="0xffffffff" />
-      <node id="word3" address="0x00000003" mask="0xffffffff" />
-      <node id="word4" address="0x00000004" mask="0xffffffff" />
-      <node id="word5" address="0x00000005" mask="0xffffffff" />
-      <node id="word6" address="0x00000006" mask="0xffffffff" />
-      <node id="word7" address="0x00000007" mask="0xffffffff" />
-    </node>
+    <node id="data_in" address="0x00000003" mode="block" size="8" />
   </node>
 
   <node id="status" address="0x00000010" permission="rw">
@@ -32,16 +23,7 @@
     <node id="fsm_state_write" address="0x00000001" mask="0x00000200" />
     <node id="fsm_state_read" address="0x00000001" mask="0x00000400" />
     <node id="fsm_state_ack" address="0x00000001" mask="0x00000800" />
-    <node id="data_out" address="0x00000002">
-      <node id="word0" address="0x00000000" mask="0xffffffff" />
-      <node id="word1" address="0x00000001" mask="0xffffffff" />
-      <node id="word2" address="0x00000002" mask="0xffffffff" />
-      <node id="word3" address="0x00000003" mask="0xffffffff" />
-      <node id="word4" address="0x00000004" mask="0xffffffff" />
-      <node id="word5" address="0x00000005" mask="0xffffffff" />
-      <node id="word6" address="0x00000006" mask="0xffffffff" />
-      <node id="word7" address="0x00000007" mask="0xffffffff" />
-    </node>
+    <node id="data_out" address="0x00000002" mode="block" size="8" />
   </node>
 
 </node>
