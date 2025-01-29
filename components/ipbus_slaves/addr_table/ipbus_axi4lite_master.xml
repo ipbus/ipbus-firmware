@@ -9,7 +9,7 @@
          read/write transaction. -->
     <node id="access_strobe" address="0x00000000" mask="0x00000004" />
     <node id="word_address" address="0x00000001" mask="0xffffffff" />
-    <node id="data_strobe" address="0x00000002" mask="0x000000ff" />
+    <node id="data_strobe" address="0x00000002" mask="0xffffffff" />
     <node id="tick" address="0x00000002" mask="0x00000100" />
     <node id="data_in" address="0x00000003" mode="block" size="8" />
   </node>
