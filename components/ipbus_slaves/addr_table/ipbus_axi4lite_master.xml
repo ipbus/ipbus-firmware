@@ -15,7 +15,7 @@
   </node>
 
   <node id="status" address="0x00000010" permission="rw">
-    <node id="num_bytes_per_word" address="0x00000000" mask="0x00000020" />
+    <node id="num_bytes_per_word" address="0x00000000" mask="0x0000003f" />
     <node id="access_done" address="0x00000001" mask="0x00000001" />
     <node id="write_error" address="0x00000001" mask="0x00000006" />
     <node id="read_error" address="0x00000001" mask="0x00000060" />
