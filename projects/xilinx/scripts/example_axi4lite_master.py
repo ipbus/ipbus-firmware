@@ -30,6 +30,11 @@ def axi_read(hw, axi4lite_master_node, word_address, num_bytes_per_axi_word=None
         num_bytes_per_axi_word_raw = hw.getNode(f"{stat_reg_name}.num_bytes_per_word").read()
         hw.dispatch()
         num_bytes_per_axi_word = num_bytes_per_axi_word_raw.value()
+    if (num_bytes_per_axi_word < 1) \
+       or (num_bytes_per_axi_word > 32) \
+       or ((num_bytes_per_axi_word % 4) != 0):
+        msg = f"Found invalid number of bytes per AXI word: {num_bytes_per_axi_word}"
+        raise ValueError(msg)
     num_ipbus_words = num_bytes_per_axi_word // 4
     hw.getNode(f"{ctrl_reg_name}.word_address").write(word_address)
     data_strobe = int("0b" + ("1" * num_bytes_per_axi_word), 2)
@@ -81,6 +86,11 @@ def axi_write(hw, axi4lite_master_node, word_address, data, num_bytes_per_axi_wo
         num_bytes_per_axi_word_raw = hw.getNode(f"{stat_reg_name}.num_bytes_per_word").read()
         hw.dispatch()
         num_bytes_per_axi_word = num_bytes_per_axi_word_raw.value()
+    if (num_bytes_per_axi_word < 1) \
+       or (num_bytes_per_axi_word > 32) \
+       or ((num_bytes_per_axi_word % 4) != 0):
+        msg = f"Found invalid number of bytes per AXI word: {num_bytes_per_axi_word}"
+        raise ValueError(msg)
     num_ipbus_words = num_bytes_per_axi_word // 4
     hw.getNode(f"{ctrl_reg_name}.word_address").write(word_address)
     data_strobe = int("0b" + ("1" * num_bytes_per_axi_word), 2)
