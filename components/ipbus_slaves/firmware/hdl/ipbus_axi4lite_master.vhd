@@ -60,7 +60,7 @@ architecture behavioral of ipbus_axi4lite_master is
   constant C_ACCESS_MODE_READ  : std_logic := '0';
   constant C_ACCESS_MODE_WRITE : std_logic := '1';
 
-  signal ctrl : ipb_reg_v(10 downto 0);
+  signal ctrl : ipb_reg_v(11 downto 0);
   signal stat : ipb_reg_v(9 downto 0);
 
   signal access_mode   : std_logic;
@@ -99,9 +99,9 @@ begin
   trigger     <= ctrl(0)(2);
   axi_rq_add  <= ctrl(1);
   axi_rq_strb <= ctrl(2)(NUM_BYTES_PER_AXI_WORD - 1 downto 0);
-  axi_tick    <= ctrl(2)(8);
+  axi_tick    <= ctrl(3)(0);
   ctrl_axi_rq_dti : for i in 0 to (C_IPBUS_DEPTH - 1) generate
-    axi_rq_dti(32 * (i + 1) - 1 downto 32 * i) <= ctrl(3 + i);
+    axi_rq_dti(32 * (i + 1) - 1 downto 32 * i) <= ctrl(4 + i);
   end generate;
 
   stat(0) <= std_logic_vector(to_unsigned(NUM_BYTES_PER_AXI_WORD, 32));
