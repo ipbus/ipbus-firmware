@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 #
 #   Copyright 2017 - Rutherford Appleton Laboratory and University of Bristol
@@ -25,34 +24,4 @@
 #-------------------------------------------------------------------------------
 
 
-SH_SOURCE=${BASH_SOURCE}
-IPBUS_PATH=$(cd $(dirname ${SH_SOURCE})/../.. && pwd)
-
-N_ERRORS=0
-
-for componentDir in $(find -L ${IPBUS_PATH} -type d  -printf "%P\n")
-do
-  if [ -d ${IPBUS_PATH}/${componentDir}/firmware ]
-  then
-
-    for depFile in $(find ${IPBUS_PATH}/${componentDir}/firmware/cfg -name "*.dep" -printf "%P\n")
-    do
-      TOOLSET=$([[ "${componentDir}/firmware/cfg/${depFile}" =~ "sim" ]] && echo "sim" || echo "vivado")
-
-      echo "Checking ${componentDir} - ${depFile}   [tool: ${TOOLSET}]"
-      ipbb toolbox check-dep ${TOOLSET} ipbus-firmware:${componentDir} ${depFile}
-
-      if [ $? -ne 0 ]; then
-        ((N_ERRORS++))
-      fi
-      echo
-    done
-
-  fi
-done
-
-if [ ${N_ERRORS} -ne 0 ]; then
-  echo "Errors found in ${N_ERRORS} dependency files"
-  exit 1
-fi
-
+src cdc_reset.vhd
