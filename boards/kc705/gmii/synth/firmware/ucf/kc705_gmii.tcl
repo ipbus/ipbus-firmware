@@ -30,7 +30,10 @@ set_property BITSTREAM.GENERAL.COMPRESS TRUE [current_design]
 create_clock -period 5.000 -name sysclk [get_ports sysclk_p]
 
 set_false_path -through [get_pins infra/clocks/rst_reg/Q]
-set_false_path -through [get_nets infra/clocks/nuke_i]
+set tmp [get_nets infra/clocks/nuke]
+if {[llength $tmp]} {
+    set_false_path -through $tmp
+}
 
 set_property IOSTANDARD LVDS [get_ports {sysclk_*}]
 set_property PACKAGE_PIN AD12 [get_ports sysclk_p]
