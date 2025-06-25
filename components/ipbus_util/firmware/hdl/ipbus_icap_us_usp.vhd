@@ -116,8 +116,11 @@ begin
     if rising_edge(clk) then
       d17_d <= d17;
       if d17='1' and d17_d='0' then
-        trigger_reboot <= request_reboot_d;
+        trigger_reboot   <= request_reboot_d;
         request_reboot_d <= request_reboot;
+      else
+        trigger_reboot <= trigger_reboot;
+        request_reboot <= request_reboot;
       end if;
     end if;
   end process;
