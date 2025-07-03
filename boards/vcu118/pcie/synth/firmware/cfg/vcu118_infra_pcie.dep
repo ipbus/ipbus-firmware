@@ -24,13 +24,6 @@
 #-------------------------------------------------------------------------------
 
 
-@device_family = "VirtexUltraScalePlus"
-@device_name = "xcvu9p"
-@device_package = "-flga2104"
-@device_speed = "-2L-e"
-@boardname = "xilinx_vcu118"
-
-
 src vcu118_infra_pcie.vhd
 src -c components/ipbus_util clocks/clocks_usp_serdes.vhd ipbus_clock_div.vhd
 include -c components/ipbus_pcie ipbus_pcie_xdma_usp.dep

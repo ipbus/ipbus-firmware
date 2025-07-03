@@ -23,6 +23,11 @@
 #
 #-------------------------------------------------------------------------------
 
+@device_family = "KintexUltraScale"
+@device_name = "xcku115"
+@device_package = "-flva1517"
+@device_speed = "-2-i"
+@boardname = "htg_k800"
 
 setup settings_ku.tcl
 setup -f xdma_loc.tcl

@@ -24,13 +24,6 @@
 #-------------------------------------------------------------------------------
 
 
-@device_family = "KintexUltraScale"
-@device_name = "xcku115"
-@device_package = "-flva1517"
-@device_speed = "-2-i"
-@boardname = "htg_k800"
-
-
 src k800_infra.vhd
 src -c components/ipbus_util clocks/clocks_us_serdes.vhd ipbus_clock_div.vhd led_stretcher.vhd
 include -c components/ipbus_pcie ipbus_pcie_xdmaBypass_us.dep
