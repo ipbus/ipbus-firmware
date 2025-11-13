@@ -170,7 +170,7 @@ architecture rtl of ipbus_sysmon_us is
   signal ipbr : ipb_rbus_array(N_SLAVES - 1 downto 0);
 
   signal ctrl : ipb_reg_v(0 downto 0);
-  signal stat : ipb_reg_v(1 downto 0);
+  signal stat : ipb_reg_v(2 downto 0);
 
   signal sysmon_select : std_logic_vector(1 downto 0);
 
@@ -259,6 +259,14 @@ begin
   stat(1)(3) <= alarm_vccint_ored;
   stat(1)(4) <= alarm_vccaux_ored;
   stat(1)(5) <= alarm_vccbram_ored;
+
+  -- Make all alarms available for the currently selected SYSMON.
+  stat(2)(0) <= alarm_any_l(to_integer(unsigned(sysmon_select)));
+  stat(2)(1) <= alarm_over_temp_l(to_integer(unsigned(sysmon_select)));
+  stat(2)(2) <= alarm_user_temp_l(to_integer(unsigned(sysmon_select)));
+  stat(2)(3) <= alarm_vccint_l(to_integer(unsigned(sysmon_select)));
+  stat(2)(4) <= alarm_vccaux_l(to_integer(unsigned(sysmon_select)));
+  stat(2)(5) <= alarm_vccbram_l(to_integer(unsigned(sysmon_select)));
 
   -- IPBus to DRP bridge for sysmons.
   drp : entity work.ipbus_drp_bridge

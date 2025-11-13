@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
-<node id="ipbus_sysmon_ups_ext_ref" fwinfo="endpoint; width=12">
+<node id="ipbus_sysmon_ups_ext_ref" fwinfo="endpoint; width=9">
 
-  <node id="csr" fwinfo="endpoint; width=2">
+  <node id="csr" fwinfo="endpoint; width=3">
     <node id="control" address="0x00000000">
       <node id="sysmon_select"
             description="Selection of SYSMON to read. 0: SYSMON in primary SLR. [1, 4]: SYSMONs in additional SLRs, if present. See the 'num_slrs' status register for the number of SLRs present."
@@ -10,7 +10,7 @@
             mask="0x00000003"
             permission="rw" />
     </node>
-    <node id="status" address="0x00000002">
+    <node id="status" address="0x00000004">
       <node id="num_slrs"
             description="The number of SLRs present in the FPGA. Each SLR has its dedicated SYSMON. Use the 'sysmon_select' control register to determine which SYSMON to read."
             address="0x00000000"
