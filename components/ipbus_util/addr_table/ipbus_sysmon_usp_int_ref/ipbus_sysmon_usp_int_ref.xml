@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
-<node id="ipbus_sysmon_ups_int_ref" fwinfo="endpoint; width=12">
+<node id="ipbus_sysmon_ups_int_ref" fwinfo="endpoint; width=9">
 
   <node id="csr" fwinfo="endpoint; width=3">
     <node id="control" address="0x00000000">
