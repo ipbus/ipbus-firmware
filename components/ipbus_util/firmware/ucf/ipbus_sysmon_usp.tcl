@@ -19,7 +19,7 @@ if {[llength $sysmons] != ([llength $slr_pri] + [llength $slrs_sec])} \
 # The first SYSMON goes into the primary SLR.
 set sysmon_pri [lindex $sysmons 0]
 set slr_index [get_property SLR_INDEX $slr_pri]
-set_property LOC [format "SYSMONE4_X0Y%d" $slr_index] $sysmon_pri
+set_property LOC [get_sites -filter [format "NAME=~SYSMONE*_X0Y%d" $slr_index]] $sysmon_pri
 
 # The others get distributed in order.
 set sysmons_sec [lrange $sysmons 1 end]
@@ -28,6 +28,6 @@ set cnt 0
 foreach sm $sysmons_sec {
     set slr [lindex $slrs_sec $cnt]
     set slr_index [get_property SLR_INDEX $slr]
-    set_property LOC [format "SYSMONE4_X0Y%d" $slr_index] $sm
+    set_property LOC [get_sites -filter [format "NAME=~SYSMONE*_X0Y%d" $slr_index]] $sm
     incr cnt
 }
