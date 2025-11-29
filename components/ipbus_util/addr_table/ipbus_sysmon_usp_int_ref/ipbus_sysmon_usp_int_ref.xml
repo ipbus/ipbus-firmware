@@ -14,7 +14,7 @@
       <node id="num_slrs"
             description="The number of SLRs present in the FPGA. Each SLR has its dedicated SYSMON. Use the 'sysmon_select' control register to determine which SYSMON to read."
             address="0x00000000"
-            mask="0x00000003"
+            mask="0x00000007"
             permission="r" />
 
       <node id="any_sysmon"
