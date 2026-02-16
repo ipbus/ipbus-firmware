@@ -1,0 +1,6 @@
+setup settings_v7.tcl
+include z7020.dep
+src microzed.vhd
+include microzed_infra.dep
+src -c ipbus-firmware:components/ipbus_core ipbus_package.vhd
+src --cd ../ucf microzed.tcl
