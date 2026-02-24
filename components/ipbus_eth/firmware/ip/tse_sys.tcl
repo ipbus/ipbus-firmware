@@ -1,0 +1,735 @@
+package require -exact qsys 24.3.1
+
+# create the system "tse_sys"
+proc do_create_tse_sys {} {
+	# create the system
+	create_system tse_sys
+	set_project_property BOARD {Agilex 7 FPGA I-Series Transceiver Development Kit 6x F-Tile DK-SI-AGI040FES}
+	set_project_property DEVICE {AGIC040R39A2E2VR0}
+	set_project_property DEVICE_FAMILY {Agilex 7}
+	set_project_property HIDE_FROM_IP_CATALOG {false}
+	set_use_testbench_naming_pattern 0 {}
+
+	# add HDL parameters
+
+	# add the components
+	add_component clock_125 ip/tse_sys/clock_125.ip altera_clock_bridge clock_125 19.2.0
+	load_component clock_125
+	set_component_parameter_value EXPLICIT_CLOCK_RATE {125000000.0}
+	set_component_parameter_value NUM_CLOCK_OUTPUTS {1}
+	set_component_project_property HIDE_FROM_IP_CATALOG {false}
+	save_component
+	load_instantiation clock_125
+	remove_instantiation_interfaces_and_ports
+	add_instantiation_interface in_clk clock INPUT
+	set_instantiation_interface_parameter_value in_clk clockRate {0}
+	set_instantiation_interface_parameter_value in_clk externallyDriven {false}
+	set_instantiation_interface_parameter_value in_clk ptfSchematicName {}
+	add_instantiation_interface_port in_clk in_clk clk 1 STD_LOGIC Input
+	add_instantiation_interface out_clk clock OUTPUT
+	set_instantiation_interface_parameter_value out_clk associatedDirectClock {in_clk}
+	set_instantiation_interface_parameter_value out_clk clockRate {125000000}
+	set_instantiation_interface_parameter_value out_clk clockRateKnown {true}
+	set_instantiation_interface_parameter_value out_clk externallyDriven {false}
+	set_instantiation_interface_parameter_value out_clk ptfSchematicName {}
+	set_instantiation_interface_sysinfo_parameter_value out_clk clock_rate {125000000}
+	add_instantiation_interface_port out_clk out_clk clk 1 STD_LOGIC Output
+	save_instantiation
+	add_component clock_62_5 ip/tse_sys/clock_62_5.ip altera_clock_bridge clock_62_5 19.2.0
+	load_component clock_62_5
+	set_component_parameter_value EXPLICIT_CLOCK_RATE {62500000.0}
+	set_component_parameter_value NUM_CLOCK_OUTPUTS {1}
+	set_component_project_property HIDE_FROM_IP_CATALOG {false}
+	save_component
+	load_instantiation clock_62_5
+	remove_instantiation_interfaces_and_ports
+	add_instantiation_interface in_clk clock INPUT
+	set_instantiation_interface_parameter_value in_clk clockRate {0}
+	set_instantiation_interface_parameter_value in_clk externallyDriven {false}
+	set_instantiation_interface_parameter_value in_clk ptfSchematicName {}
+	add_instantiation_interface_port in_clk in_clk clk 1 STD_LOGIC Input
+	add_instantiation_interface out_clk clock OUTPUT
+	set_instantiation_interface_parameter_value out_clk associatedDirectClock {in_clk}
+	set_instantiation_interface_parameter_value out_clk clockRate {62500000}
+	set_instantiation_interface_parameter_value out_clk clockRateKnown {true}
+	set_instantiation_interface_parameter_value out_clk externallyDriven {false}
+	set_instantiation_interface_parameter_value out_clk ptfSchematicName {}
+	set_instantiation_interface_sysinfo_parameter_value out_clk clock_rate {62500000}
+	add_instantiation_interface_port out_clk out_clk clk 1 STD_LOGIC Output
+	save_instantiation
+	add_component mac_reset ip/tse_sys/mac_reset.ip altera_reset_bridge mac_reset 19.2.0
+	load_component mac_reset
+	set_component_parameter_value ACTIVE_LOW_RESET {0}
+	set_component_parameter_value NUM_RESET_OUTPUTS {1}
+	set_component_parameter_value SYNCHRONOUS_EDGES {deassert}
+	set_component_parameter_value SYNC_RESET {0}
+	set_component_parameter_value USE_RESET_REQUEST {0}
+	set_component_project_property HIDE_FROM_IP_CATALOG {false}
+	save_component
+	load_instantiation mac_reset
+	remove_instantiation_interfaces_and_ports
+	add_instantiation_interface clk clock INPUT
+	set_instantiation_interface_parameter_value clk clockRate {0}
+	set_instantiation_interface_parameter_value clk externallyDriven {false}
+	set_instantiation_interface_parameter_value clk ptfSchematicName {}
+	add_instantiation_interface_port clk clk clk 1 STD_LOGIC Input
+	add_instantiation_interface in_reset reset INPUT
+	set_instantiation_interface_parameter_value in_reset associatedClock {clk}
+	set_instantiation_interface_parameter_value in_reset synchronousEdges {DEASSERT}
+	add_instantiation_interface_port in_reset in_reset reset 1 STD_LOGIC Input
+	add_instantiation_interface out_reset reset OUTPUT
+	set_instantiation_interface_parameter_value out_reset associatedClock {clk}
+	set_instantiation_interface_parameter_value out_reset associatedDirectReset {in_reset}
+	set_instantiation_interface_parameter_value out_reset associatedResetSinks {in_reset}
+	set_instantiation_interface_parameter_value out_reset synchronousEdges {DEASSERT}
+	add_instantiation_interface_port out_reset out_reset reset 1 STD_LOGIC Output
+	save_instantiation
+	add_component syspll ip/tse_sys/syspll.ip systemclk_f syspll 3.2.1
+	load_component syspll
+	set_component_parameter_value bk_cfg_kvcc_vreg_offset_en_val {CFG_KVCC_VREG_OFFSET_EN_VAL_DISABLE}
+	set_component_parameter_value bk_ext_ac_cap {EXTERNAL_AC_CAP_ENABLE}
+	set_component_parameter_value bk_rx_invert_p_and_n {RX_INVERT_PN_DIS}
+	set_component_parameter_value bk_rx_termination {RXTERM_OFFSET_P0}
+	set_component_parameter_value bk_tx_invert_p_and_n {TX_INVERT_PN_DIS}
+	set_component_parameter_value bk_tx_termination {TXTERM_OFFSET_P0}
+	set_component_parameter_value bk_txeq_main_tap {41.5}
+	set_component_parameter_value bk_txeq_post_tap_1 {0.0}
+	set_component_parameter_value bk_txeq_post_tap_2 {0.0}
+	set_component_parameter_value bk_txeq_post_tap_3 {0.0}
+	set_component_parameter_value bk_txeq_post_tap_4 {0.0}
+	set_component_parameter_value bk_txeq_pre_tap_1 {0.0}
+	set_component_parameter_value bk_txeq_pre_tap_2 {0.0}
+	set_component_parameter_value bk_txeq_pre_tap_3 {0.0}
+	set_component_parameter_value bk_txout_tristate_en {TXOUT_TRISTATE_DIS}
+	set_component_parameter_value cmnpll_dummy {0}
+	set_component_parameter_value cmnpll_enable_0 {0}
+	set_component_parameter_value cmnpll_enable_1 {0}
+	set_component_parameter_value cmnpll_refclk_src_0 {FHT RefClk #0}
+	set_component_parameter_value cmnpll_refclk_src_1 {FHT RefClk #0}
+	set_component_parameter_value cmnpll_xtensa_src {Auto}
+	set_component_parameter_value protocol_hard_pcie_lowloss {DISABLE}
+	set_component_parameter_value refclk_cdrclk_output_enable_0 {0}
+	set_component_parameter_value refclk_cdrclk_output_enable_1 {0}
+	set_component_parameter_value refclk_fgt_always_active_0 {1}
+	set_component_parameter_value refclk_fgt_always_active_1 {1}
+	set_component_parameter_value refclk_fgt_always_active_2 {1}
+	set_component_parameter_value refclk_fgt_always_active_3 {1}
+	set_component_parameter_value refclk_fgt_always_active_4 {1}
+	set_component_parameter_value refclk_fgt_always_active_5 {1}
+	set_component_parameter_value refclk_fgt_always_active_6 {1}
+	set_component_parameter_value refclk_fgt_always_active_7 {1}
+	set_component_parameter_value refclk_fgt_always_active_8 {1}
+	set_component_parameter_value refclk_fgt_always_active_9 {1}
+	set_component_parameter_value refclk_fgt_coreclk_enable_0 {0}
+	set_component_parameter_value refclk_fgt_coreclk_enable_1 {0}
+	set_component_parameter_value refclk_fgt_coreclk_enable_2 {0}
+	set_component_parameter_value refclk_fgt_coreclk_enable_3 {0}
+	set_component_parameter_value refclk_fgt_coreclk_enable_4 {0}
+	set_component_parameter_value refclk_fgt_coreclk_enable_5 {0}
+	set_component_parameter_value refclk_fgt_coreclk_enable_6 {0}
+	set_component_parameter_value refclk_fgt_coreclk_enable_7 {0}
+	set_component_parameter_value refclk_fgt_coreclk_enable_8 {0}
+	set_component_parameter_value refclk_fgt_coreclk_enable_9 {0}
+	set_component_parameter_value refclk_fgt_freq_mhz_0 {156.250000}
+	set_component_parameter_value refclk_fgt_freq_mhz_1 {NotSpecified}
+	set_component_parameter_value refclk_fgt_freq_mhz_2 {NotSpecified}
+	set_component_parameter_value refclk_fgt_freq_mhz_3 {NotSpecified}
+	set_component_parameter_value refclk_fgt_freq_mhz_4 {NotSpecified}
+	set_component_parameter_value refclk_fgt_freq_mhz_5 {NotSpecified}
+	set_component_parameter_value refclk_fgt_freq_mhz_6 {NotSpecified}
+	set_component_parameter_value refclk_fgt_freq_mhz_7 {NotSpecified}
+	set_component_parameter_value refclk_fgt_freq_mhz_8 {NotSpecified}
+	set_component_parameter_value refclk_fgt_freq_mhz_9 {NotSpecified}
+	set_component_parameter_value refclk_fgt_freq_mhz_txt_0 {100}
+	set_component_parameter_value refclk_fgt_freq_mhz_txt_1 {100}
+	set_component_parameter_value refclk_fgt_freq_mhz_txt_2 {100}
+	set_component_parameter_value refclk_fgt_freq_mhz_txt_3 {100}
+	set_component_parameter_value refclk_fgt_freq_mhz_txt_4 {100}
+	set_component_parameter_value refclk_fgt_freq_mhz_txt_5 {100}
+	set_component_parameter_value refclk_fgt_freq_mhz_txt_6 {100}
+	set_component_parameter_value refclk_fgt_freq_mhz_txt_7 {100}
+	set_component_parameter_value refclk_fgt_freq_mhz_txt_8 {100}
+	set_component_parameter_value refclk_fgt_freq_mhz_txt_9 {100}
+	set_component_parameter_value refclk_fgt_output_enable_0 {1}
+	set_component_parameter_value refclk_fgt_output_enable_1 {0}
+	set_component_parameter_value refclk_fgt_output_enable_2 {0}
+	set_component_parameter_value refclk_fgt_output_enable_3 {0}
+	set_component_parameter_value refclk_fgt_output_enable_4 {0}
+	set_component_parameter_value refclk_fgt_output_enable_5 {0}
+	set_component_parameter_value refclk_fgt_output_enable_6 {0}
+	set_component_parameter_value refclk_fgt_output_enable_7 {0}
+	set_component_parameter_value refclk_fgt_output_enable_8 {0}
+	set_component_parameter_value refclk_fgt_output_enable_9 {0}
+	set_component_parameter_value refclk_fht_freq_mhz_txt_0 {}
+	set_component_parameter_value refclk_fht_freq_mhz_txt_1 {}
+	set_component_parameter_value rx_ac_couple_enable {ENABLE}
+	set_component_parameter_value rx_onchip_termination {RX_ONCHIP_TERMINATION_R_2}
+	set_component_parameter_value rxeq_dfe_data_tap_1 {0}
+	set_component_parameter_value rxeq_hf_boost {0}
+	set_component_parameter_value rxeq_vga_gain {0}
+	set_component_parameter_value syspll_flux_src {Auto}
+	set_component_parameter_value syspll_freq_mhz_0 {805.6640625}
+	set_component_parameter_value syspll_freq_mhz_1 {805.6640625}
+	set_component_parameter_value syspll_freq_mhz_2 {805.6640625}
+	set_component_parameter_value syspll_mod_0 {ETHERNET_FREQ_805_156}
+	set_component_parameter_value syspll_mod_1 {Disabled}
+	set_component_parameter_value syspll_mod_2 {Disabled}
+	set_component_parameter_value syspll_refclk_src_0 {RefClk #0}
+	set_component_parameter_value syspll_refclk_src_1 {RefClk #0}
+	set_component_parameter_value syspll_refclk_src_2 {RefClk #0}
+	set_component_parameter_value ux_txeq_main_tap {35}
+	set_component_parameter_value ux_txeq_post_tap_1 {0}
+	set_component_parameter_value ux_txeq_pre_tap_1 {5}
+	set_component_parameter_value ux_txeq_pre_tap_2 {0}
+	set_component_parameter_value vsr_mode {VSR_MODE_DISABLE}
+	set_component_project_property HIDE_FROM_IP_CATALOG {false}
+	save_component
+	load_instantiation syspll
+	remove_instantiation_interfaces_and_ports
+	add_instantiation_interface out_systempll_synthlock_0 conduit INPUT
+	set_instantiation_interface_parameter_value out_systempll_synthlock_0 associatedClock {}
+	set_instantiation_interface_parameter_value out_systempll_synthlock_0 associatedReset {}
+	set_instantiation_interface_parameter_value out_systempll_synthlock_0 prSafe {false}
+	set_instantiation_interface_assignment_value out_systempll_synthlock_0 ui.blockdiagram.direction {output}
+	add_instantiation_interface_port out_systempll_synthlock_0 out_systempll_synthlock_0 out_systempll_synthlock 1 STD_LOGIC Output
+	add_instantiation_interface out_systempll_clk_0 ftile_hssi_system_clock OUTPUT
+	set_instantiation_interface_parameter_value out_systempll_clk_0 clockRate {0}
+	set_instantiation_interface_assignment_value out_systempll_clk_0 ui.blockdiagram.direction {output}
+	add_instantiation_interface_port out_systempll_clk_0 out_systempll_clk_0 clk 1 STD_LOGIC Output
+	add_instantiation_interface out_refclk_fgt_0 ftile_hssi_reference_clock OUTPUT
+	set_instantiation_interface_parameter_value out_refclk_fgt_0 clockRate {0}
+	set_instantiation_interface_assignment_value out_refclk_fgt_0 ui.blockdiagram.direction {output}
+	add_instantiation_interface_port out_refclk_fgt_0 out_refclk_fgt_0 clk 1 STD_LOGIC Output
+	add_instantiation_interface refclk_fgt conduit INPUT
+	set_instantiation_interface_parameter_value refclk_fgt associatedClock {}
+	set_instantiation_interface_parameter_value refclk_fgt associatedReset {}
+	set_instantiation_interface_parameter_value refclk_fgt prSafe {false}
+	set_instantiation_interface_assignment_value refclk_fgt ui.blockdiagram.direction {input}
+	add_instantiation_interface_port refclk_fgt in_refclk_fgt_0 in_refclk_fgt_0 1 STD_LOGIC Input
+	add_instantiation_interface disable_refclk_monitor_0 conduit INPUT
+	set_instantiation_interface_parameter_value disable_refclk_monitor_0 associatedClock {}
+	set_instantiation_interface_parameter_value disable_refclk_monitor_0 associatedReset {}
+	set_instantiation_interface_parameter_value disable_refclk_monitor_0 prSafe {false}
+	set_instantiation_interface_assignment_value disable_refclk_monitor_0 ui.blockdiagram.direction {input}
+	add_instantiation_interface_port disable_refclk_monitor_0 disable_refclk_monitor_0 disable_refclk_monitor_0 1 STD_LOGIC Input
+	save_instantiation
+	add_component tse ip/tse_sys/tse.ip altera_eth_tse tse 22.5.0
+	load_component tse
+	set_component_parameter_value DEV_BOARD {0}
+	set_component_parameter_value EXAMPLE_DESIGN_VARIANT {0}
+	set_component_parameter_value GEN_SIM {0}
+	set_component_parameter_value GEN_SYNTH {0}
+	set_component_parameter_value HDL_FORMAT {1}
+	set_component_parameter_value ND_XCVR_RCFG_JTAG_ENABLE {0}
+	set_component_parameter_value ND_XCVR_SET_CAPABILITY_REG_ENABLE {0}
+	set_component_parameter_value ND_XCVR_SET_CSR_SOFT_LOGIC_ENABLE {0}
+	set_component_parameter_value ND_XCVR_SET_USER_IDENTIFIER {0}
+	set_component_parameter_value System_PLL_Frequency {805.664062}
+	set_component_parameter_value XCVR_RCFG_JTAG_ENABLE {0}
+	set_component_parameter_value XCVR_SET_CAPABILITY_REG_ENABLE {0}
+	set_component_parameter_value XCVR_SET_CSR_SOFT_LOGIC_ENABLE {0}
+	set_component_parameter_value XCVR_SET_PRBS_SOFT_LOGIC_ENABLE {0}
+	set_component_parameter_value XCVR_SET_USER_IDENTIFIER {0}
+	set_component_parameter_value adpt_multi_enable {1}
+	set_component_parameter_value adpt_recipe_cnt {1}
+	set_component_parameter_value adpt_recipe_data0 {}
+	set_component_parameter_value adpt_recipe_data1 {}
+	set_component_parameter_value adpt_recipe_data2 {}
+	set_component_parameter_value adpt_recipe_data3 {}
+	set_component_parameter_value adpt_recipe_data4 {}
+	set_component_parameter_value adpt_recipe_data5 {}
+	set_component_parameter_value adpt_recipe_data6 {}
+	set_component_parameter_value adpt_recipe_data7 {}
+	set_component_parameter_value adpt_recipe_select {0}
+	set_component_parameter_value avmm2_enable_tse {0}
+	set_component_parameter_value cal_recipe_sel {NRZ_28Gbps_VSR}
+	set_component_parameter_value core_variation {MAC_PCS_2xTBI}
+	set_component_parameter_value ctle_gs1_val_a {999}
+	set_component_parameter_value ctle_gs1_val_b {999}
+	set_component_parameter_value ctle_gs2_val_a {999}
+	set_component_parameter_value ctle_gs2_val_b {999}
+	set_component_parameter_value ctle_hf_max_a {999}
+	set_component_parameter_value ctle_hf_max_b {999}
+	set_component_parameter_value ctle_hf_min_a {999}
+	set_component_parameter_value ctle_hf_min_b {999}
+	set_component_parameter_value ctle_hf_val_a {999}
+	set_component_parameter_value ctle_hf_val_ada_a {adaptable}
+	set_component_parameter_value ctle_hf_val_ada_b {adaptable}
+	set_component_parameter_value ctle_hf_val_b {999}
+	set_component_parameter_value ctle_lf_max_a {999}
+	set_component_parameter_value ctle_lf_max_b {999}
+	set_component_parameter_value ctle_lf_min_a {999}
+	set_component_parameter_value ctle_lf_min_b {999}
+	set_component_parameter_value ctle_lf_val_a {999}
+	set_component_parameter_value ctle_lf_val_ada_a {adaptable}
+	set_component_parameter_value ctle_lf_val_ada_b {adaptable}
+	set_component_parameter_value ctle_lf_val_b {999}
+	set_component_parameter_value data_clocking_mode {syspll}
+	set_component_parameter_value eg_addr {11}
+	set_component_parameter_value ena_hash {0}
+	set_component_parameter_value enable_alt_reconfig {0}
+	set_component_parameter_value enable_deterministic_latency {0}
+	set_component_parameter_value enable_ecc {0}
+	set_component_parameter_value enable_ena {8}
+	set_component_parameter_value enable_gmii_loopback {0}
+	set_component_parameter_value enable_hd_logic {0}
+	set_component_parameter_value enable_hidden_features {0}
+	set_component_parameter_value enable_mac_flow_ctrl {0}
+	set_component_parameter_value enable_mac_vlan {0}
+	set_component_parameter_value enable_magic_detect {0}
+	set_component_parameter_value enable_pma_3125 {0}
+	set_component_parameter_value enable_ptp_1step {0}
+	set_component_parameter_value enable_sgmii {1}
+	set_component_parameter_value enable_shift16 {0}
+	set_component_parameter_value enable_sup_addr {0}
+	set_component_parameter_value enable_system_pll {0}
+	set_component_parameter_value enable_timestamping {0}
+	set_component_parameter_value enable_use_internal_fifo {1}
+	set_component_parameter_value export_pwrdn {0}
+	set_component_parameter_value ext_stat_cnt_ena {0}
+	set_component_parameter_value ftile_phyip_rcfg_enable {1}
+	set_component_parameter_value ifGMII {MII_GMII}
+	set_component_parameter_value ing_addr {11}
+	set_component_parameter_value l_av1_enable_tse {0}
+	set_component_parameter_value max_channels {1}
+	set_component_parameter_value mdio_clk_div {40}
+	set_component_parameter_value nd_phyip_rcfg_enable {0}
+	set_component_parameter_value nf_phyip_rcfg_enable {0}
+	set_component_parameter_value phy_identifier {0}
+	set_component_parameter_value phyip_en_synce_support {0}
+	set_component_parameter_value phyip_pll_base_data_rate {1250 Mbps}
+	set_component_parameter_value phyip_pll_type {CMU}
+	set_component_parameter_value phyip_pma_bonding_mode {x1}
+	set_component_parameter_value rcp_load_enable {0}
+	set_component_parameter_value rf_a_a {999}
+	set_component_parameter_value rf_a_b {999}
+	set_component_parameter_value rf_b0_a {999}
+	set_component_parameter_value rf_b0_ada_a {adaptable}
+	set_component_parameter_value rf_b0_ada_b {adaptable}
+	set_component_parameter_value rf_b0_b {999}
+	set_component_parameter_value rf_b0t_a {999}
+	set_component_parameter_value rf_b0t_b {999}
+	set_component_parameter_value rf_b1_a {999}
+	set_component_parameter_value rf_b1_ada_a {adaptable}
+	set_component_parameter_value rf_b1_ada_b {adaptable}
+	set_component_parameter_value rf_b1_b {999}
+	set_component_parameter_value rf_p0_val_a {999}
+	set_component_parameter_value rf_p0_val_ada_a {adaptable}
+	set_component_parameter_value rf_p0_val_ada_b {adaptable}
+	set_component_parameter_value rf_p0_val_b {999}
+	set_component_parameter_value rf_p1_max_a {999}
+	set_component_parameter_value rf_p1_max_b {999}
+	set_component_parameter_value rf_p1_min_a {999}
+	set_component_parameter_value rf_p1_min_b {999}
+	set_component_parameter_value rf_p1_val_a {999}
+	set_component_parameter_value rf_p1_val_ada_a {adaptable}
+	set_component_parameter_value rf_p1_val_ada_b {adaptable}
+	set_component_parameter_value rf_p1_val_b {999}
+	set_component_parameter_value rf_p2_max_a {999}
+	set_component_parameter_value rf_p2_max_b {999}
+	set_component_parameter_value rf_p2_min_a {999}
+	set_component_parameter_value rf_p2_min_b {999}
+	set_component_parameter_value rf_p2_val_a {999}
+	set_component_parameter_value rf_p2_val_ada_a {adaptable}
+	set_component_parameter_value rf_p2_val_ada_b {adaptable}
+	set_component_parameter_value rf_p2_val_b {999}
+	set_component_parameter_value rf_reserved0_a {999}
+	set_component_parameter_value rf_reserved0_b {999}
+	set_component_parameter_value rf_reserved1_a {999}
+	set_component_parameter_value rf_reserved1_b {999}
+	set_component_parameter_value starting_channel_number {0}
+	set_component_parameter_value stat_cnt_ena {1}
+	set_component_parameter_value transceiver_type {FGT}
+	set_component_parameter_value tstamp_fp_width {4}
+	set_component_parameter_value useMDIO {0}
+	set_component_parameter_value use_mac_clken {0}
+	set_component_parameter_value use_misc_ports {1}
+	set_component_project_property HIDE_FROM_IP_CATALOG {false}
+	save_component
+	load_instantiation tse
+	remove_instantiation_interfaces_and_ports
+	set_instantiation_assignment_value embeddedsw.CMacro.ENABLE_MACLITE {0}
+	set_instantiation_assignment_value embeddedsw.CMacro.FIFO_WIDTH {8}
+	set_instantiation_assignment_value embeddedsw.CMacro.IS_MULTICHANNEL_MAC {0}
+	set_instantiation_assignment_value embeddedsw.CMacro.MACLITE_GIGE {0}
+	set_instantiation_assignment_value embeddedsw.CMacro.MDIO_SHARED {0}
+	set_instantiation_assignment_value embeddedsw.CMacro.NUMBER_OF_CHANNEL {1}
+	set_instantiation_assignment_value embeddedsw.CMacro.NUMBER_OF_MAC_MDIO_SHARED {1}
+	set_instantiation_assignment_value embeddedsw.CMacro.PCS {0}
+	set_instantiation_assignment_value embeddedsw.CMacro.PCS_ID {0}
+	set_instantiation_assignment_value embeddedsw.CMacro.PCS_SGMII {1}
+	set_instantiation_assignment_value embeddedsw.CMacro.RECEIVE_FIFO_DEPTH {2048}
+	set_instantiation_assignment_value embeddedsw.CMacro.REGISTER_SHARED {0}
+	set_instantiation_assignment_value embeddedsw.CMacro.RGMII {0}
+	set_instantiation_assignment_value embeddedsw.CMacro.TRANSMIT_FIFO_DEPTH {2048}
+	set_instantiation_assignment_value embeddedsw.CMacro.USE_MDIO {0}
+	set_instantiation_assignment_value embeddedsw.dts.compatible {altr,tse-1.0}
+	set_instantiation_assignment_value embeddedsw.dts.group {ethernet}
+	set_instantiation_assignment_value embeddedsw.dts.name {tse}
+	set_instantiation_assignment_value embeddedsw.dts.params.ALTR,rx-fifo-depth {2048}
+	set_instantiation_assignment_value embeddedsw.dts.params.ALTR,tx-fifo-depth {2048}
+	set_instantiation_assignment_value embeddedsw.dts.params.phy-mode {sgmii}
+	set_instantiation_assignment_value embeddedsw.dts.vendor {altr}
+	add_instantiation_interface transmit_clock_connection clock INPUT
+	set_instantiation_interface_parameter_value transmit_clock_connection clockRate {0}
+	set_instantiation_interface_parameter_value transmit_clock_connection externallyDriven {false}
+	set_instantiation_interface_parameter_value transmit_clock_connection ptfSchematicName {}
+	add_instantiation_interface_port transmit_clock_connection ff_tx_clk clk 1 STD_LOGIC Input
+	add_instantiation_interface receive_clock_connection clock INPUT
+	set_instantiation_interface_parameter_value receive_clock_connection clockRate {0}
+	set_instantiation_interface_parameter_value receive_clock_connection externallyDriven {false}
+	set_instantiation_interface_parameter_value receive_clock_connection ptfSchematicName {}
+	add_instantiation_interface_port receive_clock_connection ff_rx_clk clk 1 STD_LOGIC Input
+	add_instantiation_interface receive avalon_streaming OUTPUT
+	set_instantiation_interface_parameter_value receive associatedClock {receive_clock_connection}
+	set_instantiation_interface_parameter_value receive associatedReset {reset_connection}
+	set_instantiation_interface_parameter_value receive beatsPerCycle {1}
+	set_instantiation_interface_parameter_value receive dataBitsPerSymbol {8}
+	set_instantiation_interface_parameter_value receive emptyWithinPacket {false}
+	set_instantiation_interface_parameter_value receive errorDescriptor {}
+	set_instantiation_interface_parameter_value receive firstSymbolInHighOrderBits {true}
+	set_instantiation_interface_parameter_value receive highOrderSymbolAtMSB {false}
+	set_instantiation_interface_parameter_value receive maxChannel {0}
+	set_instantiation_interface_parameter_value receive packetDescription {}
+	set_instantiation_interface_parameter_value receive prSafe {false}
+	set_instantiation_interface_parameter_value receive readyAllowance {0}
+	set_instantiation_interface_parameter_value receive readyLatency {2}
+	set_instantiation_interface_parameter_value receive symbolsPerBeat {1}
+	add_instantiation_interface_port receive ff_rx_data data 8 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port receive ff_rx_eop endofpacket 1 STD_LOGIC Output
+	add_instantiation_interface_port receive rx_err error 6 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port receive ff_rx_rdy ready 1 STD_LOGIC Input
+	add_instantiation_interface_port receive ff_rx_sop startofpacket 1 STD_LOGIC Output
+	add_instantiation_interface_port receive ff_rx_dval valid 1 STD_LOGIC Output
+	add_instantiation_interface transmit avalon_streaming INPUT
+	set_instantiation_interface_parameter_value transmit associatedClock {transmit_clock_connection}
+	set_instantiation_interface_parameter_value transmit associatedReset {reset_connection}
+	set_instantiation_interface_parameter_value transmit beatsPerCycle {1}
+	set_instantiation_interface_parameter_value transmit dataBitsPerSymbol {8}
+	set_instantiation_interface_parameter_value transmit emptyWithinPacket {false}
+	set_instantiation_interface_parameter_value transmit errorDescriptor {}
+	set_instantiation_interface_parameter_value transmit firstSymbolInHighOrderBits {true}
+	set_instantiation_interface_parameter_value transmit highOrderSymbolAtMSB {false}
+	set_instantiation_interface_parameter_value transmit maxChannel {0}
+	set_instantiation_interface_parameter_value transmit packetDescription {}
+	set_instantiation_interface_parameter_value transmit prSafe {false}
+	set_instantiation_interface_parameter_value transmit readyAllowance {0}
+	set_instantiation_interface_parameter_value transmit readyLatency {0}
+	set_instantiation_interface_parameter_value transmit symbolsPerBeat {1}
+	add_instantiation_interface_port transmit ff_tx_data data 8 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port transmit ff_tx_eop endofpacket 1 STD_LOGIC Input
+	add_instantiation_interface_port transmit ff_tx_err error 1 STD_LOGIC Input
+	add_instantiation_interface_port transmit ff_tx_rdy ready 1 STD_LOGIC Output
+	add_instantiation_interface_port transmit ff_tx_sop startofpacket 1 STD_LOGIC Input
+	add_instantiation_interface_port transmit ff_tx_wren valid 1 STD_LOGIC Input
+	add_instantiation_interface mac_misc_connection conduit INPUT
+	set_instantiation_interface_parameter_value mac_misc_connection associatedClock {}
+	set_instantiation_interface_parameter_value mac_misc_connection associatedReset {}
+	set_instantiation_interface_parameter_value mac_misc_connection prSafe {false}
+	add_instantiation_interface_port mac_misc_connection ff_tx_crc_fwd ff_tx_crc_fwd 1 STD_LOGIC Input
+	add_instantiation_interface_port mac_misc_connection ff_tx_septy ff_tx_septy 1 STD_LOGIC Output
+	add_instantiation_interface_port mac_misc_connection tx_ff_uflow tx_ff_uflow 1 STD_LOGIC Output
+	add_instantiation_interface_port mac_misc_connection ff_tx_a_full ff_tx_a_full 1 STD_LOGIC Output
+	add_instantiation_interface_port mac_misc_connection ff_tx_a_empty ff_tx_a_empty 1 STD_LOGIC Output
+	add_instantiation_interface_port mac_misc_connection rx_err_stat rx_err_stat 18 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port mac_misc_connection rx_frm_type rx_frm_type 4 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port mac_misc_connection ff_rx_dsav ff_rx_dsav 1 STD_LOGIC Output
+	add_instantiation_interface_port mac_misc_connection ff_rx_a_full ff_rx_a_full 1 STD_LOGIC Output
+	add_instantiation_interface_port mac_misc_connection ff_rx_a_empty ff_rx_a_empty 1 STD_LOGIC Output
+	add_instantiation_interface control_port_clock_connection clock INPUT
+	set_instantiation_interface_parameter_value control_port_clock_connection clockRate {0}
+	set_instantiation_interface_parameter_value control_port_clock_connection externallyDriven {false}
+	set_instantiation_interface_parameter_value control_port_clock_connection ptfSchematicName {}
+	add_instantiation_interface_port control_port_clock_connection clk clk 1 STD_LOGIC Input
+	add_instantiation_interface reset_connection reset INPUT
+	set_instantiation_interface_parameter_value reset_connection associatedClock {control_port_clock_connection}
+	set_instantiation_interface_parameter_value reset_connection synchronousEdges {DEASSERT}
+	add_instantiation_interface_port reset_connection reset reset 1 STD_LOGIC Input
+	add_instantiation_interface control_port avalon INPUT
+	set_instantiation_interface_parameter_value control_port addressAlignment {DYNAMIC}
+	set_instantiation_interface_parameter_value control_port addressGroup {0}
+	set_instantiation_interface_parameter_value control_port addressSpan {1024}
+	set_instantiation_interface_parameter_value control_port addressUnits {WORDS}
+	set_instantiation_interface_parameter_value control_port alwaysBurstMaxBurst {false}
+	set_instantiation_interface_parameter_value control_port associatedClock {control_port_clock_connection}
+	set_instantiation_interface_parameter_value control_port associatedReset {reset_connection}
+	set_instantiation_interface_parameter_value control_port bitsPerSymbol {8}
+	set_instantiation_interface_parameter_value control_port bridgedAddressOffset {0}
+	set_instantiation_interface_parameter_value control_port bridgesToMaster {}
+	set_instantiation_interface_parameter_value control_port burstOnBurstBoundariesOnly {false}
+	set_instantiation_interface_parameter_value control_port burstcountUnits {WORDS}
+	set_instantiation_interface_parameter_value control_port constantBurstBehavior {false}
+	set_instantiation_interface_parameter_value control_port dfhFeatureGuid {0}
+	set_instantiation_interface_parameter_value control_port dfhFeatureId {35}
+	set_instantiation_interface_parameter_value control_port dfhFeatureMajorVersion {0}
+	set_instantiation_interface_parameter_value control_port dfhFeatureMinorVersion {0}
+	set_instantiation_interface_parameter_value control_port dfhFeatureType {3}
+	set_instantiation_interface_parameter_value control_port dfhGroupId {0}
+	set_instantiation_interface_parameter_value control_port dfhParameterData {}
+	set_instantiation_interface_parameter_value control_port dfhParameterDataLength {}
+	set_instantiation_interface_parameter_value control_port dfhParameterId {}
+	set_instantiation_interface_parameter_value control_port dfhParameterName {}
+	set_instantiation_interface_parameter_value control_port dfhParameterVersion {}
+	set_instantiation_interface_parameter_value control_port explicitAddressSpan {0}
+	set_instantiation_interface_parameter_value control_port holdTime {0}
+	set_instantiation_interface_parameter_value control_port interleaveBursts {false}
+	set_instantiation_interface_parameter_value control_port isBigEndian {false}
+	set_instantiation_interface_parameter_value control_port isFlash {false}
+	set_instantiation_interface_parameter_value control_port isMemoryDevice {false}
+	set_instantiation_interface_parameter_value control_port isNonVolatileStorage {false}
+	set_instantiation_interface_parameter_value control_port linewrapBursts {false}
+	set_instantiation_interface_parameter_value control_port maximumPendingReadTransactions {0}
+	set_instantiation_interface_parameter_value control_port maximumPendingWriteTransactions {0}
+	set_instantiation_interface_parameter_value control_port minimumReadLatency {1}
+	set_instantiation_interface_parameter_value control_port minimumResponseLatency {1}
+	set_instantiation_interface_parameter_value control_port minimumUninterruptedRunLength {1}
+	set_instantiation_interface_parameter_value control_port prSafe {false}
+	set_instantiation_interface_parameter_value control_port printableDevice {false}
+	set_instantiation_interface_parameter_value control_port readLatency {0}
+	set_instantiation_interface_parameter_value control_port readWaitStates {1}
+	set_instantiation_interface_parameter_value control_port readWaitTime {1}
+	set_instantiation_interface_parameter_value control_port registerIncomingSignals {false}
+	set_instantiation_interface_parameter_value control_port registerOutgoingSignals {false}
+	set_instantiation_interface_parameter_value control_port setupTime {0}
+	set_instantiation_interface_parameter_value control_port timingUnits {Cycles}
+	set_instantiation_interface_parameter_value control_port transparentBridge {false}
+	set_instantiation_interface_parameter_value control_port waitrequestAllowance {0}
+	set_instantiation_interface_parameter_value control_port waitrequestTimeout {1024}
+	set_instantiation_interface_parameter_value control_port wellBehavedWaitrequest {false}
+	set_instantiation_interface_parameter_value control_port writeLatency {0}
+	set_instantiation_interface_parameter_value control_port writeWaitStates {1}
+	set_instantiation_interface_parameter_value control_port writeWaitTime {1}
+	set_instantiation_interface_assignment_value control_port embeddedsw.configuration.isFlash {0}
+	set_instantiation_interface_assignment_value control_port embeddedsw.configuration.isMemoryDevice {0}
+	set_instantiation_interface_assignment_value control_port embeddedsw.configuration.isNonVolatileStorage {0}
+	set_instantiation_interface_assignment_value control_port embeddedsw.configuration.isPrintableDevice {0}
+	set_instantiation_interface_sysinfo_parameter_value control_port address_map {<address-map><slave name='control_port' start='0x0' end='0x400' datawidth='32' /></address-map>}
+	set_instantiation_interface_sysinfo_parameter_value control_port address_width {10}
+	set_instantiation_interface_sysinfo_parameter_value control_port max_slave_data_width {32}
+	add_instantiation_interface_port control_port reg_data_out readdata 32 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port control_port reg_rd read 1 STD_LOGIC Input
+	add_instantiation_interface_port control_port reg_data_in writedata 32 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port control_port reg_wr write 1 STD_LOGIC Input
+	add_instantiation_interface_port control_port reg_busy waitrequest 1 STD_LOGIC Output
+	add_instantiation_interface_port control_port reg_addr address 8 STD_LOGIC_VECTOR Input
+	add_instantiation_interface pcs_transmit_clock_half_connection clock INPUT
+	set_instantiation_interface_parameter_value pcs_transmit_clock_half_connection clockRate {0}
+	set_instantiation_interface_parameter_value pcs_transmit_clock_half_connection externallyDriven {false}
+	set_instantiation_interface_parameter_value pcs_transmit_clock_half_connection ptfSchematicName {}
+	add_instantiation_interface_port pcs_transmit_clock_half_connection tx_clk_62_5 clk 1 STD_LOGIC Input
+	add_instantiation_interface pcs_receive_clock_half_connection clock INPUT
+	set_instantiation_interface_parameter_value pcs_receive_clock_half_connection clockRate {0}
+	set_instantiation_interface_parameter_value pcs_receive_clock_half_connection externallyDriven {false}
+	set_instantiation_interface_parameter_value pcs_receive_clock_half_connection ptfSchematicName {}
+	add_instantiation_interface_port pcs_receive_clock_half_connection rx_clk_62_5 clk 1 STD_LOGIC Input
+	add_instantiation_interface status_led_connection conduit INPUT
+	set_instantiation_interface_parameter_value status_led_connection associatedClock {}
+	set_instantiation_interface_parameter_value status_led_connection associatedReset {}
+	set_instantiation_interface_parameter_value status_led_connection prSafe {false}
+	add_instantiation_interface_port status_led_connection led_crs led_crs 1 STD_LOGIC Output
+	add_instantiation_interface_port status_led_connection led_link led_link 1 STD_LOGIC Output
+	add_instantiation_interface_port status_led_connection led_panel_link led_panel_link 1 STD_LOGIC Output
+	add_instantiation_interface_port status_led_connection led_col led_col 1 STD_LOGIC Output
+	add_instantiation_interface_port status_led_connection led_an led_an 1 STD_LOGIC Output
+	add_instantiation_interface_port status_led_connection led_char_err led_char_err 1 STD_LOGIC Output
+	add_instantiation_interface_port status_led_connection led_disp_err led_disp_err 1 STD_LOGIC Output
+	add_instantiation_interface rx_cdr_refclk_link ftile_hssi_reference_clock INPUT
+	set_instantiation_interface_parameter_value rx_cdr_refclk_link clockRate {0}
+	set_instantiation_interface_assignment_value rx_cdr_refclk_link ui.blockdiagram.direction {input}
+	add_instantiation_interface_port rx_cdr_refclk_link rx_cdr_refclk_link clk 1 STD_LOGIC Input
+	add_instantiation_interface tx_pll_refclk_link ftile_hssi_reference_clock INPUT
+	set_instantiation_interface_parameter_value tx_pll_refclk_link clockRate {0}
+	set_instantiation_interface_assignment_value tx_pll_refclk_link ui.blockdiagram.direction {input}
+	add_instantiation_interface_port tx_pll_refclk_link tx_pll_refclk_link clk 1 STD_LOGIC Input
+	add_instantiation_interface system_pll_clk_link ftile_hssi_system_clock INPUT
+	set_instantiation_interface_parameter_value system_pll_clk_link clockRate {0}
+	set_instantiation_interface_assignment_value system_pll_clk_link ui.blockdiagram.direction {input}
+	add_instantiation_interface_port system_pll_clk_link system_pll_clk_link clk 1 STD_LOGIC_VECTOR Input
+	add_instantiation_interface tx_serial_data conduit INPUT
+	set_instantiation_interface_parameter_value tx_serial_data associatedClock {}
+	set_instantiation_interface_parameter_value tx_serial_data associatedReset {}
+	set_instantiation_interface_parameter_value tx_serial_data prSafe {false}
+	set_instantiation_interface_assignment_value tx_serial_data ui.blockdiagram.direction {output}
+	add_instantiation_interface_port tx_serial_data tx_serial_data tx_serial_data 1 STD_LOGIC_VECTOR Output
+	add_instantiation_interface tx_serial_data_n conduit INPUT
+	set_instantiation_interface_parameter_value tx_serial_data_n associatedClock {}
+	set_instantiation_interface_parameter_value tx_serial_data_n associatedReset {}
+	set_instantiation_interface_parameter_value tx_serial_data_n prSafe {false}
+	set_instantiation_interface_assignment_value tx_serial_data_n ui.blockdiagram.direction {output}
+	add_instantiation_interface_port tx_serial_data_n tx_serial_data_n tx_serial_data_n 1 STD_LOGIC_VECTOR Output
+	add_instantiation_interface rx_serial_data conduit INPUT
+	set_instantiation_interface_parameter_value rx_serial_data associatedClock {}
+	set_instantiation_interface_parameter_value rx_serial_data associatedReset {}
+	set_instantiation_interface_parameter_value rx_serial_data prSafe {false}
+	set_instantiation_interface_assignment_value rx_serial_data ui.blockdiagram.direction {input}
+	add_instantiation_interface_port rx_serial_data rx_serial_data rx_serial_data 1 STD_LOGIC_VECTOR Input
+	add_instantiation_interface rx_serial_data_n conduit INPUT
+	set_instantiation_interface_parameter_value rx_serial_data_n associatedClock {}
+	set_instantiation_interface_parameter_value rx_serial_data_n associatedReset {}
+	set_instantiation_interface_parameter_value rx_serial_data_n prSafe {false}
+	set_instantiation_interface_assignment_value rx_serial_data_n ui.blockdiagram.direction {input}
+	add_instantiation_interface_port rx_serial_data_n rx_serial_data_n rx_serial_data_n 1 STD_LOGIC_VECTOR Input
+	add_instantiation_interface rx_is_lockedtodata conduit INPUT
+	set_instantiation_interface_parameter_value rx_is_lockedtodata associatedClock {}
+	set_instantiation_interface_parameter_value rx_is_lockedtodata associatedReset {}
+	set_instantiation_interface_parameter_value rx_is_lockedtodata prSafe {false}
+	set_instantiation_interface_assignment_value rx_is_lockedtodata ui.blockdiagram.direction {output}
+	add_instantiation_interface_port rx_is_lockedtodata rx_is_lockedtodata rx_is_lockedtodata 1 STD_LOGIC_VECTOR Output
+	add_instantiation_interface tx_clk_125 clock INPUT
+	set_instantiation_interface_parameter_value tx_clk_125 clockRate {0}
+	set_instantiation_interface_parameter_value tx_clk_125 externallyDriven {false}
+	set_instantiation_interface_parameter_value tx_clk_125 ptfSchematicName {}
+	add_instantiation_interface_port tx_clk_125 tx_clk_125 clk 1 STD_LOGIC Input
+	add_instantiation_interface rx_clk_125 clock INPUT
+	set_instantiation_interface_parameter_value rx_clk_125 clockRate {0}
+	set_instantiation_interface_parameter_value rx_clk_125 externallyDriven {false}
+	set_instantiation_interface_parameter_value rx_clk_125 ptfSchematicName {}
+	add_instantiation_interface_port rx_clk_125 rx_clk_125 clk 1 STD_LOGIC Input
+	add_instantiation_interface phyip_reset_tx_ack_o conduit INPUT
+	set_instantiation_interface_parameter_value phyip_reset_tx_ack_o associatedClock {}
+	set_instantiation_interface_parameter_value phyip_reset_tx_ack_o associatedReset {}
+	set_instantiation_interface_parameter_value phyip_reset_tx_ack_o prSafe {false}
+	add_instantiation_interface_port phyip_reset_tx_ack_o phyip_reset_tx_ack_o tx_reset_ack 1 STD_LOGIC Output
+	add_instantiation_interface phyip_reset_rx_ack_o conduit INPUT
+	set_instantiation_interface_parameter_value phyip_reset_rx_ack_o associatedClock {}
+	set_instantiation_interface_parameter_value phyip_reset_rx_ack_o associatedReset {}
+	set_instantiation_interface_parameter_value phyip_reset_rx_ack_o prSafe {false}
+	add_instantiation_interface_port phyip_reset_rx_ack_o phyip_reset_rx_ack_o rx_reset_ack 1 STD_LOGIC Output
+	add_instantiation_interface phyip_reset_tx_in conduit INPUT
+	set_instantiation_interface_parameter_value phyip_reset_tx_in associatedClock {}
+	set_instantiation_interface_parameter_value phyip_reset_tx_in associatedReset {}
+	set_instantiation_interface_parameter_value phyip_reset_tx_in prSafe {false}
+	add_instantiation_interface_port phyip_reset_tx_in phyip_reset_tx_in tx_reset 1 STD_LOGIC Input
+	add_instantiation_interface phyip_reset_rx_in conduit INPUT
+	set_instantiation_interface_parameter_value phyip_reset_rx_in associatedClock {}
+	set_instantiation_interface_parameter_value phyip_reset_rx_in associatedReset {}
+	set_instantiation_interface_parameter_value phyip_reset_rx_in prSafe {false}
+	add_instantiation_interface_port phyip_reset_rx_in phyip_reset_rx_in rx_reset 1 STD_LOGIC Input
+	add_instantiation_interface tx_ready conduit INPUT
+	set_instantiation_interface_parameter_value tx_ready associatedClock {}
+	set_instantiation_interface_parameter_value tx_ready associatedReset {}
+	set_instantiation_interface_parameter_value tx_ready prSafe {false}
+	add_instantiation_interface_port tx_ready tx_ready tx_ready 1 STD_LOGIC Output
+	add_instantiation_interface rx_ready conduit INPUT
+	set_instantiation_interface_parameter_value rx_ready associatedClock {}
+	set_instantiation_interface_parameter_value rx_ready associatedReset {}
+	set_instantiation_interface_parameter_value rx_ready prSafe {false}
+	add_instantiation_interface_port rx_ready rx_ready rx_ready 1 STD_LOGIC Output
+	save_instantiation
+
+	# add wirelevel expressions
+
+	# preserve ports for debug
+
+	# add the connections
+	add_connection clock_125.out_clk/mac_reset.clk
+	set_connection_parameter_value clock_125.out_clk/mac_reset.clk clockDomainSysInfo {-1}
+	set_connection_parameter_value clock_125.out_clk/mac_reset.clk clockRateSysInfo {125000000.0}
+	set_connection_parameter_value clock_125.out_clk/mac_reset.clk clockResetSysInfo {}
+	set_connection_parameter_value clock_125.out_clk/mac_reset.clk resetDomainSysInfo {-1}
+	add_connection clock_125.out_clk/tse.control_port_clock_connection
+	set_connection_parameter_value clock_125.out_clk/tse.control_port_clock_connection clockDomainSysInfo {-1}
+	set_connection_parameter_value clock_125.out_clk/tse.control_port_clock_connection clockRateSysInfo {125000000.0}
+	set_connection_parameter_value clock_125.out_clk/tse.control_port_clock_connection clockResetSysInfo {}
+	set_connection_parameter_value clock_125.out_clk/tse.control_port_clock_connection resetDomainSysInfo {-1}
+	add_connection clock_125.out_clk/tse.receive_clock_connection
+	set_connection_parameter_value clock_125.out_clk/tse.receive_clock_connection clockDomainSysInfo {-1}
+	set_connection_parameter_value clock_125.out_clk/tse.receive_clock_connection clockRateSysInfo {125000000.0}
+	set_connection_parameter_value clock_125.out_clk/tse.receive_clock_connection clockResetSysInfo {}
+	set_connection_parameter_value clock_125.out_clk/tse.receive_clock_connection resetDomainSysInfo {-1}
+	add_connection clock_125.out_clk/tse.rx_clk_125
+	set_connection_parameter_value clock_125.out_clk/tse.rx_clk_125 clockDomainSysInfo {-1}
+	set_connection_parameter_value clock_125.out_clk/tse.rx_clk_125 clockRateSysInfo {125000000.0}
+	set_connection_parameter_value clock_125.out_clk/tse.rx_clk_125 clockResetSysInfo {}
+	set_connection_parameter_value clock_125.out_clk/tse.rx_clk_125 resetDomainSysInfo {-1}
+	add_connection clock_125.out_clk/tse.transmit_clock_connection
+	set_connection_parameter_value clock_125.out_clk/tse.transmit_clock_connection clockDomainSysInfo {-1}
+	set_connection_parameter_value clock_125.out_clk/tse.transmit_clock_connection clockRateSysInfo {125000000.0}
+	set_connection_parameter_value clock_125.out_clk/tse.transmit_clock_connection clockResetSysInfo {}
+	set_connection_parameter_value clock_125.out_clk/tse.transmit_clock_connection resetDomainSysInfo {-1}
+	add_connection clock_125.out_clk/tse.tx_clk_125
+	set_connection_parameter_value clock_125.out_clk/tse.tx_clk_125 clockDomainSysInfo {-1}
+	set_connection_parameter_value clock_125.out_clk/tse.tx_clk_125 clockRateSysInfo {125000000.0}
+	set_connection_parameter_value clock_125.out_clk/tse.tx_clk_125 clockResetSysInfo {}
+	set_connection_parameter_value clock_125.out_clk/tse.tx_clk_125 resetDomainSysInfo {-1}
+	add_connection clock_62_5.out_clk/tse.pcs_receive_clock_half_connection
+	set_connection_parameter_value clock_62_5.out_clk/tse.pcs_receive_clock_half_connection clockDomainSysInfo {-1}
+	set_connection_parameter_value clock_62_5.out_clk/tse.pcs_receive_clock_half_connection clockRateSysInfo {62500000.0}
+	set_connection_parameter_value clock_62_5.out_clk/tse.pcs_receive_clock_half_connection clockResetSysInfo {}
+	set_connection_parameter_value clock_62_5.out_clk/tse.pcs_receive_clock_half_connection resetDomainSysInfo {-1}
+	add_connection clock_62_5.out_clk/tse.pcs_transmit_clock_half_connection
+	set_connection_parameter_value clock_62_5.out_clk/tse.pcs_transmit_clock_half_connection clockDomainSysInfo {-1}
+	set_connection_parameter_value clock_62_5.out_clk/tse.pcs_transmit_clock_half_connection clockRateSysInfo {62500000.0}
+	set_connection_parameter_value clock_62_5.out_clk/tse.pcs_transmit_clock_half_connection clockResetSysInfo {}
+	set_connection_parameter_value clock_62_5.out_clk/tse.pcs_transmit_clock_half_connection resetDomainSysInfo {-1}
+	add_connection mac_reset.out_reset/tse.reset_connection
+	set_connection_parameter_value mac_reset.out_reset/tse.reset_connection clockDomainSysInfo {-1}
+	set_connection_parameter_value mac_reset.out_reset/tse.reset_connection clockResetSysInfo {}
+	set_connection_parameter_value mac_reset.out_reset/tse.reset_connection resetDomainSysInfo {-1}
+	add_connection syspll.out_refclk_fgt_0/tse.rx_cdr_refclk_link
+	add_connection syspll.out_refclk_fgt_0/tse.tx_pll_refclk_link
+	add_connection syspll.out_systempll_clk_0/tse.system_pll_clk_link
+
+	# add the exports
+	set_interface_property clock_125 EXPORT_OF clock_125.in_clk
+	set_interface_property clock_62_5 EXPORT_OF clock_62_5.in_clk
+	set_interface_property mac_reset EXPORT_OF mac_reset.in_reset
+	set_interface_property syspll_synthlock EXPORT_OF syspll.out_systempll_synthlock_0
+	set_interface_property syspll_refclk_fgt EXPORT_OF syspll.refclk_fgt
+	set_interface_property syspll_disable_refclk_monitor EXPORT_OF syspll.disable_refclk_monitor_0
+	set_interface_property mac_receive EXPORT_OF tse.receive
+	set_interface_property mac_transmit EXPORT_OF tse.transmit
+	set_interface_property mac_misc_connection EXPORT_OF tse.mac_misc_connection
+	set_interface_property tse_control_port EXPORT_OF tse.control_port
+	set_interface_property mac_leds EXPORT_OF tse.status_led_connection
+	set_interface_property mac_tx_serial_data EXPORT_OF tse.tx_serial_data
+	set_interface_property mac_tx_serial_data_n EXPORT_OF tse.tx_serial_data_n
+	set_interface_property mac_rx_serial_data EXPORT_OF tse.rx_serial_data
+	set_interface_property mac_rx_serial_data_n EXPORT_OF tse.rx_serial_data_n
+	set_interface_property phy_rx_is_lockedtodata EXPORT_OF tse.rx_is_lockedtodata
+	set_interface_property phy_reset_tx_ack EXPORT_OF tse.phyip_reset_tx_ack_o
+	set_interface_property phy_reset_rx_ack EXPORT_OF tse.phyip_reset_rx_ack_o
+	set_interface_property phy_reset_tx_in EXPORT_OF tse.phyip_reset_tx_in
+	set_interface_property phy_reset_rx_in EXPORT_OF tse.phyip_reset_rx_in
+	set_interface_property phy_tx_ready EXPORT_OF tse.tx_ready
+	set_interface_property phy_rx_ready EXPORT_OF tse.rx_ready
+
+	# set values for exposed HDL parameters
+
+	# set the the module properties
+	set_module_property BONUS_DATA {<?xml version="1.0" encoding="UTF-8"?>
+<bonusData>
+ <element __value="clock_125">
+  <datum __value="_sortIndex" value="0" type="int" />
+ </element>
+ <element __value="clock_62_5">
+  <datum __value="_sortIndex" value="1" type="int" />
+ </element>
+ <element __value="mac_reset">
+  <datum __value="_sortIndex" value="2" type="int" />
+ </element>
+ <element __value="syspll">
+  <datum __value="_sortIndex" value="3" type="int" />
+ </element>
+ <element __value="tse">
+  <datum __value="_sortIndex" value="4" type="int" />
+ </element>
+</bonusData>
+}
+	set_module_property FILE {tse_sys.qsys}
+	set_module_property GENERATION_ID {0x00000000}
+	set_module_property NAME {tse_sys}
+
+	# save the system
+	sync_sysinfo_parameters
+	save_system tse_sys
+}
+
+proc do_set_exported_interface_sysinfo_parameters {} {
+}
+
+# create all the systems, from bottom up
+do_create_tse_sys
+
+# set system info parameters on exported interface, from bottom up
+do_set_exported_interface_sysinfo_parameters
