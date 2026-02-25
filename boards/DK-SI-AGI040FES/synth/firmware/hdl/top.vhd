@@ -98,7 +98,6 @@ begin
             --
             mac_rx_data       => mac_rx_data,
             mac_rx_last       => mac_rx_last,
-            mac_rx_ready      => '1',
             mac_rx_valid      => mac_rx_valid,
             --
             mac_tx_data       => mac_tx_data,
