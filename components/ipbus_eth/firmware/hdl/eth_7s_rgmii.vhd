@@ -37,6 +37,8 @@ library unisim;
 use unisim.VComponents.all;
 use work.emac_hostbus_decl.all;
 
+library xil_defaultlib;
+
 entity eth_7s_rgmii is
 	port(
 		clk125: in std_logic;
@@ -127,18 +129,18 @@ architecture rtl of eth_7s_rgmii is
 		 m_axis_tuser : OUT STD_LOGIC_VECTOR(0 DOWNTO 0)
 	  );
 	END COMPONENT;
-	
+
 	signal rx_data_e: std_logic_vector(7 downto 0);
 	signal rx_clk_e, rx_valid_e, rx_last_e, rx_user_e, rx_rst_e, rx_rst_en, rstn: std_logic;
 	signal rx_user_f, rx_user_ef: std_logic_vector(0 downto 0);
-	
+
 begin
 
 	idelayctrl0: idelayctrl port map(
 		refclk => clk200,
 		rst => rst
 	);
-	
+
 	rstn <= not rst;
 
 	emac0: temac_gbe_v9_0_rgmii
@@ -149,7 +151,7 @@ begin
 			rx_axi_rstn => '1',
 			tx_axi_rstn => '1',
 			rx_statistics_vector => open,
-			rx_statistics_valid => open,		
+			rx_statistics_valid => open,
 			rx_mac_aclk => rx_clk_e,
 			rx_reset => rx_rst_e,
 			rx_axis_mac_tdata => rx_data_e,
@@ -158,7 +160,7 @@ begin
 			rx_axis_mac_tuser => rx_user_e,
 			tx_ifg_delay => X"00",
 			tx_statistics_vector => open,
-			tx_statistics_valid => open,	
+			tx_statistics_valid => open,
 			tx_mac_aclk => open, -- Internally connected to gtx_clk inside core
 			tx_reset => open,
 			tx_axis_mac_tdata => tx_data,
@@ -182,11 +184,11 @@ begin
 			rx_configuration_vector => X"0000_0000_0000_0000_0812",
 			tx_configuration_vector => X"0000_0000_0000_0000_0012"
 		);
-	
+
 	rx_user_ef(0) <= rx_user_e;
 	rx_error <= rx_user_f(0);
 	rx_rst_en <= not rx_rst_e;
-	
+
 	fifo: mac_fifo_axi4
 		port map(
 			m_aclk => clk125,
@@ -206,5 +208,5 @@ begin
 
 	hostbus_out.hostrddata <= (others => '0');
 	hostbus_out.hostmiimrdy <= '0';
-	
+
 end rtl;

@@ -37,6 +37,7 @@ use ieee.std_logic_1164.all;
 use work.ipbus_trans_decl.all;
 use work.ipbus_axi_decl.all;
 
+library xil_defaultlib;
 
 entity ipbus_transport_axi_if is
 	generic(

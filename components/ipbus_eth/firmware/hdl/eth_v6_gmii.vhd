@@ -38,6 +38,8 @@ library unisim;
 use unisim.VComponents.all;
 use work.emac_hostbus_decl.all;
 
+library xil_defaultlib;
+
 entity eth_v6_gmii is
 	generic(
 		IODEL: integer := 20
@@ -62,7 +64,7 @@ entity eth_v6_gmii is
 		rxd: out std_logic_vector(7 downto 0);
 		rxdvld: out std_logic;
 		rxgoodframe: out std_logic;
-		rxbadframe: out std_logic
+		rxbadframe: out std_logic;
 		hostbus_in: in emac_hostbus_in := ('0', "00", "0000000000", X"00000000", '0', '0', '0');
 		hostbus_out: out emac_hostbus_out
 
@@ -86,7 +88,7 @@ architecture rtl of eth_v6_gmii is
 begin
 
 	rxclko <= rx_clk;
-	
+
 	idelayctrl0: idelayctrl port map(
 		refclk => clk200,
 		rst => rst
@@ -96,14 +98,14 @@ begin
 		i => gmii_rx_clk,
 		o => rx_clk_io
 	);
-	
+
 	bufr0: bufr port map(
 		i => gmii_rx_clk,
 		o => rx_clk,
 		ce => '1',
 		clr => '0'
 	);
-	
+
 	iodelgen: for i in 7 downto 0 generate
 		attribute IODELAY_GROUP of iodelay: label is "iodel_gmii_rx";
 	begin
@@ -127,9 +129,9 @@ begin
 				odatain => '0',
 				rst => '0'
 			); -- Delay element for phase alignment
-	
+
 	end generate;
-	
+
 	iodelay_dv: iodelaye1
 		generic map(
 			IDELAY_TYPE => "FIXED",
@@ -149,7 +151,7 @@ begin
 			odatain => '0',
 			rst => '0'
 		); -- Delay element on rx clock for phase alignment
-		
+
 	iodelay_er: iodelaye1
 		generic map(
 			IDELAY_TYPE => "FIXED",
@@ -187,7 +189,7 @@ begin
 			gmii_tx_er <= tx_er_e;
 		end if;
 	end process;
-	
+
 	oddr0: oddr port map(
 		q => gmii_gtx_clk,
 		c => clk125,
@@ -198,7 +200,7 @@ begin
 		s => '0'
 	); -- DDR register for clock forwarding
 
-	emac0: entity work.v6_emac_v1_5 port map(
+	emac0: entity xil_defaultlib.v6_emac_v1_5 port map(
 		EMACCLIENTRXCLIENTCLKOUT => open,
 		CLIENTEMACRXCLIENTCLKIN => rx_clk,
 		EMACCLIENTRXD => rxd,
@@ -239,7 +241,7 @@ begin
 		MMCM_LOCKED => locked,
 		RESET => '0'
 	);
-	
+
 	hostbus_out.hostrddata <= (others => '0');
 	hostbus_out.hostmiimrdy <= '0';
 

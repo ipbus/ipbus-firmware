@@ -42,6 +42,8 @@ library unisim;
 use unisim.VComponents.all;
 use work.emac_hostbus_decl.all;
 
+library xil_defaultlib;
+
 entity eth_7s_1000basex_gtp is
 	port(
 		gt_clkp, gt_clkn: in std_logic;
@@ -118,7 +120,7 @@ architecture rtl of eth_7s_1000basex_gtp is
 	signal rstn, phy_done, mmcm_locked, locked_int: std_logic;
 	signal dc: std_logic := '0';
 	signal clk_dc: std_logic;
-	
+
 begin
 
 	clkp_buf: IBUF -- required because top level IBUF insertion does not work for IBUFDS_GT buried in PCS/PMA core
@@ -126,7 +128,7 @@ begin
 			i => gt_clkp,
 			o => gt_clkp_i
 		);
-		
+
 	clkn_buf: IBUF
 		port map(
 			i => gt_clkn,
@@ -186,7 +188,7 @@ begin
 	hostbus_out.hostmiimrdy <= '0';
 
 -- This is pretty crap, but appears the only way to avoid vivado issues
-	
+
 	process(clk_fr)
 	begin
 		if rising_edge(clk_fr) then
@@ -199,13 +201,13 @@ begin
 			i => dc,
 			o => clk_dc
 		);
-	
-	phy: entity work.gig_eth_pcs_pma_basex_gtp
+
+	phy: entity xil_defaultlib.gig_eth_pcs_pma_basex_gtp
 		port map(
 			gtrefclk_p => gt_clkp_i,
 			gtrefclk_n => gt_clkn_i,
 			gtrefclk_out => open,
-			gtrefclk_bufg_out => clk_fr,	
+			gtrefclk_bufg_out => clk_fr,
 			txp => gt_txp,
 			txn => gt_txn,
 			rxp => gt_rxp,
@@ -236,7 +238,7 @@ begin
 			gt0_pll0refclklost_out => open,
 			gt0_pll0lock_out => open
 		);
-		
+
 	sig_det <= not sfp_los;
 
 end rtl;

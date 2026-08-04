@@ -77,14 +77,14 @@ begin
 	axi_rx_valid <= v5_rxdvld;
 	axi_rx_last <= v5_rxgoodframe or v5_rxbadframe;
 	axi_rx_error <= v5_rxbadframe;
-	
+
 	v5_txd <= axi_tx_data;
 	v5_txdvld <= axi_tx_valid;
-	
-	process(clk)
+
+	process(clk125)
 	begin
 		if rising_edge(clk125) then
-			tx_ready <= tx_ready or v5_txack and not (axi_tx_last or rst);
+			tx_ready <= tx_ready or (v5_txack and not (axi_tx_last or rst));
 		end if;
 	end process;
 
