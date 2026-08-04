@@ -33,6 +33,8 @@ use work.ipbus.all;
 LIBRARY UNISIM;
 USE UNISIM.VComponents.ALL;
 
+library xil_defaultlib;
+
 entity uc_pipe_interface is
   port(
     clk: in std_logic;
@@ -44,7 +46,7 @@ entity uc_pipe_interface is
     uc_pipe_nwe: in std_logic;
     uc_pipe: inout std_logic_vector(15 downto 0)
   );
-  
+
 end uc_pipe_interface;
 
 architecture rtl of uc_pipe_interface is
@@ -81,7 +83,7 @@ architecture rtl of uc_pipe_interface is
       doutb : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
     );
   END COMPONENT;
-  
+
   COMPONENT sdpram_32x9_16x10
     PORT (
       clka : IN STD_LOGIC;
@@ -124,7 +126,7 @@ begin
 			elsif( samp_nrd = "10" ) then
 				r_addr_pipe <= r_addr_pipe + 1;
 			end if;
-	 
+
 			if( pipe_to_ipbus_reset = '1') then
 				w_addr_pipe <= (others => '1');
 			elsif( samp_nwe = "10" ) then
@@ -154,21 +156,21 @@ begin
   end process;
 
 
-  ipbus_out.ipb_err <= '0'; 
+  ipbus_out.ipb_err <= '0';
   ipbus_out.ipb_ack <= ack;
 
 
   process(sclk)
   begin
-    if falling_edge(sclk) then 
+    if falling_edge(sclk) then
 
-        -- Jumping direct to reg in ipb domain due to large skew between 
+        -- Jumping direct to reg in ipb domain due to large skew between
         -- ipb clk (31.25MHz) and sclk (125MHz).  Sclk drives the DCM
-        -- for IPB, but no BUFG in feedback path (resource saving?) leads to 
+        -- for IPB, but no BUFG in feedback path (resource saving?) leads to
         -- large skew.
-          
+
         r_addr_pipe_sclk_domain <= r_addr_pipe;
-        w_addr_pipe_sclk_domain <= w_addr_pipe; 
+        w_addr_pipe_sclk_domain <= w_addr_pipe;
 
     end if;
   end process;
@@ -177,15 +179,15 @@ begin
 
   process(clk)
   begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
 
-        -- Jumping direct to reg in ipb domain due to large skew between 
+        -- Jumping direct to reg in ipb domain due to large skew between
         -- ipb clk (31.25MHz) and sclk (125MHz).  Sclk drives the DCM
-        -- for IPB, but no BUFG in feedback path (resource saving?) leads to 
+        -- for IPB, but no BUFG in feedback path (resource saving?) leads to
         -- large skew.
-          
+
         r_addr_pipe_ipb_domain <= r_addr_pipe_sclk_domain;
-        w_addr_pipe_ipb_domain <= w_addr_pipe_sclk_domain; 
+        w_addr_pipe_ipb_domain <= w_addr_pipe_sclk_domain;
 
     end if;
   end process;
@@ -193,22 +195,22 @@ begin
 
   process(clk)
   begin
-    if rising_edge(clk) then 
-        
+    if rising_edge(clk) then
+
 
 --       if( ipbus_to_pipe_reset = '1' ) then
---         ipbus_to_pipe_reset <= '0';  
+--         ipbus_to_pipe_reset <= '0';
 --         w_addr_ipbus <= (others=>'1');
 --       elsif( pipe_to_ipbus_reset = '1' ) then
 --         pipe_to_ipbus_reset <= '0';
 --         r_addr_ipbus <= (others=>'0');
 --       else
-  
+
 			ack <= ipbus_in.ipb_strobe and not ack;
 
 --STATUS/CONFIGURATION REGISTER
 			if ipbus_in.ipb_strobe='1' and ack='0' then
-				if ipbus_in.ipb_write='0' then 
+				if ipbus_in.ipb_write='0' then
 					if ipbus_in.ipb_addr(1 downto 0)="00" then
 						ipbus_out.ipb_rdata <= "0000000" & std_logic_vector( w_addr_ipbus ) & "000000" & std_logic_vector( r_addr_pipe_ipb_domain );
 					elsif ipbus_in.ipb_addr(1 downto 0)="01" then
@@ -222,12 +224,12 @@ begin
 					elsif ipbus_in.ipb_addr(1 downto 0)="01" then
 						pipe_to_ipbus_reset <= ipbus_in.ipb_wdata(0);
 						r_addr_ipbus <= (others => '0');
-					end if;   
+					end if;
 --           else
 --             if ipbus_in.ipb_addr(1 downto 0)="00" then
---               ipbus_to_pipe_reset <= '1';          
+--               ipbus_to_pipe_reset <= '1';
 --             elsif ipbus_in.ipb_addr(1 downto 0)="01" then
---               pipe_to_ipbus_reset <= '1';          
+--               pipe_to_ipbus_reset <= '1';
 --             end if;
 				end if;
 			end if;

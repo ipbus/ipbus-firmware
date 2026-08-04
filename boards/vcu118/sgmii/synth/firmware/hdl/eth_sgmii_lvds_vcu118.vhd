@@ -40,6 +40,8 @@ use ieee.numeric_std.all;
 library unisim;
 use unisim.vcomponents.all;
 
+library xil_defaultlib;
+
 entity eth_sgmii_lvds_vcu118 is
     port(
         -- clock and data i/o (connected to external device)
@@ -417,7 +419,7 @@ begin
     -- 7: PHY Link Status
 
     -- PHY status registers
-    -- 
+    --
     -- https://www.ti.com/lit/gpn/DP83867E
 
     set_leds : process(clk125_fr)

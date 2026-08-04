@@ -30,12 +30,12 @@
 --
 -- Create Date: 10/02/2020
 -- Design Name: eth_vc707_sgmii
--- Module Name: 
+-- Module Name:
 -- Version: 1.0
 -- Project Name: HTT (ATLAS)
 -- Target Devices: VC707
 -- Tool Versions: Vivado 2017.2
--- Description: This is the ethernet block that instantiates the 
+-- Description: This is the ethernet block that instantiates the
 -- gigabit ethernet and the tri-speed mac layer cores for the VC707
 -- board. Modifications in the clock module are required in order to have
 -- the proper clock frequencies for the two cores
@@ -54,6 +54,8 @@ use ieee.std_logic_1164.all;
 library unisim;
 use unisim.VComponents.all;
 use work.emac_hostbus_decl.all;
+
+library xil_defaultlib;
 
 entity eth_7s_sgmii is
   port(
@@ -82,7 +84,7 @@ entity eth_7s_sgmii is
 end eth_7s_sgmii;
 
 architecture rtl of eth_7s_sgmii is
-    
+
   COMPONENT temac_gbe_v9_0
     PORT (
       gtx_clk : IN STD_LOGIC;
@@ -123,7 +125,7 @@ architecture rtl of eth_7s_sgmii is
       tx_configuration_vector : IN STD_LOGIC_VECTOR(79 DOWNTO 0)
       );
   END COMPONENT;
-	
+
   component gig_ethernet_pcs_pma_basex_156_25
     port(
       gmii_rx_dv: out std_logic;
@@ -181,7 +183,7 @@ architecture rtl of eth_7s_sgmii is
   signal tx_data_ila, rx_data_ila: std_logic_vector(7 downto 0);
   signal rsti_ila, rstn_ila: std_logic;
   signal rx_clk_e: std_logic;
-  
+
   attribute mark_debug: string;
   attribute mark_debug of gmii_rxd: signal is "true";
   attribute mark_debug of gmii_txd: signal is "true";
@@ -192,20 +194,20 @@ architecture rtl of eth_7s_sgmii is
 
   signal rx_rst_e, rx_rst_en: std_logic;
   signal rx_user_ef, rx_user_f: std_logic_vector(0 downto 0);
-  
+
 begin
 
   clk125_out <= clk125;
-  
+
   rstn <= not (rsti or not locked_i);
-  
+
   --rx_data <= rx_data_int;
   --tx_data_int <= tx_data;
   rx_data <= rx_data_ila;
   tx_data_ila <= tx_data;
   rsti_ila <= rsti;
   rstn_ila <= rstn;
-  
+
   mac: temac_gbe_v9_0
     port map(
       gtx_clk => clk125,
@@ -245,10 +247,10 @@ begin
       rx_configuration_vector => X"0000_0000_0000_0000_0812",
       tx_configuration_vector => X"0000_0000_0000_0000_0012"
       );
-  
+
   hostbus_out.hostrddata <= (others => '0');
   hostbus_out.hostmiimrdy <= '0';
-  
+
   phy: gig_ethernet_pcs_pma_basex_156_25
     port map(
       gtrefclk_p => gt_clkp,
@@ -278,7 +280,7 @@ begin
       gmii_isolate => open,
       configuration_vector => "10000",
       status_vector => status_vector_ila,
-      reset => rsti, 
+      reset => rsti,
       gt0_qplloutclk_out => open,
       gt0_qplloutrefclk_out => open,
       speed_is_100 => '0',--speedis100_int,
@@ -287,10 +289,10 @@ begin
       an_adv_config_vector => "0000000000100001",--"1101100000000001",--[15]: Link Status, [14]: Acknowledge, [13]: Reserved, [12]: Duplex Mode, [11]: Speed, [10]: Speed, [9]-[1]: Reserved, [0]: SGMII
       an_restart_config => '0' --This may cause an issue
       );
-  
+
   locked_i <= resetdone and mmcm_locked;
   locked <= locked_i;
-  
+
   sig_det <= not sfp_los;
-   
+
 end rtl;

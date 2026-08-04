@@ -37,6 +37,8 @@ library unisim;
 use unisim.VComponents.all;
 use work.emac_hostbus_decl.all;
 
+library xil_defaultlib;
+
 entity eth_us_1000basex is
 	port(
 		gt_clkp, gt_clkn: in std_logic;
@@ -118,7 +120,7 @@ begin
 --	);
 
 	clk125_out <= clk125;
-	
+
 	rstn <= not (rsti or not locked_i);
 
 	mac: temac_gbe_v9_0
@@ -160,7 +162,7 @@ begin
 	hostbus_out.hostrddata <= (others => '0');
 	hostbus_out.hostmiimrdy <= '0';
 
-	phy: entity work.gig_ethernet_pcs_pma_basex_156_25
+	phy: entity xil_defaultlib.gig_ethernet_pcs_pma_basex_156_25
 		port map(
 			gtrefclk_p => gt_clkp,
 			gtrefclk_n => gt_clkn,
@@ -189,10 +191,10 @@ begin
 			reset => rsti,
 			signal_detect => sig_det
 		);
-		
+
   locked_i <= resetdone and mmcm_locked;
   locked <= locked_i;
-  
+
 	sig_det <= not sfp_los;
 
 end rtl;

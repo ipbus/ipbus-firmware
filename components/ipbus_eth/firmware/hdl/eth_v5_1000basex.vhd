@@ -41,6 +41,8 @@ library unisim;
 use unisim.VComponents.all;
 use work.emac_hostbus_decl.all;
 
+library xil_defaultlib;
+
 entity eth_v5_1000basex is
 	port(
 		gt_clkp, gt_clkn: in std_logic;
@@ -86,7 +88,7 @@ begin
 			i => refclk125,
 			o => refclk125_buf
 		);
-	
+
 	dcm: DCM_BASE
 		generic map(
 			clkin_period => 8.0
@@ -105,7 +107,7 @@ begin
 			i => clk125,
 			o => clk125_buf
 		);
-	
+
 	bufg_62_5: bufg
 		port map(
 			i => clk62_5,
@@ -115,7 +117,7 @@ begin
 	clk125_o <= clk125_buf;
 	locked <= phy_locked and dcm_locked and sync_acq;
 
-	mac: entity work.v5_emac_v1_8_serdes_block
+	mac: entity xil_defaultlib.v5_emac_v1_8_serdes_block
 		port map(
 			CLK125_OUT => refclk125,
 			CLK125 => clk125_buf,
@@ -160,21 +162,21 @@ begin
 			rxpolarity(1) => '0',
 			txpolarity(0) => txpolarity,
 			txpolarity(1) => '0'
-		
+
 		);
-		
+
 	rx_last <= rxgoodframe or rxbadframe;
 	rx_error <= rxbadframe;
-    
+
 	process(clk125_buf) -- Shim between new and old-style MAC interfaces
 	begin
 		if rising_edge(clk125_buf) then
 			tx_ready_i <= (tx_ready_i or txack) and not (tx_last or rsti); -- Assume long rst pulse
 		end if;
 	end process;
-  
+
 	tx_ready <= tx_ready_i or txack;
-	
+
 	hostbus_out.hostrddata <= (others => '0');
 	hostbus_out.hostmiimrdy <= '0';
 

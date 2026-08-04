@@ -42,6 +42,8 @@ library unisim;
 use unisim.VComponents.all;
 use work.emac_hostbus_decl.all;
 
+library xil_defaultlib;
+
 entity eth_v5_gmii is
 	port(
 		clk125: in std_logic;
@@ -100,7 +102,7 @@ architecture rtl of eth_v5_gmii is
 	attribute IODELAY_GROUP of iodelay0: label is "iodel_gmii_rx";
 
 begin
-	
+
 	idelayctrl0: idelayctrl port map(
 		refclk => clk200,
 		rst => rst
@@ -123,7 +125,7 @@ begin
 			c => '0',
 			rst => '0'
 		); -- Delay element on rx clock for phase alignment
-	
+
 	bufg0: bufg port map(
 		i => gmii_rx_clk_del,
 		o => rx_clk
@@ -146,7 +148,7 @@ begin
 			gmii_tx_er <= tx_er_e;
 		end if;
 	end process;
-	
+
 	oddr0: oddr port map(
 		q => gmii_tx_clk,
 		c => clk125,
@@ -157,7 +159,7 @@ begin
 		s => '0'
 	); -- DDR register for clock forwarding
 
-	emac0: entity work.v5_emac_v1_8 port map(
+	emac0: entity xil_defaultlib.v5_emac_v1_8 port map(
 --		EMAC0CLIENTRXCLIENTCLKOUT => open,
 		CLIENTEMAC0RXCLIENTCLKIN => rx_clk,
 		EMAC0CLIENTRXD => rx_data_e,
@@ -169,7 +171,7 @@ begin
 --   	EMAC0CLIENTRXSTATS =>
 --		EMAC0CLIENTRXSTATSVLD =>
 --		EMAC0CLIENTRXSTATSBYTEVLD =>
--- 	EMAC0CLIENTTXCLIENTCLKOUT => 
+-- 	EMAC0CLIENTTXCLIENTCLKOUT =>
 		CLIENTEMAC0TXCLIENTCLKIN => clk125,
 		CLIENTEMAC0TXD => tx_data,
 		CLIENTEMAC0TXDVLD => tx_valid,
@@ -198,10 +200,10 @@ begin
 		DCM_LOCKED_0 => locked,
 		RESET => rst
 	);
-	
+
 	fifo_d <= rxbadframe & (rxgoodframe or rxbadframe) & rx_valid_e & rx_data_e;
 	rx_en <= rx_valid_e or rxgoodframe or rxbadframe;
-	
+
 	fifo: mac_fifo
 		port map(
 			rst => rst,
@@ -214,7 +216,7 @@ begin
 			full => open,
 			empty => fifo_empty
 		);
-	
+
 	rx_data <= fifo_q(7 downto 0);
 	rx_valid <= fifo_q(8) and not fifo_empty;
 	rx_last <= fifo_q(9) and not fifo_empty;
@@ -226,9 +228,9 @@ begin
 			tx_ready_i <= (tx_ready_i or txack) and not (tx_last or rst); -- Assume long rst pulse
 		end if;
 	end process;
-  
+
 	tx_ready <= tx_ready_i or txack;
-	
+
 	hostbus_out.hostrddata <= (others => '0');
 	hostbus_out.hostmiimrdy <= '0';
 

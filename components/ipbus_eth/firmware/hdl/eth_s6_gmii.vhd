@@ -42,6 +42,8 @@ library unisim;
 use unisim.VComponents.all;
 use work.emac_hostbus_decl.all;
 
+library xil_defaultlib;
+
 entity eth_s6_gmii is
 	port(
 		clk125: in std_logic;
@@ -108,7 +110,7 @@ architecture rtl of eth_s6_gmii is
 		 tx_mac_config_vector : IN STD_LOGIC_VECTOR(79 DOWNTO 0)
 	  );
 	END COMPONENT;
-	
+
 	COMPONENT mac_fifo_axi4
 	  PORT (
 		 m_aclk : IN STD_LOGIC;
@@ -132,24 +134,24 @@ architecture rtl of eth_s6_gmii is
 	signal tx_en_e, tx_er_e, rx_dv_r, rx_er_r: std_logic;
 	signal gmii_rxd_del: std_logic_vector(7 downto 0);
 	signal gmii_rx_dv_del, gmii_rx_er_del: std_logic;
-	
+
 	signal rx_data_e: std_logic_vector(7 downto 0);
 	signal rx_valid_e, rx_last_e, rx_user_e, rx_rst, rstn: std_logic;
 	signal rx_user_f, rx_user_ef: std_logic_vector(0 downto 0);
 	signal rx_valid_f, rx_valid_d: std_logic;
-	
+
 begin
 
 	bufio0: bufio2 port map(
 		i => gmii_rx_clk,
 		ioclk => rx_clk_io
 	);
-	
+
 	bufg0: bufg port map(
 		i => gmii_rx_clk,
 		o => rx_clk
 	);
-	
+
 	iodelgen: for i in 7 downto 0 generate
 	begin
 		iodelay: iodelay2
@@ -170,9 +172,9 @@ begin
 				rst => '0',
 				t => '1'
 			); -- Delay element for phase alignment
-	
+
 	end generate;
-	
+
 	iodelay_dv: iodelay2
 		generic map(
 			DELAY_SRC => "IDATAIN",
@@ -191,7 +193,7 @@ begin
 			rst => '0',
 			t => '1'
 		); -- Delay element on rx clock for phase alignment
-		
+
 	iodelay_er: iodelay2
 		generic map(
 			DELAY_SRC => "IDATAIN",
@@ -228,9 +230,9 @@ begin
 			gmii_tx_er <= tx_er_e;
 		end if;
 	end process;
-	
+
 	clk125n <= not clk125;
-	
+
 	oddr0: oddr2 port map(
 		q => gmii_gtx_clk,
 		c0 => clk125,
@@ -279,17 +281,17 @@ begin
 		rx_mac_config_vector => X"0000_0000_0000_0000_0812",
 		tx_mac_config_vector => X"0000_0000_0000_0000_0012"
 	);
-	
+
 	rx_user_ef(0) <= rx_user_e;
 	rx_error <= rx_user_f(0);
-	
+
 	process(rx_clk)
 	begin
 		if rising_edge(rx_clk) then
 			rx_rst <= not rst;
 		end if;
 	end process;
-	
+
 	fifo: mac_fifo_axi4 port map(
 		m_aclk => clk125,
 		s_aclk => rx_clk,
@@ -305,9 +307,9 @@ begin
 		m_axis_tlast => rx_last,
 		m_axis_tuser => rx_user_f
 	); -- Clock domain crossing FIFO
-	
+
 	hostbus_out.hostrddata <= (others => '0');
 	hostbus_out.hostmiimrdy <= '0';
-	
+
 end rtl;
 

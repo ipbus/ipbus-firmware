@@ -38,6 +38,8 @@ library unisim;
 use unisim.VComponents.all;
 use work.emac_hostbus_decl.all;
 
+library xil_defaultlib;
+
 entity eth_s6_1000basex is
 	port(
 		gtp_clkp, gtp_clkn: in std_logic;
@@ -108,13 +110,13 @@ architecture rtl of eth_s6_1000basex is
 	END COMPONENT;
 
 begin
-	
+
 	ibuf0: IBUFDS port map(
 		i => gtp_clkp,
 		ib => gtp_clkn,
 		o => clkin
 	);
-	
+
 	bufio0: BUFIO2
 		generic map(
 			divide => 1,
@@ -175,7 +177,7 @@ begin
 	hostbus_out.hostrddata <= (others => '0');
 	hostbus_out.hostmiimrdy <= '0';
 
-	phy: entity work.gig_eth_pcs_pma_v11_4_block port map(
+	phy: entity xil_defaultlib.gig_eth_pcs_pma_v11_4_block port map(
 		gtpclkout => gtpclkout,
 		gtpreset0 => '0',  -- rely upon powerup reset for now
 		gmii_txd0 => gmii_txd,
@@ -200,5 +202,5 @@ begin
 		rxp1 => '0',
 		rxn1 => '0'
 	);
-	  
+
 end rtl;

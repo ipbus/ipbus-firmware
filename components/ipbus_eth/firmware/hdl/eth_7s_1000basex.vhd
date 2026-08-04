@@ -39,6 +39,8 @@ library unisim;
 use unisim.VComponents.all;
 use work.emac_hostbus_decl.all;
 
+library xil_defaultlib;
+
 entity eth_7s_1000basex is
     generic(
         RXPOLARITY_SWAP: boolean := false;
@@ -121,27 +123,27 @@ architecture rtl of eth_7s_1000basex is
 	signal txpol, rxpol: std_logic;
 
 begin
-	
+
 	ibuf0: IBUFDS_GTE2 port map(
 		i => gt_clkp,
 		ib => gt_clkn,
 		o => clkin,
 		ceb => '0'
 	);
-	
+
 	bufg_fr: BUFG port map(
 		i => clkin,
 		o => clk_fr
 	);
-	
+
 	refclk_out <= clkin;
 	clk125_fr <= clk_fr;
-	
+
 	bufh_tx: BUFH port map(
 		i => txoutclk_ub,
 		o => txoutclk
 	);
-	
+
 	mmcm: MMCME2_BASE
 		generic map(
 			CLKIN1_PERIOD => 16.0,
@@ -157,7 +159,7 @@ begin
 			rst => rsti,
 			pwrdwn => '0',
 			locked => mmcm_locked);
-	
+
 	bufr_125: BUFH
 		port map(
 			i => clk125_ub,
@@ -223,10 +225,10 @@ begin
 
 	-- Vivado generates a CRC error if you drive the CPLLLOCKDET circuitry with
 	-- the same clock used to drive the transceiver PLL.  While this makes sense
-	-- if the clk is derved from the CPLL (e.g. TXOUTCLK) it is less clear is 
+	-- if the clk is derved from the CPLL (e.g. TXOUTCLK) it is less clear is
 	-- essential if you use the clock raw from the input pins.  The short story
-	-- is that it has always worked in the past with ISE, but Vivado generates 
-	-- DRC error.  Can be bypassed by decoupling the clock from the perpective 
+	-- is that it has always worked in the past with ISE, but Vivado generates
+	-- DRC error.  Can be bypassed by decoupling the clock from the perpective
 	-- of the tools by just toggling a flip flop, which is what is done below.
 
 	process(clk_fr)
@@ -235,11 +237,11 @@ begin
 			decoupled_clk <= not decoupled_clk;
 		end if;
 	end process;
-	
+
 	rxpol <= '1' when RXPOLARITY_SWAP else '0';
 	txpol <= '1' when TXPOLARITY_SWAP else '0';
 
-	phy: entity work.gig_eth_pcs_pma_basex_v15_1
+	phy: entity xil_defaultlib.gig_eth_pcs_pma_basex_v15_1
 		port map(
 			gtrefclk => clkin,
 			gtrefclk_bufg => clk_fr,
@@ -318,7 +320,7 @@ begin
             gt0_drpwe_in => '0',
             gt0_dmonitorout_out => open
 		);
-		
+
 	sig_det <= not sfp_los;
 
 end rtl;

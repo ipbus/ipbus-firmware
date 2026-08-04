@@ -39,6 +39,8 @@ library unisim;
 use unisim.VComponents.all;
 use work.emac_hostbus_decl.all;
 
+library xil_defaultlib;
+
 entity eth_v6_sgmii is
 	port(
 		sgmii_clkp, sgmii_clkn: in std_logic;
@@ -78,7 +80,7 @@ begin
       o => clkin,
       odiv2 => open
     );
-	 
+
 	bufg_d: bufg port map(
 		i => clkin,
 		o => clk125_fr
@@ -90,12 +92,12 @@ begin
 	);
 
 	clk125_o <= clk125;
-	
+
 	locked <= resetdone and syncacqstatus;
-	
+
 	rstn <= not rst;
 
-	sgmii: entity work.v6_emac_v2_3_sgmii_block port map(
+	sgmii: entity xil_defaultlib.v6_emac_v2_3_sgmii_block port map(
       clk125_out => clk125_out,
       gtx_clk => clk125,
       rx_statistics_vector => open,
@@ -135,7 +137,7 @@ begin
       rx_axi_rstn => '1',
       tx_axi_rstn => '1'
    );
-   
+
   hostbus_out.hostrddata <= (others => '0');
 	hostbus_out.hostmiimrdy <= '0';
 

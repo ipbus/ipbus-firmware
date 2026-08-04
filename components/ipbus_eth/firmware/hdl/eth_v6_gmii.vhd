@@ -38,6 +38,8 @@ library unisim;
 use unisim.VComponents.all;
 use work.emac_hostbus_decl.all;
 
+library xil_defaultlib;
+
 entity eth_v6_gmii is
 	generic(
 		IODEL: integer := 20
@@ -198,7 +200,7 @@ begin
 		s => '0'
 	); -- DDR register for clock forwarding
 
-	emac0: entity work.v6_emac_v1_5 port map(
+	emac0: entity xil_defaultlib.v6_emac_v1_5 port map(
 		EMACCLIENTRXCLIENTCLKOUT => open,
 		CLIENTEMACRXCLIENTCLKIN => rx_clk,
 		EMACCLIENTRXD => rxd,

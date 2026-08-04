@@ -14,6 +14,7 @@ use unisim.VComponents.all;
 
 use work.ipbus_axi_decl.all;
 
+library xil_defaultlib;
 
 entity pcie_xdma_axi_us_if is
   generic (
