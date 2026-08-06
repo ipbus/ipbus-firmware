@@ -53,14 +53,14 @@ entity syncreg_r is
 		s_d: in std_logic_vector(SIZE - 1 downto 0);
 		s_stb: out std_logic
 	);
-	
+
 end syncreg_r;
 
 architecture rtl of syncreg_r is
-		
-	signal we, rdy, cyc, ack, s1, s2, s3, s4, s5, m1, m2, m3, stab: std_logic;
-	signal da, db: std_logic_vector(SIZE - 1 downto 0);
-	
+
+	signal we, rdy, cyc, ack, s1, s2, s3, s4, s5, m1, m2, m3, stab: std_logic := '0';
+	signal da, db: std_logic_vector(SIZE - 1 downto 0) := (others => '0');
+
 	attribute SHREG_EXTRACT: string;
 	attribute SHREG_EXTRACT of s1, m1, s2, m2: signal is "no"; -- Synchroniser not to be optimised into shreg
 	attribute ASYNC_REG: string;
@@ -80,13 +80,13 @@ begin
 			rdy <= (rdy or m_rst or (m3 and not m2)) and not m_re;
 		end if;
 	end process;
-	
+
 	ack <= m2 and not m3;
 	m_ack <= ack;
 	m_rdy <= rdy;
 
 -- Move cyc into slave domain, generate handshake
-	
+
 	process(s_clk)
 	begin
 		if rising_edge(s_clk) then
@@ -97,12 +97,12 @@ begin
 			s5 <= s4 and stab;
 		end if;
 	end process;
-	
+
 -- Capture register, in slave domain
-	
+
 	we <= s3 and not s4;
 	s_stb <= s2 and not s3;
-	
+
 	process(s_clk)
 	begin
 		if rising_edge(s_clk) then
@@ -113,12 +113,12 @@ begin
 	end process;
 
 	m_q <= da;
-	
+
 -- Avoid race between data and handshake (optimised away if ULTRA_SAFE is false)
 
 	db <= da when rising_edge(s_clk);
 	stab <= '1' when (da = db or not ULTRA_SAFE) else '0';
 
 
-	
+
 end rtl;

@@ -81,8 +81,8 @@ architecture rtl of ipbus_syncreg_v is
 	signal cq: ipb_reg_v(2 ** ADDR_WIDTH - 1 downto 0);
 	signal sq, ds, cd: std_logic_vector(31 downto 0);
 	signal crdy, cack: std_logic_vector(N_CTRL - 1 downto 0);
-	signal sre, srdy, sack, sstb, cstab, sstab: std_logic;
-	signal rdy, ack, rdy_d, pend: std_logic;
+	signal sre, srdy, sack, sstb, cstab, sstab: std_logic := '0';
+	signal rdy, ack, rdy_d, pend: std_logic := '0';
 
 begin
 
