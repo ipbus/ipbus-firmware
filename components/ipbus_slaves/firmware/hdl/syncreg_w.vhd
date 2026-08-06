@@ -52,18 +52,18 @@ entity syncreg_w is
 		s_q: out std_logic_vector(SIZE - 1 downto 0);
 		s_stb: out std_logic
 	);
-	
+
 end syncreg_w;
 
 architecture rtl of syncreg_w is
-		
-	signal rdy, cyc, ack, s1, s2, s3, m1, m2, m3: std_logic;
-	
+
+	signal rdy, cyc, ack, s1, s2, s3, m1, m2, m3: std_logic := '0';
+
 	attribute SHREG_EXTRACT: string;
 	attribute SHREG_EXTRACT of s1, m1, s2, m2: signal is "no"; -- Synchroniser not to be optimised into shreg
 	attribute ASYNC_REG: string;
 	attribute ASYNC_REG of s1, m1, s2, m2: signal is "yes";
-	
+
 begin
 
 -- Generate cyc and recover handshake into master domain
@@ -78,13 +78,13 @@ begin
 			rdy <= (rdy or m_rst or (m3 and not m2)) and not m_we;
 		end if;
 	end process;
-	
+
 	ack <= m2 and not m3;
 	m_ack <= ack;
 	m_rdy <= rdy;
-	
+
 -- Move cyc into slave domain, generate handshake
-	
+
 	process(s_clk)
 	begin
 		if rising_edge(s_clk) then
