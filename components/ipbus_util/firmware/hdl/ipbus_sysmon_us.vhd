@@ -106,7 +106,6 @@ entity ipbus_sysmon_us is
     G_INIT_6E : std_logic_vector(15 downto 0);
     G_INIT_6F : std_logic_vector(15 downto 0);
     -- SYSMON primitive attributes.
-    G_COMMON_N_SOURCE       : std_logic_vector(15 downto 0);
     G_IS_CONVSTCLK_INVERTED : bit;
     G_IS_DCLK_INVERTED      : bit;
     -- SYSMON user voltage monitor attributes.
@@ -170,7 +169,7 @@ architecture rtl of ipbus_sysmon_us is
   signal ipbr : ipb_rbus_array(N_SLAVES - 1 downto 0);
 
   signal ctrl : ipb_reg_v(0 downto 0);
-  signal stat : ipb_reg_v(1 downto 0);
+  signal stat : ipb_reg_v(2 downto 0);
 
   signal sysmon_select : std_logic_vector(1 downto 0);
 
@@ -250,7 +249,7 @@ begin
 
   -- Make the number of available SLRs accessible in a status
   -- register.
-  stat(0)(1 downto 0) <= std_logic_vector(to_unsigned(G_NUM_SLRS, 2));
+  stat(0)(2 downto 0) <= std_logic_vector(to_unsigned(G_NUM_SLRS, 3));
 
   -- Make all the alarms available.
   stat(1)(0) <= alarm_any_ored;
@@ -259,6 +258,14 @@ begin
   stat(1)(3) <= alarm_vccint_ored;
   stat(1)(4) <= alarm_vccaux_ored;
   stat(1)(5) <= alarm_vccbram_ored;
+
+  -- Make all alarms available for the currently selected SYSMON.
+  stat(2)(0) <= alarm_any_l(to_integer(unsigned(sysmon_select)));
+  stat(2)(1) <= alarm_over_temp_l(to_integer(unsigned(sysmon_select)));
+  stat(2)(2) <= alarm_user_temp_l(to_integer(unsigned(sysmon_select)));
+  stat(2)(3) <= alarm_vccint_l(to_integer(unsigned(sysmon_select)));
+  stat(2)(4) <= alarm_vccaux_l(to_integer(unsigned(sysmon_select)));
+  stat(2)(5) <= alarm_vccbram_l(to_integer(unsigned(sysmon_select)));
 
   -- IPBus to DRP bridge for sysmons.
   drp : entity work.ipbus_drp_bridge
@@ -278,55 +285,54 @@ begin
 
     sysmon_inst : SYSMONE1
       generic map (
-        INIT_40 => G_INIT_40,
-        INIT_41 => G_INIT_41,
-        INIT_42 => G_INIT_42,
-        INIT_43 => G_INIT_43,
-        INIT_44 => G_INIT_44,
-        INIT_45 => G_INIT_45,
-        INIT_46 => G_INIT_46,
-        INIT_47 => G_INIT_47,
-        INIT_48 => G_INIT_48,
-        INIT_49 => G_INIT_49,
-        INIT_4A => G_INIT_4A,
-        INIT_4B => G_INIT_4B,
-        INIT_4C => G_INIT_4C,
-        INIT_4D => G_INIT_4D,
-        INIT_4E => G_INIT_4E,
-        INIT_4F => G_INIT_4F,
-        INIT_50 => G_INIT_50,
-        INIT_51 => G_INIT_51,
-        INIT_52 => G_INIT_52,
-        INIT_53 => G_INIT_53,
-        INIT_54 => G_INIT_54,
-        INIT_55 => G_INIT_55,
-        INIT_56 => G_INIT_56,
-        INIT_57 => G_INIT_57,
-        INIT_58 => G_INIT_58,
-        INIT_59 => G_INIT_59,
-        INIT_5A => G_INIT_5A,
-        INIT_5B => G_INIT_5B,
-        INIT_5C => G_INIT_5C,
-        INIT_5D => G_INIT_5D,
-        INIT_5E => G_INIT_5E,
-        INIT_5F => G_INIT_5F,
-        INIT_60 => G_INIT_60,
-        INIT_61 => G_INIT_61,
-        INIT_62 => G_INIT_62,
-        INIT_63 => G_INIT_63,
-        INIT_64 => G_INIT_64,
-        INIT_65 => G_INIT_65,
-        INIT_66 => G_INIT_66,
-        INIT_67 => G_INIT_67,
-        INIT_68 => G_INIT_68,
-        INIT_69 => G_INIT_69,
-        INIT_6A => G_INIT_6A,
-        INIT_6B => G_INIT_6B,
-        INIT_6C => G_INIT_6C,
-        INIT_6D => G_INIT_6D,
-        INIT_6E => G_INIT_6E,
-        INIT_6F => G_INIT_6F,
-        COMMON_N_SOURCE       => G_COMMON_N_SOURCE,
+        INIT_40 => to_bitvector(G_INIT_40),
+        INIT_41 => to_bitvector(G_INIT_41),
+        INIT_42 => to_bitvector(G_INIT_42),
+        INIT_43 => to_bitvector(G_INIT_43),
+        INIT_44 => to_bitvector(G_INIT_44),
+        INIT_45 => to_bitvector(G_INIT_45),
+        INIT_46 => to_bitvector(G_INIT_46),
+        INIT_47 => to_bitvector(G_INIT_47),
+        INIT_48 => to_bitvector(G_INIT_48),
+        INIT_49 => to_bitvector(G_INIT_49),
+        INIT_4A => to_bitvector(G_INIT_4A),
+        INIT_4B => to_bitvector(G_INIT_4B),
+        INIT_4C => to_bitvector(G_INIT_4C),
+        INIT_4D => to_bitvector(G_INIT_4D),
+        INIT_4E => to_bitvector(G_INIT_4E),
+        INIT_4F => to_bitvector(G_INIT_4F),
+        INIT_50 => to_bitvector(G_INIT_50),
+        INIT_51 => to_bitvector(G_INIT_51),
+        INIT_52 => to_bitvector(G_INIT_52),
+        INIT_53 => to_bitvector(G_INIT_53),
+        INIT_54 => to_bitvector(G_INIT_54),
+        INIT_55 => to_bitvector(G_INIT_55),
+        INIT_56 => to_bitvector(G_INIT_56),
+        INIT_57 => to_bitvector(G_INIT_57),
+        INIT_58 => to_bitvector(G_INIT_58),
+        INIT_59 => to_bitvector(G_INIT_59),
+        INIT_5A => to_bitvector(G_INIT_5A),
+        INIT_5B => to_bitvector(G_INIT_5B),
+        INIT_5C => to_bitvector(G_INIT_5C),
+        INIT_5D => to_bitvector(G_INIT_5D),
+        INIT_5E => to_bitvector(G_INIT_5E),
+        INIT_5F => to_bitvector(G_INIT_5F),
+        INIT_60 => to_bitvector(G_INIT_60),
+        INIT_61 => to_bitvector(G_INIT_61),
+        INIT_62 => to_bitvector(G_INIT_62),
+        INIT_63 => to_bitvector(G_INIT_63),
+        INIT_64 => to_bitvector(G_INIT_64),
+        INIT_65 => to_bitvector(G_INIT_65),
+        INIT_66 => to_bitvector(G_INIT_66),
+        INIT_67 => to_bitvector(G_INIT_67),
+        INIT_68 => to_bitvector(G_INIT_68),
+        INIT_69 => to_bitvector(G_INIT_69),
+        INIT_6A => to_bitvector(G_INIT_6A),
+        INIT_6B => to_bitvector(G_INIT_6B),
+        INIT_6C => to_bitvector(G_INIT_6C),
+        INIT_6D => to_bitvector(G_INIT_6D),
+        INIT_6E => to_bitvector(G_INIT_6E),
+        INIT_6F => to_bitvector(G_INIT_6F),
         IS_CONVSTCLK_INVERTED => G_IS_CONVSTCLK_INVERTED,
         IS_DCLK_INVERTED      => G_IS_DCLK_INVERTED,
         SYSMON_VUSER0_BANK    => G_SYSMON_VUSER0_BANK,

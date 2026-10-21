@@ -251,7 +251,7 @@ begin
 
   -- Make the number of available SLRs accessible in a status
   -- register.
-  stat(0)(1 downto 0) <= std_logic_vector(to_unsigned(G_NUM_SLRS, 2));
+  stat(0)(2 downto 0) <= std_logic_vector(to_unsigned(G_NUM_SLRS, 3));
 
   -- Make all the top-level alarms available.
   stat(1)(0) <= alarm_any_top;
